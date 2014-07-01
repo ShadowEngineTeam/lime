@@ -2,19 +2,16 @@
 #define LIME_GRAPHICS_PNG_H
 
 
-#include <graphics/ImageData.h>
-#include <utils/ByteArray.h>
-
-
 namespace lime {
 	
+	class ImageData;
 	
 	class PNG {
 		
 		
 		public:
 			
-			static void Decode (ByteArray bytes, value imageData);
+			static bool Decode (const char *path, ImageData *imageData);
 		
 		
 	};
