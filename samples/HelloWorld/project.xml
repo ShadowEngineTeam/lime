@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	
-	<meta title="HelloWorld" package="com.example.helloworld" version="1.0.0" company="Company Name" />
+	<meta title="HelloWorld" package="org.openfl.lime.samples.helloworld" version="1.0.0" company="OpenFL Technologies" />
 	<app main="Main" path="Export" file="HelloWorld" />
 	
 	<source path="Source" />
