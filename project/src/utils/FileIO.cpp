@@ -8,24 +8,48 @@
 namespace lime {
 	
 	
-	int fclose (FILE *stream) {
+	FILE* FILE_HANDLE::getFile () {
 		
-		return ::fclose (stream);
-		
-	}
-	
-	
-	FILE *fdopen (int fd, const char *mode) {
-		
-		return ::fdopen (fd, mode);
+		return (FILE*)handle;
 		
 	}
 	
 	
-	FILE* fopen (const char *filename, const char *mode) {
+	int fclose (FILE_HANDLE *stream) {
 		
+		if (stream) {
+			
+			int value = ::fclose ((FILE*)stream->handle);
+			if (stream) delete stream;
+			return value;
+			
+		}
+		
+		return 0;
+		
+	}
+	
+	
+	FILE_HANDLE *fdopen (int fd, const char *mode) {
+		
+		FILE* result = ::fdopen (fd, mode);
+		
+		if (result) {
+			
+			return new FILE_HANDLE (result);
+			
+		}
+		
+		return NULL;
+		
+	}
+	
+	
+	FILE_HANDLE *fopen (const char *filename, const char *mode) {
+		
+		FILE* result;
 		#ifdef HX_MACOS
-		FILE *result = ::fopen (filename, "rb");
+		result = ::fopen (filename, "rb");
 		if (!result) {
 			CFStringRef str = CFStringCreateWithCString (NULL, filename, kCFStringEncodingUTF8);
 			CFURLRef path = CFBundleCopyResourceURL (CFBundleGetMainBundle (), str, NULL, NULL);
@@ -42,38 +66,45 @@ namespace lime {
 				CFRelease (path);
 			}
 		}
-		return result;
 		#else
-		return ::fopen (filename, mode);
+		result = ::fopen (filename, mode);
 		#endif
 		
-	}
-	
-	
-	size_t fread (void *ptr, size_t size, size_t count, FILE *stream) {
+		if (result) {
+			
+			return new FILE_HANDLE (result);
+			
+		}
 		
-		return ::fread (ptr, size, count, stream);
-		
-	}
-	
-	
-	int fseek (FILE *stream, long int offset, int origin) {
-		
-		return ::fseek (stream, offset, origin);
+		return NULL;
 		
 	}
 	
 	
-	long int ftell (FILE *stream) {
+	size_t fread (void *ptr, size_t size, size_t count, FILE_HANDLE *stream) {
 		
-		return ::ftell (stream);
+		return ::fread (ptr, size, count, stream ? (FILE*)stream->handle : NULL);
 		
 	}
 	
 	
-	size_t fwrite (const void *ptr, size_t size, size_t count, FILE *stream) {
+	int fseek (FILE_HANDLE *stream, long int offset, int origin) {
 		
-		return ::fwrite (ptr, size, count, stream);
+		return ::fseek (stream ? (FILE*)stream->handle : NULL, offset, origin);
+		
+	}
+	
+	
+	long int ftell (FILE_HANDLE *stream) {
+		
+		return ::ftell (stream ? (FILE*)stream->handle : NULL);
+		
+	}
+	
+	
+	size_t fwrite (const void *ptr, size_t size, size_t count, FILE_HANDLE *stream) {
+		
+		return ::fwrite (ptr, size, count, (FILE*)stream->handle);
 		
 	}
 	
