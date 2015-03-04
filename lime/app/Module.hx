@@ -6,7 +6,7 @@ import lime.ui.KeyCode;
 import lime.ui.KeyModifier;
 
 
-class Module {
+class Module implements IModule {
 	
 	
 	public function new () {
