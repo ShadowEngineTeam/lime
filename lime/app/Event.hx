@@ -9,7 +9,7 @@ using haxe.macro.Tools;
 #end
 
 #if (!macro && !display)
-@:genericBuild(lime.app.Event.build())
+@:genericBuild(lime._macros.EventMacro.build())
 #end
 
 
