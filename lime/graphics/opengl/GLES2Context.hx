@@ -358,7 +358,8 @@ abstract GLES2Context(GLRenderContext) from GLRenderContext to GLRenderContext {
 	public var UNPACK_COLORSPACE_CONVERSION_WEBGL (get, never):Int;
 	public var BROWSER_DEFAULT_WEBGL (get, never):Int;
 	
-	public var version (get, never):Int;
+	public var type (get, never):GLContextType;
+	public var version (get, never):Float;
 	
 	private inline function get_DEPTH_BUFFER_BIT ():Int { return this.DEPTH_BUFFER_BIT; }
 	private inline function get_STENCIL_BUFFER_BIT ():Int { return this.STENCIL_BUFFER_BIT; }
@@ -659,7 +660,8 @@ abstract GLES2Context(GLRenderContext) from GLRenderContext to GLRenderContext {
 	private inline function get_CONTEXT_LOST_WEBGL ():Int { return this.CONTEXT_LOST_WEBGL; }
 	private inline function get_UNPACK_COLORSPACE_CONVERSION_WEBGL ():Int { return this.UNPACK_COLORSPACE_CONVERSION_WEBGL; }
 	private inline function get_BROWSER_DEFAULT_WEBGL ():Int { return this.BROWSER_DEFAULT_WEBGL; }
-	private inline function get_version ():Int { #if (js && html5) return 2; #else return this.version; #end } // TODO
+	private inline function get_type ():GLContextType { return this.type; }
+	private inline function get_version ():Float { return this.version; }
 	
 	
 	public inline function activeTexture (texture:Int):Void {
