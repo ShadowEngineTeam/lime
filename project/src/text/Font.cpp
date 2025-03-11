@@ -1064,6 +1064,7 @@ namespace lime {
 			unsigned long character;
 			int index;
 			int count = 0;
+			const char* characters_start = characters;
 
 			// TODO: Determine array size first
 
@@ -1076,6 +1077,7 @@ namespace lime {
 
 			hl_varray* indices = (hl_varray*)hl_alloc_array (&hlt_i32, count);
 			int* indicesData = hl_aptr (indices, int);
+			characters = characters_start;
 
 			while (*characters != 0) {
 
