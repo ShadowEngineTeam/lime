@@ -1052,6 +1052,10 @@ namespace lime {
 			while (*characters != 0) {
 
 				character = readNextChar (characters);
+
+				if (character == -1)
+					break;
+
 				index = FT_Get_Char_Index ((FT_Face)face, character);
 				val_array_push (indices, alloc_int (index));
 
@@ -1069,6 +1073,10 @@ namespace lime {
 			while (*characters != 0) {
 
 				character = readNextChar (characters);
+
+				if (character == -1)
+					break;
+
 				count++;
 
 			}
@@ -1080,6 +1088,10 @@ namespace lime {
 			while (*characters != 0) {
 
 				character = readNextChar (characters);
+
+				if (character == -1)
+					break;
+
 				*indicesData++ = FT_Get_Char_Index ((FT_Face)face, character);
 
 			}
