@@ -1066,8 +1066,6 @@ namespace lime {
 			int count = 0;
 			const char* characters_start = characters;
 
-			// TODO: Determine array size first
-
 			while (*characters != 0) {
 
 				character = readNextChar (characters);
