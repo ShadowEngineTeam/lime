@@ -373,7 +373,7 @@ class AndroidPlatform extends PlatformTarget
 		var x64 = (command == "rebuild" || ArrayTools.containsValue(project.architectures, Architecture.X64));
 		
 		var commands = [];
-		var minSDKVer = project.config.getInt("android.minimum-sdk-version", 28);
+		var minSDKVer = 28;
 		var platformDefine = '-DPLATFORM_NUMBER=$minSDKVer';
 		
 		if (armv5) commands.push(["-Dandroid", platformDefine]);
