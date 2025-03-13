@@ -1,6 +1,7 @@
 <xml>
 
-	<set name="HXCPP_NO_CPP11" value="1" />
+	<set name="HXCPP_NO_CPP11" value="1" unless="mac" />
+	<set name="HXCPP_CPP14" value="1" if="mac" />
 
 	<include name="${HXCPP}/build-tool/BuildCommon.xml" />
 
