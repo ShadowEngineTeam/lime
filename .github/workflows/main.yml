@@ -340,6 +340,7 @@ jobs:
             ndll/Android/
             !**/.gitignore
           if-no-files-found: error
+        if: matrix.ndk-version != 'stable'
 
       - name: Install samples
         run: |
