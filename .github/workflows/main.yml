@@ -273,6 +273,10 @@ jobs:
 
   android:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        ndk-version: [r21e, stable]
+      fail-fast: false
     steps:
 
       - uses: actions/checkout@v4
@@ -282,8 +286,9 @@ jobs:
       - name: Install Android NDK
         uses: nttld/setup-ndk@v1
         id: setup-ndk
+        if: matrix.ndk-version != 'stable'
         with:
-          ndk-version: r21e
+          ndk-version: ${{ matrix.ndk-version }}
 
       - uses: actions/setup-java@v4
         with:
@@ -317,10 +322,12 @@ jobs:
       - name: Configure Android support
         run: |
           lime config ANDROID_SDK $ANDROID_HOME -eval
-          lime config ANDROID_NDK_ROOT ${{ steps.setup-ndk.outputs.ndk-path }} -eval
+          lime config ANDROID_NDK_ROOT ${{ env.LIME_NDK_ROOT }} -eval
           lime config JAVA_HOME $JAVA_HOME -eval
           lime config ANDROID_SETUP true -eval
           lime config -eval
+        env:
+          LIME_NDK_ROOT: ${{ matrix.ndk-version == 'stable' && '$ANDROID_NDK_ROOT' || steps.setup-ndk.outputs.ndk-path }}
 
       - name: Rebuild Lime (Android)
         run: |
@@ -333,6 +340,7 @@ jobs:
             ndll/Android/
             !**/.gitignore
           if-no-files-found: error
+        if: matrix.ndk-version != 'stable'
 
       - name: Install samples
         run: |
