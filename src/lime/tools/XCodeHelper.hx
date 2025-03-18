@@ -99,7 +99,7 @@ class XCodeHelper
 
 		if (currentDevice == null)
 		{
-			if (project.targetFlags.exists("ipad"))
+			if (project.targetFlags.exists("ipad") || project.config.getString("ios.device", "universal") == "ipad")
 			{
 				for (device in DEFAULT_IPAD_SIMULATOR_NAMES)
 				{
