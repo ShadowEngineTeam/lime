@@ -168,7 +168,7 @@
 #define HAVE_STRINGS_H
 
 /* Define if we have cpuid.h */
-#define HAVE_CPUID_H
+/* #undef HAVE_CPUID_H */
 
 /* Define if we have intrin.h */
 /* #undef HAVE_INTRIN_H */
@@ -192,7 +192,7 @@
 #define HAVE_FENV_H
 
 /* Define if we have GCC's __get_cpuid() */
-#define HAVE_GCC_GET_CPUID
+/* #undef HAVE_GCC_GET_CPUID */
 
 /* Define if we have the __cpuid() intrinsic */
 /* #undef HAVE_CPUID_INTRINSIC */
