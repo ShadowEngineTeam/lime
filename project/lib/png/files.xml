@@ -38,7 +38,7 @@
 		<file name="${NATIVE_TOOLKIT_PATH}/png/pngwtran.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/png/pngwutil.c" />
 		
-		<section if="ios || tvos">
+		<section if="android HXCPP_ARMV7 || android HXCPP_ARM64 || ios || tvos">
 			
 			<file name="${NATIVE_TOOLKIT_PATH}/png/arm/arm_init.c" />
 			<file name="${NATIVE_TOOLKIT_PATH}/png/arm/filter_neon_intrinsics.c" />
