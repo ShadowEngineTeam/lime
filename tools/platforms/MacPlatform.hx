@@ -113,7 +113,7 @@ class MacPlatform extends PlatformTarget
 		targetArchitecture = Type.createEnum(Architecture, Type.enumConstructor(System.hostArchitecture));
 		for (architecture in project.architectures)
 		{
-			if (architecture.match(X86 | X64 | ARMV6 | ARMV7 | ARM64))
+			if (architecture.match(X86 | X64 /*| ARMV6 | ARMV7 | ARM64*/))
 			{
 				targetArchitecture = architecture;
 				break;
@@ -261,9 +261,13 @@ class MacPlatform extends PlatformTarget
 			}
 			else if (targetArchitecture == ARM64)
 			{
-				haxeArgs.push("-D");
+				/*haxeArgs.push("-D");
 				haxeArgs.push("HXCPP_ARM64");
-				flags.push("-DHXCPP_ARM64");
+				flags.push("-DHXCPP_ARM64");*/
+
+				haxeArgs.push("-D");
+				haxeArgs.push("HXCPP_M64");
+				flags.push("-DHXCPP_M64");
 			}
 
 			if (!project.targetFlags.exists("static"))
@@ -387,7 +391,8 @@ class MacPlatform extends PlatformTarget
 			case X86:
 				commands.push(["-Dmac", "-DHXCPP_CLANG", "-DHXCPP_M32"]);
 			case ARM64:
-				commands.push(["-Dmac", "-DHXCPP_CLANG", "-DHXCPP_ARM64"]);
+				commands.push(["-Dmac", "-DHXCPP_CLANG", "-DHXCPP_M64"]);
+				/*commands.push(["-Dmac", "-DHXCPP_CLANG", "-DHXCPP_ARM64"]);*/
 			default:
 		}
 
