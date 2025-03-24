@@ -1,8 +1,4 @@
-#if defined(HX_MACOS) && defined(HXCPP_ARM64)
-
-#include "config-macos-arm64.h"
-
-#elif defined(HX_MACOS)
+#if defined(HX_MACOS)
 
 #include "config-macos-x86_64.h"
 
@@ -22,8 +18,4 @@
 
 #include "config-android.h"
 
-#elif defined (IPHONE)
-
-#include "config-ios.h"
-
-#endif
+#end
