@@ -102,7 +102,7 @@
 
         </section>
 
-        <section if="mac">
+        <section if="mac || ios">
 
             <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/backends/coreaudio.c" />
 
