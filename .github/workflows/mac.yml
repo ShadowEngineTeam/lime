@@ -31,7 +31,7 @@ jobs:
         run: |
           # haxelib run lime rebuild mac -32 -release -nocolor -nocffi -D HXCPP_M32
           haxelib run lime rebuild mac -64 -release -nocolor -nocffi -D HXCPP_M64
-          haxelib run lime rebuild mac -arm64 -release -nocolor -nocffi -eval -D HXCPP_ARM64
+          haxelib run lime rebuild mac -arm64 -release -nocolor -nocffi -D HXCPP_ARM64
       # - name: Upload Artifact (x86)
         # uses: actions/upload-artifact@v4
         # with:
