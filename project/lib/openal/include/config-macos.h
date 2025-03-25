@@ -36,10 +36,12 @@
 /* #undef HAVE_GETOPT */
 
 /* Define if we have SSE CPU extensions */
+#ifndef HXCPP_ARM64
 #define HAVE_SSE
 #define HAVE_SSE2
 #define HAVE_SSE3
 /* #undef HAVE_SSE4_1 */
+#endif
 
 /* Define if we have ARM Neon CPU extensions */
 #ifdef HXCPP_ARM64
