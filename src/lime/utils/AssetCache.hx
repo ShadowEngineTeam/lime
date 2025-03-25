@@ -1,6 +1,8 @@
 package lime.utils;
 
+#if macro
 import haxe.macro.Compiler;
+#end
 import lime.media.AudioBuffer;
 import lime.graphics.Image;
 #if !(macro || commonjs)
@@ -27,7 +29,7 @@ class AssetCache
 
 		#if (macro || commonjs || lime_disable_assets_version)
 		version = 0;
-		#elseif lime_assets_version
+		#elseif (lime_assets_version && macro)
 		version = Std.parseInt(Compiler.getDefine("lime-assets-version"));
 		#else
 		version = AssetsMacro.cacheVersion();
