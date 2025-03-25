@@ -172,7 +172,9 @@
 #define HAVE_STRINGS_H
 
 /* Define if we have cpuid.h */
+#ifndef HXCPP_ARM64
 #define HAVE_CPUID_H
+#endif
 
 /* Define if we have intrin.h */
 /* #undef HAVE_INTRIN_H */
