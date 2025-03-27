@@ -18,4 +18,5 @@ android {
 
 dependencies {
 	implementation project(':deps:extension-api')
+	implementation project(':deps:androidtools')
 }

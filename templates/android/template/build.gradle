@@ -47,6 +47,7 @@ configure(subprojects.findAll {!it.file('build.gradle').exists() && it.file('bui
 		compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
 		buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
 		::if (ANDROID_GRADLE_PLUGIN>="4.0")::ndkPath '::ANDROID_NDK_ROOT_ESCAPED::'::end::
+		::if (ANDROID_GRADLE_PLUGIN>="4.0")::ndkVersion '::ANDROID_NDK_VERSION::'::end::
 
 		sourceSets {
 			main {
@@ -59,5 +60,6 @@ configure(subprojects.findAll {!it.file('build.gradle').exists() && it.file('bui
 
 	dependencies {
 		implementation project(':deps:extension-api')
+		implementation project(':deps:androidtools')
 	}
 }

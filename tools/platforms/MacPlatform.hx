@@ -328,6 +328,7 @@ class MacPlatform extends PlatformTarget
 		context.HL_FILE = targetDirectory + "/obj/ApplicationMain.hl";
 		context.CPP_DIR = targetDirectory + "/obj/";
 		context.BUILD_DIR = project.app.path + "/mac" + dirSuffix.toLowerCase();
+		context.CATEGORY_TYPE = project.config.getString("mac.category_type", "public.app-category.entertainment");
 
 		return context;
 	}

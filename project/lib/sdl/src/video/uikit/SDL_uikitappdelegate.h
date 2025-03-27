@@ -19,6 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+#import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 
 @interface SDLLaunchScreenController : UIViewController
@@ -35,6 +36,10 @@
 + (NSString *)getAppDelegateClassName;
 
 - (void)hideLaunchScreen;
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
+- (void)applicationWillEnterForeground:(UIApplication *)application;
+- (void)applicationDidEnterBackground:(UIApplication *)application;
 
 /* This property is marked as optional, and is only intended to be used when
  * the app's UI is storyboard-based. SDL is not storyboard-based, however
