@@ -1678,16 +1678,16 @@ namespace lime {
 	}
 
 
-	void lime_gamepad_rumble (int id, int duration, double largeStrength, double smallStrength) {
+	void lime_gamepad_rumble (int id, double lowFrequencyRumble, double highFrequencyRumble, int duration) {
 
-		Gamepad::Rumble (id, duration, largeStrength, smallStrength);
+		Gamepad::Rumble (id, lowFrequencyRumble, highFrequencyRumble, duration);
 
 	}
 
 
-	HL_PRIM void HL_NAME(hl_gamepad_rumble) (int id, int duration, double largeStrength, double smallStrength) {
+	HL_PRIM void HL_NAME(hl_gamepad_rumble) (int id, double lowFrequencyRumble, double highFrequencyRumble, int duration) {
 
-		Gamepad::Rumble (id, duration, largeStrength, smallStrength);
+		Gamepad::Rumble (id, lowFrequencyRumble, highFrequencyRumble, duration);
 
 	}
 
