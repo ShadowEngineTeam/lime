@@ -1,0 +1,51 @@
+name: Windows CI
+on:
+  workflow_dispatch:
+  workflow_call:
+
+env:
+  HAXE_VERSION: 4.3.6
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: ${{ env.HAXE_VERSION }}
+      - name: Set HAXEPATH
+        run: echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
+      - name: Install Haxe dependencies
+        run: |
+          haxelib git hxcpp https://github.com/mcagabe19-stuff/hxcpp --quiet
+          haxelib install format --quiet
+          haxelib git hxp https://github.com/MobilePorting/hxp --quiet
+      - name: Enable HXCPP compile cache
+        run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
+      - name: Configure Lime
+        run: haxelib dev lime ${{ github.workspace }}
+      - name: Rebuild Lime
+        run: |
+          haxelib run lime rebuild windows -32 -release -nocolor -nocffi -eval
+          haxelib run lime rebuild windows -64 -release -nocolor -nocffi -eval
+      - name: Upload Artifact (x86)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-NDLL
+          path: |
+            ndll/Windows/
+            !**/.gitignore
+            lime.png
+          if-no-files-found: error
+      - name: Upload Artifact (x86_64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows64-NDLL
+          path: |
+            ndll/Windows64/
+            !**/.gitignore
+            lime.png
+          if-no-files-found: error

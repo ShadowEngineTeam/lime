@@ -675,8 +675,8 @@ class System
 			__deviceModel = NativeCFFI.lime_system_get_device_model();
 			#end
 			#elseif android
-			var manufacturer:String = JNI.createStaticField("android/os/Build", "MANUFACTURER", "Ljava/lang/String;").get();
-			var model:String = JNI.createStaticField("android/os/Build", "MODEL", "Ljava/lang/String;").get();
+			var manufacturer:String = android.os.Build.MANUFACTURER;
+			var model:String = android.os.Build.MODEL;
 			if (manufacturer != null && model != null)
 			{
 				if (StringTools.startsWith(model.toLowerCase(), manufacturer.toLowerCase()))
@@ -710,7 +710,7 @@ class System
 			__deviceVendor = NativeCFFI.lime_system_get_device_vendor();
 			#end
 			#elseif android
-			var vendor:String = JNI.createStaticField("android/os/Build", "MANUFACTURER", "Ljava/lang/String;").get();
+			var vendor:String = android.os.Build.MANUFACTURER;
 			if (vendor != null)
 			{
 				__deviceVendor = vendor.charAt(0).toUpperCase() + vendor.substr(1);
@@ -858,9 +858,9 @@ class System
 			__platformVersion = NativeCFFI.lime_system_get_platform_version();
 			#end
 			#elseif android
-			var release = JNI.createStaticField("android/os/Build$VERSION", "RELEASE", "Ljava/lang/String;").get();
-			var api = JNI.createStaticField("android/os/Build$VERSION", "SDK_INT", "I").get();
-			if (release != null && api != null) __platformVersion = release + " (API " + api + ")";
+			var release = android.os.Build.VERSION.RELEASE;
+			var api = android.os.Build.VERSION.SDK_INT;
+			/*if (release != null && api != null)*/ __platformVersion = release + " (API " + api + ")";
 			#elseif (lime_cffi && !macro && (ios || tvos))
 			__platformVersion = NativeCFFI.lime_system_get_platform_version();
 			#elseif mac

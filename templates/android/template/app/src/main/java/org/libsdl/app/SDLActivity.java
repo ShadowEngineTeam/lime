@@ -20,6 +20,8 @@ import android.widget.RelativeLayout;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ScrollView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.os.*;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -621,6 +623,9 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
                             window.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
                             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                             SDLActivity.mFullscreenModeActive = false;
+                            if (Build.VERSION.SDK_INT >= 28) {
+                                window.getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+                            }
                         }
                     }
                 } else {
@@ -843,11 +848,11 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         boolean is_portrait_allowed = (orientation_portrait == -1 ? false : true);
         int req = -1; /* Requested orientation */
 
-        /* No valid hint, nothing is explicitly allowed */
+        /* No valid hint, nothing is explicitly allowed, respecting user orientation lock setting */
         if (!is_portrait_allowed && !is_landscape_allowed) {
             if (resizable) {
                 /* All orientations are allowed */
-                req = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
+                req = ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
             } else {
                 /* Fixed window and nothing specified. Get orientation from w/h of created window */
                 req = (w > h ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
@@ -856,8 +861,8 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             /* At least one orientation is allowed */
             if (resizable) {
                 if (is_portrait_allowed && is_landscape_allowed) {
-                    /* hint allows both landscape and portrait, promote to full sensor */
-                    req = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
+                    /* hint allows both landscape and portrait, promote to full user */
+                    req = ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
                 } else {
                     /* Use the only one allowed "orientation" */
                     req = (is_landscape_allowed ? orientation_landscape : orientation_portrait);
@@ -1270,9 +1275,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
     /** Result of current messagebox. Also used for blocking the calling thread. */
     protected final int[] messageboxSelection = new int[1];
 
-    /** Id of current dialog. */
-    protected int dialogs = 0;
-
     /**
      * This method is called by SDL using JNI.
      * Shows the messagebox from UI thread and block calling thread.
@@ -1316,7 +1318,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                showDialog(dialogs++, args);
+                messageboxCreateAndShow(args);
             }
         });
 
@@ -1336,138 +1338,61 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         return messageboxSelection[0];
     }
 
-    @Override
-    protected Dialog onCreateDialog(int ignore, Bundle args) {
+    protected void messageboxCreateAndShow(Bundle args) {
 
         // TODO set values from "flags" to messagebox dialog
 
-        // get colors
-
-        int[] colors = args.getIntArray("colors");
-        int backgroundColor;
-        int textColor;
-        int buttonBorderColor;
-        int buttonBackgroundColor;
-        int buttonSelectedColor;
-        if (colors != null) {
-            int i = -1;
-            backgroundColor = colors[++i];
-            textColor = colors[++i];
-            buttonBorderColor = colors[++i];
-            buttonBackgroundColor = colors[++i];
-            buttonSelectedColor = colors[++i];
-        } else {
-            backgroundColor = Color.TRANSPARENT;
-            textColor = Color.TRANSPARENT;
-            buttonBorderColor = Color.TRANSPARENT;
-            buttonBackgroundColor = Color.TRANSPARENT;
-            buttonSelectedColor = Color.TRANSPARENT;
-        }
-
         // create dialog with title and a listener to wake up calling thread
 
-        final Dialog dialog = new Dialog(this);
-        dialog.setTitle(args.getString("title"));
-        dialog.setCancelable(false);
-        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface unused) {
-                synchronized (messageboxSelection) {
-                    messageboxSelection.notify();
-                }
-            }
-        });
-
-        // create text
-
-        TextView message = new TextView(this);
-        message.setGravity(Gravity.CENTER);
-        message.setText(args.getString("message"));
-        if (textColor != Color.TRANSPARENT) {
-            message.setTextColor(textColor);
-        }
-
+        final MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(SDL.getContext());
+        builder.setTitle(args.getString("title"));
+        builder.setMessage(args.getString("message"));
+        builder.setCancelable(false);
+    
         // create buttons
 
-        int[] buttonFlags = args.getIntArray("buttonFlags");
-        int[] buttonIds = args.getIntArray("buttonIds");
         String[] buttonTexts = args.getStringArray("buttonTexts");
-
-        final SparseArray<Button> mapping = new SparseArray<Button>();
-
-        LinearLayout buttons = new LinearLayout(this);
-        buttons.setOrientation(LinearLayout.HORIZONTAL);
-        buttons.setGravity(Gravity.CENTER);
-        for (int i = 0; i < buttonTexts.length; ++i) {
-            Button button = new Button(this);
-            final int id = buttonIds[i];
-            button.setOnClickListener(new View.OnClickListener() {
+        int[] buttonIds = args.getIntArray("buttonIds");
+    
+        // hardcoded but idk how to do better
+        if (buttonTexts.length >= 2)
+        {
+            builder.setPositiveButton(buttonTexts[0], new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    messageboxSelection[0] = id;
-                    dialog.dismiss();
+                public void onClick(DialogInterface di, int i)
+                {
+                    messageboxSelection[0] = buttonIds[0];
+                    di.dismiss();
                 }
             });
-            if (buttonFlags[i] != 0) {
-                // see SDL_messagebox.h
-                if ((buttonFlags[i] & 0x00000001) != 0) {
-                    mapping.put(KeyEvent.KEYCODE_ENTER, button);
+            builder.setNegativeButton(buttonTexts[1], new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface di, int i)
+                {
+                    messageboxSelection[1] = buttonIds[1];
+                    di.dismiss();
                 }
-                if ((buttonFlags[i] & 0x00000002) != 0) {
-                    mapping.put(KeyEvent.KEYCODE_ESCAPE, button); /* API 11 */
+            });
+        }
+        else
+        {
+            builder.setPositiveButton(buttonTexts[0], new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface di, int i)
+                {
+                    messageboxSelection[0] = buttonIds[0];
+                    di.dismiss();
                 }
-            }
-            button.setText(buttonTexts[i]);
-            if (textColor != Color.TRANSPARENT) {
-                button.setTextColor(textColor);
-            }
-            if (buttonBorderColor != Color.TRANSPARENT) {
-                // TODO set color for border of messagebox button
-            }
-            if (buttonBackgroundColor != Color.TRANSPARENT) {
-                Drawable drawable = button.getBackground();
-                if (drawable == null) {
-                    // setting the color this way removes the style
-                    button.setBackgroundColor(buttonBackgroundColor);
-                } else {
-                    // setting the color this way keeps the style (gradient, padding, etc.)
-                    drawable.setColorFilter(buttonBackgroundColor, PorterDuff.Mode.MULTIPLY);
-                }
-            }
-            if (buttonSelectedColor != Color.TRANSPARENT) {
-                // TODO set color for selected messagebox button
-            }
-            buttons.addView(button);
+            });
         }
 
-        // create content
-
-        LinearLayout content = new LinearLayout(this);
-        content.setOrientation(LinearLayout.VERTICAL);
-        content.addView(message);
-        content.addView(buttons);
-        if (backgroundColor != Color.TRANSPARENT) {
-            content.setBackgroundColor(backgroundColor);
-        }
-
-        // add content to dialog and return
-
-        dialog.setContentView(content);
-        dialog.setOnKeyListener(new Dialog.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface d, int keyCode, KeyEvent event) {
-                Button button = mapping.get(keyCode);
-                if (button != null) {
-                    if (event.getAction() == KeyEvent.ACTION_UP) {
-                        button.performClick();
-                    }
-                    return true; // also for ignored actions
-                }
-                return false;
+        builder.setOnDismissListener(unused -> {
+            synchronized (messageboxSelection) {
+                messageboxSelection.notify();
             }
         });
-
-        return dialog;
+    
+        builder.show();
     }
 
     private final Runnable rehideSystemUi = new Runnable() {
@@ -2334,4 +2259,3 @@ class SDLClipboardHandler_API11 implements
     }
 
 }
-

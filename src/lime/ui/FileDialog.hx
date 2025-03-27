@@ -8,6 +8,7 @@ import lime.graphics.Image;
 import lime.system.BackgroundWorker;
 import lime.utils.ArrayBuffer;
 import lime.utils.Resource;
+import lime.system.JNI;
 #if hl
 import hl.Bytes as HLBytes;
 import hl.NativeArray;
@@ -47,7 +48,7 @@ import js.html.Blob;
 #end
 @:access(lime._internal.backend.native.NativeCFFI)
 @:access(lime.graphics.Image)
-class FileDialog
+class FileDialog #if android implements JNISafety #end
 {
 	/**
 		Triggers when the user clicks "Cancel" during any operation, or when a function is unsupported
@@ -78,7 +79,20 @@ class FileDialog
 	**/
 	public var onSelectMultiple = new Event<Array<String>->Void>();
 
-	public function new() {}
+	#if android
+	private static final OPEN_REQUEST_CODE:Int = JNI.createStaticField('org/haxe/lime/FileDialog', 'OPEN_REQUEST_CODE', 'I').get();
+	private static final SAVE_REQUEST_CODE:Int = JNI.createStaticField('org/haxe/lime/FileDialog', 'SAVE_REQUEST_CODE', 'I').get();
+	private static final DOCUMENT_TREE_REQUEST_CODE:Int = JNI.createStaticField('org/haxe/lime/FileDialog', 'DOCUMENT_TREE_REQUEST_CODE', 'I').get();
+	private static final RESULT_OK:Int = -1;
+	private var JNI_FILE_DIALOG:Dynamic = null;
+	#end
+
+	public function new()
+	{
+		#if android
+		JNI_FILE_DIALOG = JNI.createStaticMethod('org/haxe/lime/FileDialog', 'createInstance', '(Lorg/haxe/lime/HaxeObject;)Lorg/haxe/lime/FileDialog;')(this);
+		#end
+	}
 
 	/**
 		Opens a file selection dialog. If successful, either `onSelect` or `onSelectMultiple` will trigger
@@ -229,6 +243,24 @@ class FileDialog
 		worker.run();
 
 		return true;
+		#elseif android
+		switch (type)
+		{
+			case OPEN:
+				open(filter, defaultPath, title);
+
+			case OPEN_MULTIPLE:
+				onCancel.dispatch();
+				return false;
+
+			case OPEN_DIRECTORY:
+				// onCancel.dispatch();
+				JNI.callMember(JNI.createMemberMethod('org/haxe/lime/FileDialog', 'openDocumentTree', '(Ljava/lang/String;)V'), JNI_FILE_DIALOG, [null]);
+
+			case SAVE:
+				save(null, filter, defaultPath, title, 'application/octet-stream');
+		}
+		return true;
 		#else
 		onCancel.dispatch();
 		return false;
@@ -289,6 +321,9 @@ class FileDialog
 		worker.run();
 
 		return true;
+		#elseif android
+		JNI.callMember(JNI.createMemberMethod('org/haxe/lime/FileDialog', 'open', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V'), JNI_FILE_DIALOG, [filter, defaultPath, title]);
+		return true;
 		#else
 		onCancel.dispatch();
 		return false;
@@ -307,16 +342,18 @@ class FileDialog
 		HTML5, this defaults to the browser's download directory, with a default filename based on the MIME type.
 		@param title 		The title to give the dialog window.
 		@param type 		The default MIME type of the file, in case the type can't be determined from the
-		file data. Used only if targeting HTML5.
+		file data. Used only if targeting Android or HTML5.
 		@return Whether `save()` is supported on this target.
 	**/
 	public function save(data:Resource, filter:String = null, defaultPath:String = null, title:String = null, type:String = "application/octet-stream"):Bool
 	{
+		#if !android
 		if (data == null)
 		{
 			onCancel.dispatch();
 			return false;
 		}
+		#end
 
 		#if (desktop && sys)
 		var worker = new BackgroundWorker();
@@ -396,9 +433,67 @@ class FileDialog
 		#end
 		onSave.dispatch(path);
 		return true;
+		#elseif android
+		if (Image.__isPNG(data))
+		{
+			type = "image/png";
+		}
+		else if (Image.__isJPG(data))
+		{
+			type = "image/jpeg";
+		}
+		else if (Image.__isGIF(data))
+		{
+			type = "image/gif";
+		}
+		else if (Image.__isWebP(data))
+		{
+			type = "image/webp";
+		}
+		var bytes:Bytes = data;
+		var path:String = defaultPath == null ? null : Path.directory(defaultPath);
+		var defaultName:String = defaultPath == null ? null : Path.withoutDirectory(defaultPath);
+		JNI.callMember(JNI.createMemberMethod('org/haxe/lime/FileDialog', 'save', '([BLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V'),
+			JNI_FILE_DIALOG, [bytes == null ? null : bytes.getData(), type, path, defaultName]);
+		return true;
 		#else
 		onCancel.dispatch();
 		return false;
 		#end
 	}
+
+	#if android
+	@:runOnMainThread
+	private function jni_activity_results(requestCode:Int, resultCode:Int, uri:String, path:String, data:Dynamic)
+	{
+		if (resultCode == RESULT_OK)
+		{
+			switch (requestCode)
+			{
+				case OPEN_REQUEST_CODE:
+					try
+					{
+						onOpen.dispatch(Bytes.ofData(data));
+					}
+					catch (e:Dynamic) {}
+				case SAVE_REQUEST_CODE:
+					try
+					{
+						onSave.dispatch(path);
+					}
+					catch (e:Dynamic) {}
+				case DOCUMENT_TREE_REQUEST_CODE:
+					try
+					{
+						onSelect.dispatch(uri);
+					}
+					catch (e:Dynamic) {}
+			}
+		}
+		else
+		{
+			onCancel.dispatch();
+		}
+	}
+	#end
 }
