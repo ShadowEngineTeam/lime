@@ -1,6 +1,6 @@
 #if defined(HX_MACOS)
 
-#include "config-macos-x86_64.h"
+#include "config-macos.h"
 
 #elif defined(HX_WINDOWS)
 

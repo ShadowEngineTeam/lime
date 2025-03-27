@@ -14,13 +14,12 @@
 
       <depend files="native-toolkit-png-depends" />
 
-		<depend name="${NATIVE_TOOLKIT_PATH}/png/pngstruct.h"/>
-		<depend name="${NATIVE_TOOLKIT_PATH}/png/pnginfo.h"/>
-		<depend name="${NATIVE_TOOLKIT_PATH}/png/pnglibconf.h"/>
-		<depend name="${NATIVE_TOOLKIT_PATH}/png/pngpriv.h"/>
-		<depend name="${NATIVE_TOOLKIT_PATH}/png/pngconf.h"/>
-		<depend name="${NATIVE_TOOLKIT_PATH}/png/pngdebug.h"/>
-
+		<depend name="${NATIVE_TOOLKIT_PATH}/png/pngconf.h" />
+		<depend name="${NATIVE_TOOLKIT_PATH}/png/pngdebug.h" />
+		<depend name="${NATIVE_TOOLKIT_PATH}/png/pnginfo.h" />
+		<depend name="${NATIVE_TOOLKIT_PATH}/png/pnglibconf.h" />
+		<depend name="${NATIVE_TOOLKIT_PATH}/png/pngpriv.h" />
+		<depend name="${NATIVE_TOOLKIT_PATH}/png/pngstruct.h" />
 
 		<file name="${NATIVE_TOOLKIT_PATH}/png/png.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/png/pngerror.c" />
@@ -38,11 +37,12 @@
 		<file name="${NATIVE_TOOLKIT_PATH}/png/pngwtran.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/png/pngwutil.c" />
 		
-		<section if="android HXCPP_ARMV7 || android HXCPP_ARM64 || ios || tvos">
-			
+		<section if="HXCPP_ARMV7 || HXCPP_ARMV7S || HXCPP_ARM64">
+
 			<file name="${NATIVE_TOOLKIT_PATH}/png/arm/arm_init.c" />
 			<file name="${NATIVE_TOOLKIT_PATH}/png/arm/filter_neon_intrinsics.c" />
-			
+			<file name="${NATIVE_TOOLKIT_PATH}/png/arm/palette_neon_intrinsics.c" />
+
 		</section>
 		
 	</files>

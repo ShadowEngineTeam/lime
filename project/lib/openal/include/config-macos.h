@@ -42,7 +42,11 @@
 /* #undef HAVE_SSE4_1 */
 
 /* Define if we have ARM Neon CPU extensions */
-/* #undef HAVE_NEON */
+#ifdef HXCPP_ARM64
+#define HAVE_NEON
+#else
+/* #undef HAVE_NEON*/
+#endif
 
 /* Define if we have the ALSA backend */
 /* #undef HAVE_ALSA */
@@ -192,7 +196,9 @@
 #define HAVE_FENV_H
 
 /* Define if we have GCC's __get_cpuid() */
+#ifndef HXCPP_ARM64
 #define HAVE_GCC_GET_CPUID
+#endif
 
 /* Define if we have the __cpuid() intrinsic */
 /* #undef HAVE_CPUID_INTRINSIC */
