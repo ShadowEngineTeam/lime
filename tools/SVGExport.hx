@@ -69,6 +69,7 @@ class SVGExport
 			case MAC:
 				untyped $loader.path = $array(path + "Mac/", $loader.path);
 				untyped $loader.path = $array(path + "Mac64/", $loader.path);
+				untyped $loader.path = $array(path + "MacArm64/", $loader.path);
 
 			case LINUX:
 				var arguments = Sys.args();
