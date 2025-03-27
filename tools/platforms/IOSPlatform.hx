@@ -320,10 +320,25 @@ class IOSPlatform extends PlatformTarget
 		context.IOS_COMPILER = project.config.getString("ios.compiler", "clang");
 		context.CPP_BUILD_LIBRARY = project.config.getString("cpp.buildLibrary", "hxcpp");
 
-		context.CPP_CACHE_WORKAROUND = "unset HXCPP_COMPILE_CACHE;";
+		var json = Json.parse(File.getContent(Haxelib.getPath(new Haxelib("hxcpp"), true) + "/haxelib.json"));
+
+		var version = Std.string(json.version);
+		var versionSplit = version.split(".");
+
+		while (versionSplit.length > 2)
+			versionSplit.pop();
+
+		if (Std.parseFloat(versionSplit.join(".")) > 3.1)
+		{
+			context.CPP_LIBPREFIX = "lib";
+		}
+		else
+		{
+			context.CPP_LIBPREFIX = "";
+		}
 
 		context.IOS_LINKER_FLAGS = ["-stdlib=libc++"].concat(project.config.getArrayString("ios.linker-flags"));
-		context.IOS_NON_EXEMPT_ENCRYPTION = project.config.getBool("ios.non-exempt-encryption", false);
+		context.IOS_NON_EXEMPT_ENCRYPTION = project.config.getBool("ios.non-exempt-encryption", true);
 
 		switch (project.window.orientation)
 		{
@@ -797,7 +812,6 @@ class IOSPlatform extends PlatformTarget
 
 			for (ndll in project.ndlls)
 			{
-				Sys.println(ndll);
 				// if (ndll.haxelib != null) {
 
 				var releaseLib = NDLL.getLibraryPath(ndll, "iPhone", "lib", libExt);
