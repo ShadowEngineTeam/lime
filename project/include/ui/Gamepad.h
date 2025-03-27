@@ -13,7 +13,7 @@ namespace lime {
 			static const char* GetDeviceGUID (int id);
 			static const char* GetDeviceName (int id);
 			
-			static void Rumble(int id, int duration, double largeStrength, double smallStrength);
+			static void Rumble(int id, double lowFrequencyRumble, double highFrequencyRumble, int duration);
 
 	};
 
