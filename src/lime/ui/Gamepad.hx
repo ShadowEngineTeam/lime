@@ -42,6 +42,13 @@ class Gamepad
 		#end
 	}
 
+	/**
+	    @param	lowFrequencyRumble	The intensity of the low frequency (left)
+		rumble motor, from 0 to 1.
+	    @param	highFrequencyRumble	The intensity of the high frequency (right)
+		rumble motor, from 0 to 1.
+		@param	duration	The duration of the rumble effect, in milliseconds.
+	**/
 	public inline function rumble(lowFrequencyRumble:Float, highFrequencyRumble:Float, duration:Int):Void
 	{
 		#if (lime_cffi && !macro)
