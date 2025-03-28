@@ -452,7 +452,7 @@ class NativeCFFI
 		false));
 	private static var lime_gamepad_get_device_name = new cpp.Callable<Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_gamepad_get_device_name", "io",
 		false));
-	private static var lime_gamepad_rumble = new cpp.Callable<Int->Int->Float->Float->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_gamepad_rumble", "iiddv",
+	private static var lime_gamepad_rumble = new cpp.Callable<Int->Float->Float->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_gamepad_rumble", "iddiv",
 		false));
 	private static var lime_gamepad_event_manager_register = new cpp.Callable<cpp.Object->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime",
 		"lime_gamepad_event_manager_register", "oov", false));
