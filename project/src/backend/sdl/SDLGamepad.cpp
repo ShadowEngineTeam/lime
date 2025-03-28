@@ -14,7 +14,6 @@ namespace lime {
 			return false;
 
 		SDL_GameController *gameController = SDL_GameControllerOpen (deviceID);
-
 		if (gameController == nullptr)
 			return false;
 
@@ -35,8 +34,7 @@ namespace lime {
 		if (it == gameControllers.end ())
 			return false;
 
-		SDL_GameController *gameController = it->second;
-		SDL_GameControllerClose (gameController);
+		SDL_GameControllerClose (it->second);
 		gameControllers.erase (id);
 
 		return true;
@@ -51,7 +49,6 @@ namespace lime {
 	}
 
 
-	// Gamepad API
 	void Gamepad::AddMapping (const char* content) {
 
 		SDL_GameControllerAddMapping (content);
@@ -66,7 +63,6 @@ namespace lime {
 			return nullptr;
 
 		SDL_Joystick* joystick = SDL_GameControllerGetJoystick (it->second);
-
 		if (joystick == nullptr)
 			return nullptr;
 
@@ -86,6 +82,7 @@ namespace lime {
 		return SDL_GameControllerName (it->second);
 
 	}
+
 
 	void Gamepad::Rumble (int id, double lowFrequencyRumble, double highFrequencyRumble, int duration) {
 
@@ -111,4 +108,6 @@ namespace lime {
 		SDL_GameControllerRumble (it->second, lowFrequencyRumble * 0xFFFF, highFrequencyRumble * 0xFFFF, duration);
 
 	}
+
+
 }
