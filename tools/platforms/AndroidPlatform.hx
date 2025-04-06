@@ -490,6 +490,7 @@ class AndroidPlatform extends PlatformTarget
 			"android:theme": "@style/LimeAppMainTheme" + (project.window.fullscreen ? "Fullscreen" : ""),
 			"android:hardwareAccelerated": "true",
 			"android:allowNativeHeapPointerTagging": context.ANDROID_TARGET_SDK_VERSION >= 30 ? "false" : null,
+			"android:requestLegacyExternalStorage": context.ANDROID_TARGET_SDK_VERSION >= 29 ? "true" : null,
 			"android:largeHeap": "true"
 		});
 		context.ANDROID_ACTIVITY = project.config.getKeyValueArray("android.activity", {
