@@ -30,6 +30,7 @@ jobs:
       - name: Install Haxe dependencies
         run: |
           curl --output ../hxcpp-4.3.45.zip --location https://github.com/HaxeFoundation/hxcpp/releases/download/v4.3.45/hxcpp-4.3.45.zip
+          haxelib --global update haxelib --quiet
           haxelib install ../hxcpp-4.3.45.zip --quiet
           haxelib install format --quiet
           haxelib install hxp --quiet
