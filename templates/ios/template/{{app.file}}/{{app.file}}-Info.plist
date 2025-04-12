@@ -4,9 +4,9 @@
 <dict>
 	::if (SHARE_FILES)::
 	<key>UIFileSharingEnabled</key>
-	<string>true</string>
+	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<string>true</string>
+	<true/>
 	::end::
 	<key>com.apple.developer.kernel.increased-memory-limit</key>
 	<true/>
