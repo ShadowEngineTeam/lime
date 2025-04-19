@@ -8,8 +8,6 @@
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
 	::end::
-	<key>com.apple.developer.kernel.increased-memory-limit</key>
-	<true/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>LSApplicationCategoryType</key>
