@@ -22,7 +22,7 @@ jobs:
         run: |
           haxelib git hxcpp https://github.com/mcagabe19-stuff/hxcpp --quiet
           haxelib install format --quiet
-          haxelib git hxp https://github.com/MobilePorting/hxp --quiet
+          haxelib install hxp
           haxelib install openfl --quiet
           haxelib install svg --quiet
       - name: Enable HXCPP compile cache
