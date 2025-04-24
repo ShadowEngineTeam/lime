@@ -1,6 +1,5 @@
 package org.haxe.lime;
 
-
 import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
