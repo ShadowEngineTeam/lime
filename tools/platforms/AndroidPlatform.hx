@@ -168,8 +168,8 @@ class AndroidPlatform extends PlatformTarget
 		for (architecture in architectures)
 		{
 			var minSDKVer = project.config.getInt("android.minimum-sdk-version", 21);
-			var haxeParams = [hxml, "-D", "android", "-D", 'PLATFORM_NUMBER=$minSDKVer'];
-			var cppParams = ["-Dandroid", '-DPLATFORM_NUMBER=$minSDKVer'];
+			var haxeParams = [hxml, "-D", "android", "-D", 'HXCPP_ANDROID_PLATFORM=$minSDKVer'];
+			var cppParams = ["-Dandroid", '-DHXCPP_ANDROID_PLATFORM=$minSDKVer'];
 			var path = sourceSet + "/jniLibs";
 			var suffix = ".so";
 
@@ -370,7 +370,7 @@ class AndroidPlatform extends PlatformTarget
 		var commands = [];
 
 		var minSDKVer = 21;
-		var platformDefine = '-DPLATFORM_NUMBER=$minSDKVer';
+		var platformDefine = '-DHXCPP_ANDROID_PLATFORM=$minSDKVer';
 
 		if (project.targetFlags.exists("ONLY_ARM64"))
 		{
@@ -462,7 +462,7 @@ class AndroidPlatform extends PlatformTarget
 		context.OUTPUT_DIR = targetDirectory;
 		context.ANDROID_INSTALL_LOCATION = project.config.getString("android.install-location", "auto");
 		context.ANDROID_MINIMUM_SDK_VERSION = project.config.getInt("android.minimum-sdk-version", 21);
-		context.ANDROID_TARGET_SDK_VERSION = project.config.getInt("android.target-sdk-version", 35);
+		context.ANDROID_TARGET_SDK_VERSION = project.config.getInt("android.target-sdk-version", 36);
 		context.ANDROID_EXTENSIONS = project.config.getArrayString("android.extension");
 		context.ANDROID_PERMISSIONS = project.config.getArrayString("android.permission", [
 			"android.permission.WAKE_LOCK",
@@ -478,8 +478,8 @@ class AndroidPlatform extends PlatformTarget
 			"android.permission.READ_EXTERNAL_STORAGE",
 			"android.permission.WRITE_EXTERNAL_STORAGE"
 		]);
-		context.ANDROID_GRADLE_VERSION = project.config.getString("android.gradle-version", "8.10.2");
-		context.ANDROID_GRADLE_PLUGIN = project.config.getString("android.gradle-plugin", "8.8.0");
+		context.ANDROID_GRADLE_VERSION = project.config.getString("android.gradle-version", "8.11.1");
+		context.ANDROID_GRADLE_PLUGIN = project.config.getString("android.gradle-plugin", "8.9.2");
 		context.ANDROID_USE_ANDROIDX = project.config.getString("android.useAndroidX", "true");
 		context.ANDROID_ENABLE_JETIFIER = project.config.getString("android.enableJetifier", "false");
 		context.ANDROID_DISPLAY_CUTOUT = project.config.getString("android.layoutInDisplayCutoutMode", "shortEdges");
