@@ -33,11 +33,11 @@
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/filters/nfc.c"/>
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/filters/splitter.c"/>
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_c.c" />
-        <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse.c" unless="rpi || android || HXCPP_ARM64" />
-        <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse2.c" unless="rpi || android || HXCPP_ARM64" />
-        <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse3.c" unless="rpi || android || HXCPP_ARM64" />
-        <!-- <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse41.c" unless="rpi || android" /> -->
-        <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_neon.c" if="rpi || HXCPP_ARM64" />
+        <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse.c" unless="HXCPP_ARMV7 || HXCPP_ARM64 || android || HXCPP_ARM64" />
+        <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse2.c" unless="HXCPP_ARMV7 || HXCPP_ARM64 || android || HXCPP_ARM64" />
+        <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse3.c" unless="HXCPP_ARMV7 || HXCPP_ARM64 || android || HXCPP_ARM64" />
+        <!-- <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse41.c" unless="HXCPP_ARMV7 || HXCPP_ARM64 || android" /> -->
+        <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_neon.c" if="HXCPP_ARMV7 || HXCPP_ARM64 || HXCPP_ARM64" />
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/ALc.c"/>
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/alconfig.c"/>
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/ALu.c"/>
@@ -88,12 +88,12 @@
 
             <compilerflag value="-D_POSIX_C_SOURCE=200112L" />
             <compilerflag value="-D_XOPEN_SOURCE=500" />
-            <compilerflag value="-mmmx" unless="rpi" />
-            <compilerflag value="-msse" unless="rpi" />
-            <compilerflag value="-msse2" unless="rpi" />
-            <compilerflag value="-msse3" unless="rpi" />
-            <compilerflag value="-mssse3" unless="rpi" />
-            <compilerflag value="-mfpu=neon" if="rpi" />
+            <compilerflag value="-mmmx" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+            <compilerflag value="-msse" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+            <compilerflag value="-msse2" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+            <compilerflag value="-msse3" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+            <compilerflag value="-mssse3" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+            <compilerflag value="-mfpu=neon" if="HXCPP_ARMV7" />
             <compilerflag value="-fcommon" />
 
             <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/backends/pulseaudio.c" />
