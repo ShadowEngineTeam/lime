@@ -12,7 +12,7 @@
 
 #elif defined(HX_LINUX)
 
-#include "config-linux-x86_64.h"
+#include "config-linux.h"
 
 #elif defined (HX_ANDROID)
 
