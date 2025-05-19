@@ -266,14 +266,14 @@
 /* #undef USE_OPENMP */
 
 /* use SSE2 compiler intrinsics */
-#if defined(HX_WINDOWS) || (defined(HX_MACOS) && !defined(HXCPP_ARM64)) || (defined(HX_LINUX) && !defined(HXCPP_ARM64))
+#if (defined(HX_WINDOWS) && !defined(HXCPP_ARM64)) || (defined(HX_MACOS) && !defined(HXCPP_ARM64)) || (defined(HX_LINUX) && !defined(HXCPP_ARM64))
 #define USE_SSE2 1
 #else
 /* #undef USE_SSE2 */
 #endif
 
 /* use SSSE3 compiler intrinsics */
-#if defined(HX_WINDOWS) || (defined(HX_MACOS) && !defined(HXCPP_ARM64)) || (defined(HX_LINUX) && !defined(HXCPP_ARM64))
+#if (defined(HX_WINDOWS) && !defined(HXCPP_ARM64)) || (defined(HX_MACOS) && !defined(HXCPP_ARM64)) || (defined(HX_LINUX) && !defined(HXCPP_ARM64))
 #define USE_SSE3 1
 #else
 /* #undef USE_SSE3 */
@@ -283,14 +283,14 @@
 /* #undef USE_VMX */
 
 /* use x86 MMX compiler intrinsics */
-#if (defined(HX_WINDOWS) || /*(defined(HX_MACOS) && !defined(HXCPP_ARM64)) ||*/ (defined(HX_LINUX) && !defined(HXCPP_ARM64))) && !defined(HXCPP_M64)
+#if ((defined(HX_WINDOWS) && !defined(HXCPP_ARM64)) || /*(defined(HX_MACOS) && !defined(HXCPP_ARM64)) ||*/ (defined(HX_LINUX) && !defined(HXCPP_ARM64))) && !defined(HXCPP_M64)
 #define USE_X86_MMX 1
 #else
 /* #undef USE_X86_MMX */
 #endif
 
 /* Version number of package */
-#define VERSION "0.32.8"
+#define VERSION "0.42.0"
 
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */
