@@ -6,6 +6,8 @@
 
 #ifdef HXCPP_M64
 #include "config-windows-x86_64.h"
+#elif defined(HXCPP_ARM64)
+#include "config-windows-arm64.h"
 #else
 #include "config-windows-x86.h"
 #endif
