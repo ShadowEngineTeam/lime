@@ -37,7 +37,7 @@
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse2.c" unless="HXCPP_ARMV7 || HXCPP_ARM64 || android || HXCPP_ARM64" />
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse3.c" unless="HXCPP_ARMV7 || HXCPP_ARM64 || android || HXCPP_ARM64" />
         <!-- <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_sse41.c" unless="HXCPP_ARMV7 || HXCPP_ARM64 || android" /> -->
-        <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_neon.c" if="HXCPP_ARMV7 || HXCPP_ARM64 || HXCPP_ARM64" />
+        <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/mixer/mixer_neon.c" if="HXCPP_ARMV7 || HXCPP_ARM64 || HXCPP_ARM64" unless="windows" />
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/ALc.c"/>
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/alconfig.c"/>
         <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/ALu.c"/>
