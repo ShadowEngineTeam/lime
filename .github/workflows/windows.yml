@@ -50,3 +50,12 @@ jobs:
             !**/.gitignore
             lime.png
           if-no-files-found: error
+      - name: Upload Artifact (ARM64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: WindowsArm64-NDLL
+          path: |
+            ndll/WindowsArm64/
+            !**/.gitignore
+            lime.png
+          if-no-files-found: error
