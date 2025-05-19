@@ -18,7 +18,7 @@
 		<compilerflag value="-DNATIVE_TOOLKIT_HAVE_PNG" if="NATIVE_TOOLKIT_HAVE_PNG" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/png" if="NATIVE_TOOLKIT_HAVE_PNG" />
 
-		<compilerflag value="-DUSE_ARM_NEON=1" if="PIXMAN_ARM_NEON" />
+		<compilerflag value="-DUSE_ARM_NEON=1" if="PIXMAN_ARM_NEON || PIXMAN_ARMA64_NEON" />
 		<compilerflag value="-DUSE_ARM_SIMD=1" if="PIXMAN_ARM_SIMD" />
 
 		<compilerflag value="-I${ANDROID_NDK_ROOT}/sources/android/cpufeatures" if="android"/>
