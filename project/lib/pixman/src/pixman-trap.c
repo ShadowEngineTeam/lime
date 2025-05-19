@@ -34,7 +34,7 @@
  * grid row.
  */
 
-PIXMAN_EXPORT pixman_fixed_t
+pixman_fixed_t
 pixman_sample_ceil_y (pixman_fixed_t y, int n)
 {
     pixman_fixed_t f = pixman_fixed_frac (y);
@@ -62,7 +62,7 @@ pixman_sample_ceil_y (pixman_fixed_t y, int n)
  * Compute the largest value strictly less than y which is on a
  * grid row.
  */
-PIXMAN_EXPORT pixman_fixed_t
+pixman_fixed_t
 pixman_sample_floor_y (pixman_fixed_t y,
                        int            n)
 {
@@ -90,7 +90,7 @@ pixman_sample_floor_y (pixman_fixed_t y,
 /*
  * Step an edge by any amount (including negative values)
  */
-PIXMAN_EXPORT void
+void
 pixman_edge_step (pixman_edge_t *e,
                   int            n)
 {
@@ -151,7 +151,7 @@ _pixman_edge_multi_init (pixman_edge_t * e,
  * Initialize one edge structure given the line endpoints and a
  * starting y value
  */
-PIXMAN_EXPORT void
+void
 pixman_edge_init (pixman_edge_t *e,
                   int            n,
                   pixman_fixed_t y_start,
@@ -199,7 +199,7 @@ pixman_edge_init (pixman_edge_t *e,
  * Initialize one edge structure given a line, starting y value
  * and a pixel offset for the line
  */
-PIXMAN_EXPORT void
+void
 pixman_line_fixed_edge_init (pixman_edge_t *            e,
                              int                        n,
                              pixman_fixed_t             y,
@@ -229,7 +229,7 @@ pixman_line_fixed_edge_init (pixman_edge_t *            e,
                       bot->y + y_off_fixed);
 }
 
-PIXMAN_EXPORT void
+void
 pixman_add_traps (pixman_image_t *     image,
                   int16_t              x_off,
                   int16_t              y_off,
@@ -314,7 +314,7 @@ dump_image (pixman_image_t *image,
 }
 #endif
 
-PIXMAN_EXPORT void
+void
 pixman_add_trapezoids (pixman_image_t *          image,
                        int16_t                   x_off,
                        int                       y_off,
@@ -342,7 +342,7 @@ pixman_add_trapezoids (pixman_image_t *          image,
 #endif
 }
 
-PIXMAN_EXPORT void
+void
 pixman_rasterize_trapezoid (pixman_image_t *          image,
                             const pixman_trapezoid_t *trap,
                             int                       x_off,
@@ -477,7 +477,7 @@ get_trap_extents (pixman_op_t op, pixman_image_t *dest,
  * the (x, y) coordinates of the destination. Then these three images are
  * composited across the entire destination.
  */
-PIXMAN_EXPORT void
+void
 pixman_composite_trapezoids (pixman_op_t		op,
 			     pixman_image_t *		src,
 			     pixman_image_t *		dst,
@@ -668,7 +668,7 @@ convert_triangles (int n_tris, const pixman_triangle_t *tris)
     return traps;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_composite_triangles (pixman_op_t			op,
 			    pixman_image_t *		src,
 			    pixman_image_t *		dst,
@@ -692,7 +692,7 @@ pixman_composite_triangles (pixman_op_t			op,
     }
 }
 
-PIXMAN_EXPORT void
+void
 pixman_add_triangles (pixman_image_t          *image,
 		      int32_t	               x_off,
 		      int32_t	               y_off,

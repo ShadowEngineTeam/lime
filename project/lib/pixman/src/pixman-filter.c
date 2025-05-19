@@ -438,7 +438,7 @@ gnuplot_filter (int width, int n_phases, const pixman_fixed_t* p)
 /* Create the parameter list for a SEPARABLE_CONVOLUTION filter
  * with the given kernels and scale parameters
  */
-PIXMAN_EXPORT pixman_fixed_t *
+pixman_fixed_t *
 pixman_filter_create_separable_convolution (int             *n_values,
 					    pixman_fixed_t   scale_x,
 					    pixman_fixed_t   scale_y,

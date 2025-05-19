@@ -4,8 +4,6 @@
  * The features are:
  *
  *    FUNC	     must be defined to expand to the current function
- *    PIXMAN_EXPORT  should be defined to whatever is required to
- *                   export functions from a shared library
  *    limits	     limits for various types must be defined
  *    inline         must be defined
  *    force_inline   must be defined
@@ -87,18 +85,6 @@
 #   ifndef noinline
 #      define noinline
 #   endif
-#endif
-
-/* GCC visibility */
-#if defined(__GNUC__) && __GNUC__ >= 4 && !defined(_WIN32)
-#   define PIXMAN_EXPORT __attribute__ ((visibility("default")))
-/* Sun Studio 8 visibility */
-#elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
-#   define PIXMAN_EXPORT __global
-#elif defined (_MSC_VER) || defined(__MINGW32__)
-#   define PIXMAN_EXPORT PIXMAN_API
-#else
-#   define PIXMAN_EXPORT
 #endif
 
 /* member offsets */

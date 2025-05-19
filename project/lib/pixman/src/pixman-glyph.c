@@ -182,7 +182,7 @@ clear_table (pixman_glyph_cache_t *cache)
     cache->n_tombstones = 0;
 }
 
-PIXMAN_EXPORT pixman_glyph_cache_t *
+pixman_glyph_cache_t *
 pixman_glyph_cache_create (void)
 {
     pixman_glyph_cache_t *cache;
@@ -200,7 +200,7 @@ pixman_glyph_cache_create (void)
     return cache;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_glyph_cache_destroy (pixman_glyph_cache_t *cache)
 {
     return_if_fail (cache->freeze_count == 0);
@@ -210,13 +210,13 @@ pixman_glyph_cache_destroy (pixman_glyph_cache_t *cache)
     free (cache);
 }
 
-PIXMAN_EXPORT void
+void
 pixman_glyph_cache_freeze (pixman_glyph_cache_t  *cache)
 {
     cache->freeze_count++;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_glyph_cache_thaw (pixman_glyph_cache_t  *cache)
 {
     if (--cache->freeze_count == 0					&&
@@ -240,7 +240,7 @@ pixman_glyph_cache_thaw (pixman_glyph_cache_t  *cache)
     }
 }
 
-PIXMAN_EXPORT const void *
+const void *
 pixman_glyph_cache_lookup (pixman_glyph_cache_t  *cache,
 			   void                  *font_key,
 			   void                  *glyph_key)
@@ -248,7 +248,7 @@ pixman_glyph_cache_lookup (pixman_glyph_cache_t  *cache,
     return lookup_glyph (cache, font_key, glyph_key);
 }
 
-PIXMAN_EXPORT const void *
+const void *
 pixman_glyph_cache_insert (pixman_glyph_cache_t  *cache,
 			   void                  *font_key,
 			   void                  *glyph_key,
@@ -301,7 +301,7 @@ pixman_glyph_cache_insert (pixman_glyph_cache_t  *cache,
     return glyph;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_glyph_cache_remove (pixman_glyph_cache_t  *cache,
 			   void                  *font_key,
 			   void                  *glyph_key)
@@ -316,7 +316,7 @@ pixman_glyph_cache_remove (pixman_glyph_cache_t  *cache,
     }
 }
 
-PIXMAN_EXPORT void
+void
 pixman_glyph_get_extents (pixman_glyph_cache_t *cache,
 			  int                   n_glyphs,
 			  pixman_glyph_t       *glyphs,
@@ -351,7 +351,7 @@ pixman_glyph_get_extents (pixman_glyph_cache_t *cache,
 /* This function returns a format that is suitable for use as a mask for the
  * set of glyphs in question.
  */
-PIXMAN_EXPORT pixman_format_code_t
+pixman_format_code_t
 pixman_glyph_get_mask_format (pixman_glyph_cache_t *cache,
 			      int		    n_glyphs,
 			      const pixman_glyph_t *glyphs)
@@ -394,7 +394,7 @@ box32_intersect (pixman_box32_t *dest,
 #if defined(__GNUC__) && !defined(__x86_64__) && !defined(__amd64__)
 __attribute__((__force_align_arg_pointer__))
 #endif
-PIXMAN_EXPORT void
+void
 pixman_composite_glyphs_no_mask (pixman_op_t            op,
 				 pixman_image_t        *src,
 				 pixman_image_t        *dest,
@@ -636,7 +636,7 @@ out:
 #if defined(__GNUC__) && !defined(__x86_64__) && !defined(__amd64__)
 __attribute__((__force_align_arg_pointer__))
 #endif
-PIXMAN_EXPORT void
+void
 pixman_composite_glyphs (pixman_op_t            op,
 			 pixman_image_t        *src,
 			 pixman_image_t        *dest,
