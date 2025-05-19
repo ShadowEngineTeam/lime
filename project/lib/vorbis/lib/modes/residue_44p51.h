@@ -6,19 +6,18 @@
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
  * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2010             *
- * by the Xiph.Org Foundation http://www.xiph.org/                  *
+ * by the Xiph.Org Foundation https://xiph.org/                     *
  *                                                                  *
  ********************************************************************
 
  function: toplevel residue templates for 32/44.1/48kHz uncoupled
- last mod: $Id$
 
  ********************************************************************/
 
 #include "vorbis/codec.h"
-#include "../backends.h"
+#include "backends.h"
 
-#include "../books/coupled/res_books_51.h"
+#include "books/coupled/res_books_51.h"
 
 /***** residue backends *********************************************/
 

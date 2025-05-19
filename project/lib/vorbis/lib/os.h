@@ -7,8 +7,8 @@
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2009             *
- * by the Xiph.Org Foundation http://www.xiph.org/                  *
+ * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2015             *
+ * by the Xiph.Org Foundation https://xiph.org/                     *
  *                                                                  *
  ********************************************************************
 
@@ -173,7 +173,7 @@ static __inline void vorbis_fpu_restore(vorbis_fpu_control fpu){
 
 typedef int vorbis_fpu_control;
 
-static int vorbis_ftoi(double f){
+STIN int vorbis_ftoi(double f){
         /* Note: MSVC and GCC (at least on some systems) round towards zero, thus,
            the floor() call is required to ensure correct roudning of
            negative numbers */
