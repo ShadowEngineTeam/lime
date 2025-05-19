@@ -96,7 +96,7 @@
 #elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
 #   define PIXMAN_EXPORT __global
 #elif defined (_MSC_VER) || defined(__MINGW32__)
-#   define PIXMAN_EXPORT PIXMAN_API
+#   define PIXMAN_EXPORT __declspec(dllexport)
 #else
 #   define PIXMAN_EXPORT
 #endif
