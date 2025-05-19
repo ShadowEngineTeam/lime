@@ -53,5 +53,6 @@
 #else
 # define PIXMAN_API
 #endif
+#endif
 
 #endif /* PIXMAN_VERSION_H__ */
