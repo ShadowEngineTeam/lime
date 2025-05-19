@@ -48,11 +48,7 @@
 	PIXMAN_VERSION_MICRO)
 
 #ifndef PIXMAN_API
-#if defined(_MSC_VER) || defined(__MINGW32__)
-# define PIXMAN_API __declspec(dllexport)
-#else
 # define PIXMAN_API
-#endif
 #endif
 
 #endif /* PIXMAN_VERSION_H__ */
