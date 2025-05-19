@@ -21,7 +21,9 @@ class Permissions
 	 */
 	public static inline function getGrantedPermissions():Array<String>
 	{
-		return JNICache.createStaticMethod('org/haxe/extension/Tools', 'getGrantedPermissions', '()[Ljava/lang/String;')();
+		final getGrantedPermissionsJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'requestPermissions', '([Ljava/lang/String;I)V');
+
+		return getGrantedPermissionsJNI != null ? getGrantedPermissionsJNI() : [];
 	}
 
 	/**
@@ -32,12 +34,20 @@ class Permissions
 	 */
 	public static inline function requestPermissions(permissions:Array<String>, requestCode:Int = 1):Void
 	{
-		for (i in 0...permissions.length)
-			if (!permissions[i].startsWith('android.permission.'))
-				permissions[i] = 'android.permission.${permissions[i]}';
+		final requestPermissionsJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'requestPermissions', '([Ljava/lang/String;I)V');
 
-		JNICache.createStaticMethod('org/haxe/extension/Tools', 'requestPermissions',
-			'([Ljava/lang/String;I)V')(permissions, requestCode);
+		if (requestPermissionsJNI != null)
+		{
+			final nativePermissions:Array<String> = [];
+
+			for (i in 0...permissions.length)
+			{
+				if (!permissions[i].startsWith('android.permission.'))
+					nativePermissions[i] = 'android.permission.${permissions[i]}';
+			}
+
+			requestPermissionsJNI(nativePermissions, requestCode);
+		}
 	}
 }
 #end

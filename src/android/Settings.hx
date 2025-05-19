@@ -23,8 +23,10 @@ class Settings
 	 */
 	public static inline function requestSetting(setting:String, requestCode:Int = 1):Void
 	{
-		JNICache.createStaticMethod('org/haxe/extension/Tools', 'requestSetting',
-			'(Ljava/lang/String;I)V')(!setting.startsWith('android.settings.') ? 'android.settings.$setting' : setting, requestCode);
+		final requestSettingJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'requestSetting', '(Ljava/lang/String;I)V');
+
+		if (requestSettingJNI != null)
+			requestSettingJNI(!setting.startsWith('android.settings.') ? 'android.settings.$setting' : setting, requestCode);
 	}
 }
 #end
