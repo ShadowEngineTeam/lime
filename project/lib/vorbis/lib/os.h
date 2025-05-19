@@ -13,7 +13,6 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os.h 16227 2009-07-08 06:58:46Z xiphmont $
 
  ********************************************************************/
 
@@ -31,7 +30,7 @@
 
 #  ifdef __GNUC__
 #    define STIN static __inline__
-#  elif _WIN32
+#  elif defined(_WIN32)
 #    define STIN static __inline
 #  else
 #    define STIN static
@@ -61,7 +60,7 @@ void *_alloca(size_t size);
 #  define FAST_HYPOT hypot
 #endif
 
-#endif
+#endif /* _V_IFDEFJAIL_H_ */
 
 #ifdef HAVE_ALLOCA_H
 #  include <alloca.h>
@@ -81,7 +80,7 @@ void *_alloca(size_t size);
 
 
 /* Special i386 GCC implementation */
-#if defined(__i386__) && defined(__GNUC__) && !defined(__BEOS__)
+#if defined(__i386__) && defined(__GNUC__) && !defined(__BEOS__) && !defined(__SSE2_MATH__)
 #  define VORBIS_FPU_CONTROL
 /* both GCC and MSVC are kinda stupid about rounding/casting to int.
    Because of encapsulation constraints (GCC can't see inside the asm
@@ -119,8 +118,8 @@ static inline int vorbis_ftoi(double f){  /* yes, double!  Otherwise,
 
 
 /* MSVC inline assembly. 32 bit only; inline ASM isn't implemented in the
- * 64 bit compiler */
-#if defined(_MSC_VER) && !defined(_WIN64) && !defined(_WIN32_WCE)
+ * 64 bit compiler and doesn't work on arm. */
+#if defined(_MSC_VER) && defined(_M_IX86) && !defined(_WIN32_WCE)
 #  define VORBIS_FPU_CONTROL
 
 typedef ogg_int16_t vorbis_fpu_control;
@@ -135,9 +134,11 @@ static __inline int vorbis_ftoi(double f){
 }
 
 static __inline void vorbis_fpu_setround(vorbis_fpu_control *fpu){
+  (void)fpu;
 }
 
 static __inline void vorbis_fpu_restore(vorbis_fpu_control fpu){
+  (void)fpu;
 }
 
 #endif /* Special MSVC 32 bit implementation */
@@ -145,7 +146,7 @@ static __inline void vorbis_fpu_restore(vorbis_fpu_control fpu){
 
 /* Optimized code path for x86_64 builds. Uses SSE2 intrinsics. This can be
    done safely because all x86_64 CPUs supports SSE2. */
-#if (defined(_MSC_VER) && defined(_WIN64)) || (defined(__GNUC__) && defined (__x86_64__))
+#if (defined(_MSC_VER) && defined(_M_X64)) || (defined(__GNUC__) && defined (__SSE2_MATH__))
 #  define VORBIS_FPU_CONTROL
 
 typedef ogg_int16_t vorbis_fpu_control;
@@ -156,9 +157,11 @@ static __inline int vorbis_ftoi(double f){
 }
 
 static __inline void vorbis_fpu_setround(vorbis_fpu_control *fpu){
+  (void)fpu;
 }
 
 static __inline void vorbis_fpu_restore(vorbis_fpu_control fpu){
+  (void)fpu;
 }
 
 #endif /* Special MSVC x64 implementation */
