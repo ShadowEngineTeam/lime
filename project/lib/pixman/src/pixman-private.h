@@ -819,7 +819,7 @@ get_implementation (void)
 /* This function is exported for the sake of the test suite and not part
  * of the ABI.
  */
-PIXMAN_EXPORT pixman_implementation_t *
+pixman_implementation_t *
 _pixman_internal_only_get_implementation (void);
 
 /* Memory allocation helpers */

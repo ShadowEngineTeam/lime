@@ -260,7 +260,7 @@ _pixman_linear_gradient_iter_init (pixman_image_t *image, pixman_iter_t  *iter)
     }
 }
 
-PIXMAN_EXPORT pixman_image_t *
+pixman_image_t *
 pixman_image_create_linear_gradient (const pixman_point_fixed_t *  p1,
                                      const pixman_point_fixed_t *  p2,
                                      const pixman_gradient_stop_t *stops,

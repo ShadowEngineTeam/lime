@@ -196,7 +196,7 @@ image_property_changed (pixman_image_t *image)
 }
 
 /* Ref Counting */
-PIXMAN_EXPORT pixman_image_t *
+pixman_image_t *
 pixman_image_ref (pixman_image_t *image)
 {
     image->common.ref_count++;
@@ -205,7 +205,7 @@ pixman_image_ref (pixman_image_t *image)
 }
 
 /* returns TRUE when the image is freed */
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_unref (pixman_image_t *image)
 {
     if (_pixman_image_fini (image))
@@ -217,7 +217,7 @@ pixman_image_unref (pixman_image_t *image)
     return FALSE;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_destroy_function (pixman_image_t *            image,
                                    pixman_image_destroy_func_t func,
                                    void *                      data)
@@ -226,7 +226,7 @@ pixman_image_set_destroy_function (pixman_image_t *            image,
     image->common.destroy_data = data;
 }
 
-PIXMAN_EXPORT void *
+void *
 pixman_image_get_destroy_data (pixman_image_t *image)
 {
   return image->common.destroy_data;
@@ -256,7 +256,7 @@ _pixman_image_reset_clip_region (pixman_image_t *image)
  * Since 0.21.2, pixman doesn't do these workarounds anymore, so now
  * this function is a no-op.
  */
-PIXMAN_EXPORT void
+void
 pixman_disable_out_of_bounds_workaround (void)
 {
 }
@@ -565,7 +565,7 @@ _pixman_image_validate (pixman_image_t *image)
 	_pixman_image_validate ((pixman_image_t *)image->common.alpha_map);
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_set_clip_region32 (pixman_image_t *   image,
                                 pixman_region32_t *region)
 {
@@ -589,7 +589,7 @@ pixman_image_set_clip_region32 (pixman_image_t *   image,
     return result;
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_set_clip_region (pixman_image_t *   image,
                               pixman_region16_t *region)
 {
@@ -613,14 +613,14 @@ pixman_image_set_clip_region (pixman_image_t *   image,
     return result;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_has_client_clip (pixman_image_t *image,
                                   pixman_bool_t   client_clip)
 {
     image->common.client_clip = client_clip;
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_set_transform (pixman_image_t *          image,
                             const pixman_transform_t *transform)
 {
@@ -672,7 +672,7 @@ out:
     return result;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_repeat (pixman_image_t *image,
                          pixman_repeat_t repeat)
 {
@@ -684,7 +684,7 @@ pixman_image_set_repeat (pixman_image_t *image,
     image_property_changed (image);
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_dither (pixman_image_t *image,
 			 pixman_dither_t dither)
 {
@@ -699,7 +699,7 @@ pixman_image_set_dither (pixman_image_t *image,
     }
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_dither_offset (pixman_image_t *image,
 				int             offset_x,
 				int             offset_y)
@@ -719,7 +719,7 @@ pixman_image_set_dither_offset (pixman_image_t *image,
     }
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_set_filter (pixman_image_t *      image,
                          pixman_filter_t       filter,
                          const pixman_fixed_t *params,
@@ -767,7 +767,7 @@ pixman_image_set_filter (pixman_image_t *      image,
     return TRUE;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_source_clipping (pixman_image_t *image,
                                   pixman_bool_t   clip_sources)
 {
@@ -783,7 +783,7 @@ pixman_image_set_source_clipping (pixman_image_t *image,
  * copy the content of indexed. Doing this copying is simply
  * way, way too expensive.
  */
-PIXMAN_EXPORT void
+void
 pixman_image_set_indexed (pixman_image_t *        image,
                           const pixman_indexed_t *indexed)
 {
@@ -797,7 +797,7 @@ pixman_image_set_indexed (pixman_image_t *        image,
     image_property_changed (image);
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_alpha_map (pixman_image_t *image,
                             pixman_image_t *alpha_map,
                             int16_t         x,
@@ -850,7 +850,7 @@ pixman_image_set_alpha_map (pixman_image_t *image,
     image_property_changed (image);
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_component_alpha   (pixman_image_t *image,
                                     pixman_bool_t   component_alpha)
 {
@@ -862,13 +862,13 @@ pixman_image_set_component_alpha   (pixman_image_t *image,
     image_property_changed (image);
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_get_component_alpha   (pixman_image_t       *image)
 {
     return image->common.component_alpha;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_accessors (pixman_image_t *           image,
                             pixman_read_memory_func_t  read_func,
                             pixman_write_memory_func_t write_func)
@@ -888,7 +888,7 @@ pixman_image_set_accessors (pixman_image_t *           image,
     }
 }
 
-PIXMAN_EXPORT uint32_t *
+uint32_t *
 pixman_image_get_data (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -897,7 +897,7 @@ pixman_image_get_data (pixman_image_t *image)
     return NULL;
 }
 
-PIXMAN_EXPORT int
+int
 pixman_image_get_width (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -906,7 +906,7 @@ pixman_image_get_width (pixman_image_t *image)
     return 0;
 }
 
-PIXMAN_EXPORT int
+int
 pixman_image_get_height (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -915,7 +915,7 @@ pixman_image_get_height (pixman_image_t *image)
     return 0;
 }
 
-PIXMAN_EXPORT int
+int
 pixman_image_get_stride (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -924,7 +924,7 @@ pixman_image_get_stride (pixman_image_t *image)
     return 0;
 }
 
-PIXMAN_EXPORT int
+int
 pixman_image_get_depth (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -933,7 +933,7 @@ pixman_image_get_depth (pixman_image_t *image)
     return 0;
 }
 
-PIXMAN_EXPORT pixman_format_code_t
+pixman_format_code_t
 pixman_image_get_format (pixman_image_t *image)
 {
     if (image->type == BITS)

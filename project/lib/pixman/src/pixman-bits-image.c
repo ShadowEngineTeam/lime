@@ -1358,7 +1358,7 @@ create_bits_image_internal (pixman_format_code_t format,
 }
 
 /* If bits is NULL, a buffer will be allocated and initialized to 0 */
-PIXMAN_EXPORT pixman_image_t *
+pixman_image_t *
 pixman_image_create_bits (pixman_format_code_t format,
                           int                  width,
                           int                  height,
@@ -1371,7 +1371,7 @@ pixman_image_create_bits (pixman_format_code_t format,
 
 
 /* If bits is NULL, a buffer will be allocated and _not_ initialized */
-PIXMAN_EXPORT pixman_image_t *
+pixman_image_t *
 pixman_image_create_bits_no_clear (pixman_format_code_t format,
 				   int                  width,
 				   int                  height,

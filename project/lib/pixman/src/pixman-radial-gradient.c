@@ -458,7 +458,7 @@ _pixman_radial_gradient_iter_init (pixman_image_t *image, pixman_iter_t *iter)
 	iter->get_scanline = radial_get_scanline_wide;
 }
 
-PIXMAN_EXPORT pixman_image_t *
+pixman_image_t *
 pixman_image_create_radial_gradient (const pixman_point_fixed_t *  inner,
 				     const pixman_point_fixed_t *  outer,
 				     pixman_fixed_t                inner_radius,
