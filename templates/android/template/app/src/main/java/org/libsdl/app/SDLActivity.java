@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ScrollView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.os.*;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -215,7 +214,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         if (mBrokenLibraries)
         {
             mSingleton = this;
-            AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+            AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert);
             dlgAlert.setMessage("An error occurred while trying to start the application. Please try again and/or reinstall."
                   + System.getProperty("line.separator")
                   + System.getProperty("line.separator")
@@ -1344,7 +1343,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
 
         // create dialog with title and a listener to wake up calling thread
 
-        final MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(SDL.getContext());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(SDL.getContext(), android.R.style.Theme_DeviceDefault_Dialog_Alert);
         builder.setTitle(args.getString("title"));
         builder.setMessage(args.getString("message"));
         builder.setCancelable(false);
