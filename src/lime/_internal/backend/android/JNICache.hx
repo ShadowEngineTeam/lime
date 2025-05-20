@@ -33,11 +33,8 @@ class JNICache
 	 * @param cache Whether to cache the result (default true).
 	 * @return A dynamic reference to the static method.
 	 */
-	public static function createStaticMethod(className:String, methodName:String, signature:String, cache:Bool = true):Null<Dynamic>
+	public static function createStaticMethod(className:String, methodName:String, signature:String, cache:Bool = true):Dynamic
 	{
-		@:privateAccess
-		className = JNI.transformClassName(className);
-
 		final key:String = '$className::$methodName::$signature';
 
 		if (cache && !staticMethodCache.exists(key))
@@ -57,11 +54,8 @@ class JNICache
 	 * @param cache Whether to cache the result (default true).
 	 * @return A dynamic reference to the member method.
 	 */
-	public static function createMemberMethod(className:String, methodName:String, signature:String, cache:Bool = true):Null<Dynamic>
+	public static function createMemberMethod(className:String, methodName:String, signature:String, cache:Bool = true):Dynamic
 	{
-		@:privateAccess
-		className = JNI.transformClassName(className);
-
 		final key:String = '$className::$methodName::$signature';
 
 		if (cache && !memberMethodCache.exists(key))
@@ -81,11 +75,8 @@ class JNICache
 	 * @param cache Whether to cache the result (default true).
 	 * @return A reference to the static field.
 	 */
-	public static function createStaticField(className:String, fieldName:String, signature:String, cache:Bool = true):Null<JNIStaticField>
+	public static function createStaticField(className:String, fieldName:String, signature:String, cache:Bool = true):JNIStaticField
 	{
-		@:privateAccess
-		className = JNI.transformClassName(className);
-
 		final key:String = '$className::$fieldName::$signature';
 
 		if (cache && !staticFieldCache.exists(key))
@@ -105,11 +96,8 @@ class JNICache
 	 * @param cache Whether to cache the result (default true).
 	 * @return A reference to the member field.
 	 */
-	public static function createMemberField(className:String, fieldName:String, signature:String, cache:Bool = true):Null<JNIMemberField>
+	public static function createMemberField(className:String, fieldName:String, signature:String, cache:Bool = true):JNIMemberField
 	{
-		@:privateAccess
-		className = JNI.transformClassName(className);
-
 		final key:String = '$className::$fieldName::$signature';
 
 		if (cache && !memberFieldCache.exists(key))
