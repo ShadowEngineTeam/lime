@@ -39,3 +39,4 @@ class Toast
 			makeToastTextJNI(text, duration, gravity, xOffset, yOffset);
 	}
 }
+#end

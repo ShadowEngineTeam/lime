@@ -210,3 +210,4 @@ class Environment
 		return isExternalStorageRemovableJNI != null && isExternalStorageRemovableJNI();
 	}
 }
+#end
