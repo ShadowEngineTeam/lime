@@ -120,6 +120,11 @@
             <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/backends/dsound.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/backends/wasapi.c" />
 
+            <compilerflag value="-mmmx" if="mingw" />
+            <compilerflag value="-msse" if="mingw"  />
+            <compilerflag value="-msse2" if="mingw"  />
+            <compilerflag value="-msse3" if="mingw"  />
+            <compilerflag value="-mssse3" if="mingw"  />
             <compilerflag value="-DWIN32"/>
             <compilerflag value="-D_WINDOWS" />
             <compilerflag value="-D_WIN32" />
@@ -127,7 +132,7 @@
             <compilerflag value="-Drestrict=" />
             <compilerflag value="-D_CRT_SECURE_NO_WARNINGS" />
             <compilerflag value="-D_CRT_NONSTDC_NO_DEPRECATE" />
-            <compilerflag value="/wd4098" />
+            <compilerflag value="/wd4098" unless="mingw" />
             <compilerflag value="-Dstrcasecmp=_stricmp" />
             <compilerflag value="-Dstrncasecmp=_strnicmp" />
 

@@ -59,6 +59,7 @@
 		<compilerflag value="-Iinclude" />
 
 		<file name="src/ExternalInterface.cpp" />
+		<file name="src/mingw.cpp" if="mingw" />
 
 		<section if="LIME_CAIRO">
 
@@ -408,7 +409,7 @@
 				<lib name="rpcrt4.lib" if="LIME_HARFBUZZ" />
 				<lib name="dwrite.lib" if="LIME_HARFBUZZ" />
 
-				<lib name="comsuppw.lib" unless="winrt" />
+				<lib name="comsuppw.lib" unless="winrt || mingw" />
 
 				<lib name="D3D11.lib" if="winrt" />
 				<lib name="RuntimeObject.lib" if="winrt" />
