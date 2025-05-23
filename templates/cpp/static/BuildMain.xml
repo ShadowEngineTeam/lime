@@ -30,7 +30,7 @@
 			<lib name="wldap32.lib" />
 			<lib name="shell32.lib" />
 			<lib name="comdlg32.lib" />
-			<lib name="comsuppw.lib" />
+			<lib name="comsuppw.lib" unless="mingw" />
 			<lib name="usp10.lib" />
 			<lib name="rpcrt4.lib" />
 			<lib name="dwrite.lib" />
