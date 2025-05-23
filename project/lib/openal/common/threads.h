@@ -42,7 +42,7 @@ typedef void (*altss_dtor_t)(void*);
 #include <windows.h>
 
 
-#ifndef HAVE_STRUCT_TIMESPEC
+#if !defined(HAVE_STRUCT_TIMESPEC) && !defined(__MINGW32__)
 struct timespec {
     time_t tv_sec;
     long tv_nsec;
