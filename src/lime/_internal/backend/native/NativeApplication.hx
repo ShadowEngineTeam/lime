@@ -1054,8 +1054,7 @@ class NativeApplication
 	var DEVICE_ORIENTATION_CHANGE = 1;
 }
 
-#if android
-private class OrientationChangeListener #if !macro implements JNISafety #end
+private class OrientationChangeListener #if (android && !macro) implements JNISafety #end
 {
 	private var callback:Int->Void;
 
@@ -1064,7 +1063,7 @@ private class OrientationChangeListener #if !macro implements JNISafety #end
 		this.callback = callback;
 	}
 
-	#if !macro
+	#if (android && !macro)
 	@:runOnMainThread
 	#end
 	public function onOrientationChanged(orientation:Int):Void
@@ -1072,4 +1071,3 @@ private class OrientationChangeListener #if !macro implements JNISafety #end
 		callback(orientation);
 	}
 }
-#end
