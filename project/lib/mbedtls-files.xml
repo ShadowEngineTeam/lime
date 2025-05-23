@@ -2,6 +2,7 @@
 
 	<files id="native-toolkit-mbedtls">
 
+		<compilerflag value="-std=c11" if="mingw" />
 		<compilerflag value="-std=c11" unless="windows" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/mbedtls/include/" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/zlib/" />

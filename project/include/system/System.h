@@ -94,7 +94,7 @@ namespace lime {
 #include <stdint.h>
 #else
 
-
+#ifdef _MSC_VER
 // ISO C9x  compliant stdint.h for Microsoft Visual Studio
 // Based on ISO/IEC 9899:TC2 Committee draft (May 6, 2005) WG14/N1124
 //
@@ -126,10 +126,6 @@ namespace lime {
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 ///////////////////////////////////////////////////////////////////////////////
-
-#ifndef _MSC_VER // [
-#warning "Use this header only with Microsoft Visual C++ compilers!"
-#endif // _MSC_VER ]
 
 #ifndef _MSC_STDINT_H_ // [
 #define _MSC_STDINT_H_
@@ -354,6 +350,7 @@ typedef uint64_t  uintmax_t;
 #endif // _MSC_VER >= 1600 ]
 
 #endif // _MSC_STDINT_H_ ]
+#endif
 #endif
 
 
