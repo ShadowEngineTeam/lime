@@ -204,7 +204,7 @@ class WindowsPlatform extends PlatformTarget
 					catch (e:Dynamic) {}
 				}
 			}
-			if (architecture == Architecture.ARMV7 || architecture == Architecture.ARM64)
+			if ((project.flags.exists("armv7") || architecture == Architecture.ARMV7) || (project.flags.exists("arm64") || architecture == Architecture.ARM64))
 			{
 				isArm = true;
 			}
@@ -701,6 +701,32 @@ class WindowsPlatform extends PlatformTarget
 			}
 			else
 			{
+				if (((!targetFlags.exists("armv7") && System.hostArchitecture == ARM64) || (targetFlags.exists("arm64")))
+					&& (command != "rebuild" || targetType == "cpp" || targetType == "winrt"))
+				{
+					if (targetType == "winrt")
+					{
+						commands.push(["-Dwinrt", "-DHXCPP_ARM64"]);
+					}
+					else
+					{
+						commands.push(["-Dwindows", "-DHXCPP_ARM64"]);
+					}
+				}
+
+				if (((!targetFlags.exists("arm64") && System.hostArchitecture == ARMV7) || (targetFlags.exists("armv7")))
+					&& (command != "rebuild" || (targetType != "cpp" && targetType != "winrt")))
+				{
+					if (targetType == "winrt")
+					{
+						commands.push(["-Dwinrt", "-DHXCPP_ARMV7"]);
+					}
+					else
+					{
+						commands.push(["-Dwindows", "-DHXCPP_ARMV7"]);
+					}
+				}
+
 				if (!targetFlags.exists("64")
 					&& (command == "rebuild" || System.hostArchitecture == X86 || (targetType != "cpp" && targetType != "winrt")))
 				{
@@ -729,32 +755,6 @@ class WindowsPlatform extends PlatformTarget
 					else
 					{
 						commands.push(["-Dwindows", "-DHXCPP_M64"]);
-					}
-				}
-
-				if (!targetFlags.exists("armv7") && System.hostArchitecture == ARM64
-					&& (command != "rebuild" || targetType == "cpp" || targetType == "winrt"))
-				{
-					if (targetType == "winrt")
-					{
-						commands.push(["-Dwinrt", "-DHXCPP_ARM64"]);
-					}
-					else
-					{
-						commands.push(["-Dwindows", "-DHXCPP_ARM64"]);
-					}
-				}
-
-				if (!targetFlags.exists("arm64") && System.hostArchitecture == ARMV7
-					&& (command == "rebuild" || (targetType != "cpp" && targetType != "winrt")))
-				{
-					if (targetType == "winrt")
-					{
-						commands.push(["-Dwinrt", "-DHXCPP_ARMV7"]);
-					}
-					else
-					{
-						commands.push(["-Dwindows", "-DHXCPP_ARMV7"]);
 					}
 				}
 			}

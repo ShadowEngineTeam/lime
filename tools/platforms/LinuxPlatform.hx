@@ -126,12 +126,12 @@ class LinuxPlatform extends PlatformTarget
 			{
 				is64 = true;
 			}
-			else if (architecture == Architecture.ARM64)
+			else if (targetFlags.exists("arm64") || architecture == Architecture.ARM64)
 			{
 				isArm = true;
 				is64 = true;
 			}
-			else if (architecture == Architecture.ARMV7)
+			else if (targetFlags.exists("armv7") || architecture == Architecture.ARMV7)
 			{
 				isArm = true;
 				is64 = false;
@@ -401,6 +401,16 @@ class LinuxPlatform extends PlatformTarget
 		}
 		else
 		{
+			if ((!targetFlags.exists("armv7") && System.hostArchitecture == ARM64) || targetFlags.exists("arm64"))
+			{
+				commands.push(["-Dlinux", "-DHXCPP_ARM64"]);
+			}
+
+			if ((!targetFlags.exists("arm64") && System.hostArchitecture == ARMV7) || targetFlags.exists("armv7"))
+			{
+				commands.push(["-Dlinux", "-DHXCPP_ARMV7"]);
+			}
+
 			if (!targetFlags.exists("32") && System.hostArchitecture == X64)
 			{
 				commands.push(["-Dlinux", "-DHXCPP_M64"]);
@@ -409,16 +419,6 @@ class LinuxPlatform extends PlatformTarget
 			if (!targetFlags.exists("64") && (command == "rebuild" || System.hostArchitecture == X86))
 			{
 				commands.push(["-Dlinux", "-DHXCPP_M32"]);
-			}
-
-			if (!targetFlags.exists("armv7") && System.hostArchitecture == ARM64)
-			{
-				commands.push(["-Dlinux", "-DHXCPP_ARM64"]);
-			}
-
-			if (!targetFlags.exists("arm64") && System.hostArchitecture == ARMV7)
-			{
-				commands.push(["-Dlinux", "-DHXCPP_ARMV7"]);
 			}
 		}
 

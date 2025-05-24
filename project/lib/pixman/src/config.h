@@ -201,7 +201,7 @@
 /* #undef PIXMAN_TIMERS */
 
 /* The size of `long', as computed by sizeof. */
-#if (defined(HX_LINUX) && defined(HXCPP_M64)) || defined(HX_MACOS)
+#if (defined(HX_LINUX) && defined(HXCPP_M64)) || (defined(HX_LINUX) && defined(HXCPP_ARM64)) || defined(HX_MACOS)
 #define SIZEOF_LONG 8
 #else
 #define SIZEOF_LONG 4
