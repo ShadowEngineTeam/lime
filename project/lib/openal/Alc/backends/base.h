@@ -1,168 +1,125 @@
-#ifndef AL_BACKENDS_BASE_H
-#define AL_BACKENDS_BASE_H
+#ifndef ALC_BACKENDS_BASE_H
+#define ALC_BACKENDS_BASE_H
 
-#include "alMain.h"
-#include "threads.h"
+#include <chrono>
+#include <cstdarg>
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
+
+#include "alc/events.h"
+#include "core/device.h"
+#include "core/except.h"
+#include "fmt/core.h"
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+using uint = unsigned int;
 
-typedef struct ClockLatency {
-    ALint64 ClockTime;
-    ALint64 Latency;
-} ClockLatency;
+struct ClockLatency {
+    std::chrono::nanoseconds ClockTime;
+    std::chrono::nanoseconds Latency;
+};
 
-/* Helper to get the current clock time from the device's ClockBase, and
- * SamplesDone converted from the sample rate.
+struct BackendBase {
+    virtual void open(std::string_view name) = 0;
+
+    virtual bool reset();
+    virtual void start() = 0;
+    virtual void stop() = 0;
+
+    virtual void captureSamples(std::byte *buffer, uint samples);
+    virtual uint availableSamples();
+
+    virtual ClockLatency getClockLatency();
+
+    DeviceBase *const mDevice;
+    std::string mDeviceName;
+
+    BackendBase() = delete;
+    BackendBase(const BackendBase&) = delete;
+    BackendBase(BackendBase&&) = delete;
+    explicit BackendBase(DeviceBase *device) noexcept : mDevice{device} { }
+    virtual ~BackendBase() = default;
+
+    void operator=(const BackendBase&) = delete;
+    void operator=(BackendBase&&) = delete;
+
+protected:
+    /** Sets the default channel order used by most non-WaveFormatEx-based APIs. */
+    void setDefaultChannelOrder() const;
+    /** Sets the default channel order used by WaveFormatEx. */
+    void setDefaultWFXChannelOrder() const;
+};
+using BackendPtr = std::unique_ptr<BackendBase>;
+
+enum class BackendType {
+    Playback,
+    Capture
+};
+
+
+/* Helper to get the device latency from the backend, including any fixed
+ * latency from post-processing.
  */
-inline ALuint64 GetDeviceClockTime(ALCdevice *device)
+inline ClockLatency GetClockLatency(DeviceBase *device, BackendBase *backend)
 {
-    return device->ClockBase + (device->SamplesDone * DEVICE_CLOCK_RES /
-                                device->Frequency);
+    ClockLatency ret{backend->getClockLatency()};
+    ret.Latency += device->FixedLatency;
+    return ret;
 }
 
 
-struct ALCbackendVtable;
+struct BackendFactory {
+    BackendFactory() = default;
+    BackendFactory(const BackendFactory&) = delete;
+    BackendFactory(BackendFactory&&) = delete;
+    virtual ~BackendFactory() = default;
 
-typedef struct ALCbackend {
-    const struct ALCbackendVtable *vtbl;
+    void operator=(const BackendFactory&) = delete;
+    void operator=(BackendFactory&&) = delete;
 
-    ALCdevice *mDevice;
+    virtual auto init() -> bool = 0;
 
-    almtx_t mMutex;
-} ALCbackend;
+    virtual auto querySupport(BackendType type) -> bool = 0;
 
-void ALCbackend_Construct(ALCbackend *self, ALCdevice *device);
-void ALCbackend_Destruct(ALCbackend *self);
-ALCboolean ALCbackend_reset(ALCbackend *self);
-ALCenum ALCbackend_captureSamples(ALCbackend *self, void *buffer, ALCuint samples);
-ALCuint ALCbackend_availableSamples(ALCbackend *self);
-ClockLatency ALCbackend_getClockLatency(ALCbackend *self);
-void ALCbackend_lock(ALCbackend *self);
-void ALCbackend_unlock(ALCbackend *self);
+    virtual auto queryEventSupport(alc::EventType, BackendType) -> alc::EventSupport
+    { return alc::EventSupport::NoSupport; }
 
-struct ALCbackendVtable {
-    void (*const Destruct)(ALCbackend*);
+    virtual auto enumerate(BackendType type) -> std::vector<std::string> = 0;
 
-    ALCenum (*const open)(ALCbackend*, const ALCchar*);
-
-    ALCboolean (*const reset)(ALCbackend*);
-    ALCboolean (*const start)(ALCbackend*);
-    void (*const stop)(ALCbackend*);
-
-    ALCenum (*const captureSamples)(ALCbackend*, void*, ALCuint);
-    ALCuint (*const availableSamples)(ALCbackend*);
-
-    ClockLatency (*const getClockLatency)(ALCbackend*);
-
-    void (*const lock)(ALCbackend*);
-    void (*const unlock)(ALCbackend*);
-
-    void (*const Delete)(void*);
+    virtual auto createBackend(DeviceBase *device, BackendType type) -> BackendPtr = 0;
 };
 
-#define DEFINE_ALCBACKEND_VTABLE(T)                                           \
-DECLARE_THUNK(T, ALCbackend, void, Destruct)                                  \
-DECLARE_THUNK1(T, ALCbackend, ALCenum, open, const ALCchar*)                  \
-DECLARE_THUNK(T, ALCbackend, ALCboolean, reset)                               \
-DECLARE_THUNK(T, ALCbackend, ALCboolean, start)                               \
-DECLARE_THUNK(T, ALCbackend, void, stop)                                      \
-DECLARE_THUNK2(T, ALCbackend, ALCenum, captureSamples, void*, ALCuint)        \
-DECLARE_THUNK(T, ALCbackend, ALCuint, availableSamples)                       \
-DECLARE_THUNK(T, ALCbackend, ClockLatency, getClockLatency)                   \
-DECLARE_THUNK(T, ALCbackend, void, lock)                                      \
-DECLARE_THUNK(T, ALCbackend, void, unlock)                                    \
-static void T##_ALCbackend_Delete(void *ptr)                                  \
-{ T##_Delete(STATIC_UPCAST(T, ALCbackend, (ALCbackend*)ptr)); }               \
-                                                                              \
-static const struct ALCbackendVtable T##_ALCbackend_vtable = {                \
-    T##_ALCbackend_Destruct,                                                  \
-                                                                              \
-    T##_ALCbackend_open,                                                      \
-    T##_ALCbackend_reset,                                                     \
-    T##_ALCbackend_start,                                                     \
-    T##_ALCbackend_stop,                                                      \
-    T##_ALCbackend_captureSamples,                                            \
-    T##_ALCbackend_availableSamples,                                          \
-    T##_ALCbackend_getClockLatency,                                           \
-    T##_ALCbackend_lock,                                                      \
-    T##_ALCbackend_unlock,                                                    \
-                                                                              \
-    T##_ALCbackend_Delete,                                                    \
-}
+namespace al {
 
-
-typedef enum ALCbackend_Type {
-    ALCbackend_Playback,
-    ALCbackend_Capture,
-    ALCbackend_Loopback
-} ALCbackend_Type;
-
-
-struct ALCbackendFactoryVtable;
-
-typedef struct ALCbackendFactory {
-    const struct ALCbackendFactoryVtable *vtbl;
-} ALCbackendFactory;
-
-void ALCbackendFactory_deinit(ALCbackendFactory *self);
-
-struct ALCbackendFactoryVtable {
-    ALCboolean (*const init)(ALCbackendFactory *self);
-    void (*const deinit)(ALCbackendFactory *self);
-
-    ALCboolean (*const querySupport)(ALCbackendFactory *self, ALCbackend_Type type);
-
-    void (*const probe)(ALCbackendFactory *self, enum DevProbe type);
-
-    ALCbackend* (*const createBackend)(ALCbackendFactory *self, ALCdevice *device, ALCbackend_Type type);
+enum class backend_error {
+    NoDevice,
+    DeviceError,
+    OutOfMemory
 };
 
-#define DEFINE_ALCBACKENDFACTORY_VTABLE(T)                                    \
-DECLARE_THUNK(T, ALCbackendFactory, ALCboolean, init)                         \
-DECLARE_THUNK(T, ALCbackendFactory, void, deinit)                             \
-DECLARE_THUNK1(T, ALCbackendFactory, ALCboolean, querySupport, ALCbackend_Type) \
-DECLARE_THUNK1(T, ALCbackendFactory, void, probe, enum DevProbe)              \
-DECLARE_THUNK2(T, ALCbackendFactory, ALCbackend*, createBackend, ALCdevice*, ALCbackend_Type) \
-                                                                              \
-static const struct ALCbackendFactoryVtable T##_ALCbackendFactory_vtable = {  \
-    T##_ALCbackendFactory_init,                                               \
-    T##_ALCbackendFactory_deinit,                                             \
-    T##_ALCbackendFactory_querySupport,                                       \
-    T##_ALCbackendFactory_probe,                                              \
-    T##_ALCbackendFactory_createBackend,                                      \
-}
+class backend_exception final : public base_exception {
+    backend_error mErrorCode;
 
+    static auto make_string(fmt::string_view fmt, fmt::format_args args) -> std::string;
 
-ALCbackendFactory *ALCpulseBackendFactory_getFactory(void);
-ALCbackendFactory *ALCalsaBackendFactory_getFactory(void);
-ALCbackendFactory *ALCcoreAudioBackendFactory_getFactory(void);
-ALCbackendFactory *ALCossBackendFactory_getFactory(void);
-ALCbackendFactory *ALCjackBackendFactory_getFactory(void);
-ALCbackendFactory *ALCsolarisBackendFactory_getFactory(void);
-ALCbackendFactory *ALCsndioBackendFactory_getFactory(void);
-ALCbackendFactory *ALCqsaBackendFactory_getFactory(void);
-ALCbackendFactory *ALCwasapiBackendFactory_getFactory(void);
-ALCbackendFactory *ALCdsoundBackendFactory_getFactory(void);
-ALCbackendFactory *ALCwinmmBackendFactory_getFactory(void);
-ALCbackendFactory *ALCportBackendFactory_getFactory(void);
-ALCbackendFactory *ALCopenslBackendFactory_getFactory(void);
-ALCbackendFactory *ALCnullBackendFactory_getFactory(void);
-ALCbackendFactory *ALCwaveBackendFactory_getFactory(void);
-ALCbackendFactory *ALCsdl2BackendFactory_getFactory(void);
-ALCbackendFactory *ALCloopbackFactory_getFactory(void);
+public:
+    template<typename ...Args>
+    backend_exception(backend_error code, fmt::format_string<Args...> fmt, Args&& ...args)
+        : base_exception{make_string(fmt, fmt::make_format_args(args...))}, mErrorCode{code}
+    { }
+    backend_exception(const backend_exception&) = default;
+    backend_exception(backend_exception&&) = default;
+    ~backend_exception() override;
 
+    backend_exception& operator=(const backend_exception&) = default;
+    backend_exception& operator=(backend_exception&&) = default;
 
-inline void ALCdevice_Lock(ALCdevice *device)
-{ V0(device->Backend,lock)(); }
+    [[nodiscard]] auto errorCode() const noexcept -> backend_error { return mErrorCode; }
+};
 
-inline void ALCdevice_Unlock(ALCdevice *device)
-{ V0(device->Backend,unlock)(); }
+} // namespace al
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
-#endif /* AL_BACKENDS_BASE_H */
+#endif /* ALC_BACKENDS_BASE_H */
