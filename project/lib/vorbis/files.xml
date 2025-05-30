@@ -39,9 +39,11 @@
 
 
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/vorbis/include/"/>
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/vorbis/lib/"/>
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/ogg/include/"/>
 		
 		<file name="${NATIVE_TOOLKIT_PATH}/vorbis/lib/mdct.c"/>
+		<file name="${NATIVE_TOOLKIT_PATH}/vorbis/lib/misc.c" unless="windows" />
 		<file name="${NATIVE_TOOLKIT_PATH}/vorbis/lib/smallft.c"/>
 		<file name="${NATIVE_TOOLKIT_PATH}/vorbis/lib/block.c"/>
 		<file name="${NATIVE_TOOLKIT_PATH}/vorbis/lib/envelope.c"/>

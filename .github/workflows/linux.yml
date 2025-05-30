@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 env:
-  HAXE_VERSION: 4.3.6
+  HAXE_VERSION: 4.3.7
 
 jobs:
   linux:
@@ -26,7 +26,7 @@ jobs:
         run: |
           haxelib git hxcpp https://github.com/th2l-devs/hxcpp --quiet
           haxelib install format --quiet
-          haxelib install hxp
+          haxelib install hxp --quiet
       - name: Enable HXCPP compile cache
         run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
       - name: Configure Lime
@@ -50,6 +50,37 @@ jobs:
           name: Linux64-NDLL
           path: |
             ndll/Linux64/
+            !**/.gitignore
+            lime.png
+          if-no-files-found: error
+  linuxarm64:
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: |
+          sudo add-apt-repository ppa:haxe/releases -y
+          sudo apt update
+          sudo apt-get install -y haxe libdrm-dev libgl1-mesa-dev libglu1-mesa-dev libpulse-dev libasound2-dev libx11-dev libxext-dev libxi-dev libxrandr-dev libxinerama-dev libmbedtls-dev libpng-dev libturbojpeg-dev libuv1-dev libvorbis-dev
+      - name: Install Haxe dependencies
+        run: |
+          haxelib setup ~/haxelib
+          haxelib git hxcpp https://github.com/th2l-devs/hxcpp --quiet
+          haxelib install format --quiet
+          haxelib install hxp --quiet
+      - name: Enable HXCPP compile cache
+        run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
+      - name: Configure Lime
+        run: haxelib dev lime ${{ github.workspace }}
+      - name: Rebuild Lime
+        run: haxelib run lime rebuild linux -arm64 -release -nocolor -nocffi -D HXCPP_ARM64
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LinuxArm64-NDLL
+          path: |
+            ndll/LinuxArm64/
             !**/.gitignore
             lime.png
           if-no-files-found: error

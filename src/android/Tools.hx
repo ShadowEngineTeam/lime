@@ -241,7 +241,7 @@ private typedef ButtonData =
 @:fileXml('tags="haxe,release"')
 @:noDebug
 #end
-private class ButtonListener #if android implements JNISafety #end
+private class ButtonListener #if !macro implements JNISafety #end
 {
 	private var onClickEvent:Event<Void->Void> = new Event<Void->Void>();
 

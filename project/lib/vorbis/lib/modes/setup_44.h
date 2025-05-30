@@ -6,18 +6,17 @@
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
  * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2009             *
- * by the Xiph.Org Foundation http://www.xiph.org/                  *
+ * by the Xiph.Org Foundation https://xiph.org/                     *
  *                                                                  *
  ********************************************************************
 
  function: toplevel settings for 44.1/48kHz
- last mod: $Id: setup_44.h 16962 2010-03-11 07:30:34Z xiphmont $
 
  ********************************************************************/
 
-#include "./floor_all.h"
-#include "./residue_44.h"
-#include "./psych_44.h"
+#include "modes/floor_all.h"
+#include "modes/residue_44.h"
+#include "modes/psych_44.h"
 
 static const double rate_mapping_44_stereo[12]={
   22500.,32000.,40000.,48000.,56000.,64000.,
