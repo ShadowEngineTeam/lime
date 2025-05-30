@@ -6,16 +6,15 @@
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
  * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2010             *
- * by the Xiph.Org Foundation http://www.xiph.org/                  *
+ * by the Xiph.Org Foundation https://xiph.org/                     *
  *                                                                  *
  ********************************************************************
 
  function: toplevel settings for 44.1/48kHz 5.1 surround modes
- last mod: $Id$
 
  ********************************************************************/
 
-#include "./residue_44p51.h"
+#include "modes/residue_44p51.h"
 
 static const double rate_mapping_44p51[12]={
   14000.,20000.,28000.,38000.,46000.,54000.,

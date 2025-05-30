@@ -1,5 +1,3 @@
-#include <float.h>
-
 #ifndef PIXMAN_PRIVATE_H
 #define PIXMAN_PRIVATE_H
 
@@ -7,7 +5,7 @@
  * The defines which are shared between C and assembly code
  */
 
-/* bilinear interpolation precision (must be <= 8) */
+/* bilinear interpolation precision (must be < 8) */
 #define BILINEAR_INTERPOLATION_BITS 7
 #define BILINEAR_INTERPOLATION_RANGE (1 << BILINEAR_INTERPOLATION_BITS)
 
@@ -30,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include <float.h>
 
 #include "pixman-compiler.h"
 
@@ -180,6 +179,10 @@ struct bits_image
     uint32_t *                 bits;
     uint32_t *                 free_me;
     int                        rowstride;  /* in number of uint32_t's */
+
+    pixman_dither_t            dither;
+    uint32_t                   dither_offset_y;
+    uint32_t                   dither_offset_x;
 
     fetch_scanline_t           fetch_scanline_32;
     fetch_pixel_32_t	       fetch_pixel_32;
@@ -345,8 +348,8 @@ typedef struct
     float		    r_s, r_b;
     float		    g_s, g_b;
     float		    b_s, b_b;
-    pixman_fixed_t	    left_x;
-    pixman_fixed_t          right_x;
+    pixman_fixed_48_16_t    left_x;
+    pixman_fixed_48_16_t    right_x;
 
     pixman_gradient_stop_t *stops;
     int                     num_stops;
@@ -364,9 +367,38 @@ void
 _pixman_gradient_walker_reset (pixman_gradient_walker_t *walker,
                                pixman_fixed_48_16_t      pos);
 
-uint32_t
-_pixman_gradient_walker_pixel (pixman_gradient_walker_t *walker,
-                               pixman_fixed_48_16_t      x);
+typedef void (*pixman_gradient_walker_write_t) (
+    pixman_gradient_walker_t *walker,
+    pixman_fixed_48_16_t      x,
+    uint32_t                 *buffer);
+
+void
+_pixman_gradient_walker_write_narrow(pixman_gradient_walker_t *walker,
+				     pixman_fixed_48_16_t      x,
+				     uint32_t                 *buffer);
+
+void
+_pixman_gradient_walker_write_wide(pixman_gradient_walker_t *walker,
+				   pixman_fixed_48_16_t      x,
+				   uint32_t                 *buffer);
+
+typedef void (*pixman_gradient_walker_fill_t) (
+    pixman_gradient_walker_t *walker,
+    pixman_fixed_48_16_t      x,
+    uint32_t                 *buffer,
+    uint32_t                 *end);
+
+void
+_pixman_gradient_walker_fill_narrow(pixman_gradient_walker_t *walker,
+				    pixman_fixed_48_16_t      x,
+				    uint32_t                 *buffer,
+				    uint32_t                 *end);
+
+void
+_pixman_gradient_walker_fill_wide(pixman_gradient_walker_t *walker,
+				  pixman_fixed_48_16_t      x,
+				  uint32_t                 *buffer,
+				  uint32_t                 *end);
 
 /*
  * Edges
@@ -608,6 +640,11 @@ pixman_implementation_t *
 _pixman_implementation_create_arm_neon (pixman_implementation_t *fallback);
 #endif
 
+#ifdef USE_ARM_A64_NEON
+pixman_implementation_t *
+_pixman_implementation_create_arm_neon (pixman_implementation_t *fallback);
+#endif
+
 #ifdef USE_MIPS_DSPR2
 pixman_implementation_t *
 _pixman_implementation_create_mips_dspr2 (pixman_implementation_t *fallback);
@@ -782,7 +819,7 @@ get_implementation (void)
 /* This function is exported for the sake of the test suite and not part
  * of the ABI.
  */
-PIXMAN_EXPORT pixman_implementation_t *
+pixman_implementation_t *
 _pixman_internal_only_get_implementation (void);
 
 /* Memory allocation helpers */

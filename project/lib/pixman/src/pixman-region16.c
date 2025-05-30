@@ -56,7 +56,7 @@ typedef struct {
  * the addresses of those structs which makes the existing code continue to
  * work.
  */
-PIXMAN_EXPORT void
+void
 pixman_region_set_static_pointers (pixman_box16_t *empty_box,
 				   pixman_region16_data_t *empty_data,
 				   pixman_region16_data_t *broken_data)

@@ -325,18 +325,20 @@ _pixman_compute_composite_region32 (pixman_region32_t * region,
     return TRUE;
 }
 
-typedef struct
+typedef struct box_48_16 box_48_16_t;
+
+struct box_48_16
 {
-    pixman_fixed_48_16_t	x1;
-    pixman_fixed_48_16_t	y1;
-    pixman_fixed_48_16_t	x2;
-    pixman_fixed_48_16_t	y2;
-} box_48_16_t;
+    pixman_fixed_48_16_t        x1;
+    pixman_fixed_48_16_t        y1;
+    pixman_fixed_48_16_t        x2;
+    pixman_fixed_48_16_t        y2;
+};
 
 static pixman_bool_t
-compute_transformed_extents (pixman_transform_t *transform,
+compute_transformed_extents (pixman_transform_t   *transform,
 			     const pixman_box32_t *extents,
-			     box_48_16_t *transformed)
+			     box_48_16_t          *transformed)
 {
     pixman_fixed_48_16_t tx1, ty1, tx2, ty2;
     pixman_fixed_t x1, y1, x2, y2;
@@ -495,21 +497,12 @@ analyze_extent (pixman_image_t       *image,
     if (!compute_transformed_extents (transform, extents, &transformed))
 	return FALSE;
 
-    /* Expand the source area by a tiny bit so account of different rounding that
-     * may happen during sampling. Note that (8 * pixman_fixed_e) is very far from
-     * 0.5 so this won't cause the area computed to be overly pessimistic.
-     */
-    transformed.x1 -= 8 * pixman_fixed_e;
-    transformed.y1 -= 8 * pixman_fixed_e;
-    transformed.x2 += 8 * pixman_fixed_e;
-    transformed.y2 += 8 * pixman_fixed_e;
-
     if (image->common.type == BITS)
     {
-	if (pixman_fixed_to_int (transformed.x1) >= 0			&&
-	    pixman_fixed_to_int (transformed.y1) >= 0			&&
-	    pixman_fixed_to_int (transformed.x2) < image->bits.width	&&
-	    pixman_fixed_to_int (transformed.y2) < image->bits.height)
+	if (pixman_fixed_to_int (transformed.x1 - pixman_fixed_e) >= 0                &&
+	    pixman_fixed_to_int (transformed.y1 - pixman_fixed_e) >= 0                &&
+	    pixman_fixed_to_int (transformed.x2 - pixman_fixed_e) < image->bits.width &&
+	    pixman_fixed_to_int (transformed.y2 - pixman_fixed_e) < image->bits.height)
 	{
 	    *flags |= FAST_PATH_SAMPLES_COVER_CLIP_NEAREST;
 	}
@@ -566,7 +559,7 @@ analyze_extent (pixman_image_t       *image,
 #if defined (USE_SSE2) && defined(__GNUC__) && !defined(__x86_64__) && !defined(__amd64__)
 __attribute__((__force_align_arg_pointer__))
 #endif
-PIXMAN_EXPORT void
+void
 pixman_image_composite32 (pixman_op_t      op,
                           pixman_image_t * src,
                           pixman_image_t * mask,
@@ -713,7 +706,7 @@ out:
     pixman_region32_fini (&region);
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_composite (pixman_op_t      op,
                         pixman_image_t * src,
                         pixman_image_t * mask,
@@ -731,7 +724,7 @@ pixman_image_composite (pixman_op_t      op,
                               mask_x, mask_y, dest_x, dest_y, width, height);
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_blt (uint32_t *src_bits,
             uint32_t *dst_bits,
             int       src_stride,
@@ -753,7 +746,7 @@ pixman_blt (uint32_t *src_bits,
                                        width, height);
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_fill (uint32_t *bits,
              int       stride,
              int       bpp,
@@ -783,6 +776,11 @@ color_to_pixel (const pixman_color_t *color,
                 pixman_format_code_t  format)
 {
     uint32_t c = color_to_uint32 (color);
+
+    if (PIXMAN_FORMAT_TYPE (format) == PIXMAN_TYPE_RGBA_FLOAT)
+    {
+	return FALSE;
+    }
 
     if (!(format == PIXMAN_a8r8g8b8     ||
           format == PIXMAN_x8r8g8b8     ||
@@ -834,7 +832,7 @@ color_to_pixel (const pixman_color_t *color,
     return TRUE;
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_fill_rectangles (pixman_op_t                 op,
                               pixman_image_t *            dest,
 			      const pixman_color_t *      color,
@@ -873,7 +871,7 @@ pixman_image_fill_rectangles (pixman_op_t                 op,
     return result;
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_fill_boxes (pixman_op_t           op,
                          pixman_image_t *      dest,
                          const pixman_color_t *color,
@@ -977,7 +975,7 @@ pixman_image_fill_boxes (pixman_op_t           op,
  *
  * Return value: the encoded version.
  **/
-PIXMAN_EXPORT int
+int
 pixman_version (void)
 {
     return PIXMAN_VERSION;
@@ -994,7 +992,7 @@ pixman_version (void)
  *
  * Return value: a string containing the version.
  **/
-PIXMAN_EXPORT const char*
+const char*
 pixman_version_string (void)
 {
     return PIXMAN_VERSION_STRING;
@@ -1010,7 +1008,7 @@ pixman_version_string (void)
  *
  * Currently, all pixman_format_code_t values are supported.
  **/
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_format_supported_source (pixman_format_code_t format)
 {
     switch (format)
@@ -1090,7 +1088,7 @@ pixman_format_supported_source (pixman_format_code_t format)
  * Currently, all pixman_format_code_t values are supported
  * except for the YUV formats.
  **/
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_format_supported_destination (pixman_format_code_t format)
 {
     /* YUV formats cannot be written to at the moment */
@@ -1100,7 +1098,7 @@ pixman_format_supported_destination (pixman_format_code_t format)
     return pixman_format_supported_source (format);
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_compute_composite_region (pixman_region16_t * region,
                                  pixman_image_t *    src_image,
                                  pixman_image_t *    mask_image,

@@ -66,6 +66,7 @@ class CreateTemplate
 			System.mkdir(title + "/ndll");
 			System.mkdir(title + "/ndll/Linux");
 			System.mkdir(title + "/ndll/Linux64");
+			System.mkdir(title + "/ndll/LinuxArm64");
 			System.mkdir(title + "/ndll/Mac");
 			System.mkdir(title + "/ndll/Mac64");
 			System.mkdir(title + "/ndll/MacArm64");

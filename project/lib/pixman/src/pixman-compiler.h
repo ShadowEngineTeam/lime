@@ -4,8 +4,6 @@
  * The features are:
  *
  *    FUNC	     must be defined to expand to the current function
- *    PIXMAN_EXPORT  should be defined to whatever is required to
- *                   export functions from a shared library
  *    limits	     limits for various types must be defined
  *    inline         must be defined
  *    force_inline   must be defined
@@ -89,16 +87,6 @@
 #   endif
 #endif
 
-/* GCC visibility */
-#if defined(__GNUC__) && __GNUC__ >= 4 && !defined(_WIN32)
-#   define PIXMAN_EXPORT __attribute__ ((visibility("default")))
-/* Sun Studio 8 visibility */
-#elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
-#   define PIXMAN_EXPORT __global
-#else
-#   define PIXMAN_EXPORT
-#endif
-
 /* member offsets */
 #define CONTAINER_OF(type, member, data)				\
     ((type *)(((uint8_t *)data) - offsetof (type, member)))
@@ -107,14 +95,14 @@
 #if defined(PIXMAN_NO_TLS)
 
 #   define PIXMAN_DEFINE_THREAD_LOCAL(type, name)			\
-    static type name
+    static type name;
 #   define PIXMAN_GET_THREAD_LOCAL(name)				\
     (&name)
 
 #elif defined(TLS)
 
 #   define PIXMAN_DEFINE_THREAD_LOCAL(type, name)			\
-    static TLS type name
+    static TLS type name;
 #   define PIXMAN_GET_THREAD_LOCAL(name)				\
     (&name)
 
@@ -174,7 +162,7 @@
 #elif defined(_MSC_VER)
 
 #   define PIXMAN_DEFINE_THREAD_LOCAL(type, name)			\
-    static __declspec(thread) type name
+    static __declspec(thread) type name;
 #   define PIXMAN_GET_THREAD_LOCAL(name)				\
     (&name)
 

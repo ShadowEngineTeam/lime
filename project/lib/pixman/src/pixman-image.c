@@ -196,7 +196,7 @@ image_property_changed (pixman_image_t *image)
 }
 
 /* Ref Counting */
-PIXMAN_EXPORT pixman_image_t *
+pixman_image_t *
 pixman_image_ref (pixman_image_t *image)
 {
     image->common.ref_count++;
@@ -205,7 +205,7 @@ pixman_image_ref (pixman_image_t *image)
 }
 
 /* returns TRUE when the image is freed */
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_unref (pixman_image_t *image)
 {
     if (_pixman_image_fini (image))
@@ -217,7 +217,7 @@ pixman_image_unref (pixman_image_t *image)
     return FALSE;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_destroy_function (pixman_image_t *            image,
                                    pixman_image_destroy_func_t func,
                                    void *                      data)
@@ -226,7 +226,7 @@ pixman_image_set_destroy_function (pixman_image_t *            image,
     image->common.destroy_data = data;
 }
 
-PIXMAN_EXPORT void *
+void *
 pixman_image_get_destroy_data (pixman_image_t *image)
 {
   return image->common.destroy_data;
@@ -256,7 +256,7 @@ _pixman_image_reset_clip_region (pixman_image_t *image)
  * Since 0.21.2, pixman doesn't do these workarounds anymore, so now
  * this function is a no-op.
  */
-PIXMAN_EXPORT void
+void
 pixman_disable_out_of_bounds_workaround (void)
 {
 }
@@ -335,37 +335,47 @@ compute_image_info (pixman_image_t *image)
 	{
 	    flags |= FAST_PATH_NEAREST_FILTER;
 	}
-	else if (
-	    /* affine and integer translation components in matrix ... */
-	    ((flags & FAST_PATH_AFFINE_TRANSFORM) &&
-	     !pixman_fixed_frac (image->common.transform->matrix[0][2] |
-				 image->common.transform->matrix[1][2])) &&
-	    (
-		/* ... combined with a simple rotation */
-		(flags & (FAST_PATH_ROTATE_90_TRANSFORM |
-			  FAST_PATH_ROTATE_180_TRANSFORM |
-			  FAST_PATH_ROTATE_270_TRANSFORM)) ||
-		/* ... or combined with a simple non-rotated translation */
-		(image->common.transform->matrix[0][0] == pixman_fixed_1 &&
-		 image->common.transform->matrix[1][1] == pixman_fixed_1 &&
-		 image->common.transform->matrix[0][1] == 0 &&
-		 image->common.transform->matrix[1][0] == 0)
-		)
-	    )
+	else if (flags & FAST_PATH_AFFINE_TRANSFORM)
 	{
-	    /* FIXME: there are some affine-test failures, showing that
-	     * handling of BILINEAR and NEAREST filter is not quite
-	     * equivalent when getting close to 32K for the translation
-	     * components of the matrix. That's likely some bug, but for
-	     * now just skip BILINEAR->NEAREST optimization in this case.
+	    /* Suppose the transform is
+	     *
+	     *    [ t00, t01, t02 ]
+	     *    [ t10, t11, t12 ]
+	     *    [   0,   0,   1 ]
+	     *
+	     * and the destination coordinates are (n + 0.5, m + 0.5). Then
+	     * the transformed x coordinate is:
+	     *
+	     *     tx = t00 * (n + 0.5) + t01 * (m + 0.5) + t02
+	     *        = t00 * n + t01 * m + t02 + (t00 + t01) * 0.5
+	     *
+	     * which implies that if t00, t01 and t02 are all integers
+	     * and (t00 + t01) is odd, then tx will be an integer plus 0.5,
+	     * which means a BILINEAR filter will reduce to NEAREST. The same
+	     * applies in the y direction
 	     */
-	    pixman_fixed_t magic_limit = pixman_int_to_fixed (30000);
-	    if (image->common.transform->matrix[0][2] <= magic_limit  &&
-	        image->common.transform->matrix[1][2] <= magic_limit  &&
-	        image->common.transform->matrix[0][2] >= -magic_limit &&
-	        image->common.transform->matrix[1][2] >= -magic_limit)
+	    pixman_fixed_t (*t)[3] = image->common.transform->matrix;
+
+	    if ((pixman_fixed_frac (
+		     t[0][0] | t[0][1] | t[0][2] |
+		     t[1][0] | t[1][1] | t[1][2]) == 0)			&&
+		(pixman_fixed_to_int (
+		    (t[0][0] + t[0][1]) & (t[1][0] + t[1][1])) % 2) == 1)
 	    {
-		flags |= FAST_PATH_NEAREST_FILTER;
+		/* FIXME: there are some affine-test failures, showing that
+		 * handling of BILINEAR and NEAREST filter is not quite
+		 * equivalent when getting close to 32K for the translation
+		 * components of the matrix. That's likely some bug, but for
+		 * now just skip BILINEAR->NEAREST optimization in this case.
+		 */
+		pixman_fixed_t magic_limit = pixman_int_to_fixed (30000);
+		if (image->common.transform->matrix[0][2] <= magic_limit  &&
+		    image->common.transform->matrix[1][2] <= magic_limit  &&
+		    image->common.transform->matrix[0][2] >= -magic_limit &&
+		    image->common.transform->matrix[1][2] >= -magic_limit)
+		{
+		    flags |= FAST_PATH_NEAREST_FILTER;
+		}
 	    }
 	}
 	break;
@@ -555,7 +565,7 @@ _pixman_image_validate (pixman_image_t *image)
 	_pixman_image_validate ((pixman_image_t *)image->common.alpha_map);
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_set_clip_region32 (pixman_image_t *   image,
                                 pixman_region32_t *region)
 {
@@ -579,7 +589,7 @@ pixman_image_set_clip_region32 (pixman_image_t *   image,
     return result;
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_set_clip_region (pixman_image_t *   image,
                               pixman_region16_t *region)
 {
@@ -603,14 +613,14 @@ pixman_image_set_clip_region (pixman_image_t *   image,
     return result;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_has_client_clip (pixman_image_t *image,
                                   pixman_bool_t   client_clip)
 {
     image->common.client_clip = client_clip;
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_set_transform (pixman_image_t *          image,
                             const pixman_transform_t *transform)
 {
@@ -662,7 +672,7 @@ out:
     return result;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_repeat (pixman_image_t *image,
                          pixman_repeat_t repeat)
 {
@@ -674,7 +684,42 @@ pixman_image_set_repeat (pixman_image_t *image,
     image_property_changed (image);
 }
 
-PIXMAN_EXPORT pixman_bool_t
+void
+pixman_image_set_dither (pixman_image_t *image,
+			 pixman_dither_t dither)
+{
+    if (image->type == BITS)
+    {
+	if (image->bits.dither == dither)
+	    return;
+
+	image->bits.dither = dither;
+
+	image_property_changed (image);
+    }
+}
+
+void
+pixman_image_set_dither_offset (pixman_image_t *image,
+				int             offset_x,
+				int             offset_y)
+{
+    if (image->type == BITS)
+    {
+	if (image->bits.dither_offset_x == offset_x &&
+	    image->bits.dither_offset_y == offset_y)
+	{
+	    return;
+	}
+
+	image->bits.dither_offset_x = offset_x;
+	image->bits.dither_offset_y = offset_y;
+
+	image_property_changed (image);
+    }
+}
+
+pixman_bool_t
 pixman_image_set_filter (pixman_image_t *      image,
                          pixman_filter_t       filter,
                          const pixman_fixed_t *params,
@@ -722,7 +767,7 @@ pixman_image_set_filter (pixman_image_t *      image,
     return TRUE;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_source_clipping (pixman_image_t *image,
                                   pixman_bool_t   clip_sources)
 {
@@ -738,7 +783,7 @@ pixman_image_set_source_clipping (pixman_image_t *image,
  * copy the content of indexed. Doing this copying is simply
  * way, way too expensive.
  */
-PIXMAN_EXPORT void
+void
 pixman_image_set_indexed (pixman_image_t *        image,
                           const pixman_indexed_t *indexed)
 {
@@ -752,7 +797,7 @@ pixman_image_set_indexed (pixman_image_t *        image,
     image_property_changed (image);
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_alpha_map (pixman_image_t *image,
                             pixman_image_t *alpha_map,
                             int16_t         x,
@@ -805,7 +850,7 @@ pixman_image_set_alpha_map (pixman_image_t *image,
     image_property_changed (image);
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_component_alpha   (pixman_image_t *image,
                                     pixman_bool_t   component_alpha)
 {
@@ -817,13 +862,13 @@ pixman_image_set_component_alpha   (pixman_image_t *image,
     image_property_changed (image);
 }
 
-PIXMAN_EXPORT pixman_bool_t
+pixman_bool_t
 pixman_image_get_component_alpha   (pixman_image_t       *image)
 {
     return image->common.component_alpha;
 }
 
-PIXMAN_EXPORT void
+void
 pixman_image_set_accessors (pixman_image_t *           image,
                             pixman_read_memory_func_t  read_func,
                             pixman_write_memory_func_t write_func)
@@ -832,6 +877,10 @@ pixman_image_set_accessors (pixman_image_t *           image,
 
     if (image->type == BITS)
     {
+	/* Accessors only work for <= 32 bpp. */
+	if (PIXMAN_FORMAT_BPP(image->bits.format) > 32)
+	    return_if_fail (!read_func && !write_func);
+
 	image->bits.read_func = read_func;
 	image->bits.write_func = write_func;
 
@@ -839,7 +888,7 @@ pixman_image_set_accessors (pixman_image_t *           image,
     }
 }
 
-PIXMAN_EXPORT uint32_t *
+uint32_t *
 pixman_image_get_data (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -848,7 +897,7 @@ pixman_image_get_data (pixman_image_t *image)
     return NULL;
 }
 
-PIXMAN_EXPORT int
+int
 pixman_image_get_width (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -857,7 +906,7 @@ pixman_image_get_width (pixman_image_t *image)
     return 0;
 }
 
-PIXMAN_EXPORT int
+int
 pixman_image_get_height (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -866,7 +915,7 @@ pixman_image_get_height (pixman_image_t *image)
     return 0;
 }
 
-PIXMAN_EXPORT int
+int
 pixman_image_get_stride (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -875,7 +924,7 @@ pixman_image_get_stride (pixman_image_t *image)
     return 0;
 }
 
-PIXMAN_EXPORT int
+int
 pixman_image_get_depth (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -884,7 +933,7 @@ pixman_image_get_depth (pixman_image_t *image)
     return 0;
 }
 
-PIXMAN_EXPORT pixman_format_code_t
+pixman_format_code_t
 pixman_image_get_format (pixman_image_t *image)
 {
     if (image->type == BITS)
@@ -911,7 +960,7 @@ _pixman_image_get_solid (pixman_implementation_t *imp,
 	else if (image->bits.format == PIXMAN_x8r8g8b8)
 	    result = image->bits.bits[0] | 0xff000000;
 	else if (image->bits.format == PIXMAN_a8)
-	    result = (*(uint8_t *)image->bits.bits) << 24;
+	    result = (uint32_t)(*(uint8_t *)image->bits.bits) << 24;
 	else
 	    goto otherwise;
     }

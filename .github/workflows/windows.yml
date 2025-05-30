@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 env:
-  HAXE_VERSION: 4.3.6
+  HAXE_VERSION: 4.3.7
 
 jobs:
   windows:
@@ -20,7 +20,7 @@ jobs:
         run: echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
       - name: Install Haxe dependencies
         run: |
-          haxelib git hxcpp https://github.com/MobilePorting/hxcpp --quiet
+          haxelib git hxcpp https://github.com/th2l-devs/hxcpp --quiet
           haxelib install format --quiet
           haxelib install hxp
       - name: Enable HXCPP compile cache
@@ -30,7 +30,8 @@ jobs:
       - name: Rebuild Lime
         run: |
           haxelib run lime rebuild windows -32 -release -nocolor -nocffi
-          haxelib run lime rebuild windows -64 -release -nocolor -nocffi -eval
+          haxelib run lime rebuild windows -64 -release -nocolor -nocffi
+          haxelib run lime rebuild windows -arm64 -release -nocolor -nocffi -D HXCPP_ARM64
       - name: Upload Artifact (x86)
         uses: actions/upload-artifact@v4
         with:
@@ -46,6 +47,15 @@ jobs:
           name: Windows64-NDLL
           path: |
             ndll/Windows64/
+            !**/.gitignore
+            lime.png
+          if-no-files-found: error
+      - name: Upload Artifact (ARM64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: WindowsArm64-NDLL
+          path: |
+            ndll/WindowsArm64/
             !**/.gitignore
             lime.png
           if-no-files-found: error

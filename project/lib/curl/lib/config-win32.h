@@ -81,7 +81,7 @@
 /* #define HAVE_SSL_H 1 */
 
 /* Define to 1 if you have the <stdbool.h> header file. */
-#if defined(_MSC_VER) && (_MSC_VER >= 1800)
+#if defined(_MSC_VER) && (_MSC_VER >= 1800) || __MINGW32__
 #define HAVE_STDBOOL_H 1
 #endif
 
@@ -152,7 +152,7 @@
 /* #define TIME_WITH_SYS_TIME 1 */
 
 /* Define to 1 if bool is an available type. */
-#if defined(_MSC_VER) && (_MSC_VER >= 1800)
+#if defined(_MSC_VER) && (_MSC_VER >= 1800) || defined(__MINGW32__)
 #define HAVE_BOOL_T 1
 #endif
 
