@@ -9,7 +9,7 @@
 #include <string_view>
 #include <vector>
 
-#include "alc/events.h"
+#include "Alc/events.h"
 #include "core/device.h"
 #include "core/except.h"
 #include "fmt/core.h"

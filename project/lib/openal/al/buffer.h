@@ -13,7 +13,7 @@
 #include "AL/al.h"
 #include "AL/alc.h"
 
-#include "alc/inprogext.h"
+#include "Alc/inprogext.h"
 #include "almalloc.h"
 #include "alnumeric.h"
 #include "core/buffer_storage.h"

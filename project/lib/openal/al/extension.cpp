@@ -25,7 +25,7 @@
 #include "AL/al.h"
 #include "AL/alc.h"
 
-#include "alc/context.h"
+#include "Alc/context.h"
 #include "alstring.h"
 #include "direct_defs.h"
 #include "opthelpers.h"

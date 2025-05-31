@@ -9,7 +9,7 @@
 #include "AL/al.h"
 #include "AL/efx.h"
 
-#include "alc/context.h"
+#include "Alc/context.h"
 #include "alnumeric.h"
 #include "alspan.h"
 #include "effects.h"

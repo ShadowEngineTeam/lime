@@ -27,7 +27,7 @@
 #include <variant>
 #include <vector>
 
-#include "alc/effects/base.h"
+#include "Alc/effects/base.h"
 #include "alnumeric.h"
 #include "alspan.h"
 #include "core/ambidefs.h"

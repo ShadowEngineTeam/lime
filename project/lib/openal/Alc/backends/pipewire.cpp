@@ -44,8 +44,8 @@
 #include <tuple>
 #include <utility>
 
-#include "alc/alconfig.h"
-#include "alc/backends/base.h"
+#include "Alc/alconfig.h"
+#include "Alc/backends/base.h"
 #include "almalloc.h"
 #include "alspan.h"
 #include "alstring.h"

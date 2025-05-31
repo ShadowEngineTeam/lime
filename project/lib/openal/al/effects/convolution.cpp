@@ -7,8 +7,8 @@
 
 #include "AL/al.h"
 
-#include "alc/context.h"
-#include "alc/inprogext.h"
+#include "Alc/context.h"
+#include "Alc/inprogext.h"
 #include "alnumeric.h"
 #include "alspan.h"
 #include "effects.h"

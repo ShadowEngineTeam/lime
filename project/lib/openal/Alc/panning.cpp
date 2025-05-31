@@ -41,7 +41,7 @@
 #include "AL/alc.h"
 #include "AL/alext.h"
 
-#include "alc/context.h"
+#include "Alc/context.h"
 #include "alnumbers.h"
 #include "alnumeric.h"
 #include "alspan.h"

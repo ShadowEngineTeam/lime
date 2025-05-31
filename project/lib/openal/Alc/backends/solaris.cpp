@@ -40,7 +40,7 @@
 #include <thread>
 #include <functional>
 
-#include "alc/alconfig.h"
+#include "Alc/alconfig.h"
 #include "alstring.h"
 #include "althrd_setname.h"
 #include "core/device.h"

@@ -28,7 +28,7 @@
 #include <functional>
 #include <variant>
 
-#include "alc/effects/base.h"
+#include "Alc/effects/base.h"
 #include "alnumbers.h"
 #include "alnumeric.h"
 #include "alspan.h"
