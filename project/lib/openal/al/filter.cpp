@@ -38,8 +38,8 @@
 #include "AL/efx.h"
 
 #include "albit.h"
-#include "alc/context.h"
-#include "alc/device.h"
+#include "Alc/context.h"
+#include "Alc/device.h"
 #include "almalloc.h"
 #include "alnumeric.h"
 #include "alspan.h"

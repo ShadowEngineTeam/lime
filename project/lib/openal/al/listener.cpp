@@ -30,7 +30,7 @@
 #include "AL/alc.h"
 #include "AL/efx.h"
 
-#include "alc/context.h"
+#include "Alc/context.h"
 #include "alnumeric.h"
 #include "alspan.h"
 #include "core/except.h"

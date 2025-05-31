@@ -59,7 +59,7 @@
 #include <vector>
 
 #include "albit.h"
-#include "alc/alconfig.h"
+#include "Alc/alconfig.h"
 #include "alnumeric.h"
 #include "alspan.h"
 #include "althrd_setname.h"

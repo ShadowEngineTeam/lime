@@ -37,7 +37,7 @@
 #include <utility>
 #include <vector>
 
-#include "alc/alconfig.h"
+#include "Alc/alconfig.h"
 #include "almalloc.h"
 #include "alnumeric.h"
 #include "althrd_setname.h"

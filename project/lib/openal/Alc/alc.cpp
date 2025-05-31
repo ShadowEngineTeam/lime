@@ -69,7 +69,7 @@
 #include "al/effect.h"
 #include "al/filter.h"
 #include "al/source.h"
-#include "alc/events.h"
+#include "Alc/events.h"
 #include "albit.h"
 #include "alconfig.h"
 #include "almalloc.h"

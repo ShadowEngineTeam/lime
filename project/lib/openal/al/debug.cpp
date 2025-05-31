@@ -19,8 +19,8 @@
 #include "AL/alc.h"
 #include "AL/alext.h"
 
-#include "alc/context.h"
-#include "alc/device.h"
+#include "Alc/context.h"
+#include "Alc/device.h"
 #include "alnumeric.h"
 #include "alspan.h"
 #include "auxeffectslot.h"

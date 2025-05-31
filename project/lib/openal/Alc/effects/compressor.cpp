@@ -38,7 +38,7 @@
 #include <cstdlib>
 #include <variant>
 
-#include "alc/effects/base.h"
+#include "Alc/effects/base.h"
 #include "alspan.h"
 #include "core/ambidefs.h"
 #include "core/bufferline.h"

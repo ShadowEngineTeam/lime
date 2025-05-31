@@ -27,7 +27,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "alc/alconfig.h"
+#include "Alc/alconfig.h"
 #include "core/device.h"
 #include "core/logging.h"
 #include "dynload.h"

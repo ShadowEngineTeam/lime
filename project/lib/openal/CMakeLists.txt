@@ -783,35 +783,35 @@ set(OPENAL_OBJS
 
 # ALC and related routines
 set(ALC_OBJS
-    alc/alc.cpp
-    alc/alu.cpp
-    alc/alu.h
-    alc/alconfig.cpp
-    alc/alconfig.h
-    alc/context.cpp
-    alc/context.h
-    alc/device.cpp
-    alc/device.h
-    alc/effects/base.h
-    alc/effects/autowah.cpp
-    alc/effects/chorus.cpp
-    alc/effects/compressor.cpp
-    alc/effects/convolution.cpp
-    alc/effects/dedicated.cpp
-    alc/effects/distortion.cpp
-    alc/effects/echo.cpp
-    alc/effects/equalizer.cpp
-    alc/effects/fshifter.cpp
-    alc/effects/modulator.cpp
-    alc/effects/null.cpp
-    alc/effects/pshifter.cpp
-    alc/effects/reverb.cpp
-    alc/effects/vmorpher.cpp
-    alc/events.cpp
-    alc/events.h
-    alc/export_list.h
-    alc/inprogext.h
-    alc/panning.cpp)
+    Alc/alc.cpp
+    Alc/alu.cpp
+    Alc/alu.h
+    Alc/alconfig.cpp
+    Alc/alconfig.h
+    Alc/context.cpp
+    Alc/context.h
+    Alc/device.cpp
+    Alc/device.h
+    Alc/effects/base.h
+    Alc/effects/autowah.cpp
+    Alc/effects/chorus.cpp
+    Alc/effects/compressor.cpp
+    Alc/effects/convolution.cpp
+    Alc/effects/dedicated.cpp
+    Alc/effects/distortion.cpp
+    Alc/effects/echo.cpp
+    Alc/effects/equalizer.cpp
+    Alc/effects/fshifter.cpp
+    Alc/effects/modulator.cpp
+    Alc/effects/null.cpp
+    Alc/effects/pshifter.cpp
+    Alc/effects/reverb.cpp
+    Alc/effects/vmorpher.cpp
+    Alc/events.cpp
+    Alc/events.h
+    Alc/export_list.h
+    Alc/inprogext.h
+    Alc/panning.cpp)
 
 if(ALSOFT_EAX)
     set(OPENAL_OBJS
@@ -889,13 +889,13 @@ endif()
 
 set(BACKENDS "")
 set(ALC_OBJS  ${ALC_OBJS}
-    alc/backends/base.cpp
-    alc/backends/base.h
+    Alc/backends/base.cpp
+    Alc/backends/base.h
     # Default backends, always available
-    alc/backends/loopback.cpp
-    alc/backends/loopback.h
-    alc/backends/null.cpp
-    alc/backends/null.h
+    Alc/backends/loopback.cpp
+    Alc/backends/loopback.h
+    Alc/backends/null.cpp
+    Alc/backends/null.h
 )
 
 # Check PipeWire backend
@@ -906,7 +906,7 @@ if(ALSOFT_BACKEND_PIPEWIRE AND PkgConfig_FOUND)
     if(PIPEWIRE_FOUND)
         set(HAVE_PIPEWIRE 1)
         set(BACKENDS  "${BACKENDS} PipeWire${IS_LINKED},")
-        set(ALC_OBJS  ${ALC_OBJS} alc/backends/pipewire.cpp alc/backends/pipewire.h)
+        set(ALC_OBJS  ${ALC_OBJS} Alc/backends/pipewire.cpp Alc/backends/pipewire.h)
         add_backend_libs(${PIPEWIRE_LIBRARIES})
         set(INC_PATHS ${INC_PATHS} ${PIPEWIRE_INCLUDE_DIRS})
     endif()
@@ -923,7 +923,7 @@ if(ALSOFT_BACKEND_PULSEAUDIO)
     if(PULSEAUDIO_FOUND)
         set(HAVE_PULSEAUDIO 1)
         set(BACKENDS  "${BACKENDS} PulseAudio${IS_LINKED},")
-        set(ALC_OBJS  ${ALC_OBJS} alc/backends/pulseaudio.cpp alc/backends/pulseaudio.h)
+        set(ALC_OBJS  ${ALC_OBJS} Alc/backends/pulseaudio.cpp Alc/backends/pulseaudio.h)
         add_backend_libs(${PULSEAUDIO_LIBRARY})
         set(INC_PATHS ${INC_PATHS} ${PULSEAUDIO_INCLUDE_DIR})
     endif()
@@ -941,7 +941,7 @@ if(NOT WIN32)
         if(ALSA_FOUND)
             set(HAVE_ALSA 1)
             set(BACKENDS  "${BACKENDS} ALSA${IS_LINKED},")
-            set(ALC_OBJS  ${ALC_OBJS} alc/backends/alsa.cpp alc/backends/alsa.h)
+            set(ALC_OBJS  ${ALC_OBJS} Alc/backends/alsa.cpp Alc/backends/alsa.h)
             add_backend_libs(${ALSA_LIBRARIES})
             set(INC_PATHS ${INC_PATHS} ${ALSA_INCLUDE_DIRS})
         endif()
@@ -955,7 +955,7 @@ if(NOT WIN32)
         if(OSS_FOUND)
             set(HAVE_OSS 1)
             set(BACKENDS  "${BACKENDS} OSS,")
-            set(ALC_OBJS  ${ALC_OBJS} alc/backends/oss.cpp alc/backends/oss.h)
+            set(ALC_OBJS  ${ALC_OBJS} Alc/backends/oss.cpp Alc/backends/oss.h)
             if(OSS_LIBRARIES)
                 set(EXTRA_LIBS ${OSS_LIBRARIES} ${EXTRA_LIBS})
             endif()
@@ -971,7 +971,7 @@ if(NOT WIN32)
         if(AUDIOIO_FOUND)
             set(HAVE_SOLARIS 1)
             set(BACKENDS  "${BACKENDS} Solaris,")
-            set(ALC_OBJS  ${ALC_OBJS} alc/backends/solaris.cpp alc/backends/solaris.h)
+            set(ALC_OBJS  ${ALC_OBJS} Alc/backends/solaris.cpp Alc/backends/solaris.h)
             set(INC_PATHS ${INC_PATHS} ${AUDIOIO_INCLUDE_DIRS})
         endif()
     endif()
@@ -988,7 +988,7 @@ if(NOT WIN32)
         if(SNDIO_FOUND)
             set(HAVE_SNDIO 1)
             set(BACKENDS  "${BACKENDS} SndIO (linked),")
-            set(ALC_OBJS  ${ALC_OBJS} alc/backends/sndio.cpp alc/backends/sndio.hpp)
+            set(ALC_OBJS  ${ALC_OBJS} Alc/backends/sndio.cpp Alc/backends/sndio.hpp)
             set(EXTRA_LIBS ${SNDIO_LIBRARIES} ${EXTRA_LIBS})
             set(INC_PATHS ${INC_PATHS} ${SNDIO_INCLUDE_DIRS})
         endif()
@@ -1016,7 +1016,7 @@ if(WIN32)
         if(ALSOFT_BACKEND_WINMM)
             set(HAVE_WINMM 1)
             set(BACKENDS "${BACKENDS} WinMM,")
-            set(ALC_OBJS ${ALC_OBJS} alc/backends/winmm.cpp alc/backends/winmm.h)
+            set(ALC_OBJS ${ALC_OBJS} Alc/backends/winmm.cpp Alc/backends/winmm.h)
             # There doesn't seem to be good way to search for winmm.lib for MSVC.
             # find_library doesn't find it without being told to look in a specific
             # place in the WindowsSDK, but it links anyway. If there ends up being
@@ -1037,7 +1037,7 @@ if(WIN32)
             if(HAVE_DSOUND_H OR DSOUND_INCLUDE_DIR)
                 set(HAVE_DSOUND 1)
                 set(BACKENDS "${BACKENDS} DirectSound,")
-                set(ALC_OBJS ${ALC_OBJS} alc/backends/dsound.cpp alc/backends/dsound.h)
+                set(ALC_OBJS ${ALC_OBJS} Alc/backends/dsound.cpp Alc/backends/dsound.h)
 
                 if(NOT HAVE_DSOUND_H)
                     set(INC_PATHS ${INC_PATHS} ${DSOUND_INCLUDE_DIR})
@@ -1054,7 +1054,7 @@ if(WIN32)
         if(HAVE_MMDEVICEAPI_H)
             set(HAVE_WASAPI 1)
             set(BACKENDS  "${BACKENDS} WASAPI,")
-            set(ALC_OBJS  ${ALC_OBJS} alc/backends/wasapi.cpp alc/backends/wasapi.h)
+            set(ALC_OBJS  ${ALC_OBJS} Alc/backends/wasapi.cpp Alc/backends/wasapi.h)
 
             if(NOT ALSOFT_UWP)
                 set(EXTRA_LIBS avrt ${EXTRA_LIBS})
@@ -1067,7 +1067,7 @@ if(WIN32)
     if(ALSOFT_BACKEND_OTHERIO)
         set(HAVE_OTHERIO 1)
         set(BACKENDS  "${BACKENDS} OtherIO,")
-        set(ALC_OBJS  ${ALC_OBJS} alc/backends/otherio.cpp alc/backends/otherio.h)
+        set(ALC_OBJS  ${ALC_OBJS} Alc/backends/otherio.cpp Alc/backends/otherio.h)
     endif()
 endif()
 if(ALSOFT_REQUIRE_WINMM AND NOT HAVE_WINMM)
@@ -1091,7 +1091,7 @@ if(ALSOFT_BACKEND_JACK)
     if(JACK_FOUND)
         set(HAVE_JACK 1)
         set(BACKENDS  "${BACKENDS} JACK${IS_LINKED},")
-        set(ALC_OBJS  ${ALC_OBJS} alc/backends/jack.cpp alc/backends/jack.h)
+        set(ALC_OBJS  ${ALC_OBJS} Alc/backends/jack.cpp Alc/backends/jack.h)
         add_backend_libs(${JACK_LIBRARIES})
         set(INC_PATHS ${INC_PATHS} ${JACK_INCLUDE_DIRS})
     endif()
@@ -1108,7 +1108,7 @@ if(ALSOFT_BACKEND_COREAUDIO)
     find_path(AUDIOUNIT_INCLUDE_DIR NAMES AudioUnit/AudioUnit.h)
     if(COREAUDIO_FRAMEWORK AND AUDIOUNIT_INCLUDE_DIR)
         set(HAVE_COREAUDIO 1)
-        set(ALC_OBJS  ${ALC_OBJS} alc/backends/coreaudio.cpp alc/backends/coreaudio.h)
+        set(ALC_OBJS  ${ALC_OBJS} Alc/backends/coreaudio.cpp Alc/backends/coreaudio.h)
         set(BACKENDS  "${BACKENDS} CoreAudio,")
 
         set(EXTRA_LIBS -Wl,-framework,CoreAudio ${EXTRA_LIBS})
@@ -1158,7 +1158,7 @@ if(ALSOFT_BACKEND_OBOE)
 
     if(OBOE_TARGET)
         set(HAVE_OBOE 1)
-        set(ALC_OBJS  ${ALC_OBJS} alc/backends/oboe.cpp alc/backends/oboe.h)
+        set(ALC_OBJS  ${ALC_OBJS} Alc/backends/oboe.cpp Alc/backends/oboe.h)
         set(BACKENDS  "${BACKENDS} Oboe,")
         set(EXTRA_LIBS ${OBOE_TARGET} ${EXTRA_LIBS})
     endif()
@@ -1174,7 +1174,7 @@ if(ALSOFT_BACKEND_OPENSL)
     find_package(OpenSL)
     if(OPENSL_FOUND)
         set(HAVE_OPENSL 1)
-        set(ALC_OBJS  ${ALC_OBJS} alc/backends/opensl.cpp alc/backends/opensl.h)
+        set(ALC_OBJS  ${ALC_OBJS} Alc/backends/opensl.cpp Alc/backends/opensl.h)
         set(BACKENDS  "${BACKENDS} OpenSL${IS_LINKED},")
         add_backend_libs(${OPENSL_LIBRARIES})
         set(INC_PATHS ${INC_PATHS} ${OPENSL_INCLUDE_DIRS})
@@ -1192,7 +1192,7 @@ if(ALSOFT_BACKEND_PORTAUDIO)
     if(PORTAUDIO_FOUND)
         set(HAVE_PORTAUDIO 1)
         set(BACKENDS  "${BACKENDS} PortAudio${IS_LINKED},")
-        set(ALC_OBJS  ${ALC_OBJS} alc/backends/portaudio.cpp alc/backends/portaudio.hpp)
+        set(ALC_OBJS  ${ALC_OBJS} Alc/backends/portaudio.cpp Alc/backends/portaudio.hpp)
         add_backend_libs(${PORTAUDIO_LIBRARIES})
         set(INC_PATHS ${INC_PATHS} ${PORTAUDIO_INCLUDE_DIRS})
     endif()
@@ -1209,7 +1209,7 @@ option(ALSOFT_REQUIRE_SDL3 "Require SDL3 backend" OFF)
 if(ALSOFT_BACKEND_SDL3)
     if(SDL3_FOUND)
         set(HAVE_SDL3 1)
-        set(ALC_OBJS  ${ALC_OBJS} alc/backends/sdl3.cpp alc/backends/sdl3.h)
+        set(ALC_OBJS  ${ALC_OBJS} Alc/backends/sdl3.cpp Alc/backends/sdl3.h)
         set(BACKENDS  "${BACKENDS} SDL3,")
         set(EXTRA_LIBS ${EXTRA_LIBS} SDL3::SDL3)
     else()
@@ -1226,7 +1226,7 @@ if(ALSOFT_BACKEND_SDL2 AND NOT HAVE_SDL3)
     find_package(SDL2)
     if(SDL2_FOUND)
         set(HAVE_SDL2 1)
-        set(ALC_OBJS  ${ALC_OBJS} alc/backends/sdl2.cpp alc/backends/sdl2.h)
+        set(ALC_OBJS  ${ALC_OBJS} Alc/backends/sdl2.cpp Alc/backends/sdl2.h)
         set(BACKENDS  "${BACKENDS} SDL2,")
         set(EXTRA_LIBS ${EXTRA_LIBS} SDL2::SDL2)
     else()
@@ -1241,7 +1241,7 @@ endif()
 option(ALSOFT_BACKEND_WAVE "Enable Wave Writer backend" ON)
 if(ALSOFT_BACKEND_WAVE)
     set(HAVE_WAVE 1)
-    set(ALC_OBJS  ${ALC_OBJS} alc/backends/wave.cpp alc/backends/wave.h)
+    set(ALC_OBJS  ${ALC_OBJS} Alc/backends/wave.cpp Alc/backends/wave.h)
     set(BACKENDS  "${BACKENDS} WaveFile,")
 endif()
 

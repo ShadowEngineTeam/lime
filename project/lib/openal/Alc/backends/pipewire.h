@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "alc/events.h"
+#include "Alc/events.h"
 #include "base.h"
 
 struct DeviceBase;

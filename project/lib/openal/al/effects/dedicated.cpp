@@ -6,7 +6,7 @@
 #include "AL/al.h"
 #include "AL/alext.h"
 
-#include "alc/context.h"
+#include "Alc/context.h"
 #include "alnumeric.h"
 #include "effects.h"
 

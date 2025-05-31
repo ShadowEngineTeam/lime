@@ -31,7 +31,7 @@
 #include <thread>
 #include <vector>
 
-#include "alc/alconfig.h"
+#include "Alc/alconfig.h"
 #include "alnumeric.h"
 #include "alsem.h"
 #include "althrd_setname.h"

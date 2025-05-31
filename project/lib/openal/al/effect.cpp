@@ -44,9 +44,9 @@
 
 #include "al/effects/effects.h"
 #include "albit.h"
-#include "alc/context.h"
-#include "alc/device.h"
-#include "alc/inprogext.h"
+#include "Alc/context.h"
+#include "Alc/device.h"
+#include "Alc/inprogext.h"
 #include "almalloc.h"
 #include "alnumeric.h"
 #include "alspan.h"
