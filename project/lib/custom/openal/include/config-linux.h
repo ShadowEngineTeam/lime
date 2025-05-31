@@ -17,7 +17,7 @@
 /* #define HAVE_PTHREAD_NP_H */
 
 /* Define if we have cpuid.h */
-#ifndef RASPBERRYPI
+#if !defined(HXCPP_ARMV7) && !defined(HXCPP_ARM64)
 #define HAVE_CPUID_H
 #endif
 

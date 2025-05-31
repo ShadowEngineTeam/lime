@@ -1,4 +1,4 @@
-#ifndef RASPBERRYPI
+#if !defined(HXCPP_ARMV7) && !defined(HXCPP_ARM64)
 
 /* Define to 1 if we have SSE CPU extensions, else 0 */
 #define HAVE_SSE 1

@@ -10,13 +10,15 @@
 
 #ifdef HXCPP_M64
 #include "backends/config_backends-windows-x86_64.h"
+#elif defined(HXCPP_ARM64)
+#include "backends/config_backends-windows-arm64.h"
 #else
 #include "backends/config_backends-windows-x86.h"
 #endif
 
 #elif defined(HX_LINUX)
 
-#include "backends/config_backends-linux-x86_64.h"
+#include "backends/config_backends-linux.h"
 
 #elif defined (HX_ANDROID)
 
