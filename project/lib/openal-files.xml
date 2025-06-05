@@ -1,9 +1,5 @@
 <xml>
 
-    <section if="android LIME_OPENALSOFT">
-        <error value="NDK version 20 or higher is required." unless="NDKV20+" />
-    </section>
-
     <files id="native-toolkit-openal">
 
         <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/openal/" />
