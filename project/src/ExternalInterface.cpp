@@ -3906,6 +3906,22 @@ namespace lime {
 	}
 
 
+	bool lime_window_set_always_on_top (value window, bool enabled) {
+
+		Window* targetWindow = (Window*)val_data (window);
+		return targetWindow->SetAlwaysOnTop(enabled);
+
+	}
+
+
+	HL_PRIM bool HL_NAME(hl_window_set_always_on_top) (HL_CFFIPointer* window, bool enabled) {
+
+		Window* targetWindow = (Window*)window->ptr;
+		return targetWindow->SetAlwaysOnTop (enabled);
+
+	}
+
+
 	void lime_window_warp_mouse (value window, int x, int y) {
 
 		Window* targetWindow = (Window*)val_data (window);
@@ -4133,6 +4149,7 @@ namespace lime {
 	DEFINE_PRIME2v (lime_window_set_text_input_rect);
 	DEFINE_PRIME2 (lime_window_set_title);
 	DEFINE_PRIME2 (lime_window_set_visible);
+	DEFINE_PRIME2 (lime_window_set_always_on_top);
 	DEFINE_PRIME2 (lime_window_set_vsync);
 	DEFINE_PRIME3v (lime_window_warp_mouse);
 	DEFINE_PRIME1 (lime_window_get_opacity);
