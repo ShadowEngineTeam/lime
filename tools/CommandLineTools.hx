@@ -1802,6 +1802,14 @@ class CommandLineTools
 
 					args.push("-notoolscheck");
 
+					// Backport commit 95e6339 by @joshtynjala from the official lime repository
+					var projectDirectory = Path.directory(projectFile);
+					var localRepository = Path.combine(projectDirectory, ".haxelib");
+					if (FileSystem.exists(localRepository) && FileSystem.isDirectory(localRepository) && StringTools.startsWith(path, localRepository))
+					{
+						args.push("-nolocalrepocheck");
+					}
+
 					Sys.setCwd(path);
 					var args = [Path.combine(path, "run.n")].concat(args);
 					args.push(workingDirectory);
