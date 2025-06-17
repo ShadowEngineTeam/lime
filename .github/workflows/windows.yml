@@ -31,7 +31,6 @@ jobs:
         run: |
           haxelib run lime rebuild windows -32 -release -nocolor -nocffi
           haxelib run lime rebuild windows -64 -release -nocolor -nocffi
-          haxelib run lime rebuild windows -arm64 -release -nocolor -nocffi -D HXCPP_ARM64
       - name: Upload Artifact (x86)
         uses: actions/upload-artifact@v4
         with:
