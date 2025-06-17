@@ -56,9 +56,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
-        with:
-          haxe-version: ${{ env.HAXE_VERSION }}
+        shell: pwsh
+        run : |
+          iwr https://github.com/HaxeFoundation/haxe/releases/download/$Env:HAXE_VERSION/haxe-$Env:HAXE_VERSION-win.exe -OutFile haxe-installer.exe
+          .\haxe-installer.exe /S
+          rm haxe-installer.exe
       - name: Set HAXEPATH
         run: echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
       - name: Install Haxe dependencies
