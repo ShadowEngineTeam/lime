@@ -50,6 +50,28 @@ jobs:
             !**/.gitignore
             lime.png
           if-no-files-found: error
+  windowsarm64:
+    runs-on: windows-11-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: ${{ env.HAXE_VERSION }}
+      - name: Set HAXEPATH
+        run: echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
+      - name: Install Haxe dependencies
+        run: |
+          haxelib git hxcpp https://github.com/th2l-devs/hxcpp --quiet
+          haxelib install format --quiet
+          haxelib install hxp
+      - name: Enable HXCPP compile cache
+        run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
+      - name: Configure Lime
+        run: haxelib dev lime ${{ github.workspace }}
+      - name: Rebuild Lime
+        run: haxelib run lime rebuild windows -arm64 -release -nocolor -nocffi -D HXCPP_ARM64
       - name: Upload Artifact (ARM64)
         uses: actions/upload-artifact@v4
         with:
@@ -59,3 +81,4 @@ jobs:
             !**/.gitignore
             lime.png
           if-no-files-found: error
+
