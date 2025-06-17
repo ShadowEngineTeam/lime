@@ -58,11 +58,34 @@ jobs:
       - name: Setup Haxe
         shell: pwsh
         run : |
-          iwr https://github.com/HaxeFoundation/haxe/releases/download/$Env:HAXE_VERSION/haxe-$Env:HAXE_VERSION-win.exe -OutFile haxe-installer.exe
-          .\haxe-installer.exe /S
-          rm haxe-installer.exe
-      - name: Set HAXEPATH
-        run: echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
+          $version = $env:HAXE_VERSION
+          $zipUrl = "https://github.com/HaxeFoundation/haxe/releases/download/$version/haxe-$version-win.zip"
+          $zipFile = "$env:TEMP\haxe.zip"
+          $installPath = "C:\HaxeToolkit"
+          
+          Write-Output "Downloading Haxe Version $version"
+          Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
+          
+          if (-Not (Test-Path $installPath)) {
+              New-Item -ItemType Directory -Path $installPath | Out-Null
+          }
+          
+          $tempExtractPath = "$env:TEMP\haxe_extract"
+          if (Test-Path $tempExtractPath) {
+              Remove-Item -Recurse -Force $tempExtractPath
+          }
+          Expand-Archive -Path $zipFile -DestinationPath $tempExtractPath
+          
+          $innerFolder = Get-ChildItem -Path $tempExtractPath | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+          Move-Item -Path "$($innerFolder.FullName)\*" -Destination $installPath -Force
+          
+          Remove-Item -Recurse -Force $tempExtractPath
+          Remove-Item $zipFile
+
+          $env:Path = "$installPath;$env:Path"
+          [Environment]::SetEnvironmentVariable("HAXEPATH", $installPath, "User")
+
+          & "$installPath\haxe.exe" -version
       - name: Install Haxe dependencies
         run: |
           haxelib git hxcpp https://github.com/th2l-devs/hxcpp --quiet
