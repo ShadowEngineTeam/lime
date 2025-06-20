@@ -137,15 +137,14 @@
       hb_tag_t      tags[3];
 
 
-      hb_ot_tags_from_script_and_language( script,
-                                           HB_LANGUAGE_INVALID,
-                                           &tags_count,
-                                           tags,
-                                           NULL,
-                                           NULL );
-      script_tags[0] = tags_count > 0 ? tags[0] : HB_TAG_NONE;
-      script_tags[1] = tags_count > 1 ? tags[1] : HB_TAG_NONE;
-      script_tags[2] = tags_count > 2 ? tags[2] : HB_TAG_NONE;
+      hb_tag_t script_tag_1 = HB_TAG_NONE;
+      hb_tag_t script_tag_2 = HB_TAG_NONE;
+
+      hb_ot_tags_from_script(script, &script_tag_1, &script_tag_2);
+
+      script_tags[0] = script_tag_1;
+      script_tags[1] = script_tag_2;
+      script_tags[2] = HB_TAG_NONE;
     }
 
     /* If the second tag is HB_OT_TAG_DEFAULT_SCRIPT, change that to     */
