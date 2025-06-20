@@ -128,15 +128,20 @@ class IOSHelper
 
 		if (project.targetFlags.exists("simulator"))
 		{
-			if (project.targetFlags.exists("i386") || project.targetFlags.exists("32"))
+			if (project.targetFlags.exists("i386") || project.targetFlags.exists("32") || project.targetFlags.exists("x86_32"))
 			{
 				commands.push("-arch");
 				commands.push("i386");
 			}
-			else
+			else if(project.targetFlags.exists("x64") || project.targetFlags.exists("64") || project.targetFlags.exists("x86_64"))
 			{
 				commands.push("-arch");
 				commands.push("x86_64");
+			}
+			else
+			{
+				commands.push("-arch");
+				commands.push("arm64");
 			}
 		}
 		else if (project.targetFlags.exists("armv7"))
