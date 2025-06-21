@@ -12,11 +12,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Android NDK
-        uses: nttld/setup-ndk@main
-        id: ndk
-        with:
-          ndk-version: r27c
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
@@ -33,7 +28,7 @@ jobs:
       - name: Configure Lime
         run: |
           haxelib dev lime ${{ github.workspace }}
-          haxelib run lime config ANDROID_NDK_ROOT ${{ steps.ndk.outputs.ndk-path }} -nocffi
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_LATEST_HOME -nocffi
           haxelib run lime config ANDROID_SETUP true -nocffi
       - name: Rebuild Lime
         run: |
