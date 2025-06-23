@@ -69,7 +69,7 @@
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-timer.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-trap.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-utils.c" />
-		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-x86.c" if="windows || mac || linux" unless="HXCPP_ARMV7 || HXCPP_ARMV7S || HXCPP_ARM64" />
+		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-x86.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman.c" />
 
 	</files>
