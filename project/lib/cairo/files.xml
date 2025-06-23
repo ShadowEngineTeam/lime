@@ -2,7 +2,8 @@
 	
 	<files id="native-toolkit-cairo" >
 		
-		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/pixman/include" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/pixman/pixman" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/pixman/pixman" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/cairo/include/" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/cairo/include/configs/default/" unless="windows || mac || linux" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/cairo/include/configs/linux/" if="linux" />
