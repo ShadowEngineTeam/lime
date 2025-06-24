@@ -20,3 +20,6 @@ package-lock.json
 node_modules
 !templates/**/node_modules
 .vscode/
+dependencies/androidtools/.gradle
+dependencies/extension-api/.gradle
+templates/extension/dependencies/android/.gradle
