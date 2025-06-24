@@ -40,11 +40,12 @@ namespace lime {
 
 		currentApplication = this;
 
-		framePeriod = 1000.0 / 60.0;
+		framePeriod = 1.0 / 60.0;
 
 		currentUpdate = 0;
-		lastUpdate = 0;
 		nextUpdate = 0;
+		lastUpdate = SDL_GetPerformanceCounter ();
+		freq = SDL_GetPerformanceFrequency ();
 
 		ApplicationEvent applicationEvent;
 		ClipboardEvent clipboardEvent;
@@ -852,11 +853,11 @@ namespace lime {
 
 		if (frameRate > 0) {
 
-			framePeriod = 1000.0 / frameRate;
+			framePeriod = 1.0 / frameRate;
 
 		} else {
 
-			framePeriod = 1000.0;
+			framePeriod = 1.0;
 
 		}
 
@@ -893,19 +894,6 @@ namespace lime {
 		SDL_Event event;
 		event.type = -1;
 
-		#if (!defined (IPHONE) && !defined (EMSCRIPTEN))
-
-		if (active && (firstTime || WaitEvent (&event))) {
-
-			firstTime = false;
-
-			HandleEvent (&event);
-			event.type = -1;
-			if (!active)
-				return active;
-
-		#endif
-
 			while (SDL_PollEvent (&event)) {
 
 				HandleEvent (&event);
@@ -915,34 +903,27 @@ namespace lime {
 
 			}
 
-			currentUpdate = SDL_GetTicks ();
 
 		#if defined (IPHONE) || defined (EMSCRIPTEN)
+		if (!inBackground) {
+		#endif
+			currentUpdate = SDL_GetPerformanceCounter ();
+	        double deltaTime = (double)(currentUpdate - lastUpdate) / freq;
+		    if (deltaTime < framePeriod) {
+            	Uint64 waitTicks = (Uint64)((framePeriod - deltaTime) * freq);
+            	SDL_Delay((waitTicks * 1000) / freq);
+            	currentUpdate = SDL_GetPerformanceCounter();
+            	deltaTime = (double)(currentUpdate - lastUpdate) / freq;
+        	}
+			lastUpdate = currentUpdate;
 
-			if (currentUpdate >= nextUpdate) {
+			applicationEvent.type = UPDATE;
+			applicationEvent.deltaTime = deltaTime;
 
-				event.type = SDL_USEREVENT;
-				HandleEvent (&event);
-				event.type = -1;
-
-			}
-
-		#else
-
-			if (currentUpdate >= nextUpdate) {
-
-				if (timerActive) SDL_RemoveTimer (timerID);
-				OnTimer (0, 0);
-
-			} else if (!timerActive) {
-
-				timerActive = true;
-				timerID = SDL_AddTimer (nextUpdate - currentUpdate, OnTimer, 0);
-
-			}
-
+			ApplicationEvent::Dispatch (&applicationEvent);
+			RenderEvent::Dispatch (&renderEvent);
+		#if defined (IPHONE) || defined (EMSCRIPTEN)
 		}
-
 		#endif
 
 		return active;
