@@ -577,6 +577,18 @@ namespace lime {
 
 	}
 
+	double System::GetPerformanceCounter () {
+
+		return SDL_GetPerformanceCounter ();
+
+	}
+
+	double System::GetPerformanceFrequency () {
+
+		return SDL_GetPerformanceFrequency ();
+
+	}
+
 
 	bool System::SetAllowScreenTimeout (bool allow) {
 

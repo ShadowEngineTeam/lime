@@ -396,6 +396,24 @@ class System
 		#end
 	}
 
+	public static function getPerformanceCounter():Float
+	{
+		#if (lime_cffi && !macro)
+		return cast NativeCFFI.lime_system_get_performance_counter();
+		#else
+		return 0;
+		#end
+	}
+
+	public static function getPerformanceFrequency():Float
+	{
+		#if (lime_cffi && !macro)
+		return cast NativeCFFI.lime_system_get_performance_frequency();
+		#else
+		return 0;
+		#end
+	}
+
 	#if (!lime_doc_gen || lime_cffi)
 	public static inline function load(library:String, method:String, args:Int = 0, lazy:Bool = false):Dynamic
 	{

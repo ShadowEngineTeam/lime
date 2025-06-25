@@ -129,25 +129,25 @@ namespace lime {
 
 			case SDL_USEREVENT:
 
-				if (!inBackground) {
+				// if (!inBackground) {
 
-					currentUpdate = SDL_GetTicks ();
-					applicationEvent.type = UPDATE;
-					applicationEvent.deltaTime = currentUpdate - lastUpdate;
-					lastUpdate = currentUpdate;
+				// 	currentUpdate = SDL_GetTicks ();
+				// 	applicationEvent.type = UPDATE;
+				// 	applicationEvent.deltaTime = currentUpdate - lastUpdate;
+				// 	lastUpdate = currentUpdate;
 
-					nextUpdate += framePeriod;
+				// 	nextUpdate += framePeriod;
 
-					while (nextUpdate <= currentUpdate) {
+				// 	while (nextUpdate <= currentUpdate) {
 
-						nextUpdate += framePeriod;
+				// 		nextUpdate += framePeriod;
 
-					}
+				// 	}
 
-					ApplicationEvent::Dispatch (&applicationEvent);
-					RenderEvent::Dispatch (&renderEvent);
+				// 	ApplicationEvent::Dispatch (&applicationEvent);
+				// 	RenderEvent::Dispatch (&renderEvent);
 
-				}
+				// }
 
 				break;
 
@@ -894,20 +894,20 @@ namespace lime {
 		SDL_Event event;
 		event.type = -1;
 
-			while (SDL_PollEvent (&event)) {
+		while (SDL_PollEvent (&event)) {
+			HandleEvent (&event);
+			event.type = -1;
+			if (!active)
+				return active;
 
-				HandleEvent (&event);
-				event.type = -1;
-				if (!active)
-					return active;
-
-			}
+		}
 
 
-		#if defined (IPHONE) || defined (EMSCRIPTEN)
+		#if (!defined (IPHONE) && !defined (EMSCRIPTEN))
 		if (!inBackground) {
 		#endif
 			currentUpdate = SDL_GetPerformanceCounter ();
+			
 	        double deltaTime = (double)(currentUpdate - lastUpdate) / freq;
 		    if (deltaTime < framePeriod) {
             	Uint64 waitTicks = (Uint64)((framePeriod - deltaTime) * freq);
@@ -922,7 +922,7 @@ namespace lime {
 
 			ApplicationEvent::Dispatch (&applicationEvent);
 			RenderEvent::Dispatch (&renderEvent);
-		#if defined (IPHONE) || defined (EMSCRIPTEN)
+		#if (!defined (IPHONE) && !defined (EMSCRIPTEN))
 		}
 		#endif
 
