@@ -135,7 +135,7 @@ class WebAssemblyPlatform extends PlatformTarget
 
 		project.path(sdkPath);
 
-		System.runCommand("", "emcc", ["-c", targetDirectory + "/obj/Main.cpp", "-o", targetDirectory + "/obj/Main.o"], true, false, true);
+		System.runCommand("", Path.combine(sdkPath, "emcc"), ["-c", targetDirectory + "/obj/Main.cpp", "-o", targetDirectory + "/obj/Main.o"], true, false, true);
 
 		args = ["Main.o"];
 
@@ -285,7 +285,7 @@ class WebAssemblyPlatform extends PlatformTarget
 
 		// args.push ("../bin/index.html");
 
-		System.runCommand(targetDirectory + "/obj", "emcc", args, true, false, true);
+		System.runCommand(targetDirectory + "/obj", Path.combine(sdkPath, "emcc"), args, true, false, true);
 
 		if (FileSystem.exists(outputFile))
 		{
