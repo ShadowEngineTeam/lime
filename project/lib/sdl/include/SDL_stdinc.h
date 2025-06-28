@@ -405,6 +405,7 @@ extern DECLSPEC int SDLCALL SDL_abs(int x);
 /* !!! FIXME: Maybe we do forceinline functions of SDL_mini, SDL_minf, etc? */
 #define SDL_min(x, y) (((x) < (y)) ? (x) : (y))
 #define SDL_max(x, y) (((x) > (y)) ? (x) : (y))
+#define SDL_clamp(x, a, b) ((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x))
 
 extern DECLSPEC int SDLCALL SDL_isdigit(int x);
 extern DECLSPEC int SDLCALL SDL_isspace(int x);
