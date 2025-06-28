@@ -198,10 +198,9 @@ class WebAssemblyPlatform extends PlatformTarget
 		else
 		{
 			args.push("-gsource-map");
+			args.push("-fwasm-exceptions");
 			args.push("-s");
-			args.push("DISABLE_EXCEPTION_CATCHING=0");
-			args.push("-s");
-			args.push("NO_DISABLE_EXCEPTION_CATCHING=1");
+			args.push("SUPPORT_LONGJMP=wasm");
 			args.push("-s");
 			args.push("ASSERTIONS=1");
 			// args.push("-s");
