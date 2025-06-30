@@ -910,15 +910,16 @@ namespace lime {
 			
 	        double deltaTime = (double)(currentUpdate - lastUpdate) / freq;
 		    if (deltaTime < framePeriod) {
-            	Uint64 waitTicks = (Uint64)((framePeriod - deltaTime) * freq);
+				double waitTime = framePeriod - deltaTime;
+            	Uint64 waitTicks = (Uint64)(waitTime * freq);
             	SDL_Delay((waitTicks * 1000) / freq);
             	currentUpdate = SDL_GetPerformanceCounter();
-            	deltaTime = (double)(currentUpdate - lastUpdate) / freq;
+            	deltaTime += waitTime;
         	}
 			lastUpdate = currentUpdate;
 
 			applicationEvent.type = UPDATE;
-			applicationEvent.deltaTime = deltaTime;
+			applicationEvent.deltaTime = deltaTime * 1000;
 
 			ApplicationEvent::Dispatch (&applicationEvent);
 			RenderEvent::Dispatch (&renderEvent);
