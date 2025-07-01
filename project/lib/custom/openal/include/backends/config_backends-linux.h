@@ -32,4 +32,4 @@
 
 #define HAVE_WAVE 1
 
-#define HAVE_SDL2 0
+/* undef HAVE_SDL2 */

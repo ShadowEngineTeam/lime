@@ -6,6 +6,10 @@
 
 #include "config-macos-x86_64.h"
 
+#elif defined(IPHONE)
+
+#include "config-ios.h"
+
 #elif defined(HX_WINDOWS)
 
 #ifdef HXCPP_M64
