@@ -6,6 +6,10 @@
 
 #include "simd/config_simd-macos-x86_64.h"
 
+#elif defined(IPHONE)
+
+#include "simd/config_simd-ios-x86_64.h"
+
 #elif defined(HX_WINDOWS)
 
 #ifdef HXCPP_M64
