@@ -8,7 +8,7 @@
 
 #elif defined(IPHONE)
 
-#include "backends/config_backends-ios-x86_64.h"
+#include "backends/config_backends-ios.h"
 
 #elif defined(HX_WINDOWS)
 
