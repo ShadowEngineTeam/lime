@@ -151,6 +151,7 @@
         <section if="mac || ios">
 
             <file name="${NATIVE_TOOLKIT_PATH}/openal/Alc/backends/coreaudio.cpp" />
+            <file name="${NATIVE_TOOLKIT_PATH}/openal/common/filesystem.cpp" if="ios" />
 
             <compilerflag value="-mmmx" unless="HXCPP_ARM64" />
             <compilerflag value="-msse" unless="HXCPP_ARM64" />
