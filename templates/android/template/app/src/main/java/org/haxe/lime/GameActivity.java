@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.DisplayCutout;
@@ -268,7 +269,7 @@ public class GameActivity extends SDLActivity {
 
 		}
 
-		handler = new Handler ();
+		handler = new Handler (Looper.getMainLooper ());
 
 		Extension.assetManager = assetManager;
 		Extension.callbackHandler = handler;
