@@ -276,7 +276,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        ndk-version: [r21e, stable]
+        ndk-version: [r28c, stable]
       fail-fast: false
     steps:
 
