@@ -606,6 +606,7 @@ namespace lime {
 
 	}
 
+
 	int System::GetDisplayOrientation(int displayIndex) {
 		int orientation = 0;
 		switch(SDL_GetDisplayOrientation(displayIndex)) {
@@ -628,6 +629,22 @@ namespace lime {
 
 		return orientation;
 	}
+
+
+	#if !defined(IPHONE)
+	void System::OpenFile (const char* path) {
+
+		OpenURL (path, NULL);
+
+	}
+
+
+	void System::OpenURL (const char* url, const char* target) {
+
+		SDL_OpenURL (url);
+
+	}
+	#endif
 
 
 	FILE* FILE_HANDLE::getFile () {
