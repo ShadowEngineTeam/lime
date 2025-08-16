@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.os.VibratorManager;
 import android.view.DisplayCutout;
 import android.util.DisplayMetrics;
 import android.util.Log;
