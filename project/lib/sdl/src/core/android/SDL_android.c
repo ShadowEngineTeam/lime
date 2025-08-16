@@ -2796,6 +2796,15 @@ SDL_bool Android_JNI_RequestPermission(const char *permission)
 	return bPermissionRequestResult;
 }
 
+int Android_JNI_OpenURL(const char *url)
+{
+    JNIEnv *env = Android_JNI_GetEnv();
+    jstring jurl = (*env)->NewStringUTF(env, url);
+    const int ret = (*env)->CallStaticIntMethod(env, mActivityClass, midOpenURL, jurl);
+    (*env)->DeleteLocalRef(env, jurl);
+    return ret;
+}
+
 #endif /* __ANDROID__ */
 
 /* vi: set ts=4 sw=4 expandtab: */

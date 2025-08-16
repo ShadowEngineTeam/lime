@@ -97,6 +97,8 @@
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/src/dynapi/SDL_dynapi_overrides.h" if="winrt"/>
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/src/dynapi/SDL_dynapi_procs.h" if="winrt"/>
 
+        <depend name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/SDL_sysurl.h" />
+
     </files>
 
 
@@ -221,6 +223,7 @@
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/libm/s_scalbn.c" />
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/libm/s_sin.c" />
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/libm/s_tan.c" />
+        <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/SDL_url.c" />
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/power/SDL_power.c" />
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/SDL_render.c" />
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/SDL_yuv_sw.c" />
@@ -421,6 +424,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/x11/edid-parse.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/x11/imKStoUCS.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/filesystem/unix/SDL_sysfilesystem.c" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/unix/SDL_sysurl.c" />
 
         </section>
 
@@ -467,6 +471,7 @@
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/windows/SDL_windowsvideo.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/windows/SDL_windowsvulkan.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/windows/SDL_windowswindow.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/windows/SDL_sysurl.c" />
 
             </section>
 
@@ -491,6 +496,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/winrt/SDL_winrtpointerinput.cpp" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/winrt/SDL_winrtvideo.cpp" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/winrt/SDL_winrtgamebar.cpp" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/winrt/SDL_sysurl.cpp" />
 
         </section>
 
@@ -517,6 +523,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/cocoa/SDL_cocoavideo.m" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/cocoa/SDL_cocoavulkan.m" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/cocoa/SDL_cocoawindow.m" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/macosx/SDL_sysurl.m" />
 
         </section>
 
@@ -545,6 +552,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/uikit/SDL_uikitviewcontroller.m" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/uikit/SDL_uikitvulkan.m" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/uikit/SDL_uikitwindow.m" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/ios/SDL_sysurl.m" />
 
             <compilerflag value="-fobjc-arc" />
 
@@ -572,6 +580,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/android/SDL_androidwindow.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/android/SDL_androidmessagebox.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/android/SDL_androidmouse.c" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/android/SDL_sysurl.c" />
 
         </section>
 
@@ -585,6 +594,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/joystick/emscripten/SDL_sysjoystick.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/filesystem/emscripten/SDL_sysfilesystem.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/audio/emscripten/SDL_emscriptenaudio.c" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/emscripten/SDL_sysurl.c" />
         </section>
 
     </files>
