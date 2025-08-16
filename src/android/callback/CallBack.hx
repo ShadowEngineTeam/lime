@@ -1,9 +1,9 @@
 package android.callback;
 
 import lime._internal.backend.android.JNICache;
-import lime.system.JNI;
 import haxe.Json;
 import lime.app.Event;
+import lime.system.JNI;
 
 using StringTools;
 
@@ -21,41 +21,35 @@ class CallBack
 {
 	/**
 	 * Event triggered when an activity result is received.
+	 * 
 	 * Handlers should expect a dynamic argument.
 	 */
-	public static var onActivityResult:Event<Dynamic->Void>;
+	public static var onActivityResult:Event<Dynamic->Void> = new Event<Dynamic->Void>();
 
 	/**
 	 * Event triggered when a permissions result is received.
+	 * 
 	 * Handlers should expect a dynamic argument.
 	 */
-	public static var onRequestPermissionsResult:Event<Dynamic->Void>;
-
-	@:noCompletion
-	private static var initialized:Bool = false;
+	public static var onRequestPermissionsResult:Event<Dynamic->Void> = new Event<Dynamic->Void>();
 
 	/**
 	 * Initializes the callback handling mechanism.
+	 * 
 	 * This method should be called once before using any callback events.
 	 */
 	public static function init():Void
 	{
-		if (initialized)
-			return;
+		final initCallBackJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'initCallBack', '(Lorg/haxe/lime/HaxeObject;)V');
 
-		onActivityResult = new Event<Dynamic->Void>();
-		onRequestPermissionsResult = new Event<Dynamic->Void>();
-
-		JNICache.createStaticMethod('org/haxe/extension/Tools', 'initCallBack', '(Lorg/haxe/lime/HaxeObject;)V')(new CallBackHandler());
-
-		initialized = true;
+		if (initCallBackJNI != null)
+			initCallBackJNI(new CallBackHandler());
 	}
 }
 
 /**
  * Internal class to handle native callback events.
  */
-@:keep
 @:noCompletion
 #if !lime_debug
 @:fileXml('tags="haxe,release"')
@@ -70,15 +64,12 @@ private class CallBackHandler #if !macro implements JNISafety #end
 	 *
 	 * @param content The JSON string containing the activity result data.
 	 */
-	#if !macro
+	@:keep
 	@:runOnMainThread
-	#end
 	public function onActivityResult(content:String):Void
 	{
 		if (CallBack.onActivityResult != null)
-		{
 			CallBack.onActivityResult.dispatch(Json.parse(content.trim()));
-		}
 	}
 
 	/**
@@ -86,15 +77,12 @@ private class CallBackHandler #if !macro implements JNISafety #end
 	 *
 	 * @param content The JSON string containing the permissions result data.
 	 */
-	#if !macro
+	@:keep
 	@:runOnMainThread
-	#end
 	public function onRequestPermissionsResult(content:String):Void
 	{
 		if (CallBack.onRequestPermissionsResult != null)
-		{
 			CallBack.onRequestPermissionsResult.dispatch(Json.parse(content.trim()));
-		}
 	}
 }
 #end
