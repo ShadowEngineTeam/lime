@@ -1,7 +1,7 @@
 package android.media;
 
 import haxe.macro.Tools.TTypedExprTools;
-import extension.androidtools.jni.JNICache;
+import lime._internal.backend.android.JNICache;
 import lime.app.Event;
 import lime.system.JNI;
 
