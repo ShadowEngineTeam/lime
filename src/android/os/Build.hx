@@ -1,6 +1,5 @@
 package android.os;
 
-import lime.system.JNI.JNIStaticField;
 import lime._internal.backend.android.JNICache;
 
 /**
@@ -26,225 +25,123 @@ class Build
 	/**
 	 * The name of the underlying board, like 'goldfish'.
 	 */
-	public static var BOARD(get, never):String;
-
-	private static function get_BOARD():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'BOARD', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final BOARD:String = JNICache.createStaticField('android/os/Build', 'BOARD', 'Ljava/lang/String;').get();
 
 	/**
 	 * The system bootloader version number.
 	 */
-	public static var BOOTLOADER(get, never):String;
-
-	private static function get_BOOTLOADER():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'BOOTLOADER', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final BOOTLOADER:String = JNICache.createStaticField('android/os/Build', 'BOOTLOADER', 'Ljava/lang/String;').get();
 
 	/**
 	 * The consumer-visible brand with which the product/hardware will be associated, if any.
 	 */
-	public static var BRAND(get, never):String;
-
-	private static function get_BRAND():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'BRAND', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final BRAND:String = JNICache.createStaticField('android/os/Build', 'BRAND', 'Ljava/lang/String;').get();
 
 	/**
 	 * The name of the industrial design.
 	 */
-	public static var DEVICE(get, never):String;
-
-	private static function get_DEVICE():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'DEVICE', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final DEVICE:String = JNICache.createStaticField('android/os/Build', 'DEVICE', 'Ljava/lang/String;').get();
 
 	/**
 	 * Either a changelist number, or a label like 'M4-rc20'.
 	 */
-	public static var ID(get, never):String;
-
-	private static function get_ID():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'ID', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final ID:String = JNICache.createStaticField('android/os/Build', 'ID', 'Ljava/lang/String;').get();
 
 	/**
 	 * The name of the overall product.
 	 */
-	public static var PRODUCT(get, never):String;
-
-	private static function get_PRODUCT():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'PRODUCT', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final PRODUCT:String = JNICache.createStaticField('android/os/Build', 'PRODUCT', 'Ljava/lang/String;').get();
 
 	/**
 	 * The manufacturer of the product/hardware.
 	 */
-	public static var MANUFACTURER(get, never):String;
-
-	private static function get_MANUFACTURER():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'MANUFACTURER', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final MANUFACTURER:String = JNICache.createStaticField('android/os/Build', 'MANUFACTURER', 'Ljava/lang/String;').get();
 
 	/**
 	 * The name of the hardware (from the kernel command line or /proc).
 	 */
-	public static var HARDWARE(get, never):String;
-
-	private static function get_HARDWARE():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'HARDWARE', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final HARDWARE:String = JNICache.createStaticField('android/os/Build', 'HARDWARE', 'Ljava/lang/String;').get();
 
 	/**
 	 * The end-user-visible name for the end product.
 	 */
-	public static var MODEL(get, never):String;
+	public static final MODEL:String = JNICache.createStaticField('android/os/Build', 'MODEL', 'Ljava/lang/String;').get();
 
-	private static function get_MODEL():String
+	/**
+	 * The SKU of the device as set by the original design manufacturer (ODM).
+	 * This is a runtime-initialized property set during startup to configure device services.
+	 * If no value is set, this is reported as ``UNKNOWN``.
+	 *
+	 * The ODM SKU may have multiple variants for the same system SKU in case a manufacturer produces variants of the same design.
+	 * For example, the same build may be released with variations in physical keyboard and/or display hardware, each with a different ODM SKU.
+	 */
+	public static final ODM_SKU:String = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ? JNICache.createStaticField('android/os/Build', 'ODM_SKU',
+		'Ljava/lang/String;')
+		.get() : UNKNOWN;
+
+	/**
+	 * The SKU of the hardware (from the kernel command line).
+	 * The SKU is reported by the bootloader to configure system software features.
+	 * If no value is supplied by the bootloader, this is reported as ``UNKNOWN``.
+	 */
+	public static final SKU:String = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ? JNICache.createStaticField('android/os/Build', 'SKU',
+		'Ljava/lang/String;')
+		.get() : UNKNOWN;
+
+	/**
+	 * The manufacturer of the device's primary system-on-chip.
+	 */
+	public static final SOC_MANUFACTURER:String = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ? JNICache.createStaticField('android/os/Build',
+		'SOC_MANUFACTURER', 'Ljava/lang/String;')
+		.get() : UNKNOWN;
+
+	/**
+	 * The model name of the device's primary system-on-chip.
+	 */
+	public static final SOC_MODEL:String = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ? JNICache.createStaticField('android/os/Build', 'SOC_MODEL',
+		'Ljava/lang/String;')
+		.get() : UNKNOWN;
+
+	/**
+	 * Comma-separated tags describing the build, like "unsigned,debug".
+	 */
+	public static final TAGS:String = JNICache.createStaticField('android/os/Build', 'TAGS', 'Ljava/lang/String;').get();
+
+	/**
+	 * The time at which the build was produced, given in milliseconds since the UNIX epoch.
+	 */
+	public static final TIME:Int = JNICache.createStaticField('android/os/Build', 'TIME', 'J').get();
+
+	/**
+	 * The type of build, like "user" or "eng".
+	 */
+	public static final TYPE:String = JNICache.createStaticField('android/os/Build', 'TYPE', 'Ljava/lang/String;').get();
+
+	/**
+	 * The hostname of the system.
+	 */
+	public static final HOST:String = JNICache.createStaticField('android/os/Build', 'HOST', 'Ljava/lang/String;').get();
+
+	/**
+	 * The user of the system.
+	 */
+	public static final USER:String = JNICache.createStaticField('android/os/Build', 'USER', 'Ljava/lang/String;').get();
+
+	/**
+	 * The version of the radio firmware, or null if not available.
+	 */
+	public static inline function getRadioVersion():String
 	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'MODEL', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
+		return JNICache.createStaticMethod('android/os/Build', 'getRadioVersion', '()Ljava/lang/String;')();
 	}
 
 	/**
-	 * The ODM partition fingerprint.
+	 * Retrieves the hardware serial number, if available.
+	 * Requires android.permission.READ_PRIVILEGED_PHONE_STATE.
 	 */
-	public static var ODM_SKU(get, never):String;
-
-	private static function get_ODM_SKU():String
+	public static inline function getSerial():String
 	{
-		if (VERSION.SDK_INT >= VERSION_CODES.S)
-		{
-			final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'ODM_SKU', 'Ljava/lang/String;');
-
-			return field != null ? field.get() : '';
-		}
-
-		return UNKNOWN;
-	}
-
-	/**
-	 * The SKU identifier.
-	 */
-	public static var SKU(get, never):String;
-
-	private static function get_SKU():String
-	{
-		if (VERSION.SDK_INT >= VERSION_CODES.S)
-		{
-			final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'SKU', 'Ljava/lang/String;');
-
-			return field != null ? field.get() : '';
-		}
-
-		return UNKNOWN;
-	}
-
-	/**
-	 * The manufacturer of the SOC.
-	 */
-	public static var SOC_MANUFACTURER(get, never):String;
-
-	private static function get_SOC_MANUFACTURER():String
-	{
-		if (VERSION.SDK_INT >= VERSION_CODES.S)
-		{
-			final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'SOC_MANUFACTURER', 'Ljava/lang/String;');
-
-			return field != null ? field.get() : '';
-		}
-
-		return UNKNOWN;
-	}
-
-	/**
-	 * The model name/number of the SOC.
-	 */
-	public static var SOC_MODEL(get, never):String;
-
-	private static function get_SOC_MODEL():String
-	{
-		if (VERSION.SDK_INT >= VERSION_CODES.S)
-		{
-			final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'SOC_MODEL', 'Ljava/lang/String;');
-
-			return field != null ? field.get() : '';
-		}
-
-		return UNKNOWN;
-	}
-
-	/**
-	 * Comma-separated tags describing the build, like 'unsigned,debug'.
-	 */
-	public static var TAGS(get, never):String;
-
-	private static function get_TAGS():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'TAGS', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
-
-	/**
-	 * The type of build, like 'user' or 'eng'.
-	 */
-	public static var TYPE(get, never):String;
-
-	private static function get_TYPE():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'TYPE', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
-
-	/**
-	 * Hostname of the system where the build was compiled.
-	 */
-	public static var HOST(get, never):String;
-
-	private static function get_HOST():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'HOST', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
-
-	/**
-	 * The username of the builder.
-	 */
-	public static var USER(get, never):String;
-
-	private static function get_USER():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField('android/os/Build', 'USER', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
+		return JNICache.createStaticMethod('android/os/Build', 'getSerial', '()Ljava/lang/String;')();
 	}
 }
 
@@ -260,149 +157,71 @@ class VERSION
 	/**
 	 * The base OS build the product is based on.
 	 */
-	public static var BASE_OS(get, never):String;
-
-	private static function get_BASE_OS():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'BASE_OS', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final BASE_OS:String = JNICache.createStaticField("android/os/Build$VERSION", 'BASE_OS', 'Ljava/lang/String;').get();
 
 	/**
-	 * The current development codename, or the string 'REL' if this is a release build.
+	 * The current development codename, or the string "REL" if this is a release build.
 	 */
-	public static var CODENAME(get, never):String;
-
-	private static function get_CODENAME():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'CODENAME', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final CODENAME:String = JNICache.createStaticField("android/os/Build$VERSION", 'CODENAME', 'Ljava/lang/String;').get();
 
 	/**
 	 * The internal value used by the underlying source control to represent this build.
+	 * E.g., a perforce changelist number or a git hash.
 	 */
-	public static var INCREMENTAL(get, never):String;
-
-	private static function get_INCREMENTAL():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'INCREMENTAL', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final INCREMENTAL:String = JNICache.createStaticField("android/os/Build$VERSION", 'INCREMENTAL', 'Ljava/lang/String;').get();
 
 	/**
 	 * The media performance class of the device or 0 if none.
+	 * If this value is not 0, the device conforms to the media performance class definition of the SDK version of this value.
+	 * This value never changes while a device is booted, but it may increase when the hardware manufacturer provides an OTA update.
+	 * Possible non-zero values are defined in ``Build.VERSION_CODES`` starting with ``Build.VERSION_CODES.R``.
 	 */
-	public static var MEDIA_PERFORMANCE_CLASS(get, never):Int;
-
-	private static function get_MEDIA_PERFORMANCE_CLASS():Int
-	{
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-		{
-			final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'MEDIA_PERFORMANCE_CLASS', 'I');
-
-			return field != null ? field.get() : 0;
-		}
-
-		return 0;
-	}
+	public static final MEDIA_PERFORMANCE_CLASS:Int = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ? JNICache.createStaticField("android/os/Build$VERSION",
+		'MEDIA_PERFORMANCE_CLASS', 'I')
+		.get() : 0;
 
 	/**
 	 * The user-visible version string.
 	 */
-	public static var RELEASE(get, never):String;
-
-	private static function get_RELEASE():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'RELEASE', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final RELEASE:String = JNICache.createStaticField("android/os/Build$VERSION", 'RELEASE', 'Ljava/lang/String;').get();
 
 	/**
-	 * The user-visible SDK version in raw String form.
+	 * The user-visible SDK version of the framework in its raw String representation; use SDK_INT instead.
 	 */
-	public static var SDK(get, never):String;
-
-	private static function get_SDK():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'SDK', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final SDK:String = JNICache.createStaticField("android/os/Build$VERSION", 'SDK', 'Ljava/lang/String;').get();
 
 	/**
-	 * The integer SDK version of the running software.
+	 * The SDK version of the software currently running on this hardware device.
 	 */
-	public static var SDK_INT(get, never):Int;
-
-	private static function get_SDK_INT():Int
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'SDK_INT', 'I');
-
-		return field != null ? field.get() : 0;
-	}
+	public static final SDK_INT:Int = JNICache.createStaticField("android/os/Build$VERSION", 'SDK_INT', 'I').get();
 
 	/**
-	 * The preview SDK version, 0 on production builds.
+	 * The developer preview revision of a prerelease SDK.
+	 * This value will always be 0 on production platform builds/devices.
 	 */
-	public static var PREVIEW_SDK_INT(get, never):Int;
-
-	private static function get_PREVIEW_SDK_INT():Int
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'PREVIEW_SDK_INT', 'I');
-
-		return field != null ? field.get() : 0;
-	}
+	public static final PREVIEW_SDK_INT:Int = JNICache.createStaticField("android/os/Build$VERSION", 'PREVIEW_SDK_INT', 'I').get();
 
 	/**
-	 * Version string for release or codename.
+	 * The version string.
+	 * May be ``RELEASE`` or ``CODENAME`` if not a final release build.
 	 */
-	public static var RELEASE_OR_CODENAME(get, never):String;
-
-	private static function get_RELEASE_OR_CODENAME():String
-	{
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-		{
-			final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'RELEASE_OR_CODENAME', 'Ljava/lang/String;');
-
-			return field != null ? field.get() : '';
-		}
-
-		return 'unknown';
-	}
+	public static final RELEASE_OR_CODENAME:String = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) ? JNICache.createStaticField("android/os/Build$VERSION",
+		'RELEASE_OR_CODENAME', 'Ljava/lang/String;')
+		.get() : "unknown";
 
 	/**
-	 * Version string shown to users (release or preview label).
+	 * The user-visible version string shown to the user.
+	 * May be ``RELEASE`` or a descriptive string if not a final release build.
 	 */
-	public static var RELEASE_OR_PREVIEW_DISPLAY(get, never):String;
-
-	private static function get_RELEASE_OR_PREVIEW_DISPLAY():String
-	{
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-		{
-			final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'RELEASE_OR_PREVIEW_DISPLAY', 'Ljava/lang/String;');
-
-			return field != null ? field.get() : '';
-		}
-
-		return 'unknown';
-	}
+	public static final RELEASE_OR_PREVIEW_DISPLAY:String = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) ? JNICache.createStaticField("android/os/Build$VERSION",
+		'RELEASE_OR_PREVIEW_DISPLAY', 'Ljava/lang/String;')
+		.get() : "unknown";
 
 	/**
-	 * Last applied security patch date.
+	 * The user-visible security patch level.
+	 * This value represents the date when the device most recently applied a security patch.
 	 */
-	public static var SECURITY_PATCH(get, never):String;
-
-	private static function get_SECURITY_PATCH():String
-	{
-		final field:Null<Dynamic> = JNICache.createStaticField("android/os/Build$VERSION", 'SECURITY_PATCH', 'Ljava/lang/String;');
-
-		return field != null ? field.get() : '';
-	}
+	public static final SECURITY_PATCH:String = JNICache.createStaticField("android/os/Build$VERSION", 'SECURITY_PATCH', 'Ljava/lang/String;').get();
 }
 
 /**

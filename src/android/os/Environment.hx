@@ -1,7 +1,7 @@
 package android.os;
 
 import lime._internal.backend.android.JNICache;
-import lime._internal.backend.android.JNIUtil;
+import lime.system.JNI;
 
 /**
  * This class provides access to environment variables and directories on the device
@@ -66,12 +66,7 @@ class Environment
 	 */
 	public static inline function getDataDirectory():String
 	{
-		final getDataDirectoryJNI:Null<Dynamic> = JNICache.createStaticMethod('android.os.Environment', 'getDataDirectory', '()Ljava/io/File;');
-
-		if (getDataDirectoryJNI != null)
-			return JNIUtil.getAbsolutePath(getDataDirectoryJNI());
-
-		return '';
+		return getAbsolutePath(JNICache.createStaticMethod('android.os.Environment', 'getDataDirectory', '()Ljava/io/File;')());
 	}
 
 	/**
@@ -81,13 +76,7 @@ class Environment
 	 */
 	public static inline function getDownloadCacheDirectory():String
 	{
-		final getDownloadCacheDirectoryJNI:Null<Dynamic> = JNICache.createStaticMethod('android.os.Environment', 'getDownloadCacheDirectory',
-			'()Ljava/io/File;');
-
-		if (getDownloadCacheDirectoryJNI != null)
-			return JNIUtil.getAbsolutePath(getDownloadCacheDirectoryJNI());
-
-		return '';
+		return getAbsolutePath(JNICache.createStaticMethod('android.os.Environment', 'getDownloadCacheDirectory', '()Ljava/io/File;')());
 	}
 
 	/**
@@ -97,13 +86,7 @@ class Environment
 	 */
 	public static inline function getExternalStorageDirectory():String
 	{
-		final getExternalStorageDirectoryJNI:Null<Dynamic> = JNICache.createStaticMethod('android.os.Environment', 'getExternalStorageDirectory',
-			'()Ljava/io/File;');
-
-		if (getExternalStorageDirectoryJNI != null)
-			return JNIUtil.getAbsolutePath(getExternalStorageDirectoryJNI());
-
-		return '';
+		return getAbsolutePath(JNICache.createStaticMethod('android.os.Environment', 'getExternalStorageDirectory', '()Ljava/io/File;')());
 	}
 
 	/**
@@ -113,17 +96,8 @@ class Environment
 	 */
 	public static inline function getStorageDirectory():String
 	{
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-		{
-			final getStorageDirectoryJNI:Null<Dynamic> = JNICache.createStaticMethod('android.os.Environment', 'getStorageDirectory', '()Ljava/io/File;');
-
-			if (getStorageDirectoryJNI != null)
-				return JNIUtil.getAbsolutePath(getStorageDirectoryJNI());
-
-			return '';
-		}
-
-		return '/storage';
+		return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) ? getAbsolutePath(JNICache.createStaticMethod('android.os.Environment', 'getStorageDirectory',
+			'()Ljava/io/File;')())  : '/storage';
 	}
 
 	/**
@@ -133,13 +107,7 @@ class Environment
 	 */
 	public static inline function getExternalStorageState():String
 	{
-		final getExternalStorageStateJNI:Null<Dynamic> = JNICache.createStaticMethod('android.os.Environment', 'getExternalStorageState',
-			'()Ljava/lang/String;');
-
-		if (getExternalStorageStateJNI != null)
-			return getExternalStorageStateJNI();
-
-		return '';
+		return JNICache.createStaticMethod('android.os.Environment', 'getExternalStorageState', '()Ljava/lang/String;')();
 	}
 
 	/**
@@ -149,12 +117,7 @@ class Environment
 	 */
 	public static inline function getRootDirectory():String
 	{
-		final getRootDirectoryJNI:Null<Dynamic> = JNICache.createStaticMethod('android.os.Environment', 'getRootDirectory', '()Ljava/io/File;');
-
-		if (getRootDirectoryJNI != null)
-			return JNIUtil.getAbsolutePath(getRootDirectoryJNI());
-
-		return '';
+		return getAbsolutePath(JNICache.createStaticMethod('android.os.Environment', 'getRootDirectory', '()Ljava/io/File;')());
 	}
 
 	/**
@@ -164,9 +127,7 @@ class Environment
 	 */
 	public static inline function isExternalStorageEmulated():Bool
 	{
-		final isExternalStorageEmulatedJNI:Null<Dynamic> = JNICache.createStaticMethod('android.os.Environment', 'isExternalStorageEmulated', '()Z');
-
-		return isExternalStorageEmulatedJNI != null && isExternalStorageEmulatedJNI();
+		return JNICache.createStaticMethod('android.os.Environment', 'isExternalStorageEmulated', '()Z')();
 	}
 
 	/**
@@ -176,14 +137,7 @@ class Environment
 	 */
 	public static inline function isExternalStorageManager():Bool
 	{
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-		{
-			final isExternalStorageManagerJNI:Null<Dynamic> = JNICache.createStaticMethod('android.os.Environment', 'isExternalStorageManager', '()Z');
-
-			return isExternalStorageManagerJNI != null && isExternalStorageManagerJNI();
-		}
-
-		return true;
+		return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) ? JNICache.createStaticMethod('android.os.Environment', 'isExternalStorageManager', '()Z')() : true;
 	}
 
 	/**
@@ -193,9 +147,7 @@ class Environment
 	 */
 	public static inline function isExternalStorageLegacy():Bool
 	{
-		final isExternalStorageLegacyJNI:Null<Dynamic> = JNICache.createStaticMethod('android.os.Environment', 'isExternalStorageLegacy', '()Z');
-
-		return isExternalStorageLegacyJNI != null && isExternalStorageLegacyJNI();
+		return JNICache.createStaticMethod('android.os.Environment', 'isExternalStorageLegacy', '()Z')();
 	}
 
 	/**
@@ -205,9 +157,20 @@ class Environment
 	 */
 	public static inline function isExternalStorageRemovable():Bool
 	{
-		final isExternalStorageRemovableJNI:Null<Dynamic> = JNICache.createStaticMethod('android.os.Environment', 'isExternalStorageRemovable', '()Z');
+		return JNICache.createStaticMethod('android.os.Environment', 'isExternalStorageRemovable', '()Z')();
+	}
 
-		return isExternalStorageRemovableJNI != null && isExternalStorageRemovableJNI();
+	/**
+	 * Retrieves the absolute path from a given File object.
+	 *
+	 * @param file A File object for which to retrieve the absolute path.
+	 *
+	 * @return The absolute path of the File object.
+	 */
+	@:noCompletion
+	private static inline function getAbsolutePath(file:Dynamic):String
+	{
+		return JNI.callMember(JNICache.createMemberMethod('java/io/File', 'getAbsolutePath', '()Ljava/lang/String;'), file, []);
 	}
 }
 #end
