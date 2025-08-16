@@ -29,6 +29,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.graphics.*;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.hardware.*;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
