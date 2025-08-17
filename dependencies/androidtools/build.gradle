@@ -6,11 +6,6 @@ repositories
 	google()
 }
 
-tasks.withType(JavaCompile)
-{
-	options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-}
-
 android
 {
 	namespace 'org.haxe.extension.androidtools'
