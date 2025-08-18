@@ -166,10 +166,6 @@ namespace lime {
 
 				}
 
-				std::string path = std::string (home) + std::string ("/Desktop");
-				wstring_convert converter;
-				result = new std::wstring (converter.from_bytes(path));
-
 				#endif
 				break;
 
