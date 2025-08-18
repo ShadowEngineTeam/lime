@@ -147,17 +147,15 @@ namespace lime {
 
 				char const* home = getenv ("HOME");
 
-				if (home == NULL) {
+				if (home != NULL) {
 
-					return 0;
+					std::string path = std::string (home) + std::string ("/Desktop");
+					wstring_convert converter;
+					result = new std::wstring (converter.from_bytes(path));
 
 				}
-
-				std::string path = std::string (home) + std::string ("/Desktop");
-				wstring_convert converter;
-				result = new std::wstring (converter.from_bytes(path));
-
 				#endif
+
 				break;
 
 			}
