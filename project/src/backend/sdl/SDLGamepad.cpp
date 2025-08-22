@@ -67,12 +67,15 @@ namespace lime {
 
 		SDL_Joystick* joystick = SDL_GameControllerGetJoystick (it->second);
 
-		if (joystick == nullptr)
-			return nullptr;
+		if (joystick) {
 
-		char* guid = new char[64];
-		SDL_JoystickGetGUIDString (SDL_JoystickGetGUID (joystick), guid, 64);
-		return guid;
+			char* guid = new char[64];
+			SDL_JoystickGetGUIDString (SDL_JoystickGetGUID (joystick), guid, 64);
+			return guid;
+
+		}
+
+		return nullptr;
 
 	}
 
