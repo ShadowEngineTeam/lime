@@ -43,9 +43,9 @@ class Gamepad
 	}
 
 	/**
-		@param	lowFrequencyRumble	The intensity of the low frequency (left)
+	    @param	lowFrequencyRumble	The intensity of the low frequency (left)
 		rumble motor, from 0 to 1.
-		@param	highFrequencyRumble	The intensity of the high frequency (right)
+	    @param	highFrequencyRumble	The intensity of the high frequency (right)
 		rumble motor, from 0 to 1.
 		@param	duration	The duration of the rumble effect, in milliseconds.
 	**/
