@@ -11,15 +11,8 @@ namespace lime {
 
 
 	class SDLGamepad {
-		public:
-			SDL_GameController *gameController = nullptr;
-			SDL_Joystick *joystick = nullptr;
-			
-			SDLGamepad() {}
-			SDLGamepad(SDL_GameController *_gameController);
-			~SDLGamepad();
 
-			void Rumble(int duration, double largeStrength, double smallStrength);
+		public:
 
 			static bool Connect (int deviceID);
 			static int GetInstanceID (int deviceID);
