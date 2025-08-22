@@ -1,5 +1,4 @@
 #include "SDLGamepad.h"
-#include <algorithm>
 
 
 namespace lime {
