@@ -24,7 +24,7 @@ namespace lime {
 					SDL_GameControllerClose(gameController);
 			}
 
-			void Rumble(double lowFrequencyRumble, double highFrequencyRumble, int duration);
+			void Rumble(int duration, double largeStrength, double smallStrength);
 
 			static bool Connect (int deviceID);
 			static int GetInstanceID (int deviceID);
