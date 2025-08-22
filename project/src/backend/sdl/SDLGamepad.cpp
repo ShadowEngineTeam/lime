@@ -100,6 +100,11 @@ namespace lime {
 		else if (lowFrequencyRumble > 1.0f)
 			lowFrequencyRumble = 1.0f;
 
+		if (duration < 0)
+			duration = 0;
+		else if (duration > 0xFFFF)
+			duration = 0xFFFF;
+
 		SDL_GameControllerRumble (it->second, lowFrequencyRumble * 0xFFFF, highFrequencyRumble * 0xFFFF, duration);
 
 	}
