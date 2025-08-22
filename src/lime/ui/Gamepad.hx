@@ -42,18 +42,6 @@ class Gamepad
 		#end
 	}
 
-	public inline function rumble(lowFrequencyRumble:Float, highFrequencyRumble:Float, duration:Int):Void
-	{
-		#if (lime_cffi && !macro)
-		NativeCFFI.lime_gamepad_rumble(this.id, lowFrequencyRumble, highFrequencyRumble, duration);
-		#elseif (js && html5)
-		// TODO: HTML5 Rumble
-		return;
-		#else
-		return;
-		#end
-	}
-
 	@:noCompletion private static function __connect(id:Int):Void
 	{
 		if (!devices.exists(id))
@@ -102,6 +90,19 @@ class Gamepad
 		return devices[this.id].id;
 		#else
 		return null;
+		#end
+	}
+	
+	// Rumble
+	public inline function rumble(lowFrequencyRumble:Float, highFrequencyRumble:Float, duration:Int):Void
+	{
+		#if (lime_cffi && !macro)
+		NativeCFFI.lime_gamepad_rumble(this.id, lowFrequencyRumble, highFrequencyRumble, duration);
+		#elseif (js && html5)
+		// TODO: HTML5 Rumble
+		return;
+		#else
+		return;
 		#end
 	}
 }
