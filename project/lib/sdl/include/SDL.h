@@ -48,7 +48,6 @@
 #include "SDL_log.h"
 #include "SDL_messagebox.h"
 #include "SDL_metal.h"
-#include "SDL_misc.h"
 #include "SDL_mutex.h"
 #include "SDL_power.h"
 #include "SDL_render.h"
