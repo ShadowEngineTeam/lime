@@ -47,7 +47,6 @@
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_opengles2.h"/>
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_opengles2_gl2.h"/>
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_opengles2_gl2ext.h"/>
-        <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_misc.h"/>
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_mouse.h"/>
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_mutex.h"/>
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_name.h"/>
@@ -97,6 +96,8 @@
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/src/dynapi/SDL_dynapi.h" if="winrt"/>
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/src/dynapi/SDL_dynapi_overrides.h" if="winrt"/>
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/src/dynapi/SDL_dynapi_procs.h" if="winrt"/>
+
+        <depend name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/SDL_sysurl.h" />
 
     </files>
 
