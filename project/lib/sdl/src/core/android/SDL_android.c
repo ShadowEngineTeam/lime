@@ -305,7 +305,6 @@ static jmethodID midIsScreenKeyboardShown;
 static jmethodID midIsTablet;
 static jmethodID midManualBackButton;
 static jmethodID midMinimizeWindow;
-static jmethodID midOpenURL;
 static jmethodID midOpenAPKExpansionInputStream;
 static jmethodID midRequestPermission;
 static jmethodID midSendMessage;
@@ -579,7 +578,6 @@ JNIEXPORT void JNICALL SDL_JAVA_INTERFACE(nativeSetupJNI)(JNIEnv *env, jclass cl
     midIsTablet = (*env)->GetStaticMethodID(env, mActivityClass, "isTablet", "()Z");
     midManualBackButton = (*env)->GetStaticMethodID(env, mActivityClass, "manualBackButton", "()V");
     midMinimizeWindow = (*env)->GetStaticMethodID(env, mActivityClass, "minimizeWindow","()V");
-    midOpenURL = (*env)->GetStaticMethodID(env, mActivityClass, "openURL", "(Ljava/lang/String;)I");
     midOpenAPKExpansionInputStream = (*env)->GetStaticMethodID(env, mActivityClass, "openAPKExpansionInputStream", "(Ljava/lang/String;)Ljava/io/InputStream;");
     midRequestPermission = (*env)->GetStaticMethodID(env, mActivityClass, "requestPermission", "(Ljava/lang/String;I)V");
     midSendMessage = (*env)->GetStaticMethodID(env, mActivityClass, "sendMessage", "(II)Z");
@@ -610,7 +608,6 @@ JNIEXPORT void JNICALL SDL_JAVA_INTERFACE(nativeSetupJNI)(JNIEnv *env, jclass cl
         !midIsTablet ||
         !midManualBackButton ||
         !midMinimizeWindow ||
-        !midOpenURL ||
         !midOpenAPKExpansionInputStream ||
         !midRequestPermission ||
         !midSendMessage ||
