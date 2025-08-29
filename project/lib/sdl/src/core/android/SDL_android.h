@@ -126,8 +126,6 @@ SDL_bool Android_JNI_SetRelativeMouseEnabled(SDL_bool enabled);
 /* Request permission */
 SDL_bool Android_JNI_RequestPermission(const char *permission);
 
-int Android_JNI_OpenURL(const char *url);
-
 int SDL_GetAndroidSDKVersion(void);
 
 SDL_bool SDL_IsAndroidTablet(void);
