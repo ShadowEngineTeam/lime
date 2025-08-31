@@ -492,7 +492,9 @@ class AndroidPlatform extends PlatformTarget
 			"android:allowNativeHeapPointerTagging": context.ANDROID_TARGET_SDK_VERSION >= 30 ? "false" : null,
 			"android:requestLegacyExternalStorage": context.ANDROID_TARGET_SDK_VERSION >= 29 ? "true" : null,
 			"android:preserveLegacyExternalStorage": context.ANDROID_TARGET_SDK_VERSION >= 30 ? "true" : null,
-			"android:largeHeap": "true"
+			"android:largeHeap": "true",
+			"android:isGame": "true",
+			"android:appCategory": "game"
 		});
 		context.ANDROID_ACTIVITY = project.config.getKeyValueArray("android.activity", {
 			"android:name": "MainActivity",
