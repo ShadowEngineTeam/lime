@@ -4,4 +4,5 @@
 	android:supportsBatteryGameMode="true"
 	android:supportsPerformanceGameMode="true"
 	android:allowGameAngleDriver="true"
-	android:allowGameDownscaling="true" />
+	android:allowGameDownscaling="true"
+	android:allowGameFpsOverride="true" />
