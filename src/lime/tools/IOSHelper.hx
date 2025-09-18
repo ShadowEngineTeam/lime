@@ -420,6 +420,10 @@ class IOSHelper
 							break;
 						}
 					}
+					if (deviceUUID != null && deviceUUID.length > 0)
+					{
+						break;
+					}
 				}
 
 				if (deviceUUID == null || deviceUUID.length == 0) {
