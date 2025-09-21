@@ -242,7 +242,7 @@ public class FileDialog extends Extension
 				args[2] = uri;
 				args[3] = data.getData().getPath();
 				args[4] = bytesData;
-				haxeObject.call("jni_activity_results", args); 
+				haxeObject.call("onJNIActivityResults", args); 
 			}
 			else
 			{

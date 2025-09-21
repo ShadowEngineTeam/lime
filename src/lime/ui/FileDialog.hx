@@ -464,7 +464,7 @@ class FileDialog #if android implements JNISafety #end
 
 	#if android
 	@:runOnMainThread
-	private function jni_activity_results(requestCode:Int, resultCode:Int, uri:String, path:String, data:Dynamic)
+	private function onJNIActivityResults(requestCode:Int, resultCode:Int, uri:String, path:String, data:Dynamic)
 	{
 		if (resultCode == RESULT_OK)
 		{
@@ -475,19 +475,28 @@ class FileDialog #if android implements JNISafety #end
 					{
 						onOpen.dispatch(Bytes.ofData(data));
 					}
-					catch (e:Dynamic) {}
+					catch (e:Dynamic)
+					{
+						trace('Failed to dispatch onOpen: $e');
+					}
 				case SAVE_REQUEST_CODE:
 					try
 					{
 						onSave.dispatch(path);
 					}
-					catch (e:Dynamic) {}
+					catch (e:Dynamic)
+					{
+						trace('Failed to dispatch onSave: $e');
+					}
 				case DOCUMENT_TREE_REQUEST_CODE:
 					try
 					{
 						onSelect.dispatch(uri);
 					}
-					catch (e:Dynamic) {}
+					catch (e:Dynamic)
+					{
+						trace('Failed to dispatch onSelect: $e');
+					}
 			}
 		}
 		else
