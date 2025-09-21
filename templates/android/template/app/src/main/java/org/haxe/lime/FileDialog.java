@@ -365,8 +365,8 @@ public class FileDialog extends Extension
 				out = new FileOutputStream(output);
 				out.write(fileBytes);
         	}
-        	catch (Exception e) {
-            	Log.e("Exception", e.getMessage());
+        	catch (IOException e) {
+            	Log.e(LOG_TAG, e.getMessage());
         	}
 			finally
 			{
