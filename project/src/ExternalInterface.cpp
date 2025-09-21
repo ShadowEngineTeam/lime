@@ -25,7 +25,9 @@
 #include <system/Endian.h>
 #include <system/FileWatcher.h>
 #include <system/JNI.h>
+#ifdef __ANDROID__
 #include <system/DocumentSystem.h>
+#endif
 #include <system/Locale.h>
 #include <system/OrientationEvent.h>
 #include <system/SensorEvent.h>
