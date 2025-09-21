@@ -339,7 +339,7 @@ public class FileDialog extends Extension
     	}
 	}
 
-	public static String copyURIToCache(Uri uri)
+	public static String copyURIToCache(Uri uri) throws IOException
 	{
 		if (uri != null) {
         	File output = new File(mainContext.getCacheDir(), new File(uri.getPath()).getName());
