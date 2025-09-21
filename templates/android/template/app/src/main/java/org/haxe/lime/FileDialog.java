@@ -15,7 +15,9 @@ import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.haxe.extension.Extension;
@@ -205,6 +207,7 @@ public class FileDialog extends Extension
 		if (haxeObject != null && awaitingResults)
 		{
 			String uri = null;
+			String path = null;
 			byte[] bytesData = null;
 
 			if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null)
@@ -215,8 +218,9 @@ public class FileDialog extends Extension
 					case OPEN_REQUEST_CODE:
 						try
 						{
-							Log.d(LOG_TAG, "getting file bytes from uri " + uri);
+							Log.d(LOG_TAG, "Copying URI to cache dir: " + uri);
 							bytesData = getFileBytes(data.getData());
+							path = copyURIToCache(data.getData());
 						}
 						catch (IOException e)
 						{
@@ -240,7 +244,10 @@ public class FileDialog extends Extension
 				args[0] = requestCode;
 				args[1] = resultCode;
 				args[2] = uri;
-				args[3] = data.getData().getPath();
+				if (path == null)
+					args[3] = data.getData().getPath();
+				else
+					args[3] = path;
 				args[4] = bytesData;
 				haxeObject.call("onJNIActivityResults", args); 
 			}
@@ -329,6 +336,32 @@ public class FileDialog extends Extension
 		{
         	Log.e(LOG_TAG, "Failed to save file: " + e.getMessage());
     	}
+	}
+
+	public static String copyURIToCache(Uri uri)
+	{
+		if (uri != null) {
+        	File output = new File(mainContext.getCacheDir(), new File(uri.getPath()).getName());
+			if (output.exists())
+				output.delete();
+
+        	try {
+        		InputStream in = mainContext.getContentResolver().openInputStream(uri);
+          		OutputStream out = new FileOutputStream(output);
+          		byte[] buffer = new byte[8192];
+          		int len;
+          		while ((len = in.read(buffer)) > 0) {
+            		out.write(buffer, 0, len);
+          		}
+        	}
+        	catch (Exception e) {
+            	Log.e("Exception", e.getMessage());
+        	}
+
+    		return output.getAbsolutePath();
+		}
+
+		return null;
 	}
 }
 

@@ -85,6 +85,7 @@ class FileDialog #if android implements JNISafety #end
 	private static final DOCUMENT_TREE_REQUEST_CODE:Int = JNI.createStaticField('org/haxe/lime/FileDialog', 'DOCUMENT_TREE_REQUEST_CODE', 'I').get();
 	private static final RESULT_OK:Int = -1;
 	private var JNI_FILE_DIALOG:Dynamic = null;
+	private var IS_SELECT:Bool = false;
 	#end
 
 	public function new()
@@ -244,21 +245,25 @@ class FileDialog #if android implements JNISafety #end
 
 		return true;
 		#elseif android
+		IS_SELECT = true;
 		switch (type)
 		{
 			case OPEN:
-				open(filter, defaultPath, title);
+				JNI.callMember(JNI.createMemberMethod('org/haxe/lime/FileDialog', 'open', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V'), JNI_FILE_DIALOG, [filter, defaultPath, title]);
+				return true;
 
 			case OPEN_MULTIPLE:
 				onCancel.dispatch();
 				return false;
 
 			case OPEN_DIRECTORY:
-				// onCancel.dispatch();
-				JNI.callMember(JNI.createMemberMethod('org/haxe/lime/FileDialog', 'openDocumentTree', '(Ljava/lang/String;)V'), JNI_FILE_DIALOG, [null]);
+				// JNI.callMember(JNI.createMemberMethod('org/haxe/lime/FileDialog', 'openDocumentTree', '(Ljava/lang/String;)V'), JNI_FILE_DIALOG, [null]);
+				onCancel.dispatch();
+				return false;
 
 			case SAVE:
 				save(null, filter, defaultPath, title, 'application/octet-stream');
+				return true;
 		}
 		return true;
 		#else
@@ -473,36 +478,50 @@ class FileDialog #if android implements JNISafety #end
 				case OPEN_REQUEST_CODE:
 					try
 					{
-						onOpen.dispatch(Bytes.ofData(data));
+						if (IS_SELECT)
+							onSelect.dispatch(path);
+						else
+							onOpen.dispatch(Bytes.ofData(data));
 					}
 					catch (e:Dynamic)
 					{
-						trace('Failed to dispatch onOpen: $e');
+						if (IS_SELECT)
+							trace('Failed to dispatch onSelect: $e');
+						else
+							trace('Failed to dispatch onOpen: $e');
 					}
 				case SAVE_REQUEST_CODE:
 					try
 					{
-						onSave.dispatch(path);
+						if (IS_SELECT)
+							onSelect.dispatch(path);
+						else
+							onOpen.dispatch(path);
 					}
 					catch (e:Dynamic)
 					{
-						trace('Failed to dispatch onSave: $e');
+						if (IS_SELECT)
+							trace('Failed to dispatch onSelect: $e');
+						else
+							trace('Failed to dispatch onSave: $e');
 					}
 				case DOCUMENT_TREE_REQUEST_CODE:
-					try
-					{
-						onSelect.dispatch(uri);
-					}
-					catch (e:Dynamic)
-					{
-						trace('Failed to dispatch onSelect: $e');
-					}
+					trace("Directory select doesn't work here bozo");
+					// try
+					// {
+					// 	onSelect.dispatch(uri);
+					// }
+					// catch (e:Dynamic)
+					// {
+					// 	trace('Failed to dispatch onSelect: $e');
+					// }
 			}
 		}
 		else
 		{
 			onCancel.dispatch();
 		}
+		IS_SELECT = false;
 	}
 	#end
 }
