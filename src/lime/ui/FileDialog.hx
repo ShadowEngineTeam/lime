@@ -471,7 +471,7 @@ class FileDialog #if android implements JNISafety #end
 	@:runOnMainThread
 	private function onJNIActivityResults(requestCode:Int, resultCode:Int, uri:String, path:String, data:Dynamic)
 	{
-		trace('onJNIActivityResults: requestCode: $requestCode, resultCode: $resultCode, uri: $uri, path: $path data: ${data == null ? "null" : Bytes.ofData(data).length}');
+		trace('onJNIActivityResults: requestCode: ${Std.parseInt(requestCode)}, resultCode: ${Std.parseInt(resultCode)}, uri: $uri, path: $path data: ${data == null ? "null" : Std.parseInt(Bytes.ofData(data).length)}');
 
 		if (resultCode == RESULT_OK)
 		{
