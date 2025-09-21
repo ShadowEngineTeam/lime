@@ -218,7 +218,7 @@ public class FileDialog extends Extension
 					case OPEN_REQUEST_CODE:
 						try
 						{
-							Log.d(LOG_TAG, "Copying URI to cache dir: " + uri);
+							Log.d(LOG_TAG, "Grabbing URI bytes: " + uri);
 							bytesData = getFileBytes(data.getData());
 							path = copyURIToCache(data.getData());
 						}
@@ -249,6 +249,7 @@ public class FileDialog extends Extension
 				else
 					args[3] = path;
 				args[4] = bytesData;
+				Log.d(LOG_TAG, "Dispatching activity results: " + uri);
 				haxeObject.call("onJNIActivityResults", args); 
 			}
 			else
@@ -342,21 +343,48 @@ public class FileDialog extends Extension
 	{
 		if (uri != null) {
         	File output = new File(mainContext.getCacheDir(), new File(uri.getPath()).getName());
+			Log.d(LOG_TAG, "Copying URI from '" + uri + "' to cache dir: " + output.getAbsolutePath());
+
 			if (output.exists())
+			{
 				output.delete();
+				Log.d(LOG_TAG, "deleting existing copy of: " + output.getAbsolutePath());
+			}
+
+    		ParcelFileDescriptor parcelFileDescriptor = null;
+			FileInputStream fileInputStream = null;
+			OutputStream out = null;
 
         	try {
-        		InputStream in = mainContext.getContentResolver().openInputStream(uri);
-          		OutputStream out = new FileOutputStream(output);
-          		byte[] buffer = new byte[8192];
-          		int len;
-          		while ((len = in.read(buffer)) > 0) {
-            		out.write(buffer, 0, len);
-          		}
+	    	    parcelFileDescriptor = mainContext.getContentResolver().openFileDescriptor(uri, "r");
+				fileInputStream = new FileInputStream(parcelFileDescriptor.getFileDescriptor());
+
+				byte[] fileBytes = new byte[(int) parcelFileDescriptor.getStatSize()];
+	    	    fileInputStream.read(fileBytes);
+				
+				out = new FileOutputStream(output);
+				out.write(fileBytes);
         	}
         	catch (Exception e) {
             	Log.e("Exception", e.getMessage());
         	}
+			finally
+			{
+	    	    if (fileInputStream != null)
+				{
+    		        fileInputStream.close();
+    	    	}
+
+    	    	if (parcelFileDescriptor != null)
+				{
+    	        	parcelFileDescriptor.close();
+    	    	}
+
+				if (out != null)
+				{
+					out.close();
+				}
+    		}
 
     		return output.getAbsolutePath();
 		}

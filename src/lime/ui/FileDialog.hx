@@ -471,6 +471,8 @@ class FileDialog #if android implements JNISafety #end
 	@:runOnMainThread
 	private function onJNIActivityResults(requestCode:Int, resultCode:Int, uri:String, path:String, data:Dynamic)
 	{
+		trace('onJNIActivityResults: requestCode: $requestCode, resultCode: $resultCode, uri: $uri, path: $path data: ${data == null ? "null" : Bytes.ofData(data).length}');
+
 		if (resultCode == RESULT_OK)
 		{
 			switch (requestCode)
@@ -478,6 +480,7 @@ class FileDialog #if android implements JNISafety #end
 				case OPEN_REQUEST_CODE:
 					try
 					{
+						trace('dispatching open event');
 						if (IS_SELECT)
 							onSelect.dispatch(path);
 						else
