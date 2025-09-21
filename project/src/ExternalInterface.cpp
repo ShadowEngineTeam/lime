@@ -25,6 +25,7 @@
 #include <system/Endian.h>
 #include <system/FileWatcher.h>
 #include <system/JNI.h>
+#include <system/DocumentSystem.h>
 #include <system/Locale.h>
 #include <system/OrientationEvent.h>
 #include <system/SensorEvent.h>
@@ -2220,6 +2221,119 @@ namespace lime {
 	}
 
 
+	void gc_documentsystem (value handle) {
+
+		#ifdef ANDROID
+		DocumentSystem* documentSystem = (DocumentSystem*)val_data (handle);
+		delete documentSystem;
+		#endif
+
+	}
+
+
+	value lime_documentsystem_create (HxString treeUri) {
+
+		#ifdef ANDROID
+		DocumentSystem* documentSystem = new DocumentSystem (hxs_utf8 (treeUri, nullptr));
+		return CFFIPointer (documentSystem, gc_documentsystem);
+		#else
+		return NULL;
+		#endif
+
+
+	}
+
+
+	void lime_documentsystem_write_bytes(value handle, HxString path, value bytes) {
+
+		#ifdef ANDROID
+		DocumentSystem* documentSystem = (DocumentSystem*)val_data (handle);
+		Bytes data (bytes);
+		documentSystem->writeBytes (hxs_utf8(path, nullptr), &data);
+		#endif
+
+	}
+
+
+	value lime_documentsystem_read_bytes(value handle, HxString path, value bytes) {
+
+		#ifdef ANDROID
+		DocumentSystem* documentSystem = (DocumentSystem*)val_data (handle);
+		Bytes data (bytes);
+		data.Set (documentSystem->readBytes (hxs_utf8(path, nullptr)));
+		return data.Value (bytes);
+		#else
+		return alloc_null ();
+		#endif
+
+	}
+
+	void lime_documentsystem_create_directory(value handle, HxString path) {
+
+		#ifdef ANDROID
+		DocumentSystem* documentSystem = (DocumentSystem*)val_data (handle);
+		documentSystem->createDirectory (hxs_utf8(path, nullptr));
+		#endif
+
+	}
+
+	value lime_documentsystem_read_directory(value handle, HxString path) {
+
+		#ifdef ANDROID
+		DocumentSystem* documentSystem = (DocumentSystem*)val_data (handle);
+		return documentSystem->readDirectory (hxs_utf8(path, nullptr));
+		#else
+		return alloc_null ();
+		#endif
+
+	}
+
+	bool lime_documentsystem_exists(value handle, HxString path) {
+
+		#ifdef ANDROID
+		DocumentSystem* documentSystem = (DocumentSystem*)val_data (handle);
+		return documentSystem->exists (hxs_utf8(path, nullptr));
+		#else
+		return false;
+		#endif
+
+	}
+
+
+	bool lime_documentsystem_delete_directory(value handle, HxString path) {
+
+		#ifdef ANDROID
+		DocumentSystem* documentSystem = (DocumentSystem*)val_data (handle);
+		return documentSystem->deleteDirectory (hxs_utf8(path, nullptr));
+		#else
+		return false;
+		#endif
+
+	}
+
+	bool lime_documentsystem_delete_file(value handle, HxString path) {
+
+		#ifdef ANDROID
+		DocumentSystem* documentSystem = (DocumentSystem*)val_data (handle);
+		return documentSystem->deleteFile (hxs_utf8(path, nullptr));
+		#else
+		return false;
+		#endif
+
+	}
+
+	bool lime_documentsystem_is_directory(value handle, HxString path) {
+
+		#ifdef ANDROID
+		DocumentSystem* documentSystem = (DocumentSystem*)val_data (handle);
+		return documentSystem->isDirectory (hxs_utf8(path, nullptr));
+		#else
+		return false;
+		#endif
+
+	}
+
+
 	void lime_joystick_event_manager_register (value callback, value eventObject) {
 
 		JoystickEvent::callback = new ValuePointer (callback);
@@ -4271,6 +4385,15 @@ namespace lime {
 	DEFINE_HL_PRIM (_TIMAGEBUFFER, hl_image_load_bytes, _TBYTES _TIMAGEBUFFER);
 	DEFINE_HL_PRIM (_TIMAGEBUFFER, hl_image_load_file, _STRING _TIMAGEBUFFER);
 	DEFINE_HL_PRIM (_F64, hl_jni_getenv, _NO_ARG);
+	DEFINE_PRIME1 (lime_documentsystem_create);
+	DEFINE_PRIME3v (lime_documentsystem_write_bytes);
+	DEFINE_PRIME3 (lime_documentsystem_read_bytes);
+	DEFINE_PRIME2v (lime_documentsystem_create_directory);
+	DEFINE_PRIME2 (lime_documentsystem_read_directory);
+	DEFINE_PRIME2 (lime_documentsystem_exists);
+	DEFINE_PRIME2 (lime_documentsystem_delete_directory);
+	DEFINE_PRIME2 (lime_documentsystem_delete_file);
+	DEFINE_PRIME2 (lime_documentsystem_is_directory);
 	DEFINE_HL_PRIM (_VOID, hl_joystick_event_manager_register, _FUN(_VOID, _NO_ARG) _TJOYSTICK_EVENT);
 	DEFINE_HL_PRIM (_BYTES, hl_joystick_get_device_guid, _I32);
 	DEFINE_HL_PRIM (_BYTES, hl_joystick_get_device_name, _I32);

@@ -1487,6 +1487,24 @@ class NativeCFFI
 	@:cffi private static function lime_jni_set_member(jniField:Dynamic, jniObject:Dynamic, value:Dynamic):Void;
 
 	@:cffi private static function lime_jni_set_static(jniField:Dynamic, value:Dynamic):Void;
+
+	@:cffi private static function lime_documentsystem_create(treeUri:String):Dynamic;
+
+	@:cffi private static function lime_documentsystem_write_bytes(handle:Dynamic, path:String, bytes:Bytes):Void;
+
+	@:cffi private static function lime_documentsystem_read_bytes(handle:String, path:String, bytes:Bytes):Dynamic;
+
+	@:cffi private static function lime_documentsystem_create_directory(handle:String, path:String):Void;
+
+	@:cffi private static function lime_documentsystem_read_directory(handle:String, path:String):Array<String>;
+
+	@:cffi private static function lime_documentsystem_exists(handle:String, path:String):Bool;
+
+	@:cffi private static function lime_documentsystem_delete_directory(handle:String, path:String):Bool;
+
+	@:cffi private static function lime_documentsystem_delete_file(handle:String, path:String):Bool;
+
+	@:cffi private static function lime_documentsystem_is_directory(handle:String, path:String):Bool;
 	#else
 	private static var lime_jni_call_member = new cpp.Callable<cpp.Object->cpp.Object->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime",
 		"lime_jni_call_member", "oooo", false));
@@ -1505,6 +1523,24 @@ class NativeCFFI
 	private static var lime_jni_set_member = new cpp.Callable<cpp.Object->cpp.Object->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime",
 		"lime_jni_set_member", "ooov", false));
 	private static var lime_jni_set_static = new cpp.Callable<cpp.Object->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_jni_set_static", "oov",
+		false));
+	private static var lime_documentsystem_create = new cpp.Callable<String->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_documentsystem_create", "so",
+		false));
+	private static var lime_documentsystem_write_bytes = new cpp.Callable<cpp.Object->String->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_documentsystem_write_bytes", "osov",
+		false));
+	private static var lime_documentsystem_read_bytes = new cpp.Callable<cpp.Object->String->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_documentsystem_read_bytes", "osoo",
+		false));
+	private static var lime_documentsystem_create_directory = new cpp.Callable<cpp.Object->String->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_documentsystem_create_directory", "osv",
+		false));
+	private static var lime_documentsystem_read_directory = new cpp.Callable<cpp.Object->String->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_documentsystem_read_directory", "oso",
+		false));
+	private static var lime_documentsystem_exists = new cpp.Callable<cpp.Object->String->Bool>(cpp.Prime._loadPrime("lime", "lime_documentsystem_exists", "osb",
+		false));
+	private static var lime_documentsystem_delete_directory = new cpp.Callable<cpp.Object->String->Bool>(cpp.Prime._loadPrime("lime", "lime_documentsystem_delete_directory", "osb",
+		false));
+	private static var lime_documentsystem_delete_file = new cpp.Callable<cpp.Object->String->Bool>(cpp.Prime._loadPrime("lime", "lime_documentsystem_delete_file", "osb",
+		false));
+	private static var lime_documentsystem_is_directory = new cpp.Callable<cpp.Object->String->Bool>(cpp.Prime._loadPrime("lime", "lime_documentsystem_is_directory", "osb",
 		false));
 	#end
 	#end
@@ -1528,6 +1564,24 @@ class NativeCFFI
 	@:cffi private static function lime_jni_set_member(jniField:Dynamic, jniObject:Dynamic, value:Dynamic):Void;
 
 	@:cffi private static function lime_jni_set_static(jniField:Dynamic, value:Dynamic):Void;
+
+	@:cffi private static function lime_documentsystem_create(treeUri:String):Dynamic;
+
+	@:cffi private static function lime_documentsystem_write_bytes(handle:Dynamic, path:String, bytes:Bytes):Void;
+
+	@:cffi private static function lime_documentsystem_read_bytes(handle:String, path:String, bytes:Bytes):Dynamic;
+
+	@:cffi private static function lime_documentsystem_create_directory(handle:String, path:String):Void;
+
+	@:cffi private static function lime_documentsystem_read_directory(handle:String, path:String):Array<String>;
+
+	@:cffi private static function lime_documentsystem_exists(handle:String, path:String):Bool;
+
+	@:cffi private static function lime_documentsystem_delete_directory(handle:String, path:String):Bool;
+
+	@:cffi private static function lime_documentsystem_delete_file(handle:String, path:String):Bool;
+
+	@:cffi private static function lime_documentsystem_is_directory(handle:String, path:String):Bool;
 	#end
 	#end
 	#if (lime_cffi && !macro && lime_openal)
