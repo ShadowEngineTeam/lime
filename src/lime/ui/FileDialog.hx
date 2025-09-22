@@ -470,9 +470,9 @@ class FileDialog #if android implements JNISafety #end
 	#if android
 	@:runOnMainThread
 	@:keep
-	private function onJNIActivityResults(requestCode:Int, resultCode:Int, uri:String, path:String, data:Dynamic)
+	private function onJNIActivityResults(requestCode:Int, resultCode:Int, uri:String, path:String /*, data:haxe.io.BytesData*/)
 	{
-		trace('onJNIActivityResults: requestCode: ${Std.string(requestCode)}, resultCode: ${Std.string(resultCode)}, uri: $uri, path: $path data: ${data == null ? "null" : Std.string(Bytes.ofData(data).length)}');
+		trace('onJNIActivityResults: requestCode: ${Std.string(requestCode)}, resultCode: ${Std.string(resultCode)}, uri: $uri, path: $path');
 
 		if (resultCode == RESULT_OK)
 		{
@@ -485,7 +485,7 @@ class FileDialog #if android implements JNISafety #end
 						if (IS_SELECT)
 							onSelect.dispatch(path);
 						else
-							onOpen.dispatch(Bytes.ofData(data));
+							onOpen.dispatch(File.getBytes(path));
 					}
 					catch (e:Dynamic)
 					{
