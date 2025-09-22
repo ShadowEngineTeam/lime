@@ -1063,6 +1063,7 @@ private class OrientationChangeListener #if (android && !macro) implements JNISa
 	#if (android && !macro)
 	@:runOnMainThread
 	#end
+	@:keep
 	public function onOrientationChanged(orientation:Int):Void
 	{
 		callback(orientation);
