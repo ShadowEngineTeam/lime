@@ -208,7 +208,7 @@ public class FileDialog extends Extension
 		{
 			String uri = null;
 			String path = null;
-			byte[] bytesData = null;
+			// byte[] bytesData = null;
 
 			if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null)
 			{
@@ -218,8 +218,8 @@ public class FileDialog extends Extension
 					case OPEN_REQUEST_CODE:
 						try
 						{
-							Log.d(LOG_TAG, "Grabbing URI bytes: " + uri);
-							bytesData = getFileBytes(data.getData());
+							// Log.d(LOG_TAG, "Grabbing URI bytes: " + uri);
+							// bytesData = getFileBytes(data.getData());
 							path = copyURIToCache(data.getData());
 						}
 						catch (IOException e)
@@ -240,7 +240,7 @@ public class FileDialog extends Extension
 					default:
 						break;
 				}
-				Object[] args = new Object[5];
+				Object[] args = new Object[4];
 				args[0] = requestCode;
 				args[1] = resultCode;
 				args[2] = uri;
@@ -248,7 +248,7 @@ public class FileDialog extends Extension
 					args[3] = data.getData().getPath();
 				else
 					args[3] = path;
-				args[4] = bytesData;
+				// args[4] = bytesData;
 				Log.d(LOG_TAG, "Dispatching activity results: " + uri);
 				haxeObject.call("onJNIActivityResults", args); 
 			}
@@ -281,17 +281,9 @@ public class FileDialog extends Extension
 
     	try 
 		{
-    	    // Open a file descriptor for the file URI
     	    parcelFileDescriptor = contentResolver.openFileDescriptor(fileUri, "r");
-    	    if (parcelFileDescriptor == null) 
-			{
-    	        throw new IOException("Failed to open file descriptor for URI: " + fileUri);
-    	    }
-
-    	    // Create a FileInputStream from the file descriptor
     	    fileInputStream = new FileInputStream(parcelFileDescriptor.getFileDescriptor());
 
-    	    // Read the bytes into a byte array
     	    byte[] fileBytes = new byte[(int) parcelFileDescriptor.getStatSize()];
     	    fileInputStream.read(fileBytes);
 
@@ -301,7 +293,6 @@ public class FileDialog extends Extension
 		catch (IOException e)
 		{
 			Log.e(LOG_TAG, "Failed to get file bytes\n" + e.getMessage());
-			return new byte[0];
 		}
 		finally
 		{
@@ -316,6 +307,8 @@ public class FileDialog extends Extension
     	        parcelFileDescriptor.close();
     	    }
     	}
+
+		return new byte[0];
 	}
 
 	private static void writeBytesToFile(Uri uri, byte[] data)
