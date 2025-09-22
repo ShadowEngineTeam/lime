@@ -342,7 +342,9 @@ public class FileDialog extends Extension
 	public static String copyURIToCache(Uri uri) throws IOException
 	{
 		if (uri != null) {
-			String fileName = new File(uri.getPath()).getName().split(":")[1];
+			String fileName = new File(uri.getPath()).getName();
+			if (fileName.contains(":"))
+				fileName = fileName.split(":")[1];
         	File output = new File(mainContext.getCacheDir(), fileName);
 			Log.d(LOG_TAG, "Copying URI from '" + uri + "' to cache dir: " + output.getAbsolutePath());
 
