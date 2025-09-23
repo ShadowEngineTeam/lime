@@ -204,12 +204,12 @@ public class FileDialog extends Extension
 	@Override
 	public boolean onActivityResult(int requestCode, int resultCode, Intent data)
 	{
+		String uri = null;
+		String path = null;
+		// byte[] bytesData = null;
+
 		if (haxeObject != null && awaitingResults)
 		{
-			String uri = null;
-			String path = null;
-			// byte[] bytesData = null;
-
 			if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null)
 			{
 				uri = data.getData().toString();
@@ -257,7 +257,7 @@ public class FileDialog extends Extension
 			args[3] = path;
 		// args[4] = bytesData;
 		//Log.d(LOG_TAG, "Dispatching activity results: " + uri);
-		haxeObject.call("onJNIActivityResults", args); 
+		haxeObject.call("onJNIActivityResult", args); 
 
 		awaitingResults = false;
 		return true;
