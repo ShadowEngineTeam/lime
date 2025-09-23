@@ -245,7 +245,7 @@ class FileDialog #if android implements JNISafety #end
 
 		return true;
 		#elseif android
-		IS_SELECT = true;
+		IS_SELECT = onSelect.__listeners != null && onSelect.__listeners.length > 0;
 		switch (type)
 		{
 			case OPEN:
@@ -500,7 +500,7 @@ class FileDialog #if android implements JNISafety #end
 						if (IS_SELECT)
 							onSelect.dispatch(path);
 						else
-							onOpen.dispatch(path);
+							onSave.dispatch(path);
 					}
 					catch (e:Dynamic)
 					{
