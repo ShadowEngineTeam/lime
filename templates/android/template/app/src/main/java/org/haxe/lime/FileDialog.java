@@ -251,10 +251,13 @@ public class FileDialog extends Extension
 		args[0] = requestCode;
 		args[1] = resultCode;
 		args[2] = uri;
-		if (path == null)
-			args[3] = data.getData().getPath();
-		else
-			args[3] = path;
+		if (path != null) {
+        	args[3] = path;
+    	} else if (data != null && data.getData() != null) {
+        	args[3] = data.getData().getPath();
+    	} else {
+      	  args[3] = null;
+    	}
 		// args[4] = bytesData;
 		//Log.d(LOG_TAG, "Dispatching activity results: " + uri);
 		haxeObject.call("onJNIActivityResult", args); 
