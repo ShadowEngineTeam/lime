@@ -472,7 +472,7 @@ class FileDialog #if android implements JNISafety #end
 	@:keep
 	private function onJNIActivityResults(requestCode:Int, resultCode:Int, uri:String, path:String /*, data:haxe.io.BytesData*/)
 	{
-		trace('onJNIActivityResults: requestCode: ${Std.string(requestCode)}, resultCode: ${Std.string(resultCode)}, uri: $uri, path: $path');
+		//trace('onJNIActivityResults: requestCode: ${Std.string(requestCode)}, resultCode: ${Std.string(resultCode)}, uri: $uri, path: $path');
 
 		if (resultCode == RESULT_OK)
 		{
@@ -481,7 +481,6 @@ class FileDialog #if android implements JNISafety #end
 				case OPEN_REQUEST_CODE:
 					try
 					{
-						trace('dispatching open event');
 						if (IS_SELECT)
 							onSelect.dispatch(path);
 						else
@@ -510,7 +509,8 @@ class FileDialog #if android implements JNISafety #end
 							trace('Failed to dispatch onSave: $e');
 					}
 				case DOCUMENT_TREE_REQUEST_CODE:
-					trace("Directory select doesn't work here bozo");
+					trace("Directory select doesn't work yet.");
+					onCancel.dispatch();
 					// try
 					// {
 					// 	onSelect.dispatch(uri);
@@ -522,9 +522,7 @@ class FileDialog #if android implements JNISafety #end
 			}
 		}
 		else
-		{
 			onCancel.dispatch();
-		}
 		IS_SELECT = false;
 	}
 	#end
