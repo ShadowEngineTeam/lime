@@ -240,23 +240,24 @@ public class FileDialog extends Extension
 					default:
 						break;
 				}
-				Object[] args = new Object[4];
-				args[0] = requestCode;
-				args[1] = resultCode;
-				args[2] = uri;
-				if (path == null)
-					args[3] = data.getData().getPath();
-				else
-					args[3] = path;
-				// args[4] = bytesData;
-				Log.d(LOG_TAG, "Dispatching activity results: " + uri);
-				haxeObject.call("onJNIActivityResults", args); 
 			}
 			else
 			{
 				Log.e(LOG_TAG, "Activity results for request code " + requestCode + " failed with result code " + resultCode + " and data " + data);
 			}
 		}
+
+		Object[] args = new Object[4];
+		args[0] = requestCode;
+		args[1] = resultCode;
+		args[2] = uri;
+		if (path == null)
+			args[3] = data.getData().getPath();
+		else
+			args[3] = path;
+		// args[4] = bytesData;
+		Log.d(LOG_TAG, "Dispatching activity results: " + uri);
+		haxeObject.call("onJNIActivityResults", args); 
 
 		awaitingResults = false;
 		return true;
