@@ -245,7 +245,7 @@ class FileDialog #if android implements JNISafety #end
 
 		return true;
 		#elseif android
-		IS_SELECT = onSelect.__listeners != null && onSelect.__listeners.length > 0;
+		IS_SELECT = true;
 		switch (type)
 		{
 			case OPEN:
