@@ -19,6 +19,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.haxe.extension.Extension;
 import org.haxe.lime.HaxeObject;
@@ -97,11 +100,23 @@ public class FileDialog extends Extension
 
 		if (filter != null)
 		{
-			MimeTypeMap mimeType = MimeTypeMap.getSingleton();
-			String extension = formatExtension(filter);
-			String mime = mimeType.getMimeTypeFromExtension(extension);
-			//Log.d(LOG_TAG, "Setting mime to " + mime);
-			intent.setType(mime);
+			if (filter.contains(","))
+			{
+				String[] filters = filter.split(",");
+
+				for (int i = 0; i < filters.length; i++)
+				{
+					filters[i] = getMimeFromExtension(filters[i]);
+				}
+
+				intent.setType(filters[0]);
+				intent.putExtra(Intent.EXTRA_MIME_TYPES, filters);
+			}
+			else
+			{
+				String mime = getMimeFromExtension(filter);
+				intent.setType(getMimeFromExtension(filter));
+			}
 		}
 		else
 		{
@@ -166,6 +181,8 @@ public class FileDialog extends Extension
 		//Log.d(LOG_TAG, "launching file saver (ACTION_CREATE_DOCUMENT) intent!");
 		awaitingResults = true;
 		
+		if (mime == "application/octet-stream")
+			mime = "*/*";
 		intent.setType(mime);
 		mainActivity.startActivityForResult(intent, SAVE_REQUEST_CODE);
 	}
@@ -268,12 +285,10 @@ public class FileDialog extends Extension
 
 	public static String formatExtension(String extension)
 	{
-		if (extension.startsWith("*")) {
+		if (extension.startsWith("*") || extension.startsWith(".")) {
 			extension = extension.substring(1);
 		}
-		if (extension.startsWith(".")) {
-			extension = extension.substring(1);
-		}
+
 		return extension;
 	}
 
@@ -390,6 +405,13 @@ public class FileDialog extends Extension
 		}
 
 		return null;
+	}
+
+	public static String getMimeFromExtension(String extension)
+	{
+		MimeTypeMap mimeType = MimeTypeMap.getSingleton();
+		extension = formatExtension(extension);
+		return mimeType.getMimeTypeFromExtension(extension);
 	}
 }
 

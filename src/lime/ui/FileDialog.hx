@@ -249,6 +249,7 @@ class FileDialog #if android implements JNISafety #end
 		switch (type)
 		{
 			case OPEN:
+				filter = StringTools.replace(filter, " ", "");
 				JNI.callMember(JNI.createMemberMethod('org/haxe/lime/FileDialog', 'open', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V'), JNI_FILE_DIALOG, [filter, defaultPath, title]);
 				return true;
 
@@ -262,8 +263,9 @@ class FileDialog #if android implements JNISafety #end
 				return false;
 
 			case SAVE:
-				save(null, filter, defaultPath, title, 'application/octet-stream');
-				return true;
+				// save(null, filter, defaultPath, title, 'application/octet-stream');
+				onCancel.dispatch();
+				return false;
 		}
 		return true;
 		#else
@@ -327,6 +329,7 @@ class FileDialog #if android implements JNISafety #end
 
 		return true;
 		#elseif android
+		filter = StringTools.replace(filter, " ", "");
 		JNI.callMember(JNI.createMemberMethod('org/haxe/lime/FileDialog', 'open', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V'), JNI_FILE_DIALOG, [filter, defaultPath, title]);
 		return true;
 		#else
