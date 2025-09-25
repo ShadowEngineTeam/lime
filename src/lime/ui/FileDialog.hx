@@ -81,6 +81,7 @@ class FileDialog #if android implements JNISafety #end
 
 	#if android
 	private static final OPEN_REQUEST_CODE:Int = JNI.createStaticField('org/haxe/lime/FileDialog', 'OPEN_REQUEST_CODE', 'I').get();
+	private static final OPEN_MULTIPLE_REQUEST_CODE:Int = JNI.createStaticField('org/haxe/lime/FileDialog', 'OPEN_MULTIPLE_REQUEST_CODE', 'I').get();
 	private static final SAVE_REQUEST_CODE:Int = JNI.createStaticField('org/haxe/lime/FileDialog', 'SAVE_REQUEST_CODE', 'I').get();
 	private static final DOCUMENT_TREE_REQUEST_CODE:Int = JNI.createStaticField('org/haxe/lime/FileDialog', 'DOCUMENT_TREE_REQUEST_CODE', 'I').get();
 	private static final RESULT_OK:Int = -1;
@@ -254,8 +255,9 @@ class FileDialog #if android implements JNISafety #end
 				return true;
 
 			case OPEN_MULTIPLE:
-				onCancel.dispatch();
-				return false;
+				filter = StringTools.replace(filter, " ", "");
+				JNI.callMember(JNI.createMemberMethod('org/haxe/lime/FileDialog', 'openMultiple', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V'), JNI_FILE_DIALOG, [filter, defaultPath, title]);
+				return true;
 
 			case OPEN_DIRECTORY:
 				// JNI.callMember(JNI.createMemberMethod('org/haxe/lime/FileDialog', 'openDocumentTree', '(Ljava/lang/String;)V'), JNI_FILE_DIALOG, [null]);
@@ -473,9 +475,9 @@ class FileDialog #if android implements JNISafety #end
 	#if android
 	@:runOnMainThread
 	@:keep
-	private function onJNIActivityResult(requestCode:Int, resultCode:Int, uri:String, path:String /*, data:haxe.io.BytesData*/)
+	private function onJNIActivityResult(requestCode:Int, resultCode:Int, uri:String, path:String)
 	{
-		//trace('onJNIActivityResults: requestCode: ${Std.string(requestCode)}, resultCode: ${Std.string(resultCode)}, uri: $uri, path: $path');
+		trace('onJNIActivityResults: requestCode: ${Std.string(requestCode)}, resultCode: ${Std.string(resultCode)}, uri: $uri, path: $path');
 
 		if (resultCode == RESULT_OK)
 		{
@@ -495,6 +497,17 @@ class FileDialog #if android implements JNISafety #end
 							trace('Failed to dispatch onSelect: $e');
 						else
 							trace('Failed to dispatch onOpen: $e');
+					}
+				case OPEN_MULTIPLE_REQUEST_CODE:
+					try
+					{
+						var paths:Array<String> = StringTools.contains(path, ",") ? path.split(',') : [path];
+						if (paths == null || paths.contains(null) || paths.length <= 0) throw "Got null paths array";
+						onSelectMultiple.dispatch(paths);
+					}
+					catch (e:Dynamic)
+					{
+						trace('Failed to dispatch onSelectMultiple: $e');
 					}
 				case SAVE_REQUEST_CODE:
 					try
