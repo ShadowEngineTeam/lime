@@ -267,6 +267,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = "::TARGET_DEVICES::";
+				::THUMB_SUPPORT::
 			};
 			name = Debug;
 		};
@@ -292,6 +293,7 @@
 				/* PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES; */
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = "::TARGET_DEVICES::";
+				::THUMB_SUPPORT::
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
