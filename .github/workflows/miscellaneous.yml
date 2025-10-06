@@ -22,8 +22,8 @@ jobs:
         run: |
           haxelib git hxcpp https://github.com/HomuHomu833/hxcpp --quiet
           haxelib install format --quiet
-          haxelib install hxp
-          haxelib install openfl --quiet
+          haxelib install hxp --quiet
+          haxelib git openfl https://github.com/HomuHomu833/openfl --quiet
           haxelib install svg --quiet
       - name: Enable HXCPP compile cache
         run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
