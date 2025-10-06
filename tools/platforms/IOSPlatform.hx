@@ -896,7 +896,7 @@ class IOSPlatform extends PlatformTarget
 						fileName = "lib" + fileName;
 					}
 
-					copyIfNewer(dependency.path, projectDirectory + "/lib/" + arch + "/" + fileName);
+					System.copyIfNewer(dependency.path, projectDirectory + "/lib/" + arch + "/" + fileName);
 				}
 			}
 		}
