@@ -339,5 +339,31 @@ namespace lime {
 
 	}
 
+	void System::showIOSAlert (const char* message, const char* title) {
+
+		#ifndef OBJC_ARC
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+		#endif
+
+		UIAlertController* alert = [UIAlertController alertControllerWithTitle:[NSString stringWithUTF8String:title] message:[NSString stringWithUTF8String:message] preferredStyle:UIAlertControllerStyleAlert];
+
+		UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {}];
+
+		[alert addAction:defaultAction];
+		alert.preferredAction = defaultAction;
+
+		if ([NSThread isMainThread]) {
+			[[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+			});
+		}
+
+		#ifndef OBJC_ARC
+		[pool drain];
+		#endif
+
+	}
 
 }

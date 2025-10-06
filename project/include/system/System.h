@@ -38,6 +38,7 @@ namespace lime {
 			#ifdef IPHONE
 			static std::wstring* GetIOSDirectory (SystemDirectory type);
 			static bool GetIOSTablet ();
+			static void showIOSAlert (const char* message, const char* title);
 			#endif
 			static int GetNumDisplays ();
 			static int GetDeviceOrientation ();

@@ -45,6 +45,7 @@ SDL_AppleTVControllerUIHintChanged(void *userdata, const char *name, const char 
 {
     @autoreleasepool {
         SDL_uikitviewcontroller *viewcontroller = (__bridge SDL_uikitviewcontroller *) userdata;
+        viewcontroller.controllerUserInteractionEnabled = hint && (*hint != '0');
     }
 }
 #endif
@@ -229,7 +230,13 @@ SDL_HideHomeIndicatorHintChanged(void *userdata, const char *name, const char *o
 {
     return UIRectEdgeBottom;
 }
-#endif
+
+- (BOOL)prefersPointerLocked
+{
+    return SDL_GCMouseRelativeMode() ? YES : NO;
+}
+
+#endif /* !TARGET_OS_TV */
 
 /*
  ---- Keyboard related functionality below this line ----
@@ -324,7 +331,7 @@ SDL_HideHomeIndicatorHintChanged(void *userdata, const char *name, const char *o
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {}
                                  completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         self->rotatingOrientation = NO;
-	}];
+    }];
 }
 #else
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
