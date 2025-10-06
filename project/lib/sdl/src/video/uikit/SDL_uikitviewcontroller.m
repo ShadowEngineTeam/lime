@@ -230,12 +230,6 @@ SDL_HideHomeIndicatorHintChanged(void *userdata, const char *name, const char *o
 {
     return UIRectEdgeBottom;
 }
-
-- (BOOL)prefersPointerLocked
-{
-    return SDL_GCMouseRelativeMode() ? YES : NO;
-}
-
 #endif /* !TARGET_OS_TV */
 
 /*
