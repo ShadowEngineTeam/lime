@@ -137,6 +137,15 @@ namespace lime {
 
 	}
 
+	vbyte* hl_wstring_to_utf8_bytes (const std::wstring& val) {
+
+		const std::string utf8 (wstring_utf8 (val));
+		vbyte* const bytes = hl_alloc_bytes (utf8.size () + 1);
+		std::memcpy(bytes, utf8.c_str (), utf8.size () + 1);
+		return bytes;
+
+	}
+
 
 	std::wstring* hxstring_to_wstring (HxString val) {
 
