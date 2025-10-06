@@ -1810,6 +1810,15 @@ class ProjectXMLParser extends HXProject
 										config.push("android.permission", value);
 									}
 
+							case "gradle-maven-repositories":
+								var repositories = config.getArrayString("android.gradle-maven-repositories");
+
+								if (repositories == null || repositories.indexOf(value) == -1)
+								{
+									config.push("android.gradle-maven-repositories", value);
+								}
+
+
 								case "gradle-version":
 									config.set("android.gradle-version", value);
 
