@@ -20,10 +20,10 @@ jobs:
         run: echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
       - name: Install Haxe dependencies
         run: |
-          haxelib git hxcpp https://github.com/HomuHomu833/hxcpp --quiet
+          haxelib git hxcpp https://github.com/HomuHomu833-haxelibs/hxcpp --quiet
           haxelib install format --quiet
           haxelib install hxp --quiet
-          haxelib git openfl https://github.com/HomuHomu833/openfl --quiet
+          haxelib git openfl https://github.com/HomuHomu833-haxelibs/openfl --quiet
           haxelib install svg --quiet
       - name: Enable HXCPP compile cache
         run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
