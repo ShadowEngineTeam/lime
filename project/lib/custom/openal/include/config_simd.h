@@ -8,7 +8,7 @@
 
 #elif defined(IPHONE)
 
-#include "config/simd/simd/config_simd-ios.h"
+#include "config/simd/config_simd-ios.h"
 
 #elif defined(HX_WINDOWS)
 
