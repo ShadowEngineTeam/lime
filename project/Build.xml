@@ -1,10 +1,13 @@
 <xml>
 
 	<set name="PLATFORM" value="android-21" if="android" />
-	<set name="HXCPP_CPP17" value="1" />
-	<setenv name="MACOSX_DEPLOYMENT_TARGET" value="10.15" if="mac" />
+	<set name="HXCPP_CPP20" value="1" />
 
 	<include name="${HXCPP}/build-tool/BuildCommon.xml" />
+
+	<set name="HXCPP_ANDROID_PLATFORM" value="28" if="android" />
+	<set name="PLATFORM_NUMBER" value="28" if="android" />
+	<setenv name="MACOSX_DEPLOYMENT_TARGET" value="10.13" if="mac" />
 
 	<set name="ios" value="1" if="iphone" />
 	<set name="tvos" value="1" if="appletv" />
