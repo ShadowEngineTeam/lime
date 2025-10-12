@@ -387,7 +387,12 @@ class TVOSPlatform extends PlatformTarget
 	{
 		var path = targetDirectory + "/" + project.app.file + "/haxe/Build.hxml";
 
-		if (FileSystem.exists(path))
+		// try to use the existing .hxml file. however, if the project file was
+		// modified more recently than the .hxml, then the .hxml cannot be
+		// considered valid anymore. it may cause errors in editors like vscode.
+		if (FileSystem.exists(path)
+			&& (project.projectFilePath == null || !FileSystem.exists(project.projectFilePath)
+				|| (FileSystem.stat(path).mtime.getTime() > FileSystem.stat(project.projectFilePath).mtime.getTime())))
 		{
 			return File.getContent(path);
 		}
@@ -416,7 +421,6 @@ class TVOSPlatform extends PlatformTarget
 		if (arm64) commands.push([
 			"-Dtvos",
 			"-Dappletvos",
-			"-DHXCPP_CPP11",
 			"-DHXCPP_ARM64",
 			"-DOBJC_ARC",
 			"-DENABLE_BITCODE"
@@ -425,7 +429,6 @@ class TVOSPlatform extends PlatformTarget
 			"-Dtvos",
 			"-Dappletvsim",
 			"-Dsimulator",
-			"-DHXCPP_CPP11",
 			"-DOBJC_ARC",
 			"-DENABLE_BITCODE"
 		]);
@@ -434,7 +437,6 @@ class TVOSPlatform extends PlatformTarget
 			"-Dappletvsim",
 			"-Dsimulator",
 			"-DHXCPP_M64",
-			"-DHXCPP_CPP11",
 			"-DOBJC_ARC",
 			"-DENABLE_BITCODE"
 		]);

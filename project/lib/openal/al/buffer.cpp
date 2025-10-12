@@ -45,9 +45,9 @@
 #include "AL/alext.h"
 
 #include "albit.h"
-#include "Alc/context.h"
-#include "Alc/device.h"
-#include "Alc/inprogext.h"
+#include "alc/context.h"
+#include "alc/device.h"
+#include "alc/inprogext.h"
 #include "almalloc.h"
 #include "alnumeric.h"
 #include "alspan.h"
@@ -638,7 +638,7 @@ auto DecomposeUserFormat(ALenum format) noexcept -> std::optional<DecompResult>
 
         FormatMap{AL_FORMAT_BFORMAT3D_8,       {FmtBFormat3D, FmtUByte}},
         FormatMap{AL_FORMAT_BFORMAT3D_16,      {FmtBFormat3D, FmtShort}},
-        FormatMap{AL_FORMAT_BFORMAT2D_I32,     {FmtBFormat3D, FmtInt}  },
+        FormatMap{AL_FORMAT_BFORMAT3D_I32,     {FmtBFormat3D, FmtInt}  },
         FormatMap{AL_FORMAT_BFORMAT3D_FLOAT32, {FmtBFormat3D, FmtFloat}},
         FormatMap{AL_FORMAT_BFORMAT3D_MULAW,   {FmtBFormat3D, FmtMulaw}},
 
