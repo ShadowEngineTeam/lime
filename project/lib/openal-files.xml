@@ -139,6 +139,7 @@
             <compilerflag value="-mssse3" unless="HXCPP_ARM64 || HXCPP_ARMV7" />
             <compilerflag value="-mfpu=neon" if="HXCPP_ARMV7" />
             <compilerflag value="-fcommon" />
+            <compilerflag value="-Wno-interference-size" />
 
             <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/alsa.cpp" />
             <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/oss.cpp" />
@@ -188,7 +189,6 @@
             -->
             <compilerflag value="-fPIC" />
             <compilerflag value="-fvisibility=hidden" />
-            <compilerflag value="-Wno-interference-size" />
             <compilerflag value="-pthread" />
 
         </section>
