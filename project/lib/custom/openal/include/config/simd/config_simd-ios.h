@@ -7,4 +7,8 @@
 #define HAVE_SSE_INTRINSICS 0
 
 /* Define to 1 if we have ARM Neon CPU extensions, else 0 */
+#ifdef HXCPP_ARM64
 #define HAVE_NEON 1
+#else
+#define HAVE_NEON 0
+#endif
