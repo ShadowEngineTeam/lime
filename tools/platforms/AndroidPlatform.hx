@@ -142,7 +142,7 @@ class AndroidPlatform extends PlatformTarget
 		var hasX86 = ArrayTools.containsValue(project.architectures, Architecture.X86);
 		var hasX64 = ArrayTools.containsValue(project.architectures, Architecture.X64);
 
-		var architectures = [];
+		var architectures:Array<Architecture> = [];
 
 		if (hasARMV5) architectures.push(Architecture.ARMV5);
 		if (hasARMV7) architectures.push(Architecture.ARMV7);
@@ -283,7 +283,7 @@ class AndroidPlatform extends PlatformTarget
 				build = "-release";
 			}
 
-			var outputDirectory = null;
+			var outputDirectory:String = null;
 			if (project.config.exists("android.gradle-build-directory"))
 			{
 				outputDirectory = Path.combine(project.config.getString("android.gradle-build-directory"), project.app.file + "/app/outputs/apk");
@@ -347,7 +347,7 @@ class AndroidPlatform extends PlatformTarget
 			}
 		}
 
-		var outputDirectory = null;
+		var outputDirectory:String = null;
 
 		if (project.config.exists("android.gradle-build-directory"))
 		{
@@ -373,7 +373,7 @@ class AndroidPlatform extends PlatformTarget
 		var x86 = (ArrayTools.containsValue(project.architectures, Architecture.X86));
 		var x64 = (command == "rebuild" || ArrayTools.containsValue(project.architectures, Architecture.X64));
 
-		var commands = [];
+		var commands:Array<Array<String>> = [];
 		var minSDKVer = 21;
 		var platformNumberDefine = '-DPLATFORM_NUMBER=$minSDKVer';
 		// Required for older ndk and gcc toolchain

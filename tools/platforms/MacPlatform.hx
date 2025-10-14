@@ -435,7 +435,7 @@ class MacPlatform extends PlatformTarget
 
 	public override function rebuild():Void
 	{
-		var commands = [];
+		var commands:Array<Array<String>> = [];
 
 		switch (System.hostArchitecture)
 		{

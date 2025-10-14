@@ -190,7 +190,7 @@ class IconHelper
 
 			if (image != null)
 			{
-				var data = null;
+				var data:Bytes = null;
 
 				if (size < 256)
 				{
@@ -351,7 +351,7 @@ class IconHelper
 		}
 
 		var extension = Path.extension(icon.path);
-		var image = null;
+		var image:Image = null;
 
 		#if (lime && lime_cffi && !macro)
 		switch (extension)
