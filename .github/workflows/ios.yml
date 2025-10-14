@@ -30,6 +30,7 @@ jobs:
       - name: Rebuild Lime
         run: |
           haxelib run lime rebuild ios -release -nocolor -nocffi
+          haxelib run lime rebuild ios -arm64 -simulator -release -nocolor -nocffi -D HXCPP_ARM64
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:

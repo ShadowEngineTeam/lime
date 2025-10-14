@@ -423,9 +423,16 @@ class OpenALAudioContext
 		return AL.isEnabled(capability);
 	}
 
-	public function isExtensionPresent(extname:String):Bool
+	public function isExtensionPresent(extname:String, device:ALDevice = null):Bool
 	{
-		return AL.isExtensionPresent(extname);
+		if (device == null)
+		{
+			return AL.isExtensionPresent(extname);
+		}
+		else
+		{
+			return ALC.isExtensionPresent(device, extname);
+		}
 	}
 
 	public function isSource(source:ALSource):Bool
@@ -588,14 +595,14 @@ class OpenALAudioContext
 		ALC.suspendContext(context);
 	}
 
-	public function eventControlSOFT(count:Int, events:Array<Int>, enable:Bool):Void
+	public function eventControlSOFT(events:Array<Int>, enable:Bool):Void
 	{
-		ALC.eventControlSOFT(count, events, enable);
+		ALC.eventControlSOFT(events, enable);
 	}
 
-	public function eventCallbackSOFT(device:ALDevice, callback:Dynamic):Void
+	public function eventCallbackSOFT(callback:Dynamic):Void
 	{
-		ALC.eventCallbackSOFT(device, callback);
+		ALC.eventCallbackSOFT(callback);
 	}
 
 	public function reopenDeviceSOFT(device:ALDevice, newDeviceName:String, attributes:Array<Int>):Bool

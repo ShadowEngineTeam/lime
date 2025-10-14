@@ -15,10 +15,10 @@
 #include <system/CFFI.h>
 #include <system/CFFIPointer.h>
 #include <system/Mutex.h>
+#include <system/ValuePointer.h>
 #include <utils/ArrayBufferView.h>
 #include <list>
 #include <map>
-#include <system/ValuePointer.h>
 
 
 namespace lime {
@@ -146,7 +146,12 @@ namespace lime {
 
 	}
 
-
+	/*This has been removed after updating to openal 1.20.0+ since the cleanup functions involved
+	* lead to deadlocking. See https://github.com/openfl/lime/issues/1803 for more info.
+	* Developers should use lime.system.System.exit() instead of Sys.exit() to clean up any system
+	* resources
+	*/
+	/*
 	void lime_al_atexit () {
 
 		ALCcontext* alcContext = alcGetCurrentContext ();
@@ -167,7 +172,7 @@ namespace lime {
 		}
 
 	}
-
+	*/
 
 	void lime_al_auxf (value aux, int param, float value) {
 
@@ -2102,7 +2107,6 @@ namespace lime {
 
 	}
 
-
 	value lime_al_get_sourcei (value source, int param) {
 
 		ALuint id = (ALuint)(uintptr_t)val_data (source);
@@ -2309,6 +2313,30 @@ namespace lime {
 
 		#ifdef LIME_OPENALSOFT
 		return alIsExtensionPresent (extname ? hl_to_utf8 (extname->bytes) : NULL);
+		#else
+		return false;
+		#endif
+
+	}
+
+
+	bool lime_alc_is_extension_present (value device, HxString extname) {
+
+		#ifdef LIME_OPENALSOFT
+		ALCdevice* alcDevice = (ALCdevice*)val_data (device);
+		return alcIsExtensionPresent (alcDevice, extname.__s);
+		#else
+		return false;
+		#endif
+
+	}
+
+
+	HL_PRIM bool HL_NAME(hl_alc_is_extension_present) (HL_CFFIPointer* device, hl_vstring* extname) {
+
+		#ifdef LIME_OPENALSOFT
+		ALCdevice* alcDevice = (ALCdevice*)device->ptr;
+		return alcIsExtensionPresent (alcDevice, extname ? hl_to_utf8 (extname->bytes) : NULL);
 		#else
 		return false;
 		#endif
@@ -3416,7 +3444,8 @@ namespace lime {
 	value lime_alc_open_device (HxString devicename) {
 
 		ALCdevice* alcDevice = alcOpenDevice (devicename.__s);
-		atexit (lime_al_atexit);
+		//TODO: Can we work out our own cleanup for openal?
+		//atexit (lime_al_atexit);
 
 		value ptr = CFFIPointer (alcDevice, gc_alc_object);
 		alcObjects[alcDevice] = ptr;
@@ -3428,7 +3457,8 @@ namespace lime {
 	HL_PRIM HL_CFFIPointer* HL_NAME(hl_alc_open_device) (hl_vstring* devicename) {
 
 		ALCdevice* alcDevice = alcOpenDevice (devicename ? (char*)hl_to_utf8 ((const uchar*)devicename->bytes) : 0);
-		atexit (lime_al_atexit);
+		//TODO: Can we work out our own cleanup for openal?
+		//atexit (lime_al_atexit);
 
 		HL_CFFIPointer* ptr = HLCFFIPointer (alcDevice, (hl_finalizer)hl_gc_alc_object);
 		alcObjects[alcDevice] = ptr;
@@ -3546,18 +3576,16 @@ namespace lime {
 
 
 	#ifdef LIME_OPENALSOFT
-	void ALC_APIENTRY alsoft_callback_function(ALCenum eventType, ALCenum deviceType,
-    	ALCdevice* device, ALCsizei length, const ALCchar* message, void* userParam) ALC_API_NOEXCEPT17 {
+	void ALC_APIENTRY alsoft_callback_function(ALCenum eventType, ALCenum deviceType, ALCdevice* device, ALCsizei length, const ALCchar* message, void* userParam) ALC_API_NOEXCEPT17 {
 
 		gc_set_top_of_stack((int*)99, true);
 
 		if (alSoftEventCallback) {
 
-			value devicePtr = CFFIPointer (device, nullptr);
-			value userParamPtr = CFFIPointer (userParam, nullptr);
-
 			al_gc_mutex.Lock ();
-			alSoftEventCallback->Call (alloc_int((int)eventType), alloc_int((int)deviceType), devicePtr, message ? alloc_string(message) : alloc_null(), userParamPtr);
+
+			alSoftEventCallback->Call (alloc_int((int)eventType), alloc_int((int)deviceType), CFFIPointer (device), message ? alloc_string(message) : alloc_null());
+
 			al_gc_mutex.Unlock ();
 
 		}
@@ -3566,11 +3594,19 @@ namespace lime {
 
 	}
 
-	void ALC_APIENTRY hl_alsoft_callback_function(ALCenum eventType, ALCenum deviceType,
-    	ALCdevice* device, ALCsizei length, const ALCchar* message, void* userParam) ALC_API_NOEXCEPT17 {
+	void ALC_APIENTRY hl_alsoft_callback_function(ALCenum eventType, ALCenum deviceType, ALCdevice* device, ALCsizei length, const ALCchar* message, void* userParam) ALC_API_NOEXCEPT17 {
 
-		vdynamic* ret;
-		hl_register_thread (&ret);
+		bool thread_registered = false;
+
+		vdynamic *ret = NULL;
+
+		if (!hl_get_thread ()) {
+
+			hl_register_thread (&ret);
+
+			thread_registered = true;
+
+		}
 
 		if (alSoftEventCallback) {
 
@@ -3578,28 +3614,29 @@ namespace lime {
 
 			vdynamic* _eventType = hl_alloc_dynamic (&hlt_i32);
 			_eventType->v.i = (int)eventType;
+
 			vdynamic* _deviceType = hl_alloc_dynamic (&hlt_i32);
 			_deviceType->v.i = (int)deviceType;
+
 			vdynamic* _message = hl_alloc_dynamic (&hlt_bytes);
 			_message->v.bytes = (vbyte*)message;
 
-			alSoftEventCallback->Call (_eventType, _deviceType, (void*)device, _message, (void*)userParam);
+			alSoftEventCallback->Call (_eventType, _deviceType, HLCFFIPointer(device), _message);
 
 			al_gc_mutex.Unlock ();
 
 		}
 
-		hl_unregister_thread ();
+		if (thread_registered)
+			hl_unregister_thread ();
 
 	}
 	#endif
 
 
-	void lime_alc_event_callback_soft(value device, value callback) {
+	void lime_alc_event_callback_soft(value callback) {
 
 		#ifdef LIME_OPENALSOFT
-		ALCdevice* alcDevice = (ALCdevice*)val_data (device);
-
 		if (alSoftEventCallback) {
 
 			delete alSoftEventCallback;
@@ -3608,18 +3645,15 @@ namespace lime {
 
 		alSoftEventCallback = new ValuePointer (callback);
 
-		//TODO: What is userParam?
 		alcEventCallbackSOFT (alsoft_callback_function, NULL);
 		#endif
 
 	}
 
 
-	HL_PRIM void HL_NAME(hl_alc_event_callback_soft) (HL_CFFIPointer* device, vclosure* callback) {
+	HL_PRIM void HL_NAME(hl_alc_event_callback_soft) (vclosure* callback) {
 
 		#ifdef LIME_OPENALSOFT
-		ALCdevice* alcDevice = (ALCdevice*) device->ptr;
-
 		if (alSoftEventCallback) {
 
 			delete alSoftEventCallback;
@@ -3628,7 +3662,6 @@ namespace lime {
 
 		alSoftEventCallback = new ValuePointer (callback);
 
-		//TODO: What is userParam?
 		alcEventCallbackSOFT (hl_alsoft_callback_function, NULL);
 		#endif
 
@@ -3682,7 +3715,6 @@ namespace lime {
 		#endif
 
 	}
-
 
 
 
@@ -3759,6 +3791,7 @@ namespace lime {
 	DEFINE_PRIME1 (lime_al_is_effect);
 	DEFINE_PRIME1 (lime_al_is_enabled);
 	DEFINE_PRIME1 (lime_al_is_extension_present);
+	DEFINE_PRIME2 (lime_alc_is_extension_present);
 	DEFINE_PRIME1 (lime_al_is_filter);
 	DEFINE_PRIME1 (lime_al_is_source);
 	DEFINE_PRIME4v (lime_al_listener3f);
@@ -3801,9 +3834,8 @@ namespace lime {
 	DEFINE_PRIME1v (lime_alc_resume_device);
 	DEFINE_PRIME1v (lime_alc_suspend_context);
 	DEFINE_PRIME3v (lime_alc_event_control_soft);
-	DEFINE_PRIME2v (lime_alc_event_callback_soft);
+	DEFINE_PRIME1v (lime_alc_event_callback_soft);
 	DEFINE_PRIME3 (lime_alc_reopen_device_soft);
-
 
 	#define _TBYTES _OBJ (_I32 _BYTES)
 	#define _TCFFIPOINTER _DYN
@@ -3886,6 +3918,7 @@ namespace lime {
 	DEFINE_HL_PRIM (_BOOL, hl_al_is_effect, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_BOOL, hl_al_is_enabled, _I32);
 	DEFINE_HL_PRIM (_BOOL, hl_al_is_extension_present, _STRING);
+	DEFINE_HL_PRIM (_BOOL, hl_alc_is_extension_present, _TCFFIPOINTER _STRING);
 	DEFINE_HL_PRIM (_BOOL, hl_al_is_filter, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_BOOL, hl_al_is_source, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_VOID, hl_al_listener3f, _I32 _F32 _F32 _F32);
@@ -3928,8 +3961,7 @@ namespace lime {
 	DEFINE_HL_PRIM (_VOID, hl_alc_resume_device, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_VOID, hl_alc_suspend_context, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_VOID, hl_alc_event_control_soft, _I32 _ARR _BOOL);
-	// DEFINE_HL_PRIM (_VOID, hl_alc_event_callback_soft, _TCFFIPOINTER _FUN(_VOID, _I32, _I32, _DYN, _STRING _DYN));
-	DEFINE_HL_PRIM (_VOID, hl_alc_event_callback_soft, _TCFFIPOINTER _FUN(_VOID, _I32 _I32 _TCFFIPOINTER _BYTES _DYN));
+	DEFINE_HL_PRIM (_VOID, hl_alc_event_callback_soft, _FUN(_VOID, _I32 _I32 _TCFFIPOINTER _BYTES));
 	DEFINE_HL_PRIM (_BOOL, hl_alc_reopen_device_soft, _TCFFIPOINTER _STRING _ARR);
 
 
