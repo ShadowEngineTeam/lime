@@ -38,8 +38,8 @@
 #include "AL/alc.h"
 
 #include "al/debug.h"
-#include "Alc/alconfig.h"
-#include "Alc/context.h"
+#include "alc/alconfig.h"
+#include "alc/context.h"
 #include "alnumeric.h"
 #include "core/except.h"
 #include "core/logging.h"
