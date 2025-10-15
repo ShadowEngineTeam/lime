@@ -102,13 +102,6 @@ class IOSPlatform extends PlatformTarget
 			defaults.windows.push(defaults.window);
 		}
 
-		if (defaults.launchStoryboard == null)
-		{
-			defaults.launchStoryboard = new LaunchStoryboard();
-
-			defaults.launchStoryboard.template = "LaunchScreen.storyboard";
-		}
-
 		defaults.merge(project);
 		project = defaults;
 
