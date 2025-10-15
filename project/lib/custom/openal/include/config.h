@@ -1,10 +1,10 @@
-#if defined(HX_MACOS) && defined(HXCPP_ARM64)
+#if defined(HX_MACOS)
 
+#ifdef HXCPP_ARM64
 #include "config/config-macos-arm64.h"
-
-#elif defined(HX_MACOS)
-
+#else
 #include "config/config-macos-x86_64.h"
+#endif
 
 #elif defined(IPHONE)
 
