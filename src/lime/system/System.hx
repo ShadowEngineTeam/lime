@@ -209,8 +209,11 @@ class System
 		#end
 
 		#if sys
-		@:privateAccess
-		currentApp.__backend.exit();
+		try {
+			@:privateAccess
+			currentApp.__backend.exit();
+		}
+		catch (e:Dynamic) {}
 		Sys.exit(code);
 		#elseif (js && html5)
 		if (currentApp != null && currentApp.window != null)
