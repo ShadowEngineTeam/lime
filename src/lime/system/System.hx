@@ -209,7 +209,10 @@ class System
 		#end
 
 		#if sys
-		Sys.exit(code);
+		// BROKEN
+		//Sys.exit(code);
+		@:privateAccess
+		currentApp.__backend.exit();
 		#elseif (js && html5)
 		if (currentApp != null && currentApp.window != null)
 		{
