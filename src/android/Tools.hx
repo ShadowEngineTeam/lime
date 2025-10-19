@@ -22,6 +22,28 @@ import sys.io.Process;
 class Tools
 {
 	/**
+	 * The result code for `DATA_FOLDER_CLOSED` activity.
+	 */
+	public static var DATA_FOLDER_CLOSED(get, never):Int;
+
+	@:noCompletion
+	static function get_DATA_FOLDER_CLOSED():Int
+	{
+		final field:Null<Dynamic> = JNICache.createStaticField('org/haxe/extension/Tools', 'DATA_FOLDER_CLOSED', 'I');
+		return field != null ? field.get() : 0;
+	}
+
+	/**
+	 * Opens the data folder on an Android device using JNI.
+	 */
+	public static function openDataFolder():Void
+	{
+		final openDataFolderJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'openDataFolder', '(I)V');
+		if (openDataFolderJNI != null)
+			openDataFolderJNI(DATA_FOLDER_CLOSED);
+	}
+
+	/**
 	 * Prompt the user to install a specific APK file.
 	 *
 	 * @param path The absolute path to the APK file.

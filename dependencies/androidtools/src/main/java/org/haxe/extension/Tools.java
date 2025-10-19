@@ -15,6 +15,7 @@ import android.media.MediaFormat;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.provider.DocumentsContract;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.util.DisplayMetrics;
@@ -67,6 +68,11 @@ public class Tools extends Extension
 	public static final String LOG_TAG = "Tools";
 
 	public static HaxeObject cbObject;
+
+	/**
+	 * Constant representing the event when the data folder is closed.
+	 */
+    public static int DATA_FOLDER_CLOSED = 0x01;
 
 	/**
 	 * Initializes the callback object for handling Haxe callbacks.
@@ -494,6 +500,23 @@ public class Tools extends Extension
 
 		return new Rect[0];
 	}
+
+	/**
+     * A method that opens the Application's data folder for browsing through the Storage Access Framework.
+     * It's highly based on some code borrowed from Material Files
+     * https://github.com/zhanghai/MaterialFiles
+     */
+    public static void openDataFolder(int requestCode)
+    {
+        if (Extension.mainActivity != null)
+        {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(DocumentsContract.buildRootUri("::APP_PACKAGE::.documentsprovider", ""), "vnd.android.document/directory");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            Extension.mainActivity.startActivityForResult(intent, requestCode);
+        }
+    }
 
 	/**
 	 * Retrieves the application's private files directory.
