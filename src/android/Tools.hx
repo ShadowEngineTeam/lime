@@ -39,8 +39,7 @@ class Tools
 	public static function openDataFolder():Void
 	{
 		final openDataFolderJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'openDataFolder', '(I)V');
-		if (openDataFolderJNI != null)
-			openDataFolderJNI(DATA_FOLDER_CLOSED);
+		if (openDataFolderJNI != null) openDataFolderJNI(DATA_FOLDER_CLOSED);
 	}
 
 	/**
@@ -50,7 +49,8 @@ class Tools
 	 */
 	public static function installPackage(path:String):Void
 	{
-		if (!JNICache.createStaticMethod('org/haxe/extension/Tools', 'installPackage', '(Ljava/lang/String;)Z')(path))
+		if (!JNICache.createStaticMethod('org/haxe/extension/Tools', 'installPackage',
+			'(Ljava/lang/String;)Z')(path))
 			Log.warn('"REQUEST_INSTALL_PACKAGES" permission and "Install apps from external sources" setting must be granted to this app in order to install a '
 				+ Path.extension(path).toUpperCase()
 				+ ' file.');
@@ -93,11 +93,9 @@ class Tools
 	 */
 	public static function showAlertDialog(title:String, message:String, ?positiveButton:ButtonData, ?negativeButton:ButtonData):Void
 	{
-		if (positiveButton == null)
-			positiveButton = {name: null, func: null};
+		if (positiveButton == null) positiveButton = {name: null, func: null};
 
-		if (negativeButton == null)
-			negativeButton = {name: null, func: null};
+		if (negativeButton == null) negativeButton = {name: null, func: null};
 
 		JNICache.createStaticMethod('org/haxe/extension/Tools', 'showAlertDialog',
 			'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/haxe/lime/HaxeObject;Ljava/lang/String;Lorg/haxe/lime/HaxeObject;)V')(title, message,
@@ -160,29 +158,45 @@ class Tools
 	 */
 	public static function getCutoutDimensions():Array<Rectangle>
 	{
-		final cutoutRectangles:Array<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'getCutoutDimensions', '()[Landroid/graphics/Rect;')();
+		final getCutoutDimensionsJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'getCutoutDimensions',
+			'()[Landroid/graphics/Rect;');
 
-		if (cutoutRectangles == null || cutoutRectangles.length == 0)
-			return [];
-
-		final rectangles:Array<Rectangle> = [];
-
-		for (rectangle in cutoutRectangles)
+		if (getCutoutDimensionsJNI != null)
 		{
-			if (rectangle == null)
-				continue;
+			final rectangles:Array<Rectangle> = [];
 
-			final top:Int = JNICache.createMemberField('android/graphics/Rect', 'top', 'I').get(rectangle);
-			final left:Int = JNICache.createMemberField('android/graphics/Rect', 'left', 'I').get(rectangle);
-			final right:Int = JNICache.createMemberField('android/graphics/Rect', 'right', 'I').get(rectangle);
-			final bottom:Int = JNICache.createMemberField('android/graphics/Rect', 'bottom', 'I').get(rectangle);
+			for (rectangle in cast(getCutoutDimensionsJNI(), Array<Dynamic>))
+			{
+				if (rectangle == null) continue;
 
-			rectangles.push(new Rectangle(left, top, right - left, bottom - top));
+				final topJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'top', 'I');
+				final leftJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'left', 'I');
+				final rightJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'right', 'I');
+				final bottomJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'bottom', 'I');
+
+				if (topJNI != null && leftJNI != null && rightJNI != null && bottomJNI != null)
+				{
+					final rectangle:Rectangle = new Rectangle();
+					rectangle.top = topJNI.get(rectangle);
+					rectangle.left = leftJNI.get(rectangle);
+					rectangle.right = rightJNI.get(rectangle);
+					rectangle.bottom = bottomJNI.get(rectangle);
+					rectangles.push(rectangle);
+
+					final top:Int = topJNI.get(rectangle);
+					final left:Int = leftJNI.get(rectangle);
+					final right:Int = rightJNI.get(rectangle);
+					final bottom:Int = bottomJNI.get(rectangle);
+					rectangles.push(new Rectangle(left, top, right - left, bottom - top));
+				}
+			}
+
+			return rectangles;
 		}
 
-		return rectangles;
+		return [];
 	}
-	
+
 	/**
 	 * Sets the activity's title.
 	 *
@@ -274,8 +288,7 @@ private class ButtonListener #if !macro implements JNISafety #end
 	 */
 	public function new(clickCallback:Void->Void):Void
 	{
-		if (clickCallback != null)
-			onClickEvent.add(clickCallback);
+		if (clickCallback != null) onClickEvent.add(clickCallback);
 	}
 
 	@:runOnMainThread
