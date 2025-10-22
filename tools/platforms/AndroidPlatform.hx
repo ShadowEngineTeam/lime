@@ -511,6 +511,15 @@ class AndroidPlatform extends PlatformTarget
 
 		context.SHARE_FILES = project.haxedefs.exists("SHARE_MOBILE_FILES");
 
+		var limeTemplatesPath:String = Path.combine(Haxelib.getPath(new Haxelib("lime")), "templates/bin/aapt2/" + Std.string(System.hostPlatform).toLowerCase());
+		var slashAAPTTwo:String = '/aapt2';
+		if (System.hostPlatform == WINDOWS)
+		{
+			limeTemplatesPath = StringTools.replace(limeTemplatesPath, "/", "\\");
+			slashAAPTTwo = StringTools.replace(slashAAPTTwo, "/", "\\");
+		}
+		context.AAPT2_OVERRIDE = StringTools.replace(limeTemplatesPath + (System.hostPlatform == MAC || System.hostPlatform == WINDOWS ? "" : System.hostArchitecture == X64 ? "64" : System.hostArchitecture == X86 ? "32" : Std.string(System.hostArchitecture)) + slashAAPTTwo + (System.hostPlatform == WINDOWS ? ".exe" : ""), "\\", "\\\\");
+
 		if (!project.environment.exists("ANDROID_SDK") || !project.environment.exists("ANDROID_NDK_ROOT"))
 		{
 			var command = #if lime "lime" #else "hxp" #end;
