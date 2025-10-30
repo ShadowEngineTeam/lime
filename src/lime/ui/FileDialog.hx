@@ -6,7 +6,7 @@ import haxe.ds.Map;
 import lime._internal.backend.native.NativeCFFI;
 import lime.app.Event;
 import lime.graphics.Image;
-import lime.system.BackgroundWorker;
+import lime.system.ThreadPool;
 import lime.utils.ArrayBuffer;
 import lime.utils.Resource;
 import lime.system.JNI;
@@ -124,7 +124,7 @@ class FileDialog #if android implements JNISafety #end
 		if (type == null) type = FileDialogType.OPEN;
 
 		#if desktop
-		var worker = new BackgroundWorker();
+		var worker = new ThreadPool(#if windows SINGLE_THREADED #end);
 
 		worker.doWork.add(function(_)
 		{
@@ -313,7 +313,7 @@ class FileDialog #if android implements JNISafety #end
 	public function open(filter:String = null, defaultPath:String = null, title:String = null):Bool
 	{
 		#if (desktop && sys)
-		var worker = new BackgroundWorker();
+		var worker = new ThreadPool(#if windows SINGLE_THREADED #end);
 
 		worker.doWork.add(function(_)
 		{
@@ -392,7 +392,7 @@ class FileDialog #if android implements JNISafety #end
 		#end
 
 		#if (desktop && sys)
-		var worker = new BackgroundWorker();
+		var worker = new ThreadPool(#if windows SINGLE_THREADED #end);
 
 		worker.doWork.add(function(_)
 		{
