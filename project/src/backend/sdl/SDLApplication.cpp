@@ -925,10 +925,6 @@ namespace lime {
 
 			case SDL_APP_DIDENTERBACKGROUND:
 
-				#ifdef __ANDROID__
-				SDL_GL_SetSwapInterval(0);
-				#endif
-
 				inBackground = true;
 				currentApplication->windowEvent.type = WINDOW_DEACTIVATE;
 				WindowEvent::Dispatch (&currentApplication->windowEvent);

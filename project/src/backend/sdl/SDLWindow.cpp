@@ -1134,9 +1134,7 @@ namespace lime {
 
 	bool SDLWindow::SetVSync (bool vsync) {
 
-		SDL_GL_SetSwapInterval(vsync ? 1 : 0);
-
-		return vsync;
+		return SDL_GL_SetSwapInterval (vsync) == 0;
 
 	}
 
