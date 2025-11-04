@@ -1466,29 +1466,55 @@ class ProjectXMLParser extends HXProject
 							path = Path.combine(extensionPath, substitute(element.att.name));
 						}
 
-						var icon = new Icon(path);
-
-						if (element.has.size)
+						if (target == Platform.ANDROID && element.has.adaptive)
 						{
-							icon.size = icon.width = icon.height = Std.parseInt(substitute(element.att.size));
+							adaptiveIcon = new AdaptiveIcon(path, element.has.round ? element.att.round == "true" : false);
 						}
-
-						if (element.has.width)
+						else
 						{
-							icon.width = Std.parseInt(substitute(element.att.width));
-						}
+							var icon = new Icon(path);
 
-						if (element.has.height)
-						{
-							icon.height = Std.parseInt(substitute(element.att.height));
-						}
+							if (element.has.size)
+							{
+								var parsedValue = Std.parseInt(substitute(element.att.width));
+								if (parsedValue == null)
+								{
+									Log.warn("Ignoring unknown width=\"" + element.att.width + "\"");
+								}
+								else
+								{
+									icon.width = parsedValue;
+								}
+							}
 
-						if (element.has.priority)
-						{
-							icon.priority = Std.parseInt(substitute(element.att.priority));
-						}
+							if (element.has.height)
+							{
+								var parsedValue = Std.parseInt(substitute(element.att.height));
+								if (parsedValue == null)
+								{
+									Log.warn("Ignoring unknown height=\"" + element.att.height + "\"");
+								}
+								else
+								{
+									icon.height = parsedValue;
+								}
+							}
 
-						icons.push(icon);
+							if (element.has.priority)
+							{
+								var parsedValue = Std.parseInt(substitute(element.att.priority));
+								if (parsedValue == null)
+								{
+									Log.warn("Ignoring unknown priority=\"" + element.att.priority + "\"");
+								}
+								else
+								{
+									icon.priority = parsedValue;
+								}
+							}
+
+							icons.push(icon);
+						}
 
 					case "source", "classpath":
 						var path = "";
