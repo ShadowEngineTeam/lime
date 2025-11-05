@@ -25,22 +25,19 @@ jobs:
         uses: actions/checkout@main
         with:
           ref: ${{ github.ref_name }}
-
       - name: Delete old NDLL's
         run: rm -rf ndll
-
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: .
           merge-multiple: true
-
       - name: Push to GitHub
         run: |
           USER_INFO=$(curl -s "https://api.github.com/users/${{ github.actor }}")
           USERID=$(echo "$USER_INFO" | jq -r '.id')
           USERNAME=$(echo "$USER_INFO" | jq -r '.name')
-          
+
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git add ndll
