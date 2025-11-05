@@ -21,10 +21,10 @@ jobs:
       - name: Install Haxe dependencies
         run: |
           haxelib git hxcpp https://github.com/HomuHomu833-haxelibs/hxcpp --quiet
-          haxelib install format --quiet
-          haxelib install hxp --quiet
+          haxelib git format https://github.com/HomuHomu833-haxelibs/format --quiet
+          haxelib git hxp https://github.com/HomuHomu833-haxelibs/hxp --quiet
           haxelib git openfl https://github.com/HomuHomu833-haxelibs/openfl --quiet
-          haxelib install svg --quiet
+          haxelib git svg https://github.com/HomuHomu833-haxelibs/svg --quiet
       - name: Enable HXCPP compile cache
         run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
       - name: Configure Lime
