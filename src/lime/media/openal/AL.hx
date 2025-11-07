@@ -2,6 +2,7 @@ package lime.media.openal;
 
 #if (!lime_doc_gen || lime_openal)
 import lime._internal.backend.native.NativeCFFI;
+import lime.system.CFFI;
 import lime.system.CFFIPointer;
 import lime.utils.ArrayBufferView;
 
@@ -203,6 +204,7 @@ class AL
 	public static inline var EFFECT_PITCH_SHIFTER:Int = 0x0008;
 	public static inline var EFFECT_RING_MODULATOR:Int = 0x0009;
 	public static inline var AFFECT_AUTOWAH:Int = 0x000A;
+	public static inline var FFECT_AUTOWAH:Int = 0x000A;
 	public static inline var EFFECT_COMPRESSOR:Int = 0x000B;
 	public static inline var EFFECT_EQUALIZER:Int = 0x000C;
 	/* Auxiliary Effect Slot properties. */
@@ -233,6 +235,13 @@ class AL
 	public static inline var FILTER_BANDPASS:Int = 0x0003;
 
 	public static inline var STOP_SOURCES_ON_DISCONNECT_SOFT:Int = 0x19AB;
+
+	public static inline var DEVICE_CLOCK_SOFT:Int = 0x1600;
+	public static inline var DEVICE_LATENCY_SOFT:Int = 0x1601;
+	public static inline var DEVICE_CLOCK_LATENCY_SOFT:Int = 0x1602;
+
+	public static inline var SEC_OFFSET_LATENCY_SOFT:Int = 0x1201;
+	public static inline var SEC_OFFSET_CLOCK_SOFT:Int = 0x1203;
 
 	public static function removeDirectFilter(source:ALSource)
 	{
@@ -1000,10 +1009,7 @@ class AL
 	{
 		#if (lime_cffi && lime_openal && !macro)
 		var result = NativeCFFI.lime_al_get_string(param);
-		#if hl
-		var result = @:privateAccess String.fromUTF8(result);
-		#end
-		return result;
+		return CFFI.stringValue(result);
 		#else
 		return null;
 		#end

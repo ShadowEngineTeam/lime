@@ -65,6 +65,8 @@ typedef struct _cairo_xlib_surface cairo_xlib_surface_t;
 #define RAMP_SIZE 16
 /* maximum number of cached GC's */
 #define GC_CACHE_SIZE 4
+/* maximum width/height of an X11 drawable */
+#define XLIB_COORD_MAX 32767
 
 struct _cairo_xlib_display {
     cairo_device_t base;
@@ -104,7 +106,7 @@ struct _cairo_xlib_display {
      * We also use this variable as a guard against a second
      * independent bug with transformed repeating pictures:
      *
-     * http://lists.freedesktop.org/archives/cairo/2004-September/001839.html
+     * https://lists.freedesktop.org/archives/cairo/2004-September/001839.html
      *
      * Both are fixed in xorg >= 6.9 and hopefully in > 6.8.2, so
      * we can reuse the test for now.

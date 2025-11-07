@@ -6,6 +6,7 @@
 
 #include <system/Display.h>
 #include <math/Rectangle.h>
+#include <system/Locale.h>
 
 
 namespace lime {
@@ -48,5 +49,31 @@ namespace lime {
 		rect->SetTo(0.0, 0.0, 0.0, 0.0);
 
 	}
+
+
+	float Display::GetDPI () {
+
+		#ifndef OBJC_ARC
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		#endif
+
+		NSString* locale = [[NSLocale currentLocale] localeIdentifier];
+		std::string* result = 0;
+
+		if (locale) {
+
+			const char* ptr = [locale UTF8String];
+			result = new std::string (ptr);
+
+		}
+
+		#ifndef OBJC_ARC
+		[pool drain];
+		#endif
+
+		return std::strtof(result->c_str(), nullptr);
+
+	}
+
 
 }

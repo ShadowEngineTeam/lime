@@ -155,7 +155,7 @@ _cairo_xcb_surface_create_similar (void			*abstract_other,
     }
 
     if (unlikely (surface->base.status))
-	_cairo_xcb_connection_free_pixmap (connection, pixmap);
+	xcb_free_pixmap (connection->xcb_connection, pixmap);
 
     _cairo_xcb_connection_release (connection);
 
@@ -220,7 +220,7 @@ _cairo_xcb_surface_finish (void *abstract_surface)
 	}
 
 	if (surface->owns_pixmap)
-	    _cairo_xcb_connection_free_pixmap (surface->connection, surface->drawable);
+	    xcb_free_pixmap (surface->connection->xcb_connection, surface->drawable);
 	_cairo_xcb_connection_release (surface->connection);
     }
 
@@ -423,7 +423,7 @@ _get_image (cairo_xcb_surface_t		 *surface,
 						 pixmap,
 						 0, 0,
 						 width, height);
-	_cairo_xcb_connection_free_pixmap (connection, pixmap);
+	xcb_free_pixmap (connection->xcb_connection, pixmap);
     }
 
     if (unlikely (reply == NULL)) {
@@ -833,12 +833,13 @@ _cairo_xcb_surface_fallback (cairo_xcb_surface_t *surface,
     image = (cairo_image_surface_t *)
 	    _get_image (surface, TRUE, 0, 0, surface->width, surface->height);
 
-    /* If there was a deferred clear, _get_image applied it */
-    if (image->base.status == CAIRO_STATUS_SUCCESS) {
-	surface->deferred_clear = FALSE;
+    if (image->base.status != CAIRO_STATUS_SUCCESS)
+	return &image->base;
 
-	surface->fallback = image;
-    }
+    /* If there was a deferred clear, _get_image applied it */
+    surface->deferred_clear = FALSE;
+
+    surface->fallback = image;
 
     return &surface->fallback->base;
 }
@@ -1074,7 +1075,7 @@ _cairo_xcb_surface_create_internal (cairo_xcb_screen_t		*screen,
 {
     cairo_xcb_surface_t *surface;
 
-    surface = malloc (sizeof (cairo_xcb_surface_t));
+    surface = _cairo_malloc (sizeof (cairo_xcb_surface_t));
     if (unlikely (surface == NULL))
 	return _cairo_surface_create_in_error (_cairo_error (CAIRO_STATUS_NO_MEMORY));
 

@@ -159,6 +159,10 @@ class HTML5Platform extends PlatformTarget
 					if (dependency.embed && StringTools.endsWith(dependency.path, ".js") && FileSystem.exists(dependency.path))
 					{
 						var script = File.getContent(dependency.path);
+						if (!dependency.allowWebWorkers)
+						{
+							script = 'if(typeof self === "undefined" || !self.constructor.name.includes("Worker")) { $script }';
+						}
 						context.embeddedLibraries.push(script);
 					}
 				}
@@ -209,7 +213,12 @@ class HTML5Platform extends PlatformTarget
 	{
 		var path = targetDirectory + "/haxe/" + buildType + ".hxml";
 
-		if (FileSystem.exists(path))
+		// try to use the existing .hxml file. however, if the project file was
+		// modified more recently than the .hxml, then the .hxml cannot be
+		// considered valid anymore. it may cause errors in editors like vscode.
+		if (FileSystem.exists(path)
+			&& (project.projectFilePath == null || !FileSystem.exists(project.projectFilePath)
+				|| (FileSystem.stat(path).mtime.getTime() > FileSystem.stat(project.projectFilePath).mtime.getTime())))
 		{
 			return File.getContent(path);
 		}
@@ -429,7 +438,7 @@ class HTML5Platform extends PlatformTarget
 					var name = Path.withoutDirectory(dependency.path);
 
 					context.linkedLibraries.push("./" + dependencyPath + "/" + name);
-					System.copyIfNewer(dependency.path, Path.combine(destination, Path.combine(dependencyPath, name)));
+					copyIfNewer(dependency.path, Path.combine(destination, Path.combine(dependencyPath, name)));
 				}
 			}
 		}

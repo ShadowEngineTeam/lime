@@ -10,4 +10,9 @@ namespace lime {
 		rect->SetTo(0.0, 0.0, 0.0, 0.0);
 	}
 
+	float Display::GetDPI () {
+
+		return 0.0;
+	}
+
 }

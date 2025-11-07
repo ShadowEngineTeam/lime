@@ -36,13 +36,7 @@
  *	Carl D. Worth <cworth@cworth.org>
  */
 
-#define CAIRO_VERSION_H 1
-
 #include "cairoint.h"
-
-/* get the "real" version info instead of dummy cairo-version.h */
-#undef CAIRO_VERSION_H
-#include "../cairo-version.h"
 
 /**
  * SECTION:cairo-version
@@ -115,8 +109,8 @@
  * <informalexample><screen>
  * Compile-time
  * ------------
- * CAIRO_VERSION_STRING    Human-readable
- * CAIRO_VERSION           Encoded, suitable for comparison
+ * #CAIRO_VERSION_STRING   Human-readable
+ * #CAIRO_VERSION          Encoded, suitable for comparison
  * &nbsp;
  * Run-time
  * --------

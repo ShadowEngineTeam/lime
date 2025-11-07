@@ -328,7 +328,7 @@ class HTML5Window
 						depth: Reflect.hasField(contextAttributes, "depth") ? contextAttributes.depth : true,
 						premultipliedAlpha: true,
 						stencil: Reflect.hasField(contextAttributes, "stencil") ? contextAttributes.stencil : false,
-						preserveDrawingBuffer: false,
+						preserveDrawingBuffer: Reflect.hasField(contextAttributes, "preserveDrawingBuffer") ? contextAttributes.preserveDrawingBuffer : false,
 						failIfMajorPerformanceCaveat: false
 					};
 
@@ -381,6 +381,11 @@ class HTML5Window
 
 	public function focus():Void {}
 
+	public function setVSyncMode(mode:lime.ui.WindowVSyncMode):Bool
+	{
+		return false;
+	}
+
 	private function focusTextInput():Void
 	{
 		// Avoid changing focus multiple times per frame.
@@ -402,6 +407,11 @@ class HTML5Window
 	public function getDisplay():Display
 	{
 		return System.getDisplay(0);
+	}
+
+	public function getNativeHandle():Dynamic
+	{
+		return 0;
 	}
 
 	public function getDisplayMode():DisplayMode
@@ -1272,11 +1282,6 @@ class HTML5Window
 		}
 
 		return value;
-	}
-
-	public function setVSync(value:Bool):Bool
-	{
-		return false;
 	}
 
 	public function setVisible(value:Bool):Bool

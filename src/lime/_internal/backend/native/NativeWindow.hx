@@ -1,5 +1,6 @@
 package lime._internal.backend.native;
 
+import lime.ui.WindowVSyncMode;
 import haxe.io.Bytes;
 import lime._internal.backend.native.NativeCFFI;
 import lime.app.Application;
@@ -15,6 +16,7 @@ import lime.graphics.OpenGLRenderContext;
 import lime.graphics.RenderContext;
 import lime.math.Rectangle;
 import lime.math.Vector2;
+import lime.system.CFFI;
 import lime.system.Display;
 import lime.system.DisplayMode;
 import lime.system.JNI;
@@ -123,11 +125,7 @@ class NativeWindow
 		var context = new RenderContext();
 		context.window = parent;
 
-		#if hl
-		var contextType = @:privateAccess String.fromUTF8(NativeCFFI.lime_window_get_context_type(handle));
-		#else
-		var contextType:String = NativeCFFI.lime_window_get_context_type(handle);
-		#end
+		var contextType:String = CFFI.stringValue(NativeCFFI.lime_window_get_context_type(handle));
 
 		switch (contextType)
 		{
@@ -178,6 +176,13 @@ class NativeWindow
 
 		setFrameRate(Reflect.hasField(attributes, "frameRate") ? attributes.frameRate : 60);
 		#end
+
+		// SDL 2 enables text input events by default, but we want them only
+		// when requested. otherwise, we might get weird behavior like IME
+		// candidate windows appearing unexpectedly when holding down a key.
+		// See, for example: openfl/openfl#2697
+		// it appears that SDL 3 may behave differently, if we ever upgrade.
+		setTextInputEnabled(false);
 	}
 
 	public function alert(message:String, title:String):Void
@@ -242,6 +247,18 @@ class NativeWindow
 		}
 	}
 
+	public function setVSyncMode(mode:WindowVSyncMode):Bool
+	{
+		if (handle != null)
+		{
+			#if (!macro && lime_cffi)
+			return NativeCFFI.lime_window_set_vsync_mode(handle, mode);
+			#end
+		}
+
+		return false;
+	}
+
 	public function getCursor():MouseCursor
 	{
 		return cursor;
@@ -258,6 +275,18 @@ class NativeWindow
 			{
 				return System.getDisplay(index);
 			}
+			#end
+		}
+
+		return null;
+	}
+
+	public function getNativeHandle():Dynamic
+	{
+		if (handle != null)
+		{
+			#if (!macro && lime_cffi)
+			return NativeCFFI.lime_window_get_handle(handle);
 			#end
 		}
 
@@ -707,18 +736,6 @@ class NativeWindow
 		{
 			#if (!macro && lime_cffi)
 			NativeCFFI.lime_window_set_visible(handle, value);
-			#end
-		}
-
-		return value;
-	}
-
-	public function setVSync(value:Bool):Bool
-	{
-		if (handle != null)
-		{
-			#if (!macro && lime_cffi)
-			return NativeCFFI.lime_window_set_vsync(handle, value);
 			#end
 		}
 

@@ -26,68 +26,64 @@
  * Google Author(s): Behdad Esfahbod
  */
 
-#include "hb-private.hh"
+#include "hb.hh"
 
-#include "hb-shaper-private.hh"
-#include "hb-shape-plan-private.hh"
-#include "hb-buffer-private.hh"
-#include "hb-font-private.hh"
-#include "hb-machinery-private.hh"
+#include "hb-shaper.hh"
+#include "hb-shape-plan.hh"
+#include "hb-buffer.hh"
+#include "hb-font.hh"
+#include "hb-machinery.hh"
+
+
+#ifndef HB_NO_SHAPER
 
 /**
  * SECTION:hb-shape
- * @title: Shaping
+ * @title: hb-shape
  * @short_description: Conversion of text strings into positioned glyphs
  * @include: hb.h
  *
  * Shaping is the central operation of HarfBuzz. Shaping operates on buffers,
  * which are sequences of Unicode characters that use the same font and have
- * the same text direction, script and language. After shaping the buffer
+ * the same text direction, script, and language. After shaping the buffer
  * contains the output glyphs and their positions.
  **/
 
 
-static void free_static_shaper_list (void);
-static const char *nil_shaper_list[] = {nullptr};
+static inline void free_static_shaper_list ();
+
+static const char * const nil_shaper_list[] = {nullptr};
 
 static struct hb_shaper_list_lazy_loader_t : hb_lazy_loader_t<const char *,
 							      hb_shaper_list_lazy_loader_t>
 {
-  static inline const char ** create (void)
+  static const char ** create ()
   {
-    const char **shaper_list = (const char **) calloc (1 + HB_SHAPERS_COUNT, sizeof (const char *));
+    const char **shaper_list = (const char **) hb_calloc (1 + HB_SHAPERS_COUNT, sizeof (const char *));
     if (unlikely (!shaper_list))
       return nullptr;
 
-    const hb_shaper_pair_t *shapers = _hb_shapers_get ();
+    const hb_shaper_entry_t *shapers = _hb_shapers_get ();
     unsigned int i;
     for (i = 0; i < HB_SHAPERS_COUNT; i++)
       shaper_list[i] = shapers[i].name;
     shaper_list[i] = nullptr;
 
-#ifdef HB_USE_ATEXIT
-    atexit (free_static_shaper_list);
-#endif
+    hb_atexit (free_static_shaper_list);
 
     return shaper_list;
   }
-  static inline void destroy (const char **l)
-  {
-    free (l);
-  }
-  static inline const char ** get_null (void)
-  {
-    return nil_shaper_list;
-  }
+  static void destroy (const char **l)
+  { hb_free (l); }
+  static const char * const * get_null ()
+  { return nil_shaper_list; }
 } static_shaper_list;
 
-#ifdef HB_USE_ATEXIT
-static
-void free_static_shaper_list (void)
+static inline
+void free_static_shaper_list ()
 {
   static_shaper_list.free_instance ();
 }
-#endif
 
 
 /**
@@ -101,7 +97,7 @@ void free_static_shaper_list (void)
  * Since: 0.9.2
  **/
 const char **
-hb_shape_list_shapers (void)
+hb_shape_list_shapers ()
 {
   return static_shaper_list.get_unconst ();
 }
@@ -111,13 +107,13 @@ hb_shape_list_shapers (void)
  * hb_shape_full:
  * @font: an #hb_font_t to use for shaping
  * @buffer: an #hb_buffer_t to shape
- * @features: (array length=num_features) (allow-none): an array of user
- *    specified #hb_feature_t or %NULL
+ * @features: (array length=num_features) (nullable): an array of user
+ *    specified #hb_feature_t or `NULL`
  * @num_features: the length of @features array
- * @shaper_list: (array zero-terminated=1) (allow-none): a %NULL-terminated
- *    array of shapers to use or %NULL
+ * @shaper_list: (array zero-terminated=1) (nullable): a `NULL`-terminated
+ *    array of shapers to use or `NULL`
  *
- * See hb_shape() for details. If @shaper_list is not %NULL, the specified
+ * See hb_shape() for details. If @shaper_list is not `NULL`, the specified
  * shapers will be used in the given order, otherwise the default shapers list
  * will be used.
  *
@@ -132,15 +128,45 @@ hb_shape_full (hb_font_t          *font,
 	       unsigned int        num_features,
 	       const char * const *shaper_list)
 {
+  if (unlikely (!buffer->len))
+    return true;
+
+  buffer->enter ();
+
+  hb_buffer_t *text_buffer = nullptr;
+  if (buffer->flags & HB_BUFFER_FLAG_VERIFY)
+  {
+    text_buffer = hb_buffer_create ();
+    hb_buffer_append (text_buffer, buffer, 0, -1);
+  }
+
   hb_shape_plan_t *shape_plan = hb_shape_plan_create_cached2 (font->face, &buffer->props,
 							      features, num_features,
 							      font->coords, font->num_coords,
 							      shaper_list);
+
   hb_bool_t res = hb_shape_plan_execute (shape_plan, font, buffer, features, num_features);
+
+  if (buffer->max_ops <= 0)
+    buffer->shaping_failed = true;
+
   hb_shape_plan_destroy (shape_plan);
 
-  if (res)
-    buffer->content_type = HB_BUFFER_CONTENT_TYPE_GLYPHS;
+  if (text_buffer)
+  {
+    if (res && buffer->successful && !buffer->shaping_failed
+	    && text_buffer->successful
+	    && !buffer->verify (text_buffer,
+				font,
+				features,
+				num_features,
+				shaper_list))
+      res = false;
+    hb_buffer_destroy (text_buffer);
+  }
+
+  buffer->leave ();
+
   return res;
 }
 
@@ -148,13 +174,15 @@ hb_shape_full (hb_font_t          *font,
  * hb_shape:
  * @font: an #hb_font_t to use for shaping
  * @buffer: an #hb_buffer_t to shape
- * @features: (array length=num_features) (allow-none): an array of user
- *    specified #hb_feature_t or %NULL
+ * @features: (array length=num_features) (nullable): an array of user
+ *    specified #hb_feature_t or `NULL`
  * @num_features: the length of @features array
  *
  * Shapes @buffer using @font turning its Unicode characters content to
- * positioned glyphs. If @features is not %NULL, it will be used to control the
- * features applied during shaping.
+ * positioned glyphs. If @features is not `NULL`, it will be used to control the
+ * features applied during shaping. If two @features have the same tag but
+ * overlapping ranges the value of the feature with the higher index takes
+ * precedence.
  *
  * Since: 0.9.2
  **/
@@ -166,3 +194,6 @@ hb_shape (hb_font_t           *font,
 {
   hb_shape_full (font, buffer, features, num_features, nullptr);
 }
+
+
+#endif

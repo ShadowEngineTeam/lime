@@ -29,7 +29,7 @@
 #ifndef HB_OT_HEAD_TABLE_HH
 #define HB_OT_HEAD_TABLE_HH
 
-#include "hb-open-type-private.hh"
+#include "hb-open-type.hh"
 
 /*
  * head -- Font Header
@@ -43,18 +43,45 @@ namespace OT {
 
 struct head
 {
-  friend struct OffsetTable;
+  friend struct OpenTypeOffsetTable;
 
-  static const hb_tag_t tableTag	= HB_OT_TAG_head;
+  static constexpr hb_tag_t tableTag = HB_OT_TAG_head;
 
-  inline unsigned int get_upem (void) const
+  unsigned int get_upem () const
   {
     unsigned int upem = unitsPerEm;
     /* If no valid head table found, assume 1000, which matches typical Type1 usage. */
     return 16 <= upem && upem <= 16384 ? upem : 1000;
   }
 
-  inline bool sanitize (hb_sanitize_context_t *c) const
+  bool serialize (hb_serialize_context_t *c) const
+  {
+    TRACE_SERIALIZE (this);
+    return_trace ((bool) c->embed (this));
+  }
+
+  bool subset (hb_subset_context_t *c) const
+  {
+    TRACE_SUBSET (this);
+    return_trace (serialize (c->serializer));
+  }
+
+  enum mac_style_flag_t {
+    BOLD	= 1u<<0,
+    ITALIC	= 1u<<1,
+    UNDERLINE	= 1u<<2,
+    OUTLINE	= 1u<<3,
+    SHADOW	= 1u<<4,
+    CONDENSED	= 1u<<5,
+    EXPANDED	= 1u<<6,
+  };
+
+  bool is_bold () const      { return macStyle & BOLD; }
+  bool is_italic () const    { return macStyle & ITALIC; }
+  bool is_condensed () const { return macStyle & CONDENSED; }
+  bool is_expanded () const  { return macStyle & EXPANDED; }
+
+  bool sanitize (hb_sanitize_context_t *c) const
   {
     TRACE_SANITIZE (this);
     return_trace (c->check_struct (this) &&

@@ -25,7 +25,7 @@
 #ifndef HB_AAT_LTAG_TABLE_HH
 #define HB_AAT_LTAG_TABLE_HH
 
-#include "hb-aat-layout-common-private.hh"
+#include "hb-open-type.hh"
 
 /*
  * ltag -- Language Tag
@@ -36,17 +36,21 @@
 
 namespace AAT {
 
+using namespace OT;
+
 
 struct FTStringRange
 {
-  inline bool sanitize (hb_sanitize_context_t *c, const void *base) const
+  friend struct ltag;
+
+  bool sanitize (hb_sanitize_context_t *c, const void *base) const
   {
     TRACE_SANITIZE (this);
     return_trace (c->check_struct (this) && (base+tag).sanitize (c, length));
   }
 
   protected:
-  OffsetTo<UnsizedArrayOf<HBUINT8> >
+  NNOffset16To<UnsizedArrayOf<HBUINT8>>
 		tag;		/* Offset from the start of the table to
 				 * the beginning of the string */
   HBUINT16	length;		/* String length (in bytes) */
@@ -56,18 +60,27 @@ struct FTStringRange
 
 struct ltag
 {
-  static const hb_tag_t tableTag = HB_AAT_TAG_ltag;
+  static constexpr hb_tag_t tableTag = HB_AAT_TAG_ltag;
 
-  inline bool sanitize (hb_sanitize_context_t *c) const
+  hb_language_t get_language (unsigned int i) const
+  {
+    const FTStringRange &range = tagRanges[i];
+    return hb_language_from_string ((const char *) (this+range.tag).arrayZ,
+				    range.length);
+  }
+
+  bool sanitize (hb_sanitize_context_t *c) const
   {
     TRACE_SANITIZE (this);
-    return_trace (likely (c->check_struct (this) && tagRanges.sanitize (c, this)));
+    return_trace (likely (c->check_struct (this) &&
+			  version >= 1 &&
+			  tagRanges.sanitize (c, this)));
   }
 
   protected:
   HBUINT32	version;	/* Table version; currently 1 */
   HBUINT32	flags;		/* Table flags; currently none defined */
-  LArrayOf<FTStringRange>
+  Array32Of<FTStringRange>
 		tagRanges;	/* Range for each tag's string */
   public:
   DEFINE_SIZE_ARRAY (12, tagRanges);

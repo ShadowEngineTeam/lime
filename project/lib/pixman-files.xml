@@ -32,7 +32,7 @@
 
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-access-accessors.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-access.c" />
-        <file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-arma64-neon-asm-bilinear.S" if="PIXMAN_ARMA64_NEON" />
+		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-arma64-neon-asm-bilinear.S" if="PIXMAN_ARMA64_NEON" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-arma64-neon-asm.S" if="PIXMAN_ARMA64_NEON" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-arm-neon-asm-bilinear.S" if="PIXMAN_ARM_NEON" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-arm-neon-asm.S" if="PIXMAN_ARM_NEON" />

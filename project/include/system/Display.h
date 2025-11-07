@@ -12,6 +12,7 @@ namespace lime {
 		public:
 
 			static void GetSafeAreaInsets (int displayIndex, Rectangle * rect);
+			static float GetDPI();
 
 
 	};

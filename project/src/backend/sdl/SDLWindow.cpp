@@ -6,11 +6,9 @@
 #include "../../graphics/opengl/OpenGLBindings.h"
 
 #ifdef HX_WINDOWS
-#include <SDL_syswm.h>
 #include <Windows.h>
 #undef CreateWindow
 #endif
-
 
 namespace lime {
 
@@ -29,12 +27,11 @@ namespace lime {
 	SDL_Cursor* SDLCursor::waitCursor = 0;
 	SDL_Cursor* SDLCursor::waitArrowCursor = 0;
 
-	/*#if defined (IPHONE) || defined (APPLETV)
+	#if defined (IPHONE) || defined (APPLETV)
 	static bool displayModeSet = true;
-	#else*/
+	#else
 	static bool displayModeSet = false;
-	//#endif
-
+	#endif
 
 	SDLWindow::SDLWindow (Application* application, int width, int height, int flags, const char* title) {
 
@@ -92,16 +89,23 @@ namespace lime {
 
 			}
 
-			#if defined (LIME_GL)
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+			#if defined (HX_WINDOWS) && defined (NATIVE_TOOLKIT_SDL_ANGLE)
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 0);
+			SDL_SetHint (SDL_HINT_VIDEO_WIN_D3DCOMPILER, "d3dcompiler_47.dll");
 			#endif
 
-			#if defined (LIME_GLES)
+			#if defined (RASPBERRYPI)
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 0);
+			SDL_SetHint (SDL_HINT_RENDER_DRIVER, "opengles2");
+			#endif
+
+			#if defined (IPHONE) || defined (APPLETV)
 			SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 0);
 			#endif
 
 			if (flags & WINDOW_FLAG_DEPTH_BUFFER) {
@@ -219,11 +223,11 @@ namespace lime {
 
 				if (flags & WINDOW_FLAG_VSYNC) {
 
-					SDL_GL_SetSwapInterval (1);
+					SetVSyncMode (WINDOW_VSYNC_ON);
 
 				} else {
 
-					SDL_GL_SetSwapInterval (0);
+					SetVSyncMode (WINDOW_VSYNC_OFF);
 
 				}
 
@@ -347,6 +351,12 @@ namespace lime {
 
 		}
 
+	}
+
+
+	bool SDLWindow::SetVSyncMode (int mode) {
+		int res = SDL_GL_SetSwapInterval (mode);
+		return res == mode || res == 0; // 0 sometimes means a success on some contexts?
 	}
 
 
@@ -509,6 +519,33 @@ namespace lime {
 
 	}
 
+	void* SDLWindow::GetHandle () {
+
+		SDL_SysWMinfo info;
+		SDL_VERSION (&info.version);
+		SDL_GetWindowWMInfo (sdlWindow, &info);
+
+		#if defined (SDL_VIDEO_DRIVER_WINDOWS)
+			return info.info.win.window;
+		#elif defined (SDL_VIDEO_DRIVER_WINRT)
+			return info.info.winrt.window;
+		#elif defined (SDL_VIDEO_DRIVER_X11)
+			return (void*)info.info.x11.window;
+		#elif defined (SDL_VIDEO_DRIVER_DIRECTFB)
+			return info.info.dfb.window;
+		#elif defined (SDL_VIDEO_DRIVER_COCOA)
+			return info.info.cocoa.window;
+		#elif defined (SDL_VIDEO_DRIVER_UIKIT)
+			return info.info.uikit.window;
+		#elif defined (SDL_VIDEO_DRIVER_WAYLAND)
+			return info.info.wl.surface;
+		#elif defined (SDL_VIDEO_DRIVER_ANDROID)
+			return info.info.android.window;
+		#else
+			return nullptr;
+		#endif
+
+	}
 
 	void* SDLWindow::GetContext () {
 
@@ -1122,12 +1159,6 @@ namespace lime {
 		SDL_SetWindowTitle (sdlWindow, title);
 
 		return title;
-
-	}
-
-	bool SDLWindow::SetVSync (bool vsync) {
-
-		return SDL_GL_SetSwapInterval (vsync) == 0;
 
 	}
 

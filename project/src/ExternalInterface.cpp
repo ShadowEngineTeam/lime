@@ -57,6 +57,7 @@
 #include <locale>
 #include <codecvt>
 #endif
+#include <memory>
 
 #include <cstdlib>
 #include <cstring>
@@ -138,6 +139,7 @@ namespace lime {
 
 	}
 
+
 	std::string wstring_utf8 (const std::wstring& val) {
 
 		std::string out;
@@ -210,11 +212,10 @@ namespace lime {
 
 		if (val.c_str ()) {
 
-			std::string _val = std::string (val.c_str ());
 			#ifdef HX_WINDOWS
-			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-			return new std::wstring (converter.from_bytes (_val));
+			return new std::wstring (hxs_wchar (val, nullptr));
 			#else
+			const std::string _val (hxs_utf8 (val, nullptr));
 			return new std::wstring (_val.begin (), _val.end ());
 			#endif
 
@@ -594,7 +595,7 @@ namespace lime {
 	value lime_bytes_read_file (HxString path, value bytes) {
 
 		Bytes data (bytes);
-		data.ReadFile (path.c_str ());
+		data.ReadFile (hxs_utf8 (path, nullptr));
 		return data.Value (bytes);
 
 	}
@@ -694,7 +695,7 @@ namespace lime {
 
 	void lime_clipboard_set_text (HxString text) {
 
-		Clipboard::SetText (text.c_str ());
+		Clipboard::SetText (hxs_utf8 (text, nullptr));
 
 	}
 
@@ -824,6 +825,7 @@ namespace lime {
 
 	}
 
+
 	HL_PRIM vbyte* HL_NAME(hl_file_dialog_open_directory) (hl_vstring* title, hl_vstring* filter, hl_vstring* defaultPath) {
 
 		#ifdef LIME_TINYFILEDIALOGS
@@ -840,9 +842,9 @@ namespace lime {
 
 		if (path) {
 
-			vbyte* _path = wstring_to_vbytes (path);
+			vbyte* const result = hl_wstring_to_utf8_bytes (*path);
 			delete path;
-			return _path;
+			return result;
 
 		} else {
 
@@ -906,9 +908,9 @@ namespace lime {
 
 		if (path) {
 
-			vbyte* _path = wstring_to_vbytes (path);
+			vbyte* const result = hl_wstring_to_utf8_bytes (*path);
 			delete path;
-			return _path;
+			return result;
 
 		} else {
 
@@ -977,8 +979,7 @@ namespace lime {
 
 		for (int i = 0; i < files.size (); i++) {
 
-			vbyte* _file = wstring_to_vbytes (files[i]);
-			*resultData++ = _file;
+			*resultData++ = hl_wstring_to_utf8_bytes (*files[i]);
 			delete files[i];
 
 		}
@@ -1041,9 +1042,9 @@ namespace lime {
 
 		if (path) {
 
-			vbyte* _path = wstring_to_vbytes (path);
+			vbyte* const result = hl_wstring_to_utf8_bytes (*path);
 			delete path;
-			return _path;
+			return result;
 
 		} else {
 
@@ -1252,12 +1253,11 @@ namespace lime {
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)fontHandle->ptr;
 		wchar_t *name = font->GetFamilyName ();
-		int size = std::wcslen (name);
-		char* result = (char*)malloc (size + 1);
-		std::wcstombs (result, name, size);
-		result[size] = '\0';
+		if (!name)
+			return nullptr;
+		vbyte* const result = hl_wstring_to_utf8_bytes (name);
 		delete name;
-		return (vbyte*)result;
+		return result;
 		#else
 		return 0;
 		#endif
@@ -1269,7 +1269,7 @@ namespace lime {
 
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)val_data (fontHandle);
-		return font->GetGlyphIndex ((char*)character.c_str ());
+		return font->GetGlyphIndex (hxs_utf8 (character, nullptr));
 		#else
 		return -1;
 		#endif
@@ -1293,7 +1293,7 @@ namespace lime {
 
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)val_data (fontHandle);
-		return (value)font->GetGlyphIndices (true, (char*)characters.c_str ());
+		return (value)font->GetGlyphIndices (true, hxs_utf8 (characters, nullptr));
 		#else
 		return alloc_null ();
 		#endif
@@ -1673,21 +1673,21 @@ namespace lime {
 	}
 
 
-	void lime_font_set_size (value fontHandle, int fontSize) {
+	void lime_font_set_size (value fontHandle, int fontSize, int dpi) {
 
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)val_data (fontHandle);
-		font->SetSize (fontSize);
+		font->SetSize (fontSize, dpi);
 		#endif
 
 	}
 
 
-	HL_PRIM void HL_NAME(hl_font_set_size) (HL_CFFIPointer* fontHandle, int fontSize) {
+	HL_PRIM void HL_NAME(hl_font_set_size) (HL_CFFIPointer* fontHandle, int fontSize, int dpi) {
 
 		#ifdef LIME_FREETYPE
 		Font *font = (Font*)fontHandle->ptr;
-		font->SetSize (fontSize);
+		font->SetSize (fontSize, dpi);
 		#endif
 
 	}
@@ -1786,7 +1786,6 @@ namespace lime {
 
 	}
 
-
 	value lime_gzip_compress (value buffer, value bytes) {
 
 		#ifdef LIME_ZLIB
@@ -1843,19 +1842,19 @@ namespace lime {
 	}
 
 
-	void lime_haptic_vibrate (int period, int duration) {
+	void lime_haptic_vibrate (int period, int duration, double amplitude) {
 
 		#ifdef IPHONE
-		Haptic::Vibrate (period, duration);
+		Haptic::Vibrate (period, duration, amplitude);
 		#endif
 
 	}
 
 
-	HL_PRIM void HL_NAME(hl_haptic_vibrate) (int period, int duration) {
+	HL_PRIM void HL_NAME(hl_haptic_vibrate) (int period, int duration, double amplitude) {
 
 		#ifdef IPHONE
-		Haptic::Vibrate (period, duration);
+		Haptic::Vibrate (period, duration, amplitude);
 		#endif
 
 	}
@@ -2123,7 +2122,17 @@ namespace lime {
 
 		} else {
 
-			ImageDataUtil::CopyPixels (image, sourceImage, sourceRect, destPoint, alphaImage, alphaPoint, mergeAlpha);
+			if (!alphaPoint) {
+
+				Vector2 _alphaPoint = Vector2 (0, 0);
+
+				ImageDataUtil::CopyPixels (image, sourceImage, sourceRect, destPoint, alphaImage, &_alphaPoint, mergeAlpha);
+
+			} else {
+
+				ImageDataUtil::CopyPixels (image, sourceImage, sourceRect, destPoint, alphaImage, alphaPoint, mergeAlpha);
+
+			}
 
 		}
 
@@ -2529,20 +2538,6 @@ namespace lime {
 	}
 
 
-	int lime_joystick_get_num_trackballs (int id) {
-
-		return Joystick::GetNumTrackballs (id);
-
-	}
-
-
-	HL_PRIM int HL_NAME(hl_joystick_get_num_trackballs) (int id) {
-
-		return Joystick::GetNumTrackballs (id);
-
-	}
-
-
 	value lime_jpeg_decode_bytes (value data, bool decodeData, value buffer) {
 
 		ImageBuffer imageBuffer (buffer);
@@ -2583,7 +2578,7 @@ namespace lime {
 	value lime_jpeg_decode_file (HxString path, bool decodeData, value buffer) {
 
 		ImageBuffer imageBuffer (buffer);
-		Resource resource = Resource (path.c_str ());
+		Resource resource = Resource (hxs_utf8 (path, nullptr));
 
 		#ifdef LIME_JPEG
 		if (JPEG::Decode (&resource, &imageBuffer, decodeData)) {
@@ -2838,7 +2833,7 @@ namespace lime {
 	value lime_png_decode_file (HxString path, bool decodeData, value buffer) {
 
 		ImageBuffer imageBuffer (buffer);
-		Resource resource = Resource (path.c_str ());
+		Resource resource = Resource (hxs_utf8 (path, nullptr));
 
 		#ifdef LIME_PNG
 		if (PNG::Decode (&resource, &imageBuffer, decodeData)) {
@@ -2901,6 +2896,18 @@ namespace lime {
 
 	}
 
+	int lime_sdl_get_ticks () {
+
+		return System::GetTicks();
+
+	}
+
+
+	HL_PRIM int HL_NAME(hl_sdl_get_ticks) () {
+
+		return System::GetTicks();
+
+	}
 
 	bool lime_system_get_allow_screen_timeout () {
 
@@ -2943,13 +2950,9 @@ namespace lime {
 
 		if (model) {
 
-			int size = std::wcslen (model->c_str ());
-			char* result = (char*)malloc (size + 1);
-			std::wcstombs (result, model->c_str (), size);
-			result[size] = '\0';
+			vbyte* const result = hl_wstring_to_utf8_bytes (*model);
 			delete model;
-
-			return (vbyte*)result;
+			return result;
 
 		}
 
@@ -2987,13 +2990,9 @@ namespace lime {
 
 		if (vendor) {
 
-			int size = std::wcslen (vendor->c_str ());
-			char* result = (char*)malloc (size + 1);
-			std::wcstombs (result, vendor->c_str (), size);
-			result[size] = '\0';
+			vbyte* const result = hl_wstring_to_utf8_bytes (*vendor);
 			delete vendor;
-
-			return (vbyte*)result;
+			return result;
 
 		}
 
@@ -3006,7 +3005,7 @@ namespace lime {
 
 	value lime_system_get_directory (int type, HxString company, HxString title) {
 
-		std::wstring* path = System::GetDirectory ((SystemDirectory)type, company.c_str (), title.c_str ());
+		std::wstring* path = System::GetDirectory ((SystemDirectory)type, hxs_utf8 (company, nullptr), hxs_utf8 (title, nullptr));
 
 		if (path) {
 
@@ -3031,13 +3030,9 @@ namespace lime {
 
 		if (path) {
 
-			int size = std::wcslen (path->c_str ());
-			char* result = (char*)malloc (size + 1);
-			std::wcstombs (result, path->c_str (), size);
-			result[size] = '\0';
+			vbyte* const result = hl_wstring_to_utf8_bytes (*path);
 			delete path;
-
-			return (vbyte*)result;
+			return result;
 
 		}
 
@@ -3098,6 +3093,49 @@ namespace lime {
 	}
 
 
+	int lime_system_get_first_gyroscope_sensor_id () {
+
+		#if defined(ANDROID) || defined (IPHONE)
+		return System::GetFirstGyroscopeSensorId ();
+		#else
+		return -1;
+		#endif
+
+	}
+
+
+	HL_PRIM int HL_NAME(hl_system_get_first_gyroscope_sensor_id) () {
+
+		#if defined(ANDROID) || defined (IPHONE)
+		return System::GetFirstGyroscopeSensorId ();
+		#else
+		return -1;
+		#endif
+
+	}
+
+
+	int lime_system_get_first_accelerometer_sensor_id() {
+
+		#if defined(ANDROID) || defined (IPHONE)
+		return System::GetFirstAccelerometerSensorId ();
+		#else
+		return -1;
+		#endif
+
+	}
+
+
+	HL_PRIM int HL_NAME(hl_system_get_first_accelerometer_sensor_id) () {
+
+		#if defined(ANDROID) || defined (IPHONE)
+		return System::GetFirstAccelerometerSensorId ();
+		#else
+		return -1;
+		#endif
+
+	}
+
 	int lime_system_get_device_orientation () {
 
 		return System::GetDeviceOrientation();
@@ -3139,13 +3177,9 @@ namespace lime {
 
 		if (label) {
 
-			int size = std::wcslen (label->c_str ());
-			char* result = (char*)malloc (size + 1);
-			std::wcstombs (result, label->c_str (), size);
-			result[size] = '\0';
+			vbyte* const result = hl_wstring_to_utf8_bytes (*label);
 			delete label;
-
-			return (vbyte*)result;
+			return result;
 
 		}
 
@@ -3183,13 +3217,9 @@ namespace lime {
 
 		if (name) {
 
-			int size = std::wcslen (name->c_str ());
-			char* result = (char*)malloc (size + 1);
-			std::wcstombs (result, name->c_str (), size);
-			result[size] = '\0';
+			vbyte* const result = hl_wstring_to_utf8_bytes (*name);
 			delete name;
-
-			return (vbyte*)result;
+			return result;
 
 		}
 
@@ -3227,14 +3257,9 @@ namespace lime {
 
 		if (version) {
 
-			int size = std::wcslen (version->c_str ());
-			char* result = (char*)malloc (size + 1);
-			std::wcstombs (result, version->c_str (), size);
-			result[size] = '\0';
+			vbyte* const result = hl_wstring_to_utf8_bytes (*version);
 			delete version;
-
-			return (vbyte*)result;
-
+			return result;
 		}
 
 		#endif
@@ -3306,36 +3331,28 @@ namespace lime {
 
 	void lime_system_open_file (HxString path) {
 
-		#ifdef IPHONE
 		System::OpenFile (path.c_str ());
-		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_system_open_file) (vbyte* path) {
 
-		#ifdef IPHONE
 		System::OpenFile ((char*)path);
-		#endif
 
 	}
 
 
 	void lime_system_open_url (HxString url, HxString target) {
 
-		#ifdef IPHONE
 		System::OpenURL (url.c_str (), target.c_str ());
-		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_system_open_url) (vbyte* url, vbyte* target) {
 
-		#ifdef IPHONE
 		System::OpenURL ((char*)url, (char*)target);
-		#endif
 
 	}
 
@@ -3461,7 +3478,7 @@ namespace lime {
 	void lime_window_alert (value window, HxString message, HxString title) {
 
 		Window* targetWindow = (Window*)val_data (window);
-		targetWindow->Alert (message.c_str (), title.c_str ());
+		targetWindow->Alert (hxs_utf8 (message, nullptr), hxs_utf8 (title, nullptr));
 
 	}
 
@@ -3469,10 +3486,24 @@ namespace lime {
 	HL_PRIM void HL_NAME(hl_window_alert) (HL_CFFIPointer* window, hl_vstring* message, hl_vstring* title) {
 
 		Window* targetWindow = (Window*)window->ptr;
-		const char *cmessage = message ? hl_to_utf8(message->bytes) : NULL;
-		const char *ctitle = title ? hl_to_utf8(title->bytes) : NULL;
+		const char *cmessage = message ? hl_to_utf8(message->bytes) : nullptr;
+		const char *ctitle = title ? hl_to_utf8(title->bytes) : nullptr;
 		targetWindow->Alert (cmessage, ctitle);
 
+	}
+
+
+	bool lime_window_set_vsync_mode (value window, int mode) {
+
+		Window* targetWindow = (Window*)val_data (window);
+		return targetWindow->SetVSyncMode((WindowVSyncMode)mode);
+	}
+
+
+	HL_PRIM bool HL_NAME(hl_window_set_vsync_mode) (HL_CFFIPointer* window, int mode) {
+
+		Window* targetWindow = (Window*)window->ptr;
+		return targetWindow->SetVSyncMode((WindowVSyncMode)mode);
 	}
 
 
@@ -3550,7 +3581,7 @@ namespace lime {
 
 	value lime_window_create (value application, int width, int height, int flags, HxString title) {
 
-		Window* window = CreateWindow ((Application*)val_data (application), width, height, flags, title.c_str ());
+		Window* window = CreateWindow ((Application*)val_data (application), width, height, flags, hxs_utf8 (title, nullptr));
 		return CFFIPointer (window, gc_window);
 
 	}
@@ -3592,6 +3623,22 @@ namespace lime {
 
 		Window* targetWindow = (Window*)window->ptr;
 		targetWindow->Focus ();
+
+	}
+
+
+	double lime_window_get_handle (value window) {
+
+		Window* targetWindow = (Window*)val_data (window);
+		return (uintptr_t)targetWindow->GetHandle ();
+
+	}
+
+
+	HL_PRIM double HL_NAME(hl_window_get_handle) (HL_CFFIPointer* window) {
+
+		Window* targetWindow = (Window*)window->ptr;
+		return (uintptr_t)targetWindow->GetHandle ();
 
 	}
 
@@ -4115,13 +4162,14 @@ namespace lime {
 	value lime_window_set_title (value window, HxString title) {
 
 		Window* targetWindow = (Window*)val_data (window);
-		const char* result = targetWindow->SetTitle (title.c_str ());
+		const char* titleUtf8 = hxs_utf8 (title, nullptr);
+		const char* result = targetWindow->SetTitle (titleUtf8);
 
 		if (result) {
 
 			value _result = alloc_string (result);
 
-			if (result != title.c_str ()) {
+			if (result != titleUtf8) {
 
 				free ((char*) result);
 
@@ -4168,21 +4216,6 @@ namespace lime {
 
 		Window* targetWindow = (Window*)window->ptr;
 		return targetWindow->SetVisible (visible);
-
-	}
-
-	bool lime_window_set_vsync (value window, bool vsync) {
-
-		Window* targetWindow = (Window*)val_data(window);
-		return targetWindow->SetVSync (vsync);
-
-	}
-
-
-	HL_PRIM bool HL_NAME(hl_window_set_vsync) (HL_CFFIPointer* window, bool vsync) {
-
-		Window* targetWindow = (Window*)window->ptr;
-		return targetWindow->SetVSync (vsync);
 
 	}
 
@@ -4312,14 +4345,14 @@ namespace lime {
 	DEFINE_PRIME2 (lime_font_outline_decompose);
 	DEFINE_PRIME3 (lime_font_render_glyph);
 	DEFINE_PRIME3 (lime_font_render_glyphs);
-	DEFINE_PRIME2v (lime_font_set_size);
+	DEFINE_PRIME3v (lime_font_set_size);
 	DEFINE_PRIME1v (lime_gamepad_add_mappings);
 	DEFINE_PRIME2v (lime_gamepad_event_manager_register);
 	DEFINE_PRIME1 (lime_gamepad_get_device_guid);
 	DEFINE_PRIME1 (lime_gamepad_get_device_name);
 	DEFINE_PRIME2 (lime_gzip_compress);
 	DEFINE_PRIME2 (lime_gzip_decompress);
-	DEFINE_PRIME2v (lime_haptic_vibrate);
+	DEFINE_PRIME3v (lime_haptic_vibrate);
 	DEFINE_PRIME3v (lime_image_data_util_color_transform);
 	DEFINE_PRIME6v (lime_image_data_util_copy_channel);
 	DEFINE_PRIME7v (lime_image_data_util_copy_pixels);
@@ -4344,7 +4377,6 @@ namespace lime {
 	DEFINE_PRIME1 (lime_joystick_get_num_axes);
 	DEFINE_PRIME1 (lime_joystick_get_num_buttons);
 	DEFINE_PRIME1 (lime_joystick_get_num_hats);
-	DEFINE_PRIME1 (lime_joystick_get_num_trackballs);
 	DEFINE_PRIME3 (lime_jpeg_decode_bytes);
 	DEFINE_PRIME3 (lime_jpeg_decode_file);
 	DEFINE_PRIME1 (lime_key_code_from_scan_code);
@@ -4360,6 +4392,7 @@ namespace lime {
 	DEFINE_PRIME3 (lime_png_decode_file);
 	DEFINE_PRIME2v (lime_render_event_manager_register);
 	DEFINE_PRIME2v (lime_sensor_event_manager_register);
+	DEFINE_PRIME0 (lime_sdl_get_ticks);
 	DEFINE_PRIME0 (lime_system_get_allow_screen_timeout);
 	DEFINE_PRIME0 (lime_system_get_device_model);
 	DEFINE_PRIME0 (lime_system_get_device_vendor);
@@ -4368,6 +4401,8 @@ namespace lime {
 	DEFINE_PRIME0 (lime_system_get_ios_tablet);
 	DEFINE_PRIME0 (lime_system_get_num_displays);
 	DEFINE_PRIME0 (lime_system_get_device_orientation);
+	DEFINE_PRIME0 (lime_system_get_first_gyroscope_sensor_id);
+	DEFINE_PRIME0 (lime_system_get_first_accelerometer_sensor_id);
 	DEFINE_PRIME0 (lime_system_get_platform_label);
 	DEFINE_PRIME0 (lime_system_get_platform_name);
 	DEFINE_PRIME0 (lime_system_get_platform_version);
@@ -4384,6 +4419,7 @@ namespace lime {
 	DEFINE_PRIME2v (lime_text_event_manager_register);
 	DEFINE_PRIME2v (lime_touch_event_manager_register);
 	DEFINE_PRIME3v (lime_window_alert);
+	DEFINE_PRIME2 (lime_window_set_vsync_mode);
 	DEFINE_PRIME1v (lime_window_close);
 	DEFINE_PRIME1v (lime_window_context_flip);
 	DEFINE_PRIME1 (lime_window_context_lock);
@@ -4392,6 +4428,7 @@ namespace lime {
 	DEFINE_PRIME5 (lime_window_create);
 	DEFINE_PRIME2v (lime_window_event_manager_register);
 	DEFINE_PRIME1v (lime_window_focus);
+	DEFINE_PRIME1 (lime_window_get_handle);
 	DEFINE_PRIME1 (lime_window_get_context);
 	DEFINE_PRIME1 (lime_window_get_context_type);
 	DEFINE_PRIME1 (lime_window_get_display);
@@ -4422,7 +4459,6 @@ namespace lime {
 	DEFINE_PRIME2v (lime_window_set_text_input_rect);
 	DEFINE_PRIME2 (lime_window_set_title);
 	DEFINE_PRIME2 (lime_window_set_visible);
-	DEFINE_PRIME2 (lime_window_set_vsync);
 	DEFINE_PRIME3v (lime_window_warp_mouse);
 	DEFINE_PRIME1 (lime_window_get_opacity);
 	DEFINE_PRIME2v (lime_window_set_opacity);
@@ -4438,9 +4474,9 @@ namespace lime {
 	#define _TCLIPBOARD_EVENT _OBJ (_I32)
 	#define _TDISPLAYMODE _OBJ (_I32 _I32 _I32 _I32)
 	#define _TDROP_EVENT _OBJ (_BYTES _I32)
-	#define _TGAMEPAD_EVENT _OBJ (_I32 _I32 _I32 _I32 _F64)
+	#define _TGAMEPAD_EVENT _OBJ (_I32 _I32 _I32 _I32 _F64 _I32)
 	#define _TJOYSTICK_EVENT _OBJ (_I32 _I32 _I32 _I32 _F64 _F64)
-	#define _TKEY_EVENT _OBJ (_F64 _I32 _I32 _I32)
+	#define _TKEY_EVENT _OBJ (_F64 _I32 _I32 _I32 _I32)
 	#define _TMOUSE_EVENT _OBJ (_I32 _F64 _F64 _I32 _I32 _F64 _F64 _I32)
 	#define _TORIENTATION_EVENT _OBJ (_I32 _I32 _I32)
 	#define _TRECTANGLE _OBJ (_F64 _F64 _F64 _F64)
@@ -4509,7 +4545,7 @@ namespace lime {
 	DEFINE_HL_PRIM (_DYN, hl_font_outline_decompose, _TCFFIPOINTER _I32);
 	DEFINE_HL_PRIM (_TBYTES, hl_font_render_glyph, _TCFFIPOINTER _I32 _TBYTES);
 	DEFINE_HL_PRIM (_TBYTES, hl_font_render_glyphs, _TCFFIPOINTER _ARR _TBYTES);
-	DEFINE_HL_PRIM (_VOID, hl_font_set_size, _TCFFIPOINTER _I32);
+	DEFINE_HL_PRIM (_VOID, hl_font_set_size, _TCFFIPOINTER _I32 _I32);
 	DEFINE_HL_PRIM (_VOID, hl_gamepad_add_mappings, _ARR);
 	DEFINE_HL_PRIM (_VOID, hl_gamepad_event_manager_register, _FUN(_VOID, _NO_ARG) _TGAMEPAD_EVENT);
 	DEFINE_HL_PRIM (_BYTES, hl_gamepad_get_device_guid, _I32);
@@ -4550,7 +4586,6 @@ namespace lime {
 	DEFINE_HL_PRIM (_I32, hl_joystick_get_num_axes, _I32);
 	DEFINE_HL_PRIM (_I32, hl_joystick_get_num_buttons, _I32);
 	DEFINE_HL_PRIM (_I32, hl_joystick_get_num_hats, _I32);
-	DEFINE_HL_PRIM (_I32, hl_joystick_get_num_trackballs, _I32);
 	DEFINE_HL_PRIM (_TIMAGEBUFFER, hl_jpeg_decode_bytes, _TBYTES _BOOL _TIMAGEBUFFER);
 	DEFINE_HL_PRIM (_TIMAGEBUFFER, hl_jpeg_decode_file, _STRING _BOOL _TIMAGEBUFFER);
 	DEFINE_HL_PRIM (_F32, hl_key_code_from_scan_code, _F32);
@@ -4566,6 +4601,7 @@ namespace lime {
 	DEFINE_HL_PRIM (_TIMAGEBUFFER, hl_png_decode_file, _STRING _BOOL _TIMAGEBUFFER);
 	DEFINE_HL_PRIM (_VOID, hl_render_event_manager_register, _FUN (_VOID, _NO_ARG) _TRENDER_EVENT);
 	DEFINE_HL_PRIM (_VOID, hl_sensor_event_manager_register, _FUN (_VOID, _NO_ARG) _TSENSOR_EVENT);
+	DEFINE_HL_PRIM (_I32, hl_sdl_get_ticks, _NO_ARG);
 	DEFINE_HL_PRIM (_BOOL, hl_system_get_allow_screen_timeout, _NO_ARG);
 	DEFINE_HL_PRIM (_BYTES, hl_system_get_device_model, _NO_ARG);
 	DEFINE_HL_PRIM (_BYTES, hl_system_get_device_vendor, _NO_ARG);
@@ -4574,6 +4610,8 @@ namespace lime {
 	DEFINE_HL_PRIM (_BOOL, hl_system_get_ios_tablet, _NO_ARG);
 	DEFINE_HL_PRIM (_I32, hl_system_get_num_displays, _NO_ARG);
 	DEFINE_HL_PRIM (_I32, hl_system_get_device_orientation, _NO_ARG);
+	DEFINE_HL_PRIM (_I32, hl_system_get_first_gyroscope_sensor_id, _NO_ARG);
+	DEFINE_HL_PRIM (_I32, hl_system_get_first_accelerometer_sensor_id, _NO_ARG);
 	DEFINE_HL_PRIM (_BYTES, hl_system_get_platform_label, _NO_ARG);
 	DEFINE_HL_PRIM (_BYTES, hl_system_get_platform_name, _NO_ARG);
 	DEFINE_HL_PRIM (_BYTES, hl_system_get_platform_version, _NO_ARG);
@@ -4598,6 +4636,7 @@ namespace lime {
 	DEFINE_HL_PRIM (_TCFFIPOINTER, hl_window_create, _TCFFIPOINTER _I32 _I32 _I32 _STRING);
 	DEFINE_HL_PRIM (_VOID, hl_window_event_manager_register, _FUN (_VOID, _NO_ARG) _TWINDOW_EVENT);
 	DEFINE_HL_PRIM (_VOID, hl_window_focus, _TCFFIPOINTER);
+	DEFINE_HL_PRIM (_F64, hl_window_get_handle, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_F64, hl_window_get_context, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_BYTES, hl_window_get_context_type, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_I32, hl_window_get_display, _TCFFIPOINTER);
@@ -4628,7 +4667,6 @@ namespace lime {
 	DEFINE_HL_PRIM (_VOID, hl_window_set_text_input_rect, _TCFFIPOINTER _TRECTANGLE);
 	DEFINE_HL_PRIM (_STRING, hl_window_set_title, _TCFFIPOINTER _STRING);
 	DEFINE_HL_PRIM (_BOOL, hl_window_set_visible, _TCFFIPOINTER _BOOL);
-	DEFINE_HL_PRIM (_BOOL, hl_window_set_vsync, _TCFFIPOINTER _BOOL);
 	DEFINE_HL_PRIM (_VOID, hl_window_warp_mouse, _TCFFIPOINTER _I32 _I32);
 	DEFINE_HL_PRIM (_F64, hl_window_get_opacity, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_VOID, hl_window_set_opacity, _TCFFIPOINTER _F64);

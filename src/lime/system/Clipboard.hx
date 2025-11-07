@@ -3,6 +3,7 @@ package lime.system;
 import lime._internal.backend.native.NativeCFFI;
 import lime.app.Application;
 import lime.app.Event;
+import lime.system.CFFI;
 #if flash
 import flash.desktop.Clipboard as FlashClipboard;
 #elseif (js && html5)
@@ -39,20 +40,14 @@ class Clipboard
 		_text = null;
 
 		#if (lime_cffi && !macro)
-		#if hl
-		var utf = NativeCFFI.lime_clipboard_get_text();
-		if (utf != null)
-		{
-			_text = @:privateAccess String.fromUTF8(utf);
-		}
-		#else
-		_text = NativeCFFI.lime_clipboard_get_text();
-		#end
+		_text = CFFI.stringValue(NativeCFFI.lime_clipboard_get_text());
 		#elseif flash
 		if (FlashClipboard.generalClipboard.hasFormat(TEXT_FORMAT))
 		{
 			_text = FlashClipboard.generalClipboard.getData(TEXT_FORMAT);
 		}
+		#elseif (js || html5)
+		_text = cacheText;
 		#end
 		__updated = true;
 

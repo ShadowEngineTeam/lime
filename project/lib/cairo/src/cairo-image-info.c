@@ -90,7 +90,7 @@ _jpeg_extract_info (cairo_image_info_t *info, const unsigned char *p)
 cairo_int_status_t
 _cairo_image_info_get_jpeg_info (cairo_image_info_t	*info,
 				 const unsigned char	*data,
-				 long			 length)
+				 unsigned long		 length)
 {
     const unsigned char *p = data;
 
@@ -137,7 +137,7 @@ _cairo_image_info_get_jpeg_info (cairo_image_info_t	*info,
 		break;
 	    }
 
-	    if (p + 2 > data + length)
+	    if (p + 3 > data + length)
 		return CAIRO_INT_STATUS_UNSUPPORTED;
 
 	    p = _jpeg_skip_segment (p);

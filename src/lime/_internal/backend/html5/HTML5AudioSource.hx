@@ -218,10 +218,10 @@ class HTML5AudioSource
 		#if lime_howlerjs
 		parent.buffer.__srcHowl.rate(value);
 		#end
-		
+
 		return getPitch();
 	}
-	
+
 
 	public function getPosition():Vector4
 	{

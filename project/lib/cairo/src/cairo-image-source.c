@@ -455,6 +455,7 @@ static pixman_image_t *
 _pixel_to_solid (cairo_image_surface_t *image, int x, int y)
 {
     uint32_t pixel;
+    float *rgba;
     pixman_color_t color;
 
     TRACE ((stderr, "%s\n", __FUNCTION__));
@@ -522,6 +523,32 @@ _pixel_to_solid (cairo_image_surface_t *image, int x, int y)
 	color.red = (pixel >> 16 & 0xff) | (pixel >> 8 & 0xff00);
 	color.green = (pixel >> 8 & 0xff) | (pixel & 0xff00);
 	color.blue = (pixel & 0xff) | (pixel << 8 & 0xff00);
+	return pixman_image_create_solid_fill (&color);
+
+    case CAIRO_FORMAT_RGB96F:
+    case CAIRO_FORMAT_RGBA128F:
+	if (image->format == CAIRO_FORMAT_RGBA128F)
+	{
+	    rgba = (float *)&image->data[y * image->stride + 16 * x];
+	    color.alpha = 65535.f * rgba[3];
+
+	    if (color.alpha == 0)
+		return _pixman_transparent_image ();
+	}
+	else
+	{
+	    rgba = (float *)&image->data[y * image->stride + 12 * x];
+	    color.alpha = 0xffff;
+	}
+
+	if (color.alpha == 0xffff && rgba[0] == 0.f && rgba[1] == 0.f && rgba[2] == 0.f)
+	    return _pixman_black_image ();
+	if (color.alpha == 0xffff && rgba[0] == 1.f && rgba[1] == 1.f && rgba[2] == 1.f)
+	    return _pixman_white_image ();
+
+	color.red = rgba[0] * 65535.f;
+	color.green = rgba[1] * 65535.f;
+	color.blue = rgba[2] * 65535.f;
 	return pixman_image_create_solid_fill (&color);
     }
 }
@@ -872,7 +899,7 @@ create_separable_convolution (int *n_values,
     size_y = (1 << ysubsample) * ywidth;
 
     *n_values = 4 + size_x + size_y;
-    params = malloc (*n_values * sizeof (pixman_fixed_t));
+    params = _cairo_malloc (*n_values * sizeof (pixman_fixed_t));
     if (!params) return 0;
 
     params[0] = pixman_int_to_fixed (xwidth);
@@ -1077,7 +1104,7 @@ attach_proxy (cairo_surface_t *source,
 {
     struct proxy *proxy;
 
-    proxy = malloc (sizeof (*proxy));
+    proxy = _cairo_malloc (sizeof (*proxy));
     if (unlikely (proxy == NULL))
 	return _cairo_surface_create_in_error (CAIRO_STATUS_NO_MEMORY);
 
@@ -1113,10 +1140,12 @@ _pixman_image_for_recording (cairo_image_surface_t *dst,
 {
     cairo_surface_t *source, *clone, *proxy;
     cairo_rectangle_int_t limit;
+    cairo_rectangle_int_t src_limit;
     pixman_image_t *pixman_image;
     cairo_status_t status;
     cairo_extend_t extend;
     cairo_matrix_t *m, matrix;
+    double sx = 1.0, sy = 1.0;
     int tx = 0, ty = 0;
 
     TRACE ((stderr, "%s\n", __FUNCTION__));
@@ -1124,34 +1153,38 @@ _pixman_image_for_recording (cairo_image_surface_t *dst,
     *ix = *iy = 0;
 
     source = _cairo_pattern_get_source (pattern, &limit);
+    src_limit = limit;
 
     extend = pattern->base.extend;
     if (_cairo_rectangle_contains_rectangle (&limit, sample))
 	extend = CAIRO_EXTEND_NONE;
+
     if (extend == CAIRO_EXTEND_NONE) {
 	if (! _cairo_rectangle_intersect (&limit, sample))
 	    return _pixman_transparent_image ();
+    }
 
-	if (! _cairo_matrix_is_identity (&pattern->base.matrix)) {
-	    double x1, y1, x2, y2;
+    if (! _cairo_matrix_is_identity (&pattern->base.matrix)) {
+	double x1, y1, x2, y2;
 
-	    matrix = pattern->base.matrix;
-	    status = cairo_matrix_invert (&matrix);
-	    assert (status == CAIRO_STATUS_SUCCESS);
+	matrix = pattern->base.matrix;
+	status = cairo_matrix_invert (&matrix);
+	assert (status == CAIRO_STATUS_SUCCESS);
 
-	    x1 = limit.x;
-	    y1 = limit.y;
-	    x2 = limit.x + limit.width;
-	    y2 = limit.y + limit.height;
+	x1 = limit.x;
+	y1 = limit.y;
+	x2 = limit.x + limit.width;
+	y2 = limit.y + limit.height;
 
-	    _cairo_matrix_transform_bounding_box (&matrix,
-						  &x1, &y1, &x2, &y2, NULL);
+	_cairo_matrix_transform_bounding_box (&matrix,
+					      &x1, &y1, &x2, &y2, NULL);
 
-	    limit.x = floor (x1);
-	    limit.y = floor (y1);
-	    limit.width  = ceil (x2) - limit.x;
-	    limit.height = ceil (y2) - limit.y;
-	}
+	limit.x = floor (x1);
+	limit.y = floor (y1);
+	limit.width  = ceil (x2) - limit.x;
+	limit.height = ceil (y2) - limit.y;
+	sx = (double)src_limit.width / limit.width;
+	sy = (double)src_limit.height / limit.height;
     }
     tx = limit.x;
     ty = limit.y;
@@ -1183,7 +1216,9 @@ _pixman_image_for_recording (cairo_image_surface_t *dst,
 	    cairo_matrix_translate (&matrix, tx, ty);
 	m = &matrix;
     } else {
-	/* XXX extract scale factor for repeating patterns */
+	cairo_matrix_init_scale (&matrix, sx, sy);
+	cairo_matrix_translate (&matrix, src_limit.x/sx, src_limit.y/sy);
+	m = &matrix;
     }
 
     /* Handle recursion by returning future reads from the current image */
@@ -1199,11 +1234,22 @@ done:
     pixman_image = pixman_image_ref (((cairo_image_surface_t *)clone)->pixman_image);
     cairo_surface_destroy (clone);
 
-    *ix = -limit.x;
-    *iy = -limit.y;
-    if (extend != CAIRO_EXTEND_NONE) {
+    if (extend == CAIRO_EXTEND_NONE) {
+	*ix = -limit.x;
+	*iy = -limit.y;
+    } else {
+	cairo_pattern_union_t tmp_pattern;
+	_cairo_pattern_init_static_copy (&tmp_pattern.base, &pattern->base);
+	matrix = pattern->base.matrix;
+	status = cairo_matrix_invert(&matrix);
+	assert (status == CAIRO_STATUS_SUCCESS);
+	cairo_matrix_translate (&matrix, src_limit.x, src_limit.y);
+	cairo_matrix_scale (&matrix, sx, sy);
+	status = cairo_matrix_invert(&matrix);
+	assert (status == CAIRO_STATUS_SUCCESS);
+	cairo_pattern_set_matrix (&tmp_pattern.base, &matrix);
 	if (! _pixman_image_set_properties (pixman_image,
-					    &pattern->base, extents,
+					    &tmp_pattern.base, extents,
 					    ix, iy)) {
 	    pixman_image_unref (pixman_image);
 	    pixman_image= NULL;
@@ -1388,7 +1434,7 @@ _pixman_image_for_surface (cairo_image_surface_t *dst,
 	    return NULL;
 	}
 
-	cleanup = malloc (sizeof (*cleanup));
+	cleanup = _cairo_malloc (sizeof (*cleanup));
 	if (unlikely (cleanup == NULL)) {
 	    _cairo_surface_release_source_image (pattern->surface, image, extra);
 	    pixman_image_unref (pixman_image);
@@ -1479,7 +1525,7 @@ _pixman_image_for_raster (cairo_image_surface_t *dst,
 	return NULL;
     }
 
-    cleanup = malloc (sizeof (*cleanup));
+    cleanup = _cairo_malloc (sizeof (*cleanup));
     if (unlikely (cleanup == NULL)) {
 	pixman_image_unref (pixman_image);
 	_cairo_surface_release_source_image (surface, image, extra);
@@ -1575,7 +1621,7 @@ _cairo_image_source_create_for_pattern (cairo_surface_t *dst,
 
     TRACE ((stderr, "%s\n", __FUNCTION__));
 
-    source = malloc (sizeof (cairo_image_source_t));
+    source = _cairo_malloc (sizeof (cairo_image_source_t));
     if (unlikely (source == NULL))
 	return _cairo_surface_create_in_error (_cairo_error (CAIRO_STATUS_NO_MEMORY));
 

@@ -54,7 +54,7 @@ void WatcherFSEvents::init()
 	}
 	else
 	{
-		WatcherGen = new WatcherGeneric( ID, Directory, Listener, FWatcher, Recursive );
+		WatcherGen = new WatcherGeneric( ID, Directory, Listener, FWatcher.load(), Recursive );
 	}
 	
 	FSEventStreamContext ctx;
@@ -66,8 +66,9 @@ void WatcherFSEvents::init()
 	ctx.copyDescription = NULL;
 
 	FSStream = FSEventStreamCreate( kCFAllocatorDefault, &FileWatcherFSEvents::FSEventCallback, &ctx, CFDirectoryArray, kFSEventStreamEventIdSinceNow, 0.25, streamFlags );
-
-	FWatcher->mNeedInit.push_back( this );
+	FWatcher.load()->mNeedInitMutex.lock();
+	FWatcher.load()->mNeedInit.push_back( this );
+	FWatcher.load()->mNeedInitMutex.unlock();
 
 	CFRelease( CFDirectoryArray );
 	CFRelease( CFDirectory );
@@ -75,7 +76,7 @@ void WatcherFSEvents::init()
 
 void WatcherFSEvents::initAsync()
 {
-	FSEventStreamScheduleWithRunLoop( FSStream, FWatcher->mRunLoopRef, kCFRunLoopDefaultMode );
+	FSEventStreamScheduleWithRunLoop( FSStream, FWatcher.load()->mRunLoopRef.load(), kCFRunLoopDefaultMode );
 	FSEventStreamStart( FSStream );
 	initializedAsync = true;
 }
@@ -157,7 +158,7 @@ void WatcherFSEvents::handleActions( std::vector<FSEvent>& events )
 			// This is a mess. But it's FSEvents faults, because shrinks events from the same file in one single event ( so there's no order for them )
 			// For example a file could have been added modified and erased, but i can't know if first was erased and then added and modified, or added, then modified and then erased.
 			// I don't know what they were thinking by doing this...
-			efDEBUG( "Event in: %s - flags: %ld\n", path.c_str(), event.Flags );
+			efDEBUG( "Event in: %s - flags: %ld\n", event.Path.c_str(), event.Flags );
 
 			if ( event.Flags & efswFSEventStreamEventFlagItemRenamed )
 			{

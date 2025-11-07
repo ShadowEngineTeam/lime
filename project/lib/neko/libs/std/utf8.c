@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2005-2012 Haxe Foundation
+ * Copyright (C)2005-2017 Haxe Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -168,7 +168,7 @@ static value utf8_validate( value str ) {
 	s = (unsigned char*)val_string(str);
 	while( l-- ) {
 		unsigned char c = *s++;
-		if( c < 0x7F )
+		if( c < 0x80 )
 			continue;
 		else if( c < 0xC0 )
 			return val_false;
@@ -209,7 +209,7 @@ static value utf8_length( value str ) {
 	while( l > 0 ) {
 		unsigned char c = *s;
 		count++;
-		if( c < 0x7F ) {
+		if( c < 0x80 ) {
 			l--;
 			s++;
 		} else if( c < 0xC0 )
@@ -248,7 +248,7 @@ static value utf8_sub( value str, value pos, value len ) {
 	s = (unsigned char*)val_string(str);
 	while( count-- && l > 0 ) {
 		unsigned char c = *s;
-		if( c < 0x7F ) {
+		if( c < 0x80 ) {
 			l--;
 			s++;
 		} else if( c < 0xC0 )
@@ -272,7 +272,7 @@ static value utf8_sub( value str, value pos, value len ) {
 		neko_error();
 	while( count-- && l > 0 ) {
 		unsigned char c = *s;
-		if( c < 0x7F ) {
+		if( c < 0x80 ) {
 			l--;
 			s++;
 		} else if( c < 0xC0 )
@@ -314,7 +314,7 @@ static value utf8_get( value str, value pos ) {
 	s = (unsigned char*)val_string(str);
 	while( l-- ) {
 		unsigned char c = *s++;
-		if( c < 0x7F ) {
+		if( c < 0x80 ) {
 			if( p-- == 0 )
 				return alloc_int(c);
 		} else if( c < 0xC0 )
@@ -359,7 +359,7 @@ static value utf8_iter( value str, value f ) {
 	s = (unsigned char*)val_string(str);
 	while( l-- ) {
 		unsigned char c = *s++;
-		if( c < 0x7F )
+		if( c < 0x80 )
 			val_call1(f,alloc_int(c));
 		else if( c < 0xC0 )
 			neko_error();
@@ -404,7 +404,7 @@ static value utf8_compare( value str1, value str2 ) {
 		unsigned char c1 = *s1++;
 		unsigned char c2 = *s2++;
 		if( c1 != c2 )
-			return alloc_int((c1 > c2)?-1:1);
+			return alloc_int((c1 > c2)?1:-1);
 		if( c1 < 0x7F )
 			continue;
 		else if( c1 < 0xC0 )
@@ -414,25 +414,25 @@ static value utf8_compare( value str1, value str2 ) {
 			if( l < 0 )
 				neko_error();
 			if( *s1++ != *s2++ )
-				return alloc_int((s1[-1] > s2[-1])?-1:1);
+				return alloc_int((s1[-1] > s2[-1])?1:-1);
 		} else if( c1 < 0xF0 ) {
 			l-=2;
 			if( l < 0 )
 				neko_error();
 			if( *s1++ != *s2++ )
-				return alloc_int((s1[-1] > s2[-1])?-1:1);
+				return alloc_int((s1[-1] > s2[-1])?1:-1);
 			if( *s1++ != *s2++ )
-				return alloc_int((s1[-1] > s2[-1])?-1:1);
+				return alloc_int((s1[-1] > s2[-1])?1:-1);
 		} else {
 			l -= 3;
 			if( l < 0 )
 				neko_error();
 			if( *s1++ != *s2++ )
-				return alloc_int((s1[-1] > s2[-1])?-1:1);
+				return alloc_int((s1[-1] > s2[-1])?1:-1);
 			if( *s1++ != *s2++ )
-				return alloc_int((s1[-1] > s2[-1])?-1:1);
+				return alloc_int((s1[-1] > s2[-1])?1:-1);
 			if( *s1++ != *s2++ )
-				return alloc_int((s1[-1] > s2[-1])?-1:1);
+				return alloc_int((s1[-1] > s2[-1])?1:-1);
 		}
 	}
 	if( l1 != l2 )

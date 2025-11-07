@@ -67,14 +67,19 @@ class SVGExport
 			// }
 
 			case MAC:
-				untyped $loader.path = $array(path + "Mac/", $loader.path);
-				untyped $loader.path = $array(path + "Mac64/", $loader.path);
-				untyped $loader.path = $array(path + "MacArm64/", $loader.path);
+				if (System.hostArchitecture == X64)
+				{
+					untyped $loader.path = $array(path + "Mac64/", $loader.path);
+				}
+				else if (System.hostArchitecture == ARM64)
+				{
+					untyped $loader.path = $array(path + "MacArm64/", $loader.path);
+				}
 
 			case LINUX:
 				var arguments = Sys.args();
 
-				if (System.hostArchitecture == ARMV7)
+				if ( System.hostArchitecture == ARMV7 )
 				{
 					untyped $loader.path = $array(path + "LinuxArm/", $loader.path);
 				}

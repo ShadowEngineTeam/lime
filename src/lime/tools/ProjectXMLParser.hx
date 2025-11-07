@@ -27,12 +27,7 @@ class ProjectXMLParser extends HXProject
 
 	public function new(path:String = "", defines:Map<String, Dynamic> = null, includePaths:Array<String> = null, useExtensionPath:Bool = false)
 	{
-		super();
-
-		if (defines != null)
-		{
-			this.defines = MapTools.copy(defines);
-		}
+		super(defines);
 
 		if (includePaths != null)
 		{
@@ -43,171 +38,10 @@ class ProjectXMLParser extends HXProject
 			this.includePaths = new Array<String>();
 		}
 
-		initialize();
-
 		if (path != "")
 		{
 			process(path, useExtensionPath);
 		}
-	}
-
-	private function initialize():Void
-	{
-		switch (platformType)
-		{
-			case MOBILE:
-				defines.set("platformType", "mobile");
-				defines.set("mobile", "1");
-
-			case DESKTOP:
-				defines.set("platformType", "desktop");
-				defines.set("desktop", "1");
-
-			case WEB:
-				defines.set("platformType", "web");
-				defines.set("web", "1");
-
-			case CONSOLE:
-				defines.set("platformType", "console");
-				defines.set("console", "1");
-		}
-
-		if (targetFlags.exists("neko"))
-		{
-			defines.set("targetType", "neko");
-			defines.set("native", "1");
-			defines.set("neko", "1");
-		}
-		else if (targetFlags.exists("hl"))
-		{
-			defines.set("targetType", "hl");
-			defines.set("native", "1");
-			defines.set("hl", "1");
-		}
-		else if (targetFlags.exists("java"))
-		{
-			defines.set("targetType", "java");
-			defines.set("native", "1");
-			defines.set("java", "1");
-		}
-		else if (targetFlags.exists("nodejs"))
-		{
-			defines.set("targetType", "nodejs");
-			defines.set("native", "1");
-			defines.set("nodejs", "1");
-		}
-		else if (targetFlags.exists("cs"))
-		{
-			defines.set("targetType", "cs");
-			defines.set("native", "1");
-			defines.set("cs", "1");
-		}
-		else if (target == Platform.FIREFOX)
-		{
-			defines.set("targetType", "js");
-			defines.set("html5", "1");
-		}
-		else if (target == Platform.AIR)
-		{
-			defines.set("targetType", "swf");
-			defines.set("flash", "1");
-			if (targetFlags.exists("ios")) defines.set("ios", "1");
-			if (targetFlags.exists("android")) defines.set("android", "1");
-		}
-		else if (target == Platform.WINDOWS && (targetFlags.exists("uwp") || targetFlags.exists("winjs")))
-		{
-			targetFlags.set("uwp", "");
-			targetFlags.set("winjs", "");
-
-			defines.set("targetType", "js");
-			defines.set("html5", "1");
-			defines.set("uwp", "1");
-			defines.set("winjs", "1");
-		}
-		else if (platformType == DESKTOP && target != cast System.hostPlatform)
-		{
-			defines.set("native", "1");
-
-			if (target == Platform.WINDOWS && targetFlags.exists("mingw"))
-			{
-				defines.set("targetType", "cpp");
-				defines.set("cpp", "1");
-				defines.set("mingw", "1");
-			}
-			else
-			{
-				defines.set("targetType", "neko");
-				defines.set("neko", "1");
-			}
-		}
-		else if (target == Platform.WEB_ASSEMBLY)
-		{
-			defines.set("webassembly", "1");
-			defines.set("wasm", "1");
-			defines.set("emscripten", "1");
-			defines.set("targetType", "cpp");
-			defines.set("native", "1");
-			defines.set("cpp", "1");
-		}
-		else if (targetFlags.exists("cpp")
-			|| ((platformType != PlatformType.WEB) && !targetFlags.exists("html5")))
-		{
-			defines.set("targetType", "cpp");
-			defines.set("native", "1");
-			defines.set("cpp", "1");
-		}
-		else if (target == Platform.FLASH)
-		{
-			defines.set("targetType", "swf");
-		}
-
-		if (debug)
-		{
-			defines.set("buildType", "debug");
-			defines.set("debug", "1");
-		}
-		else if (targetFlags.exists("final"))
-		{
-			defines.set("buildType", "final");
-			defines.set("final", "1");
-		}
-		else
-		{
-			defines.set("buildType", "release");
-			defines.set("release", "1");
-		}
-
-		if (targetFlags.exists("static"))
-		{
-			defines.set("static_link", "1");
-		}
-
-		if (defines.exists("SWF_PLAYER"))
-		{
-			environment.set("SWF_PLAYER", defines.get("SWF_PLAYER"));
-		}
-
-		defines.set(Std.string(target).toLowerCase(), "1");
-		defines.set("target", Std.string(target).toLowerCase());
-		defines.set("platform", defines.get("target"));
-
-		switch (System.hostPlatform)
-		{
-			case WINDOWS:
-				defines.set("host", "windows");
-			case MAC:
-				defines.set("host", "mac");
-			case LINUX:
-				defines.set("host", "linux");
-			default:
-				defines.set("host", "unknown");
-		}
-
-		#if lime
-		defines.set("lime-tools", "1");
-		#end
-
-		defines.set("hxp", "1"); // TODO: Version?
 	}
 
 	private function isValidElement(element:Access, section:String):Bool
@@ -466,6 +300,7 @@ class ProjectXMLParser extends HXProject
 		var library = null;
 		var targetPath = "";
 		var glyphs = null;
+		var deliveryPackName = '';
 		var type = null;
 
 		if (element.has.path)
@@ -495,6 +330,11 @@ class ProjectXMLParser extends HXProject
 		if (element.has.glyphs)
 		{
 			glyphs = substitute(element.att.glyphs);
+		}
+
+		if (element.has.deliveryPackName)
+		{
+			deliveryPackName = substitute(element.att.deliveryPackName);
 		}
 
 		if (isTemplate)
@@ -554,11 +394,12 @@ class ProjectXMLParser extends HXProject
 					asset.glyphs = glyphs;
 				}
 
+				asset.deliveryPackName = deliveryPackName;
 				assets.push(asset);
 			}
 			else if (Path.extension(path) == "bundle")
 			{
-				parseAssetsElementLibrary(path, targetPath, "*", "", type, embed, library, glyphs, true);
+				parseAssetsElementLibrary(path, targetPath, "*", "", type, embed, library, glyphs, true, deliveryPackName);
 			}
 			else
 			{
@@ -613,7 +454,7 @@ class ProjectXMLParser extends HXProject
 					}*/
 				}
 
-				parseAssetsElementDirectory(path, targetPath, include, exclude, type, embed, library, glyphs, true);
+				parseAssetsElementDirectory(path, targetPath, include, exclude, type, embed, library, glyphs, true, deliveryPackName);
 			}
 		}
 		else
@@ -640,6 +481,7 @@ class ProjectXMLParser extends HXProject
 					var childLibrary = library;
 					var childType = type;
 					var childGlyphs = glyphs;
+					var childDeliveryPackName = deliveryPackName;
 
 					if (childElement.has.rename)
 					{
@@ -661,6 +503,11 @@ class ProjectXMLParser extends HXProject
 						childGlyphs = substitute(childElement.att.glyphs);
 					}
 
+					if (childElement.has.deliveryPackName)
+					{
+						childDeliveryPackName = substitute(childElement.att.deliveryPackName);
+					}
+
 					switch (childElement.name)
 					{
 						case "image", "sound", "music", "font", "template":
@@ -678,7 +525,7 @@ class ProjectXMLParser extends HXProject
 
 					var asset = new Asset(path + childPath, targetPath + childTargetPath, childType, childEmbed);
 					asset.library = childLibrary;
-					
+
 					if (childElement.has.id)
 					{
 						asset.id = substitute(childElement.att.id);
@@ -693,6 +540,7 @@ class ProjectXMLParser extends HXProject
 						asset.glyphs = childGlyphs;
 					}
 
+					asset.deliveryPackName = childDeliveryPackName;
 					assets.push(asset);
 				}
 			}
@@ -700,7 +548,7 @@ class ProjectXMLParser extends HXProject
 	}
 
 	private function parseAssetsElementDirectory(path:String, targetPath:String, include:String, exclude:String, type:AssetType, embed:Null<Bool>,
-			library:String, glyphs:String, recursive:Bool):Void
+			library:String, glyphs:String, recursive:Bool, deliveryPackName:String):Void
 	{
 		var files = FileSystem.readDirectory(path);
 
@@ -715,13 +563,13 @@ class ProjectXMLParser extends HXProject
 			{
 				if (Path.extension(file) == "bundle")
 				{
-					parseAssetsElementLibrary(path + "/" + file, targetPath + file, include, exclude, type, embed, library, glyphs, true);
+					parseAssetsElementLibrary(path + "/" + file, targetPath + file, include, exclude, type, embed, library, glyphs, true, deliveryPackName);
 				}
 				else if (recursive)
 				{
 					if (filter(file, ["*"], exclude.split("|")))
 					{
-						parseAssetsElementDirectory(path + "/" + file, targetPath + file, include, exclude, type, embed, library, glyphs, true);
+						parseAssetsElementDirectory(path + "/" + file, targetPath + file, include, exclude, type, embed, library, glyphs, true, deliveryPackName);
 					}
 				}
 			}
@@ -737,6 +585,7 @@ class ProjectXMLParser extends HXProject
 						asset.glyphs = glyphs;
 					}
 
+					asset.deliveryPackName = deliveryPackName;
 					assets.push(asset);
 				}
 			}
@@ -744,7 +593,7 @@ class ProjectXMLParser extends HXProject
 	}
 
 	private function parseAssetsElementLibrary(path:String, targetPath:String, include:String, exclude:String, type:AssetType, embed:Null<Bool>,
-			library:String, glyphs:String, recursive:Bool):Void
+			library:String, glyphs:String, recursive:Bool, deliveryPackName:String):Void
 	{
 		var includePath = findIncludeFile(path);
 
@@ -773,6 +622,7 @@ class ProjectXMLParser extends HXProject
 					asset.library = library;
 					asset.data = manifest.serialize();
 					asset.embed = embed;
+					asset.deliveryPackName = deliveryPackName;
 					assets.push(asset);
 
 					for (manifestAsset in manifest.assets)
@@ -783,6 +633,7 @@ class ProjectXMLParser extends HXProject
 							asset.id = manifestAsset.id;
 							asset.library = library;
 							asset.embed = embed;
+							asset.deliveryPackName = deliveryPackName;
 							assets.push(asset);
 						}
 					}
@@ -796,7 +647,7 @@ class ProjectXMLParser extends HXProject
 
 		if (!processedLibrary)
 		{
-			parseAssetsElementDirectory(path, targetPath, include, exclude, type, embed, library, glyphs, true);
+			parseAssetsElementDirectory(path, targetPath, include, exclude, type, embed, library, glyphs, true, deliveryPackName);
 		}
 	}
 
@@ -990,92 +841,96 @@ class ProjectXMLParser extends HXProject
 	{
 		for (element in xml.elements)
 		{
-			var isValid = isValidElement(element, section);
-			if (isValid)
+			if (!isValidElement(element, section)) continue;
+
+			switch (element.name)
 			{
-				switch (element.name)
-				{
-					case "set":
-						var name = element.att.name;
-						var value = "";
+				case "set":
+					var name = element.att.name;
+					var value = "";
 
-						if (element.has.value)
-						{
-							value = substitute(element.att.value);
-						}
+					if (element.has.value)
+					{
+						value = substitute(element.att.value);
+					}
 
-						switch (name)
-						{
-							case "BUILD_DIR": app.path = value;
-							case "SWF_VERSION": app.swfVersion = Std.parseFloat(value);
-							case "PRERENDERED_ICON": config.set("ios.prerenderedIcon", value);
-							case "ANDROID_INSTALL_LOCATION": config.set("android.install-location", value);
-						}
+					switch (name)
+					{
+						case "BUILD_DIR": app.path = value;
+						case "SWF_VERSION": app.swfVersion = Std.parseFloat(value);
+						case "PRERENDERED_ICON": config.set("ios.prerenderedIcon", value);
+						case "ANDROID_INSTALL_LOCATION": config.set("android.install-location", value);
+					}
 
-						defines.set(name, value);
-						environment.set(name, value);
+					defines.set(name, value);
+					environment.set(name, value);
 
-					case "unset":
-						defines.remove(element.att.name);
-						environment.remove(element.att.name);
+				case "unset":
+					defines.remove(element.att.name);
+					environment.remove(element.att.name);
 
-					case "define":
-						var name = element.att.name;
-						var value = "";
+				case "define":
+					var name = element.att.name;
+					var value = "";
 
-						if (element.has.value)
-						{
-							value = substitute(element.att.value);
-						}
+					if (element.has.value)
+					{
+						value = substitute(element.att.value);
+					}
 
-						defines.set(name, value);
-						haxedefs.set(name, value);
-						environment.set(name, value);
+					defines.set(name, value);
+					haxedefs.set(name, value);
+					environment.set(name, value);
 
-					case "undefine":
-						defines.remove(element.att.name);
-						haxedefs.remove(element.att.name);
-						environment.remove(element.att.name);
+				case "undefine":
+					defines.remove(element.att.name);
+					haxedefs.remove(element.att.name);
+					environment.remove(element.att.name);
 
-					case "setenv":
-						var value = "";
+				case "setenv":
+					var value = "";
 
-						if (element.has.value)
-						{
-							value = substitute(element.att.value);
-						}
-						else
-						{
-							value = "1";
-						}
+					if (element.has.value)
+					{
+						value = substitute(element.att.value);
+					}
+					else
+					{
+						value = "1";
+					}
 
-						var name = substitute(element.att.name);
+					var name = substitute(element.att.name);
 
-						defines.set(name, value);
-						environment.set(name, value);
-						setenv(name, value);
+					defines.set(name, value);
+					environment.set(name, value);
+					setenv(name, value);
 
-						if (needRerun) return;
+					if (needRerun) return;
 
-					case "error":
-						Log.error(substitute(element.att.value));
+				case "error":
+					Log.error(substitute(element.att.value));
 
-					case "echo":
+				case "echo":
+					if (command != "display")
+					{
 						Log.println(substitute(element.att.value));
+					}
 
-					case "log":
-						var verbose = "";
+				case "log":
+					var verbose = "";
 
-						if (element.has.verbose)
-						{
-							verbose = substitute(element.att.verbose);
-						}
+					if (element.has.verbose)
+					{
+						verbose = substitute(element.att.verbose);
+					}
 
-						if (element.has.error)
-						{
-							Log.error(substitute(element.att.error), verbose);
-						}
-						else if (element.has.warn)
+					if (element.has.error)
+					{
+						Log.error(substitute(element.att.error), verbose);
+					}
+					else if (command != "display")
+					{
+						if (element.has.warn)
 						{
 							Log.warn(substitute(element.att.warn), verbose);
 						}
@@ -1091,187 +946,50 @@ class ProjectXMLParser extends HXProject
 						{
 							Log.info("", verbose);
 						}
+					}
 
-					case "path":
-						var value = "";
+				case "path":
+					var value = "";
 
-						if (element.has.value)
-						{
-							value = substitute(element.att.value);
-						}
-						else
-						{
-							value = substitute(element.att.name);
-						}
+					if (element.has.value)
+					{
+						value = substitute(element.att.value);
+					}
+					else
+					{
+						value = substitute(element.att.name);
+					}
 
-						path(value);
+					path(value);
 
-					case "include":
-						var path = "";
-						var addSourcePath = true;
-						var haxelib = null;
+				case "include":
+					var path = "";
+					var addSourcePath = true;
+					var haxelib = null;
 
-						if (element.has.haxelib)
-						{
-							haxelib = new Haxelib(substitute(element.att.haxelib));
-							path = findIncludeFile(Haxelib.getPath(haxelib, true));
-							addSourcePath = false;
-						}
-						else if (element.has.path)
-						{
-							var subPath = substitute(element.att.path);
-							if (subPath == "") subPath = element.att.path;
+					if (element.has.haxelib)
+					{
+						haxelib = new Haxelib(substitute(element.att.haxelib));
+						path = findIncludeFile(Haxelib.getPath(haxelib, true));
+						addSourcePath = false;
+					}
+					else if (element.has.path)
+					{
+						var subPath = substitute(element.att.path);
+						if (subPath == "") subPath = element.att.path;
 
-							path = findIncludeFile(Path.combine(extensionPath, subPath));
-						}
-						else
-						{
-							path = findIncludeFile(Path.combine(extensionPath, substitute(element.att.name)));
-						}
+						path = findIncludeFile(Path.combine(extensionPath, subPath));
+					}
+					else
+					{
+						path = findIncludeFile(Path.combine(extensionPath, substitute(element.att.name)));
+					}
 
-						if (path != null && path != "" && FileSystem.exists(path) && !FileSystem.isDirectory(path))
-						{
-							var includeProject = new ProjectXMLParser(path, defines);
+					if (path != null && path != "" && FileSystem.exists(path) && !FileSystem.isDirectory(path))
+					{
+						var includeProject = new ProjectXMLParser(path, defines);
 
-							if (includeProject != null && haxelib != null)
-							{
-								for (ndll in includeProject.ndlls)
-								{
-									if (ndll.haxelib == null)
-									{
-										ndll.haxelib = haxelib;
-									}
-								}
-							}
-
-							if (addSourcePath)
-							{
-								var dir = Path.directory(path);
-
-								if (dir != "")
-								{
-									includeProject.sources.unshift(dir);
-								}
-							}
-
-							merge(includeProject);
-						}
-						else if (!element.has.noerror)
-						{
-							if (path == "" || FileSystem.isDirectory(path))
-							{
-								var errorPath = "";
-
-								if (element.has.path)
-								{
-									errorPath = element.att.path;
-								}
-								else if (element.has.name)
-								{
-									errorPath = element.att.name;
-								}
-								else
-								{
-									errorPath = Std.string(element);
-								}
-
-								Log.error("\"" + errorPath + "\" does not appear to be a valid <include /> path");
-							}
-							else
-							{
-								Log.error("Could not find include file \"" + path + "\"");
-							}
-						}
-
-					case "meta":
-						parseMetaElement(element);
-
-					case "app":
-						parseAppElement(element, extensionPath);
-
-					case "java":
-						javaPaths.push(Path.combine(extensionPath, substitute(element.att.path)));
-
-					case "language":
-						languages.push(element.att.name);
-
-					case "haxelib":
-						if (element.has.repository)
-						{
-							setenv("HAXELIB_PATH", Path.combine(Sys.getCwd(), element.att.repository));
-							if (needRerun) return;
-							continue;
-						}
-
-						var name = substitute(element.att.name);
-						var version = "";
-						var optional = false;
-						var path = null;
-
-						if (element.has.version)
-						{
-							version = substitute(element.att.version);
-						}
-
-						if (element.has.optional)
-						{
-							optional = parseBool(element.att.optional);
-						}
-
-						if (element.has.path)
-						{
-							path = Path.combine(extensionPath, substitute(element.att.path));
-						}
-
-						var haxelib = new Haxelib(name, version);
-
-						if (version != "" && defines.exists(name) && !haxelib.versionMatches(defines.get(name)))
-						{
-							Log.warn("Ignoring requested haxelib \"" + name + "\" version \"" + version + "\" (version \"" + defines.get(name)
-								+ "\" was already included)");
-							continue;
-						}
-
-						if (path == null)
-						{
-							if (defines.exists("setup"))
-							{
-								path = Haxelib.getPath(haxelib);
-							}
-							else
-							{
-								path = Haxelib.getPath(haxelib, !optional);
-
-								if (optional && path == "")
-								{
-									continue;
-								}
-							}
-						}
-						else
-						{
-							path = Path.tryFullPath(Path.combine(extensionPath, path));
-
-							if (version != "")
-							{
-								Haxelib.pathOverrides.set(name + ":" + version, path);
-							}
-							else
-							{
-								Haxelib.pathOverrides.set(name, path);
-							}
-						}
-
-						if (!defines.exists(haxelib.name))
-						{
-							defines.set(haxelib.name, Std.string(Haxelib.getVersion(haxelib)));
-						}
-
-						haxelibs.push(haxelib);
-
-						var includeProject = HXProject.fromHaxelib(haxelib, defines);
-
-						if (includeProject != null)
+						if (includeProject != null && haxelib != null)
 						{
 							for (ndll in includeProject.ndlls)
 							{
@@ -1280,483 +998,496 @@ class ProjectXMLParser extends HXProject
 									ndll.haxelib = haxelib;
 								}
 							}
-
-							merge(includeProject);
 						}
 
-					case "ndll":
+						if (addSourcePath)
+						{
+							var dir = Path.directory(path);
+
+							if (dir != "")
+							{
+								includeProject.sources.unshift(dir);
+							}
+						}
+
+						merge(includeProject);
+					}
+					else if (!element.has.noerror)
+					{
+						if (path == "" || FileSystem.isDirectory(path))
+						{
+							var errorPath = "";
+
+							if (element.has.path)
+							{
+								errorPath = element.att.path;
+							}
+							else if (element.has.name)
+							{
+								errorPath = element.att.name;
+							}
+							else
+							{
+								errorPath = Std.string(element);
+							}
+
+							Log.error("\"" + errorPath + "\" does not appear to be a valid <include /> path");
+						}
+						else
+						{
+							Log.error("Could not find include file \"" + path + "\"");
+						}
+					}
+
+				case "meta":
+					parseMetaElement(element);
+
+				case "app":
+					parseAppElement(element, extensionPath);
+
+				case "java":
+					javaPaths.push(Path.combine(extensionPath, substitute(element.att.path)));
+
+				case "language":
+					languages.push(element.att.name);
+
+				case "haxelib":
+					if (element.has.repository)
+					{
+						setenv("HAXELIB_PATH", Path.combine(Sys.getCwd(), element.att.repository));
+						if (needRerun) return;
+						continue;
+					}
+
+					var name = substitute(element.att.name);
+					var version = "";
+					var optional = false;
+					var path = null;
+
+					if (element.has.version)
+					{
+						version = substitute(element.att.version);
+					}
+
+					if (element.has.optional)
+					{
+						optional = parseBool(element.att.optional);
+					}
+
+					if (element.has.path)
+					{
+						path = Path.combine(extensionPath, substitute(element.att.path));
+					}
+
+					var haxelib = new Haxelib(name, version);
+
+					if (version != "" && defines.exists(name) && !haxelib.versionMatches(defines.get(name)))
+					{
+						Log.warn("Ignoring requested haxelib \"" + name + "\" version \"" + version + "\" (version \"" + defines.get(name)
+							+ "\" was already included)");
+						continue;
+					}
+
+					if (path == null)
+					{
+						if (defines.exists("setup"))
+						{
+							path = Haxelib.getPath(haxelib);
+						}
+						else
+						{
+							path = Haxelib.getPath(haxelib, !optional);
+
+							if (optional && path == "")
+							{
+								continue;
+							}
+						}
+					}
+					else
+					{
+						path = Path.tryFullPath(Path.combine(extensionPath, path));
+
+						if (version != "")
+						{
+							Haxelib.pathOverrides.set(name + ":" + version, path);
+						}
+						else
+						{
+							Haxelib.pathOverrides.set(name, path);
+						}
+					}
+
+					if (!defines.exists(haxelib.name))
+					{
+						defines.set(haxelib.name, Std.string(Haxelib.getVersion(haxelib)));
+					}
+
+					haxelibs.push(haxelib);
+
+					var includeProject = HXProject.fromHaxelib(haxelib, defines);
+
+					if (includeProject != null)
+					{
+						for (ndll in includeProject.ndlls)
+						{
+							if (ndll.haxelib == null)
+							{
+								ndll.haxelib = haxelib;
+							}
+						}
+
+						merge(includeProject);
+					}
+
+				case "ndll":
+					var name = substitute(element.att.name);
+					var haxelib = null;
+					var staticLink:Null<Bool> = null;
+					var registerStatics = true;
+					var subdirectory = null;
+
+					if (element.has.haxelib)
+					{
+						haxelib = new Haxelib(substitute(element.att.haxelib));
+					}
+
+					if (element.has.dir)
+					{
+						subdirectory = substitute(element.att.dir);
+					}
+
+					if (haxelib == null && (name == "std" || name == "regexp" || name == "zlib"))
+					{
+						haxelib = new Haxelib(config.getString("cpp.buildLibrary", "hxcpp"));
+					}
+
+					if (element.has.type)
+					{
+						var typeString = substitute(element.att.type).toLowerCase();
+						if (typeString == "static") staticLink = true;
+						if (typeString == "dynamic") staticLink = false;
+					}
+
+					if (element.has.register)
+					{
+						registerStatics = parseBool(element.att.register);
+					}
+
+					var ndll = new NDLL(name, haxelib, staticLink, registerStatics);
+					ndll.extensionPath = extensionPath;
+					ndll.subdirectory = subdirectory;
+
+					ndlls.push(ndll);
+
+				case "architecture":
+					if (element.has.name)
+					{
 						var name = substitute(element.att.name);
-						var haxelib = null;
-						var staticLink:Null<Bool> = null;
-						var registerStatics = true;
-						var subdirectory = null;
 
-						if (element.has.haxelib)
+						if (Reflect.hasField(Architecture, name.toUpperCase()))
 						{
-							haxelib = new Haxelib(substitute(element.att.haxelib));
+							ArrayTools.addUnique(architectures, Reflect.field(Architecture, name.toUpperCase()));
 						}
+					}
 
-						if (element.has.dir)
+					if (element.has.exclude)
+					{
+						var exclude = substitute(element.att.exclude);
+
+						if (Reflect.hasField(Architecture, exclude.toUpperCase()))
 						{
-							subdirectory = substitute(element.att.dir);
+							ArrayTools.addUnique(excludeArchitectures, Reflect.field(Architecture, exclude.toUpperCase()));
 						}
+					}
 
-						if (haxelib == null && (name == "std" || name == "regexp" || name == "zlib"))
+				case "launchImage", "splashscreen", "splashScreen":
+					var path = "";
+
+					if (element.has.path)
+					{
+						path = Path.combine(extensionPath, substitute(element.att.path));
+					}
+					else
+					{
+						path = Path.combine(extensionPath, substitute(element.att.name));
+					}
+
+					var splashScreen = new SplashScreen(path);
+
+					if (element.has.width)
+					{
+						var parsedValue = Std.parseInt(substitute(element.att.width));
+						if (parsedValue == null)
 						{
-							haxelib = new Haxelib(config.getString("cpp.buildLibrary", "hxcpp"));
-						}
-
-						if (element.has.type)
-						{
-							var typeString = substitute(element.att.type).toLowerCase();
-							if (typeString == "static") staticLink = true;
-							if (typeString == "dynamic") staticLink = false;
-						}
-
-						if (element.has.register)
-						{
-							registerStatics = parseBool(element.att.register);
-						}
-
-						var ndll = new NDLL(name, haxelib, staticLink, registerStatics);
-						ndll.extensionPath = extensionPath;
-						ndll.subdirectory = subdirectory;
-
-						ndlls.push(ndll);
-
-					case "architecture":
-						if (element.has.name)
-						{
-							var name = substitute(element.att.name);
-
-							if (Reflect.hasField(Architecture, name.toUpperCase()))
-							{
-								ArrayTools.addUnique(architectures, Reflect.field(Architecture, name.toUpperCase()));
-							}
-						}
-
-						if (element.has.exclude)
-						{
-							var exclude = substitute(element.att.exclude);
-
-							if (Reflect.hasField(Architecture, exclude.toUpperCase()))
-							{
-								ArrayTools.addUnique(excludeArchitectures, Reflect.field(Architecture, exclude.toUpperCase()));
-							}
-						}
-
-					case "launchImage", "splashscreen", "splashScreen":
-						var path = "";
-
-						if (element.has.path)
-						{
-							path = Path.combine(extensionPath, substitute(element.att.path));
+							Log.warn("Ignoring unknown width=\"" + element.att.width + "\"");
 						}
 						else
 						{
-							path = Path.combine(extensionPath, substitute(element.att.name));
+							splashScreen.width = parsedValue;
 						}
+					}
 
-						var splashScreen = new SplashScreen(path);
-
-						if (element.has.width)
+					if (element.has.height)
+					{
+						var parsedValue = Std.parseInt(substitute(element.att.height));
+						if (parsedValue == null)
 						{
-							splashScreen.width = Std.parseInt(substitute(element.att.width));
-						}
-
-						if (element.has.height)
-						{
-							splashScreen.height = Std.parseInt(substitute(element.att.height));
-						}
-
-						splashScreens.push(splashScreen);
-
-					case "launchStoryboard":
-						if (launchStoryboard == null)
-						{
-							launchStoryboard = new LaunchStoryboard();
-						}
-
-						if (element.has.path)
-						{
-							launchStoryboard.path = Path.combine(extensionPath, substitute(element.att.path));
-						}
-						else if (element.has.name)
-						{
-							launchStoryboard.path = Path.combine(extensionPath, substitute(element.att.name));
-						}
-						else if (element.has.template)
-						{
-							launchStoryboard.template = substitute(element.att.template);
-							launchStoryboard.templateContext = {};
-
-							for (attr in element.x.attributes())
-							{
-								if (attr == "assetsPath") continue;
-
-								var valueType = "String";
-								var valueName = attr;
-
-								if (valueName.indexOf("-") != -1)
-								{
-									valueType = valueName.substring(valueName.lastIndexOf("-") + 1);
-									valueName = valueName.substring(0, valueName.lastIndexOf("-"));
-								}
-								else if (valueName.indexOf(":") != -1)
-								{
-									valueType = valueName.substring(valueName.lastIndexOf(":") + 1);
-									valueName = valueName.substring(0, valueName.lastIndexOf(":"));
-								}
-
-								var stringValue = element.x.get(attr);
-								var value:Dynamic;
-
-								switch (valueType)
-								{
-									case "Int":
-										value = Std.parseInt(stringValue);
-									case "RGB":
-										var rgb:lime.math.ARGB = Std.parseInt(stringValue);
-										value = {r: rgb.r / 255, g: rgb.g / 255, b: rgb.b / 255};
-									case "String":
-										value = stringValue;
-									default:
-										Log.warn("Ignoring unknown value type \"" + valueType + "\" in storyboard configuration.");
-										value = "";
-								}
-
-								Reflect.setField(launchStoryboard.templateContext, valueName, value);
-							}
-						}
-
-						if (element.has.assetsPath)
-						{
-							launchStoryboard.assetsPath = Path.combine(extensionPath, substitute(element.att.assetsPath));
-						}
-
-						for (childElement in element.elements)
-						{
-							var isValid = isValidElement(childElement, "");
-
-							if (isValid)
-							{
-								switch (childElement.name)
-								{
-									case "imageset":
-										var name = substitute(childElement.att.name);
-										var imageset = new LaunchStoryboard.ImageSet(name);
-
-										if (childElement.has.width) imageset.width = Std.parseInt(substitute(childElement.att.width));
-										if (childElement.has.height) imageset.height = Std.parseInt(substitute(childElement.att.height));
-
-										launchStoryboard.assets.push(imageset);
-								}
-							}
-						}
-
-					case "icon":
-						var path = "";
-
-						if (element.has.path)
-						{
-							path = Path.combine(extensionPath, substitute(element.att.path));
+							Log.warn("Ignoring unknown height=\"" + element.att.height + "\"");
 						}
 						else
 						{
-							path = Path.combine(extensionPath, substitute(element.att.name));
+							splashScreen.height = parsedValue;
 						}
+					}
 
-						if (target == Platform.ANDROID && element.has.adaptive)
-						{
-							adaptiveIcon = new AdaptiveIcon(path, element.has.round ? element.att.round == "true" : false);
-						}
-						else
-						{
-							var icon = new Icon(path);
+					splashScreens.push(splashScreen);
 
-							if (element.has.size)
+				case "launchStoryboard":
+					if (launchStoryboard == null)
+					{
+						launchStoryboard = new LaunchStoryboard();
+					}
+
+					if (element.has.path)
+					{
+						launchStoryboard.path = Path.combine(extensionPath, substitute(element.att.path));
+					}
+					else if (element.has.name)
+					{
+						launchStoryboard.path = Path.combine(extensionPath, substitute(element.att.name));
+					}
+					else if (element.has.template)
+					{
+						launchStoryboard.template = substitute(element.att.template);
+						launchStoryboard.templateContext = {};
+
+						for (attr in element.x.attributes())
+						{
+							if (attr == "assetsPath") continue;
+
+							var valueType = "String";
+							var valueName = attr;
+
+							if (valueName.indexOf("-") != -1)
 							{
-								var parsedValue = Std.parseInt(substitute(element.att.width));
+								valueType = valueName.substring(valueName.lastIndexOf("-") + 1);
+								valueName = valueName.substring(0, valueName.lastIndexOf("-"));
+							}
+							else if (valueName.indexOf(":") != -1)
+							{
+								valueType = valueName.substring(valueName.lastIndexOf(":") + 1);
+								valueName = valueName.substring(0, valueName.lastIndexOf(":"));
+							}
+
+							var stringValue = element.x.get(attr);
+							var value:Dynamic;
+
+							switch (valueType)
+							{
+								case "Int":
+									value = Std.parseInt(stringValue);
+								case "RGB":
+									var rgb:lime.math.ARGB = Std.parseInt(stringValue);
+									value = {r: rgb.r / 255, g: rgb.g / 255, b: rgb.b / 255};
+								case "String":
+									value = stringValue;
+								default:
+									Log.warn("Ignoring unknown value type \"" + valueType + "\" in storyboard configuration.");
+									value = "";
+							}
+
+							Reflect.setField(launchStoryboard.templateContext, valueName, value);
+						}
+					}
+
+					if (element.has.assetsPath)
+					{
+						launchStoryboard.assetsPath = Path.combine(extensionPath, substitute(element.att.assetsPath));
+					}
+
+					for (childElement in element.elements)
+					{
+						if (!isValidElement(childElement, "")) continue;
+
+						if (childElement.name == "imageset")
+						{
+							var name = substitute(childElement.att.name);
+							var imageset = new LaunchStoryboard.ImageSet(name);
+
+							if (childElement.has.width)
+							{
+								var parsedValue = Std.parseInt(substitute(childElement.att.width));
 								if (parsedValue == null)
 								{
 									Log.warn("Ignoring unknown width=\"" + element.att.width + "\"");
 								}
 								else
 								{
-									icon.width = parsedValue;
+									imageset.width = parsedValue;
 								}
 							}
-
-							if (element.has.height)
+							if (childElement.has.height)
 							{
-								var parsedValue = Std.parseInt(substitute(element.att.height));
+								var parsedValue = Std.parseInt(substitute(childElement.att.height));
 								if (parsedValue == null)
 								{
 									Log.warn("Ignoring unknown height=\"" + element.att.height + "\"");
 								}
 								else
 								{
-									icon.height = parsedValue;
+									imageset.height = parsedValue;
 								}
 							}
 
-							if (element.has.priority)
-							{
-								var parsedValue = Std.parseInt(substitute(element.att.priority));
-								if (parsedValue == null)
-								{
-									Log.warn("Ignoring unknown priority=\"" + element.att.priority + "\"");
-								}
-								else
-								{
-									icon.priority = parsedValue;
-								}
-							}
-
-							icons.push(icon);
+							launchStoryboard.assets.push(imageset);
 						}
+					}
 
-					case "source", "classpath":
-						var path = "";
+				case "icon":
+					var path = "";
 
-						if (element.has.path)
+					if (element.has.path)
+					{
+						path = Path.combine(extensionPath, substitute(element.att.path));
+					}
+					else
+					{
+						path = Path.combine(extensionPath, substitute(element.att.name));
+					}
+
+					if (target == Platform.ANDROID && element.has.adaptive)
+					{
+						adaptiveIcon = new AdaptiveIcon(path, element.has.round ? element.att.round == "true" : false);
+					}
+					else
+					{
+						var icon = new Icon(path);
+
+						if (element.has.size)
 						{
-							path = Path.combine(extensionPath, substitute(element.att.path));
-						}
-						else
-						{
-							path = Path.combine(extensionPath, substitute(element.att.name));
-						}
-
-						sources.push(path);
-
-					case "extension":
-
-					// deprecated
-
-					case "haxedef":
-						if (element.has.remove)
-						{
-							haxedefs.remove(substitute(element.att.remove));
-						}
-						else
-						{
-							var name = substitute(element.att.name);
-							var value = "";
-
-							if (element.has.value)
+							var parsedValue = Std.parseInt(substitute(element.att.size));
+							if (parsedValue == null)
 							{
-								value = substitute(element.att.value);
-							}
-
-							haxedefs.set(name, value);
-						}
-
-					case "haxeflag", "compilerflag":
-						var flag = substitute(element.att.name);
-
-						if (element.has.value)
-						{
-							flag += " " + substitute(element.att.value);
-						}
-
-						haxeflags.push(substitute(flag));
-
-					case "window":
-						parseWindowElement(element);
-
-					case "assets":
-						parseAssetsElement(element, extensionPath);
-
-					case "library", "swf":
-						if (element.has.handler)
-						{
-							if (element.has.type)
-							{
-								libraryHandlers.set(substitute(element.att.type), substitute(element.att.handler));
-							}
-						}
-						else
-						{
-							var path = null;
-							var name = "";
-							var type = null;
-							var embed:Null<Bool> = null;
-							var preload = false;
-							var generate = false;
-							var prefix = "";
-
-							if (element.has.path)
-							{
-								path = Path.combine(extensionPath, substitute(element.att.path));
-							}
-
-							if (element.has.name)
-							{
-								name = substitute(element.att.name);
-							}
-
-							if (element.has.id)
-							{
-								name = substitute(element.att.id);
-							}
-
-							if (element.has.type)
-							{
-								type = substitute(element.att.type);
-							}
-
-							if (element.has.embed)
-							{
-								embed = parseBool(element.att.embed);
-							}
-
-							if (element.has.preload)
-							{
-								preload = parseBool(element.att.preload);
-							}
-
-							if (element.has.generate)
-							{
-								generate = parseBool(element.att.generate);
-							}
-
-							if (element.has.prefix)
-							{
-								prefix = substitute(element.att.prefix);
-							}
-
-							libraries.push(new Library(path, name, type, embed, preload, generate, prefix));
-						}
-
-					case "module":
-						parseModuleElement(element, extensionPath);
-
-					case "ssl":
-
-					// if (wantSslCertificate())
-					// parseSsl (element);
-
-					case "sample":
-						samplePaths.push(Path.combine(extensionPath, substitute(element.att.path)));
-
-					case "target":
-						if (element.has.handler)
-						{
-							if (element.has.name)
-							{
-								targetHandlers.set(substitute(element.att.name), substitute(element.att.handler));
-							}
-						}
-						else if (element.has.path)
-						{
-							if (element.has.name)
-							{
-								targetHandlers.set(substitute(element.att.name), Path.combine(extensionPath, substitute(element.att.path)));
-							}
-						}
-
-					case "template":
-						if (element.has.path)
-						{
-							if (element.has.haxelib)
-							{
-								var haxelibPath = Haxelib.getPath(new Haxelib(substitute(element.att.haxelib)), true);
-								var path = Path.combine(haxelibPath, substitute(element.att.path));
-								templatePaths.push(path);
+								Log.warn("Ignoring unknown size=\"" + element.att.size + "\"");
 							}
 							else
 							{
-								var path = Path.combine(extensionPath, substitute(element.att.path));
-
-								if (FileSystem.exists(path) && !FileSystem.isDirectory(path))
-								{
-									parseAssetsElement(element, extensionPath, true);
-								}
-								else
-								{
-									templatePaths.push(path);
-								}
+								icon.size = icon.width = icon.height = parsedValue;
 							}
 						}
-						else
+
+						if (element.has.width)
 						{
-							parseAssetsElement(element, extensionPath, true);
+							var parsedValue = Std.parseInt(substitute(element.att.width));
+							if (parsedValue == null)
+							{
+								Log.warn("Ignoring unknown width=\"" + element.att.width + "\"");
+							}
+							else
+							{
+								icon.width = parsedValue;
+							}
 						}
 
-					case "templatePath":
-						templatePaths.push(Path.combine(extensionPath, substitute(element.att.name)));
-
-					case "preloader":
-						// deprecated
-
-						app.preloader = substitute(element.att.name);
-
-					case "output":
-						// deprecated
-
-						parseOutputElement(element, extensionPath);
-
-					case "section":
-						parseXML(element, "", extensionPath);
-
-					case "certificate":
-						if (element.has.path || element.has.type)
+						if (element.has.height)
 						{
-							keystore = new Keystore();
+							var parsedValue = Std.parseInt(substitute(element.att.height));
+							if (parsedValue == null)
+							{
+								Log.warn("Ignoring unknown height=\"" + element.att.height + "\"");
+							}
+							else
+							{
+								icon.height = parsedValue;
+							}
 						}
 
-						if (keystore != null)
+						if (element.has.priority)
 						{
-							if (element.has.path)
+							var parsedValue = Std.parseInt(substitute(element.att.priority));
+							if (parsedValue == null)
 							{
-								keystore.path = Path.combine(extensionPath, substitute(element.att.path));
+								Log.warn("Ignoring unknown priority=\"" + element.att.priority + "\"");
 							}
-							else if (element.has.keystore)
+							else
 							{
-								keystore.path = Path.combine(extensionPath, substitute(element.att.keystore));
-							}
-
-							if (element.has.type)
-							{
-								keystore.type = substitute(element.att.type);
-							}
-
-							if (element.has.password)
-							{
-								keystore.password = substitute(element.att.password);
-							}
-
-							if (element.has.alias)
-							{
-								keystore.alias = substitute(element.att.alias);
-							}
-
-							if (element.has.resolve("alias-password"))
-							{
-								keystore.aliasPassword = substitute(element.att.resolve("alias-password"));
-							}
-							else if (element.has.alias_password)
-							{
-								keystore.aliasPassword = substitute(element.att.alias_password);
+								icon.priority = parsedValue;
 							}
 						}
 
-						if (element.has.identity)
+						icons.push(icon);
+					}
+
+				case "source", "classpath":
+					var path = "";
+
+					if (element.has.path)
+					{
+						path = Path.combine(extensionPath, substitute(element.att.path));
+					}
+					else
+					{
+						path = Path.combine(extensionPath, substitute(element.att.name));
+					}
+
+					sources.push(path);
+
+				case "extension":
+
+					// deprecated
+
+				case "haxedef":
+					if (element.has.remove)
+					{
+						haxedefs.remove(substitute(element.att.remove));
+					}
+					else
+					{
+						var name = substitute(element.att.name);
+						var value = "";
+
+						if (element.has.value)
 						{
-							config.set("ios.identity", element.att.identity);
-							config.set("tvos.identity", element.att.identity);
+							value = substitute(element.att.value);
 						}
 
-						if (element.has.resolve("team-id"))
+						haxedefs.set(name, value);
+					}
+
+				case "haxeflag", "compilerflag":
+					var flag = substitute(element.att.name);
+
+					if (element.has.value)
+					{
+						flag += " " + substitute(element.att.value);
+					}
+
+					haxeflags.push(substitute(flag));
+
+				case "window":
+					parseWindowElement(element);
+
+				case "assets":
+					parseAssetsElement(element, extensionPath);
+
+				case "library", "swf":
+					if (element.has.handler)
+					{
+						if (element.has.type)
 						{
-							config.set("ios.team-id", element.att.resolve("team-id"));
-							config.set("tvos.team-id", element.att.resolve("team-id"));
+							libraryHandlers.set(substitute(element.att.type), substitute(element.att.handler));
 						}
-
-					case "dependency":
+					}
+					else
+					{
+						var path = null;
 						var name = "";
-						var path = "";
+						var type = null;
+						var embed:Null<Bool> = null;
+						var preload = false;
+						var generate = false;
+						var prefix = "";
 
 						if (element.has.path)
 						{
@@ -1765,76 +1496,269 @@ class ProjectXMLParser extends HXProject
 
 						if (element.has.name)
 						{
-							var foundName = substitute(element.att.name);
-
-							if (StringTools.endsWith(foundName, ".a") || StringTools.endsWith(foundName, ".dll"))
-							{
-								path = Path.combine(extensionPath, foundName);
-							}
-							else
-							{
-								name = foundName;
-							}
+							name = substitute(element.att.name);
 						}
 
-						var dependency = new Dependency(name, path);
+						if (element.has.id)
+						{
+							name = substitute(element.att.id);
+						}
+
+						if (element.has.type)
+						{
+							type = substitute(element.att.type);
+						}
 
 						if (element.has.embed)
 						{
-							dependency.embed = parseBool(element.att.embed);
+							embed = parseBool(element.att.embed);
 						}
 
-						if (element.has.resolve("force-load"))
+						if (element.has.preload)
 						{
-							dependency.forceLoad = parseBool(element.att.resolve("force-load"));
+							preload = parseBool(element.att.preload);
 						}
 
-						var i = dependencies.length;
-
-						while (i-- > 0)
+						if (element.has.generate)
 						{
-							if ((name != "" && dependencies[i].name == name) || (path != "" && dependencies[i].path == path))
+							generate = parseBool(element.att.generate);
+						}
+
+						if (element.has.prefix)
+						{
+							prefix = substitute(element.att.prefix);
+						}
+
+						libraries.push(new Library(path, name, type, embed, preload, generate, prefix));
+					}
+
+				case "module":
+					parseModuleElement(element, extensionPath);
+
+				case "ssl":
+
+					// if (wantSslCertificate())
+					// parseSsl (element);
+
+				case "sample":
+					samplePaths.push(Path.combine(extensionPath, substitute(element.att.path)));
+
+				case "target":
+					if (element.has.handler)
+					{
+						if (element.has.name)
+						{
+							targetHandlers.set(substitute(element.att.name), substitute(element.att.handler));
+						}
+					}
+					else if (element.has.path)
+					{
+						if (element.has.name)
+						{
+							targetHandlers.set(substitute(element.att.name), Path.combine(extensionPath, substitute(element.att.path)));
+						}
+					}
+
+				case "template":
+					if (element.has.path)
+					{
+						if (element.has.haxelib)
+						{
+							var haxelibPath = Haxelib.getPath(new Haxelib(substitute(element.att.haxelib)), true);
+							var path = Path.combine(haxelibPath, substitute(element.att.path));
+							templatePaths.push(path);
+						}
+						else
+						{
+							var path = Path.combine(extensionPath, substitute(element.att.path));
+
+							if (FileSystem.exists(path) && !FileSystem.isDirectory(path))
 							{
-								dependencies.splice(i, 1);
+								parseAssetsElement(element, extensionPath, true);
+							}
+							else
+							{
+								templatePaths.push(path);
 							}
 						}
+					}
+					else
+					{
+						parseAssetsElement(element, extensionPath, true);
+					}
 
-						dependencies.push(dependency);
+				case "templatePath":
+					templatePaths.push(Path.combine(extensionPath, substitute(element.att.name)));
 
-					case "android":
-						// deprecated
+				case "preloader":
+					// deprecated
 
-						for (attribute in element.x.attributes())
+					app.preloader = substitute(element.att.name);
+
+				case "output":
+					// deprecated
+
+					parseOutputElement(element, extensionPath);
+
+				case "section":
+					parseXML(element, "", extensionPath);
+
+				case "certificate":
+					if (element.has.path || element.has.type)
+					{
+						keystore = new Keystore();
+					}
+
+					if (keystore != null)
+					{
+						if (element.has.path)
 						{
-							var name = attribute;
-							var value = substitute(element.att.resolve(attribute));
+							keystore.path = Path.combine(extensionPath, substitute(element.att.path));
+						}
+						else if (element.has.keystore)
+						{
+							keystore.path = Path.combine(extensionPath, substitute(element.att.keystore));
+						}
 
-							switch (name)
-							{
-								case "minimum-sdk-version":
-									config.set("android.minimum-sdk-version", Std.parseInt(value));
+						if (element.has.type)
+						{
+							keystore.type = substitute(element.att.type);
+						}
 
-								case "target-sdk-version":
-									config.set("android.target-sdk-version", Std.parseInt(value));
+						if (element.has.password)
+						{
+							keystore.password = substitute(element.att.password);
+						}
 
-								case "install-location":
-									config.set("android.install-location", value);
+						if (element.has.alias)
+						{
+							keystore.alias = substitute(element.att.alias);
+						}
 
-								case "extension":
-									var extensions = config.getArrayString("android.extension");
+						if (element.has.resolve("alias-password"))
+						{
+							keystore.aliasPassword = substitute(element.att.resolve("alias-password"));
+						}
+						else if (element.has.alias_password)
+						{
+							keystore.aliasPassword = substitute(element.att.alias_password);
+						}
+					}
 
-									if (extensions == null || extensions.indexOf(value) == -1)
-									{
-										config.push("android.extension", value);
-									}
+					if (element.has.identity)
+					{
+						config.set("ios.identity", element.att.identity);
+						config.set("tvos.identity", element.att.identity);
+					}
 
-								case "permission":
-									var permissions = config.getArrayString("android.permission");
+					if (element.has.resolve("team-id"))
+					{
+						config.set("ios.team-id", element.att.resolve("team-id"));
+						config.set("tvos.team-id", element.att.resolve("team-id"));
+					}
 
-									if (permissions == null || permissions.indexOf(value) == -1)
-									{
-										config.push("android.permission", value);
-									}
+				case "dependency":
+					var name = "";
+					var path = "";
+
+					if (element.has.path)
+					{
+						path = Path.combine(extensionPath, substitute(element.att.path));
+					}
+
+					if (element.has.name)
+					{
+						var foundName = substitute(element.att.name);
+
+						if (StringTools.endsWith(foundName, ".a") || StringTools.endsWith(foundName, ".dll"))
+						{
+							path = Path.combine(extensionPath, foundName);
+						}
+						else
+						{
+							name = foundName;
+						}
+					}
+
+					var dependency = new Dependency(name, path);
+
+					if (element.has.embed)
+					{
+						dependency.embed = parseBool(element.att.embed);
+					}
+
+					if (element.has.resolve("force-load"))
+					{
+						dependency.forceLoad = parseBool(element.att.resolve("force-load"));
+					}
+
+					if (element.has.resolve("allow-web-workers"))
+					{
+						dependency.allowWebWorkers = parseBool(element.att.resolve("allow-web-workers"));
+					}
+
+					var i = dependencies.length;
+
+					while (i-- > 0)
+					{
+						if ((name != "" && dependencies[i].name == name) || (path != "" && dependencies[i].path == path))
+						{
+							dependencies.splice(i, 1);
+						}
+					}
+
+					dependencies.push(dependency);
+
+				case "android":
+					// deprecated
+
+					for (attribute in element.x.attributes())
+					{
+						var name = attribute;
+						var value = substitute(element.att.resolve(attribute));
+
+						switch (name)
+						{
+							case "minimum-sdk-version":
+								var parsedValue = Std.parseInt(value);
+								if (parsedValue == null)
+								{
+									Log.warn("Ignoring unknown " + name + "=\"" + value + "\"");
+								}
+								else
+								{
+									config.set("android.minimum-sdk-version", parsedValue);
+								}
+
+							case "target-sdk-version":
+								var parsedValue = Std.parseInt(value);
+								if (parsedValue == null)
+								{
+									Log.warn("Ignoring unknown " + name + "=\"" + value + "\"");
+								}
+								else
+								{
+									config.set("android.target-sdk-version", parsedValue);
+								}
+
+							case "install-location":
+								config.set("android.install-location", value);
+
+							case "extension":
+								var extensions = config.getArrayString("android.extension");
+
+								if (extensions == null || extensions.indexOf(value) == -1)
+								{
+									config.push("android.extension", value);
+								}
+
+							case "permission":
+								var permissions = config.getArrayString("android.permission");
+
+								if (permissions == null || permissions.indexOf(value) == -1)
+								{
+									config.push("android.permission", value);
+								}
 
 							case "gradle-maven-repositories":
 								var repositories = config.getArrayString("android.gradle-maven-repositories");
@@ -1844,147 +1768,146 @@ class ProjectXMLParser extends HXProject
 									config.push("android.gradle-maven-repositories", value);
 								}
 
+							case "gradle-version":
+								config.set("android.gradle-version", value);
 
-								case "gradle-version":
-									config.set("android.gradle-version", value);
+							case "gradle-plugin":
+								config.set("android.gradle-plugin", value);
 
-								default:
-									name = formatAttributeName(attribute);
-							}
+							default:
+								name = formatAttributeName(attribute);
 						}
+					}
 
-					case "cpp":
-						// deprecated
+				case "cpp":
+					// deprecated
 
-						for (attribute in element.x.attributes())
+					for (attribute in element.x.attributes())
+					{
+						var name = attribute;
+						var value = substitute(element.att.resolve(attribute));
+
+						switch (name)
 						{
-							var name = attribute;
-							var value = substitute(element.att.resolve(attribute));
+							case "build-library":
+								config.set("cpp.buildLibrary", value);
 
-							switch (name)
-							{
-								case "build-library":
-									config.set("cpp.buildLibrary", value);
-
-								default:
-									name = formatAttributeName(attribute);
-							}
+							default:
+								name = formatAttributeName(attribute);
 						}
+					}
 
-					case "ios":
-						// deprecated
+				case "ios":
+					// deprecated
 
-						if (target == Platform.IOS)
+					if (target != Platform.IOS) continue;
+
+					if (element.has.deployment)
+					{
+						var deployment = Std.parseFloat(substitute(element.att.deployment));
+
+						// If it is specified, assume the dev knows what he is doing!
+						config.set("ios.deployment", deployment);
+					}
+
+					if (element.has.binaries)
+					{
+						var binaries = substitute(element.att.binaries);
+
+						switch (binaries)
 						{
-							if (element.has.deployment)
-							{
-								var deployment = Std.parseFloat(substitute(element.att.deployment));
+							case "fat":
+								ArrayTools.addUnique(architectures, Architecture.ARMV6);
+								ArrayTools.addUnique(architectures, Architecture.ARMV7);
 
-								// If it is specified, assume the dev knows what he is doing!
-								config.set("ios.deployment", deployment);
-							}
+							case "armv6":
+								ArrayTools.addUnique(architectures, Architecture.ARMV6);
+								architectures.remove(Architecture.ARMV7);
 
-							if (element.has.binaries)
-							{
-								var binaries = substitute(element.att.binaries);
-
-								switch (binaries)
-								{
-									case "fat":
-										ArrayTools.addUnique(architectures, Architecture.ARMV6);
-										ArrayTools.addUnique(architectures, Architecture.ARMV7);
-
-									case "armv6":
-										ArrayTools.addUnique(architectures, Architecture.ARMV6);
-										architectures.remove(Architecture.ARMV7);
-
-									case "armv7":
-										ArrayTools.addUnique(architectures, Architecture.ARMV7);
-										architectures.remove(Architecture.ARMV6);
-								}
-							}
-
-							if (element.has.devices)
-							{
-								config.set("ios.device", substitute(element.att.devices).toLowerCase());
-							}
-
-							if (element.has.compiler)
-							{
-								config.set("ios.compiler", substitute(element.att.compiler));
-							}
-
-							if (element.has.resolve("prerendered-icon"))
-							{
-								config.set("ios.prerenderedIcon", substitute(element.att.resolve("prerendered-icon")));
-							}
-
-							if (element.has.resolve("linker-flags"))
-							{
-								config.push("ios.linker-flags", substitute(element.att.resolve("linker-flags")));
-							}
+							case "armv7":
+								ArrayTools.addUnique(architectures, Architecture.ARMV7);
+								architectures.remove(Architecture.ARMV6);
 						}
+					}
 
-					case "tvos":
-						// deprecated
+					if (element.has.devices)
+					{
+						config.set("ios.device", substitute(element.att.devices).toLowerCase());
+					}
 
-						if (target == Platform.TVOS)
+					if (element.has.compiler)
+					{
+						config.set("ios.compiler", substitute(element.att.compiler));
+					}
+
+					if (element.has.resolve("prerendered-icon"))
+					{
+						config.set("ios.prerenderedIcon", substitute(element.att.resolve("prerendered-icon")));
+					}
+
+					if (element.has.resolve("linker-flags"))
+					{
+						config.push("ios.linker-flags", substitute(element.att.resolve("linker-flags")));
+					}
+
+				case "tvos":
+					// deprecated
+
+					if (target != Platform.TVOS) continue;
+
+					if (element.has.deployment)
+					{
+						var deployment = Std.parseFloat(substitute(element.att.deployment));
+
+						// If it is specified, assume the dev knows what he is doing!
+						config.set("tvos.deployment", deployment);
+					}
+
+					if (element.has.binaries)
+					{
+						var binaries = substitute(element.att.binaries);
+
+						switch (binaries)
 						{
-							if (element.has.deployment)
-							{
-								var deployment = Std.parseFloat(substitute(element.att.deployment));
-
-								// If it is specified, assume the dev knows what he is doing!
-								config.set("tvos.deployment", deployment);
-							}
-
-							if (element.has.binaries)
-							{
-								var binaries = substitute(element.att.binaries);
-
-								switch (binaries)
-								{
-									case "arm64":
-										ArrayTools.addUnique(architectures, Architecture.ARM64);
-								}
-							}
-
-							if (element.has.devices)
-							{
-								config.set("tvos.device", substitute(element.att.devices).toLowerCase());
-							}
-
-							if (element.has.compiler)
-							{
-								config.set("tvos.compiler", substitute(element.att.compiler));
-							}
-
-							if (element.has.resolve("prerendered-icon"))
-							{
-								config.set("tvos.prerenderedIcon", substitute(element.att.resolve("prerendered-icon")));
-							}
-
-							if (element.has.resolve("linker-flags"))
-							{
-								config.push("tvos.linker-flags", substitute(element.att.resolve("linker-flags")));
-							}
+							case "arm64":
+								ArrayTools.addUnique(architectures, Architecture.ARM64);
 						}
+					}
 
-					case "config":
+					if (element.has.devices)
+					{
+						config.set("tvos.device", substitute(element.att.devices).toLowerCase());
+					}
+
+					if (element.has.compiler)
+					{
+						config.set("tvos.compiler", substitute(element.att.compiler));
+					}
+
+					if (element.has.resolve("prerendered-icon"))
+					{
+						config.set("tvos.prerenderedIcon", substitute(element.att.resolve("prerendered-icon")));
+					}
+
+					if (element.has.resolve("linker-flags"))
+					{
+						config.push("tvos.linker-flags", substitute(element.att.resolve("linker-flags")));
+					}
+
+				case "config":
+					config.parse(element, substitute);
+
+				case "prebuild":
+					parseCommandElement(element, preBuildCallbacks);
+
+				case "postbuild":
+					parseCommandElement(element, postBuildCallbacks);
+
+				default:
+					if (StringTools.startsWith(element.name, "config:"))
+					{
 						config.parse(element, substitute);
-
-					case "prebuild":
-						parseCommandElement(element, preBuildCallbacks);
-
-					case "postbuild":
-						parseCommandElement(element, postBuildCallbacks);
-
-					default:
-						if (StringTools.startsWith(element.name, "config:"))
-						{
-							config.parse(element, substitute);
-						}
-				}
+					}
 			}
 		}
 	}
@@ -1995,7 +1918,15 @@ class ProjectXMLParser extends HXProject
 
 		if (element.has.id)
 		{
-			id = Std.parseInt(substitute(element.att.id));
+			var parsedValue = Std.parseInt(substitute(element.att.id));
+			if (parsedValue == null)
+			{
+				Log.warn("Ignoring unknown id=\"" + element.att.id + "\"");
+			}
+			else
+			{
+				id = parsedValue;
+			}
 		}
 
 		while (id >= windows.length)
@@ -2027,7 +1958,15 @@ class ProjectXMLParser extends HXProject
 						}
 						else
 						{
-							windows[id].background = Std.parseInt(value);
+							var parsedValue = Std.parseInt(value);
+							if (parsedValue == null)
+							{
+								Log.warn("Ignoring unknown " + name + "=\"" + value + "\"");
+							}
+							else
+							{
+								windows[id].background = parsedValue;
+							}
 						}
 					}
 
@@ -2040,7 +1979,15 @@ class ProjectXMLParser extends HXProject
 					}
 
 				case "height", "width", "fps", "antialiasing":
-					Reflect.setField(windows[id], name, Std.parseInt(value));
+					var parsedValue = Std.parseInt(value);
+					if (parsedValue == null)
+					{
+						Log.warn("Ignoring unknown " + name + "=\"" + value + "\"");
+					}
+					else
+					{
+						Reflect.setField(windows[id], name, parsedValue);
+					}
 
 				case "parameters", "title":
 					Reflect.setField(windows[id], name, Std.string(value));
@@ -2049,7 +1996,15 @@ class ProjectXMLParser extends HXProject
 					Reflect.setField(windows[id], "allowHighDPI", value == "true");
 
 				case "color-depth":
-					Reflect.setField(windows[id], "colorDepth", Std.parseInt(value));
+					var parsedValue = Std.parseInt(value);
+					if (parsedValue == null)
+					{
+						Log.warn("Ignoring unknown " + name + "=\"" + value + "\"");
+					}
+					else
+					{
+						Reflect.setField(windows[id], "colorDepth", parsedValue);
+					}
 
 				default:
 					if (Reflect.hasField(WindowData.expectedFields, name))

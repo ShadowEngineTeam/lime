@@ -132,7 +132,8 @@ class AndroidPlatform extends PlatformTarget
 
 	public override function build():Void
 	{
-		var destination = targetDirectory + "/bin";
+		var gradleProject = project.config.getString("android.gradle-project-directory", "bin");
+		var destination = targetDirectory + "/" + gradleProject;
 		var hxml = targetDirectory + "/haxe/" + buildType + ".hxml";
 		var sourceSet = destination + "/app/src/main";
 
@@ -147,6 +148,7 @@ class AndroidPlatform extends PlatformTarget
 
 		var hasARM64 = ArrayTools.containsValue(project.architectures, Architecture.ARM64);
 		var hasARMV7 = ArrayTools.containsValue(project.architectures, Architecture.ARMV7);
+		var hasARMV5 = (ArrayTools.containsValue(project.architectures, Architecture.ARMV5) || ArrayTools.containsValue(project.architectures, Architecture.ARMV6));
 		var hasX64 = ArrayTools.containsValue(project.architectures, Architecture.X64);
 		var hasX86 = ArrayTools.containsValue(project.architectures, Architecture.X86);
 
@@ -154,6 +156,7 @@ class AndroidPlatform extends PlatformTarget
 
 		if (hasARM64) architectures.push(Architecture.ARM64);
 		if (hasARMV7) architectures.push(Architecture.ARMV7);
+		if (hasARMV5) architectures.push(Architecture.ARMV5);
 		if (hasX64) architectures.push(Architecture.X64);
 		if (hasX86) architectures.push(Architecture.X86);
 
@@ -237,6 +240,14 @@ class AndroidPlatform extends PlatformTarget
 			}
 		}
 
+		if (!hasARMV5)
+		{
+			if (FileSystem.exists(sourceSet + "/jniLibs/armeabi"))
+			{
+				System.removeDirectory(sourceSet + "/jniLibs/armeabi");
+			}
+		}
+
 		if (!hasX64)
 		{
 			if (FileSystem.exists(sourceSet + "/jniLibs/x86_64"))
@@ -284,14 +295,29 @@ class AndroidPlatform extends PlatformTarget
 			var outputDirectory = null;
 			if (project.config.exists("android.gradle-build-directory"))
 			{
-				outputDirectory = Path.combine(project.config.getString("android.gradle-build-directory"), project.app.file + "/app/outputs/apk");
+				if (targetFlags.exists("bundle"))
+				{
+					outputDirectory = Path.combine(project.config.getString("android.gradle-build-directory"), project.app.file + "/app/outputs/bundle");
+				}
+				else
+				{
+					outputDirectory = Path.combine(project.config.getString("android.gradle-build-directory"), project.app.file + "/app/outputs/apk");
+				}
 			}
 			else
 			{
-				outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory), "bin/app/build/outputs/apk");
+				var gradleProject = project.config.getString("android.gradle-project-directory", "bin");
+				if (targetFlags.exists("bundle"))
+				{
+					outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory), gradleProject + "/app/build/outputs/bundle");
+				}
+				else
+				{
+					outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory), gradleProject + "/app/build/outputs/apk");
+				}
 			}
 
-			Sys.println(Path.combine(outputDirectory, project.app.file + build + ".apk"));
+			Sys.println(Path.combine(outputDirectory, project.app.file + build + '${targetFlags.exists("bundle") ? ".aab" : ".apk"}'));
 		}
 		else
 		{
@@ -335,7 +361,7 @@ class AndroidPlatform extends PlatformTarget
 		if (project.environment.exists("ANDROID_GRADLE_TASK"))
 		{
 			var task = project.environment.get("ANDROID_GRADLE_TASK");
-			if (task == "assembleDebug")
+			if (task == "assembleDebug" || task == "bundleDebug")
 			{
 				build = "debug";
 			}
@@ -349,23 +375,39 @@ class AndroidPlatform extends PlatformTarget
 
 		if (project.config.exists("android.gradle-build-directory"))
 		{
-			outputDirectory = Path.combine(project.config.getString("android.gradle-build-directory"), project.app.file + "/app/outputs/apk/" + build);
+			if (targetFlags.exists("bundle"))
+			{
+				outputDirectory = Path.combine(project.config.getString("android.gradle-build-directory"), project.app.file + "/app/outputs/bundle/" + build);
+			}
+			else
+			{
+				outputDirectory = Path.combine(project.config.getString("android.gradle-build-directory"), project.app.file + "/app/outputs/apk/" + build);
+			}
 		}
 		else
 		{
-			outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory), "bin/app/build/outputs/apk/" + build);
+			var gradleProject = project.config.getString("android.gradle-project-directory", "bin");
+			if (targetFlags.exists("bundle"))
+			{
+				outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory), gradleProject + "/app/build/outputs/bundle/" + build);
+			}
+			else
+			{
+				outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory), gradleProject + "/app/build/outputs/apk/" + build);
+			}
 		}
 
-		var apkPath = Path.combine(outputDirectory, project.app.file + "-" + build + ".apk");
+		var packagePath = Path.combine(outputDirectory, project.app.file + "-" + build + '${targetFlags.exists("bundle") ? ".aab" : ".apk"}');
 
-		deviceID = AndroidHelper.install(project, apkPath, deviceID);
+		deviceID = AndroidHelper.install(project, packagePath, deviceID, targetFlags.exists("bundle"));
 	}
 
 	public override function rebuild():Void
 	{
-		var arm64 = ArrayTools.containsValue(project.architectures, Architecture.ARM64);
+		var arm64 = (command == "rebuild" || ArrayTools.containsValue(project.architectures, Architecture.ARM64));
 		var armv7 = (command == "rebuild" || ArrayTools.containsValue(project.architectures, Architecture.ARMV7));
-		var x64 = ArrayTools.containsValue(project.architectures, Architecture.X64);
+		var armv5 = (ArrayTools.containsValue(project.architectures, Architecture.ARMV5) || ArrayTools.containsValue(project.architectures, Architecture.ARMV6));
+		var x64 = (ArrayTools.containsValue(project.architectures, Architecture.X64));
 		var x86 = (command == "rebuild" || ArrayTools.containsValue(project.architectures, Architecture.X86));
 
 		var commands = [];
@@ -436,7 +478,8 @@ class AndroidPlatform extends PlatformTarget
 
 		// initialize (project);
 
-		var destination = targetDirectory + "/bin";
+		var gradleProject = project.config.getString("android.gradle-project-directory", "bin");
+		var destination = targetDirectory + "/" + gradleProject;
 		var sourceSet = destination + "/app/src/main";
 		System.mkdir(sourceSet);
 		System.mkdir(sourceSet + "/res/drawable-ldpi/");
@@ -451,11 +494,28 @@ class AndroidPlatform extends PlatformTarget
 
 		var context = project.templateContext;
 
+		context.ANDROID_PLAY_ASSETS_DELIVERY_PACKS = [];
+
 		for (asset in project.assets)
 		{
 			if (asset.embed != true && asset.type != AssetType.TEMPLATE)
 			{
-				AssetHelper.copyAssetIfNewer(asset, Path.combine(sourceSet + "/assets/", asset.resourceName));
+				if (asset.deliveryPackName != '')
+				{
+					AssetHelper.copyAssetIfNewer(asset, Path.combine(destination + "/" + asset.deliveryPackName + "/src/main/assets/", asset.resourceName));
+
+					if (!context.ANDROID_PLAY_ASSETS_DELIVERY_PACKS.contains(asset.deliveryPackName))
+					{
+						var padContext:Dynamic = {};
+						padContext.ANDROID_PLAY_ASSETS_DELIVERY_PACK = asset.deliveryPackName;
+						var gradleProject = project.config.getString("android.gradle-project-directory", "bin");
+						System.copyFileTemplate(project.templatePaths, "android/asset-pack/build.gradle", targetDirectory + "/" + gradleProject + "/" + asset.deliveryPackName + "/build.gradle", padContext);
+
+						context.ANDROID_PLAY_ASSETS_DELIVERY_PACKS.push(asset.deliveryPackName);
+					}
+				}
+				else
+					AssetHelper.copyAssetIfNewer(asset, Path.combine(sourceSet + "/assets/", asset.resourceName));
 			}
 		}
 
@@ -485,6 +545,12 @@ class AndroidPlatform extends PlatformTarget
 		context.ANDROID_ENABLE_JETIFIER = project.config.getString("android.enableJetifier", "false");
 		context.ANDROID_DISPLAY_CUTOUT = project.config.getString("android.layoutInDisplayCutoutMode", "shortEdges");
 
+		context.ANDROID_MANIFEST = project.config.getKeyValueArray("android.manifest", {
+			"android:versionCode": project.meta.buildNumber,
+			"android:versionName": project.meta.version,
+			"android:installLocation": project.config.getString("android.install-location", "auto")
+		});
+		context.ANDROID_MANIFEST_CHILDREN = project.config.get("android.manifest").xmlChildren;
 		context.ANDROID_APPLICATION = project.config.getKeyValueArray("android.application", {
 			"android:label": project.meta.title,
 			"android:allowBackup": "true",
@@ -497,6 +563,7 @@ class AndroidPlatform extends PlatformTarget
 			"android:isGame": "true",
 			"android:appCategory": "game"
 		});
+		context.ANDROID_APPLICATION_CHILDREN = project.config.get("android.application").xmlChildren;
 		context.ANDROID_ACTIVITY = project.config.getKeyValueArray("android.activity", {
 			"android:name": "MainActivity",
 			"android:exported": "true",
@@ -508,6 +575,7 @@ class AndroidPlatform extends PlatformTarget
 				.join("|"),
 			"android:screenOrientation": project.window.orientation == PORTRAIT ? "sensorPortrait" : (project.window.orientation == LANDSCAPE ? "sensorLandscape" : null)
 		});
+		context.ANDROID_ACTIVITY_CHILDREN = project.config.get("android.activity").xmlChildren;
 		context.ANDROID_ACCEPT_FILE_INTENT = project.config.getArrayString("android.accept-file-intent", []);
 
 		context.SHARE_FILES = project.haxedefs.exists("SHARE_MOBILE_FILES");
@@ -579,8 +647,8 @@ class AndroidPlatform extends PlatformTarget
 		if (Reflect.hasField(context,
 			"KEY_STORE_ALIAS_PASSWORD")) context.KEY_STORE_ALIAS_PASSWORD = StringTools.replace(context.KEY_STORE_ALIAS_PASSWORD, "\\", "\\\\");
 
-		var index = 1;
 		context.ANDROID_LIBRARY_PROJECTS = [];
+		context.ANDROID_LIBRARY_DEPENDENCIES = [];
 
 		for (dependency in project.dependencies)
 		{
@@ -590,17 +658,16 @@ class AndroidPlatform extends PlatformTarget
 				&& (FileSystem.exists(Path.combine(dependency.path, "project.properties"))
 					|| FileSystem.exists(Path.combine(dependency.path, "build.gradle"))))
 			{
-				var name = dependency.name;
-				if (name == "") name = "project" + index;
-
 				context.ANDROID_LIBRARY_PROJECTS.push(
 					{
-						name: name,
-						index: index,
-						path: "deps/" + name,
+						name: dependency.name,
+						path: "deps/" + dependency.name,
 						source: dependency.path
 					});
-				index++;
+			}
+			else if (dependency.name != "")
+			{
+				context.ANDROID_LIBRARY_DEPENDENCIES.push(dependency.name);
 			}
 		}
 
@@ -623,10 +690,10 @@ class AndroidPlatform extends PlatformTarget
 			{
 				ProjectHelper.recursiveSmartCopyDirectory(project, project.adaptiveIcon.path, destination + "/app/src/main/res/", context);
 				context.HAS_ICON = true;
-				context.ANDROID_APPLICATION.push({key: "android:icon", value: "@mipmap/ic_launcher"});
+				context.ANDROID_APPLICATION.push({ key: "android:icon", value: "@mipmap/ic_launcher" });
 				if (project.adaptiveIcon.hasRoundIcon)
 				{
-					context.ANDROID_APPLICATION.push({key: "android:roundIcon", value: "@mipmap/ic_launcher_round"});
+					context.ANDROID_APPLICATION.push({ key: "android:roundIcon", value: "@mipmap/ic_launcher_round" });
 				}
 			}
 			else
@@ -638,10 +705,11 @@ class AndroidPlatform extends PlatformTarget
 				for (i in 0...iconTypes.length)
 				{
 					// create multiple icons, only set "android:icon" once
-					if (IconHelper.createIcon(icons, iconSizes[i], iconSizes[i], sourceSet + "/res/drawable-" + iconTypes[i] + "/icon.png") && !context.HAS_ICON)
+					if (IconHelper.createIcon(icons, iconSizes[i], iconSizes[i], sourceSet + "/res/drawable-" + iconTypes[i] + "/icon.png")
+						&& !context.HAS_ICON)
 					{
 						context.HAS_ICON = true;
-						context.ANDROID_APPLICATION.push({key: "android:icon", value: "@drawable/icon"});
+						context.ANDROID_APPLICATION.push({ key: "android:icon", value: "@drawable/icon" });
 					}
 				}
 				IconHelper.createIcon(icons, 732, 412, sourceSet + "/res/drawable-xhdpi/ouya_icon.png");
@@ -658,17 +726,17 @@ class AndroidPlatform extends PlatformTarget
 			{
 				if (FileSystem.isDirectory(javaPath))
 				{
-					System.recursiveCopy(javaPath, sourceSet + "/java", context, true);
+					recursiveCopy(javaPath, sourceSet + "/java", context, true);
 				}
 				else
 				{
 					if (Path.extension(javaPath) == "jar")
 					{
-						System.copyIfNewer(javaPath, destination + "/app/libs/" + Path.withoutDirectory(javaPath));
+						copyIfNewer(javaPath, destination + "/app/libs/" + Path.withoutDirectory(javaPath));
 					}
 					else
 					{
-						System.copyIfNewer(javaPath, sourceSet + "/java/" + Path.withoutDirectory(javaPath));
+						copyIfNewer(javaPath, sourceSet + "/java/" + Path.withoutDirectory(javaPath));
 					}
 				}
 			}
@@ -681,7 +749,7 @@ class AndroidPlatform extends PlatformTarget
 
 		for (library in cast(context.ANDROID_LIBRARY_PROJECTS, Array<Dynamic>))
 		{
-			System.recursiveCopy(library.source, destination + "/deps/" + library.name, context, true);
+			recursiveCopy(library.source, destination + "/deps/" + library.name, context, true);
 		}
 
 		ProjectHelper.recursiveSmartCopyTemplate(project, "android/template", destination, context);
@@ -713,5 +781,20 @@ class AndroidPlatform extends PlatformTarget
 
 		var command = ProjectHelper.getCurrentCommand();
 		System.watch(command, dirs);
+	}
+
+	private function getNdkVer():String
+	{
+		var file:Array<String> = File.getContent(Sys.getEnv("ANDROID_NDK_ROOT") + '/source.properties').split('\n');
+		for (line in file)
+		{
+			if (StringTools.startsWith(line, "Pkg.BaseRevision"))
+			{
+				var baseRevision:Array<String> = line.split('=');
+				var version:String = baseRevision.pop();
+				return StringTools.trim(version);
+			}
+		}
+		return "00.0.0";
 	}
 }

@@ -57,6 +57,16 @@ _cairo_box_from_integers (cairo_box_t *box, int x, int y, int w, int h)
     box->p2.y = _cairo_fixed_from_int (y + h);
 }
 
+static inline void
+_cairo_box_from_rectangle_int (cairo_box_t *box,
+			       const cairo_rectangle_int_t *rect)
+{
+    box->p1.x = _cairo_fixed_from_int (rect->x);
+    box->p1.y = _cairo_fixed_from_int (rect->y);
+    box->p2.x = _cairo_fixed_from_int (rect->x + rect->width);
+    box->p2.y = _cairo_fixed_from_int (rect->y + rect->height);
+}
+
 /* assumes box->p1 is top-left, p2 bottom-right */
 static inline void
 _cairo_box_add_point (cairo_box_t *box,
@@ -101,7 +111,7 @@ static inline cairo_bool_t
 _cairo_box_is_pixel_aligned (const cairo_box_t *box)
 {
 #if CAIRO_FIXED_FRAC_BITS <= 8 && 0
-    return ((box->p1.x & CAIRO_FIXED_FRAC_MASK) << 24 |
+    return ((cairo_fixed_unsigned_t)(box->p1.x & CAIRO_FIXED_FRAC_MASK) << 24 |
 	    (box->p1.y & CAIRO_FIXED_FRAC_MASK) << 16 |
 	    (box->p2.x & CAIRO_FIXED_FRAC_MASK) << 8 |
 	    (box->p2.y & CAIRO_FIXED_FRAC_MASK) << 0) == 0;

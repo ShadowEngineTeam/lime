@@ -114,7 +114,7 @@ _cairo_xcb_picture_create (cairo_xcb_screen_t *screen,
 {
     cairo_xcb_picture_t *surface;
 
-    surface = malloc (sizeof (cairo_xcb_picture_t));
+    surface = _cairo_malloc (sizeof (cairo_xcb_picture_t));
     if (unlikely (surface == NULL))
 	return (cairo_xcb_picture_t *)
 	    _cairo_surface_create_in_error (_cairo_error (CAIRO_STATUS_NO_MEMORY));
@@ -128,7 +128,7 @@ _cairo_xcb_picture_create (cairo_xcb_screen_t *screen,
     cairo_list_add (&surface->link, &screen->pictures);
 
     surface->screen = screen;
-    surface->picture = _cairo_xcb_connection_get_xid (screen->connection);
+    surface->picture = xcb_generate_id (screen->connection->xcb_connection);
     surface->pixman_format = pixman_format;
     surface->xrender_format = xrender_format;
 
@@ -308,7 +308,7 @@ _cairo_xcb_surface_ensure_picture (cairo_xcb_surface_t *surface)
 	    values[0] = surface->precision;
 	}
 
-	surface->picture = _cairo_xcb_connection_get_xid (surface->connection);
+	surface->picture = xcb_generate_id (surface->connection->xcb_connection);
 	_cairo_xcb_connection_render_create_picture (surface->connection,
 						     surface->picture,
 						     surface->drawable,
@@ -382,7 +382,7 @@ _picture_from_image (cairo_xcb_surface_t *target,
 						     0, 0);
     }
 
-    _cairo_xcb_connection_free_pixmap (target->connection, pixmap);
+    xcb_free_pixmap (target->connection->xcb_connection, pixmap);
 
     return picture;
 }
@@ -627,7 +627,7 @@ _solid_picture (cairo_xcb_surface_t *target,
 	    gc = _cairo_xcb_screen_get_gc (target->screen, pixmap, 32);
 
 	    /* XXX byte ordering? */
-	    pixel = ((color->alpha_short >> 8) << 24) |
+	    pixel = (((uint32_t)color->alpha_short >> 8) << 24) |
 		    ((color->red_short   >> 8) << 16) |
 		    ((color->green_short >> 8) << 8) |
 		    ((color->blue_short  >> 8) << 0);
@@ -640,7 +640,7 @@ _solid_picture (cairo_xcb_surface_t *target,
 	    _cairo_xcb_screen_put_gc (target->screen, 32, gc);
 	}
 
-	_cairo_xcb_connection_free_pixmap (target->connection, pixmap);
+	xcb_free_pixmap (target->connection->xcb_connection, pixmap);
     }
 
     return picture;
@@ -3144,8 +3144,7 @@ _clip_and_composite_boxes (cairo_xcb_surface_t *dst,
 					 antialias,
 					 fill_rule,
 					 extents);
-	    if (extents->clip != clip)
-		clip = NULL;
+	    clip = extents->clip;
 	    extents->clip = saved_clip;
 	    _cairo_polygon_fini (&polygon);
 	}
@@ -3399,8 +3398,6 @@ _composite_mask_clip (void				*closure,
 	    return status;
 	}
     }
-
-    dst->deferred_clear = FALSE; /* assert(trap extents == extents); */
 
     status = _composite_traps (&info,
 			       dst, CAIRO_OPERATOR_SOURCE, mask_pattern,
@@ -3997,6 +3994,7 @@ _can_composite_glyphs (cairo_xcb_surface_t *dst,
 	    status = _cairo_scaled_glyph_lookup (scaled_font,
 						 glyphs->index,
 						 CAIRO_SCALED_GLYPH_INFO_METRICS,
+                                                 NULL, /* foreground color */
 						 &glyph);
 	    if (unlikely (status))
 		break;
@@ -4143,7 +4141,7 @@ _cairo_xcb_font_create (cairo_xcb_connection_t *connection,
     cairo_xcb_font_t	*priv;
     int i;
 
-    priv = malloc (sizeof (cairo_xcb_font_t));
+    priv = _cairo_malloc (sizeof (cairo_xcb_font_t));
     if (unlikely (priv == NULL))
 	return NULL;
 
@@ -4235,7 +4233,7 @@ _cairo_xcb_scaled_font_get_glyphset_info_for_format (cairo_xcb_connection_t *c,
 
     info = &priv->glyphset_info[glyphset_index];
     if (info->glyphset == XCB_NONE) {
-	info->glyphset = _cairo_xcb_connection_get_xid (c);
+	info->glyphset = xcb_generate_id (c->xcb_connection);
 	info->xrender_format = c->standard_formats[info->format];
 
 	_cairo_xcb_connection_render_create_glyph_set (c,
@@ -4336,7 +4334,7 @@ _cairo_xcb_glyph_fini (cairo_scaled_glyph_private_t *glyph_private,
 	}
 
 	if (to_free == NULL) {
-	    to_free = malloc (sizeof (cairo_xcb_font_glyphset_free_glyphs_t));
+	    to_free = _cairo_malloc (sizeof (cairo_xcb_font_glyphset_free_glyphs_t));
 	    if (unlikely (to_free == NULL)) {
 		_cairo_error_throw (CAIRO_STATUS_NO_MEMORY);
 		return; /* XXX cannot propagate failure */
@@ -4363,7 +4361,7 @@ _cairo_xcb_glyph_attach (cairo_xcb_connection_t  *c,
 {
     cairo_xcb_glyph_private_t *priv;
 
-    priv = malloc (sizeof (*priv));
+    priv = _cairo_malloc (sizeof (*priv));
     if (unlikely (priv == NULL))
 	return _cairo_error (CAIRO_STATUS_NO_MEMORY);
 
@@ -4402,6 +4400,7 @@ _cairo_xcb_surface_add_glyph (cairo_xcb_connection_t *connection,
 					     glyph_index,
 					     CAIRO_SCALED_GLYPH_INFO_METRICS |
 					     CAIRO_SCALED_GLYPH_INFO_SURFACE,
+                                             NULL, /* foreground color */
 					     scaled_glyph_out);
 	if (unlikely (status))
 	    return status;
@@ -4474,7 +4473,7 @@ _cairo_xcb_surface_add_glyph (cairo_xcb_connection_t *connection,
 	    if (c == 0)
 		break;
 
-	    new = malloc (c);
+	    new = _cairo_malloc (c);
 	    if (unlikely (new == NULL)) {
 		status = _cairo_error (CAIRO_STATUS_NO_MEMORY);
 		goto BAIL;
@@ -4505,7 +4504,7 @@ _cairo_xcb_surface_add_glyph (cairo_xcb_connection_t *connection,
 	    if (c == 0)
 		break;
 
-	    new = malloc (4 * c);
+	    new = _cairo_malloc (4 * c);
 	    if (unlikely (new == NULL)) {
 		status = _cairo_error (CAIRO_STATUS_NO_MEMORY);
 		goto BAIL;
@@ -4587,7 +4586,7 @@ _emit_glyphs_chunk (cairo_xcb_surface_t *dst,
     int i;
 
     if (estimated_req_size > ARRAY_LENGTH (stack_buf)) {
-	buf = malloc (estimated_req_size);
+	buf = _cairo_malloc (estimated_req_size);
 	if (unlikely (buf == NULL))
 	    return _cairo_error (CAIRO_STATUS_NO_MEMORY);
     }
@@ -4695,6 +4694,7 @@ _composite_glyphs (void				*closure,
 	    status = _cairo_scaled_glyph_lookup (info->font,
 						 glyph_index,
 						 CAIRO_SCALED_GLYPH_INFO_METRICS,
+                                                 NULL, /* foreground color */
 						 &glyph);
 	    if (unlikely (status)) {
 		cairo_surface_destroy (&src->base);

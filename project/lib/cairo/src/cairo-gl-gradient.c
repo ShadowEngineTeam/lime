@@ -39,7 +39,7 @@
  */
 
 #include "cairoint.h"
-
+#include <stdint.h>
 #include "cairo-error-private.h"
 #include "cairo-gl-gradient-private.h"
 #include "cairo-gl-private.h"
@@ -47,7 +47,7 @@
 
 static int
 _cairo_gl_gradient_sample_width (unsigned int                 n_stops,
-                                 const cairo_gradient_stop_t *stops)
+				 const cairo_gradient_stop_t *stops)
 {
     unsigned int n;
     int width;
@@ -99,17 +99,17 @@ static uint32_t color_stop_to_pixel(const cairo_gradient_stop_t *stop)
     b = premultiply(stop->color.blue,  stop->color.alpha);
 
     if (_cairo_is_little_endian ())
-	return a << 24 | r << 16 | g << 8 | b << 0;
+	return (uint32_t)a << 24 | r << 16 | g << 8 | b << 0;
     else
-	return a << 0 | r << 8 | g << 16 | b << 24;
+	return a << 0 | r << 8 | g << 16 | (uint32_t)b << 24;
 }
 
 static cairo_status_t
 _cairo_gl_gradient_render (const cairo_gl_context_t    *ctx,
-                           unsigned int                 n_stops,
-                           const cairo_gradient_stop_t *stops,
-                           void                        *bytes,
-                           int                          width)
+			   unsigned int                 n_stops,
+			   const cairo_gradient_stop_t *stops,
+			   void                        *bytes,
+			   int                          width)
 {
     pixman_image_t *gradient, *image;
     pixman_gradient_stop_t pixman_stops_stack[32];
@@ -169,11 +169,11 @@ _cairo_gl_gradient_render (const cairo_gl_context_t    *ctx,
     }
 
     pixman_image_composite32 (PIXMAN_OP_SRC,
-                              gradient, NULL, image,
-                              0, 0,
-                              0, 0,
-                              0, 0,
-                              width, 1);
+			      gradient, NULL, image,
+			      0, 0,
+			      0, 0,
+			      0, 0,
+			      width, 1);
 
     pixman_image_unref (gradient);
     pixman_image_unref (image);
@@ -188,20 +188,20 @@ _cairo_gl_gradient_render (const cairo_gl_context_t    *ctx,
     return CAIRO_STATUS_SUCCESS;
 }
 
-static unsigned long
+static uintptr_t
 _cairo_gl_gradient_hash (unsigned int                  n_stops,
-                         const cairo_gradient_stop_t  *stops)
+			 const cairo_gradient_stop_t  *stops)
 {
     return _cairo_hash_bytes (n_stops,
-                              stops,
-                              sizeof (cairo_gradient_stop_t) * n_stops);
+			      stops,
+			      sizeof (cairo_gradient_stop_t) * n_stops);
 }
 
 static cairo_gl_gradient_t *
 _cairo_gl_gradient_lookup (cairo_gl_context_t           *ctx,
-                           unsigned long                 hash,
-                           unsigned int                  n_stops,
-                           const cairo_gradient_stop_t  *stops)
+			   uintptr_t                     hash,
+			   unsigned int                  n_stops,
+			   const cairo_gradient_stop_t  *stops)
 {
     cairo_gl_gradient_t lookup;
 
@@ -219,18 +219,18 @@ _cairo_gl_gradient_equal (const void *key_a, const void *key_b)
     const cairo_gl_gradient_t *b = key_b;
 
     if (a->n_stops != b->n_stops)
-        return FALSE;
+	return FALSE;
 
     return memcmp (a->stops, b->stops, a->n_stops * sizeof (cairo_gradient_stop_t)) == 0;
 }
 
 cairo_int_status_t
 _cairo_gl_gradient_create (cairo_gl_context_t           *ctx,
-                           unsigned int                  n_stops,
-                           const cairo_gradient_stop_t  *stops,
-                           cairo_gl_gradient_t         **gradient_out)
+			   unsigned int                  n_stops,
+			   const cairo_gradient_stop_t  *stops,
+			   cairo_gl_gradient_t         **gradient_out)
 {
-    unsigned long hash;
+    uintptr_t hash;
     cairo_gl_gradient_t *gradient;
     cairo_status_t status;
     int tex_width;
@@ -248,7 +248,7 @@ _cairo_gl_gradient_create (cairo_gl_context_t           *ctx,
 	return CAIRO_STATUS_SUCCESS;
     }
 
-    gradient = malloc (sizeof (cairo_gl_gradient_t) + sizeof (cairo_gradient_stop_t) * (n_stops - 1));
+    gradient = _cairo_malloc (sizeof (cairo_gl_gradient_t) + sizeof (cairo_gradient_stop_t) * (n_stops - 1));
     if (gradient == NULL)
 	return _cairo_error (CAIRO_STATUS_NO_MEMORY);
 
@@ -282,7 +282,8 @@ _cairo_gl_gradient_create (cairo_gl_context_t           *ctx,
      * In OpenGL ES 2.0 no format conversion is allowed i.e. 'internalFormat'
      * must match 'format' in glTexImage2D.
      */
-    if (_cairo_gl_get_flavor () == CAIRO_GL_FLAVOR_ES)
+    if (_cairo_gl_get_flavor () == CAIRO_GL_FLAVOR_ES3 ||
+	_cairo_gl_get_flavor () == CAIRO_GL_FLAVOR_ES2)
 	internal_format = GL_BGRA;
     else
 	internal_format = GL_RGBA;
@@ -330,8 +331,8 @@ _cairo_gl_gradient_destroy (cairo_gl_gradient_t *gradient)
     if (_cairo_gl_context_acquire (gradient->device, &ctx) == CAIRO_STATUS_SUCCESS) {
 	/* The gradient my still be active in the last operation, so flush */
 	_cairo_gl_composite_flush (ctx);
-        glDeleteTextures (1, &gradient->tex);
-        ignore = _cairo_gl_context_release (ctx, CAIRO_STATUS_SUCCESS);
+	glDeleteTextures (1, &gradient->tex);
+	ignore = _cairo_gl_context_release (ctx, CAIRO_STATUS_SUCCESS);
     }
 
     free (gradient);

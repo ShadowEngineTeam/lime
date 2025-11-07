@@ -149,19 +149,6 @@ class WindowsPlatform extends PlatformTarget
 		{
 			targetType = "hl";
 			is64 = !project.flags.exists("32") && !project.flags.exists("x86_32");
-			var hlVer = project.haxedefs.get("hl-ver");
-			if (hlVer == null)
-			{
-				var hlPath = project.defines.get("HL_PATH");
-				if (hlPath == null)
-				{
-					// Haxe's default target version for HashLink may be
-					// different (newer even) than the build of HashLink that
-					// is bundled with Lime. if using Lime's bundled HashLink,
-					// set hl-ver to the correct version
-					project.haxedefs.set("hl-ver", HashlinkHelper.BUNDLED_HL_VER);
-				}
-			}
 		}
 		else if (project.targetFlags.exists("cppia"))
 		{
@@ -312,7 +299,7 @@ class WindowsPlatform extends PlatformTarget
 				if (StringTools.endsWith(dependency.path, ".dll"))
 				{
 					var fileName = Path.withoutDirectory(dependency.path);
-					System.copyIfNewer(dependency.path, applicationDirectory + "/" + fileName);
+					copyIfNewer(dependency.path, applicationDirectory + "/" + fileName);
 				}
 			}
 
@@ -403,7 +390,7 @@ class WindowsPlatform extends PlatformTarget
 						var visualStudioPath = StringTools.trim(vswhereOutput);
 						var vcvarsallPath = visualStudioPath + "\\VC\\Auxiliary\\Build\\vcvarsall.bat";
 						// this command sets up the environment variables and things that visual studio requires
-						var vcvarsallCommand = [vcvarsallPath, "x64"].map(function(arg:String):String { return ~/([&|\(\)<>\^ ])/g.replace(arg, "^$1"); });
+						var vcvarsallCommand = [vcvarsallPath, "x64"].map(arg -> ~/([&|\(\)<>\^ ])/g.replace(arg, "^$1"));
 						// this command runs the cl.exe c compiler from visual studio
 						var clCommand = ["cl.exe", "/Ox", "/Fe:" + executablePath, "-I", Path.combine(targetDirectory, "obj"), Path.combine(targetDirectory, "obj/ApplicationMain.c")];
 						for (file in System.readDirectory(applicationDirectory))
@@ -418,7 +405,7 @@ class WindowsPlatform extends PlatformTarget
 						}
 						clCommand.push("/link");
 						clCommand.push("/subsystem:windows");
-						clCommand = clCommand.map(function(arg:String):String { return ~/([&|\(\)<>\^ ])/g.replace(arg, "^$1"); });
+						clCommand = clCommand.map(arg -> ~/([&|\(\)<>\^ ])/g.replace(arg, "^$1"));
 						// combine both commands into one
 						command = ["cmd.exe", "/s", "/c", vcvarsallCommand.join(" ") + " && " + clCommand.join(" ")];
 					}
@@ -509,8 +496,8 @@ class WindowsPlatform extends PlatformTarget
 			}
 			else if (targetType == "winrt")
 			{
-				var haxeArgs:Array<String> = [hxml];
-				var flags:Array<String> = [];
+				var haxeArgs = [hxml];
+				var flags = [];
 
 				haxeArgs.push("-D");
 				haxeArgs.push("winrt");
@@ -638,18 +625,13 @@ class WindowsPlatform extends PlatformTarget
 
 					if (noOutput) return;
 
+					IconHelper.createWindowsIcon(icons, Path.combine(targetDirectory + "/obj", "ApplicationMain.ico"));
+
 					CPPHelper.compile(project, targetDirectory + "/obj", flags.concat(["-Dstatic_link"]));
+
 					CPPHelper.compile(project, targetDirectory + "/obj", flags, "BuildMain.xml");
 
 					System.copyFile(targetDirectory + "/obj/Main" + (project.debug ? "-debug" : "") + ".exe", executablePath);
-				}
-
-				var iconPath = Path.combine(applicationDirectory, "icon.ico");
-
-				if (IconHelper.createWindowsIcon(icons, iconPath) && System.hostPlatform == WINDOWS)
-				{
-					var templates = [Haxelib.getPath(new Haxelib(#if lime "lime" #else "hxp" #end)) + "/templates"].concat(project.templatePaths);
-					System.runCommand("", System.findTemplate(templates, "bin/ReplaceVistaIcon.exe"), [executablePath, iconPath, "1"], true, true);
 				}
 			}
 		}
@@ -796,7 +778,7 @@ class WindowsPlatform extends PlatformTarget
 
 			// }
 
-			var commands:Array<Array<String>> = [];
+			var commands = [];
 			if (targetType == "hl")
 			{
 				// default to 64 bit, just like upstream Hashlink releases
@@ -979,7 +961,7 @@ class WindowsPlatform extends PlatformTarget
 		{
 			winrtRun(arguments);
 		}
-		else if (project.target == cast System.hostPlatform)
+		else if (project.target == System.hostPlatform)
 		{
 			arguments = arguments.concat(["-livereload"]);
 			System.runCommand(applicationDirectory, Path.withoutDirectory(executablePath), arguments);
@@ -1001,11 +983,6 @@ class WindowsPlatform extends PlatformTarget
 		if (project.targetFlags.exists("xml"))
 		{
 			project.haxeflags.push("-xml " + targetDirectory + "/types.xml");
-		}
-
-		if (project.targetFlags.exists("json"))
-		{
-			project.haxeflags.push("--json " + targetDirectory + "/types.json");
 		}
 
 		for (asset in project.assets)
@@ -1124,7 +1101,7 @@ class WindowsPlatform extends PlatformTarget
 			}
 		}
 
-		var fontPath:String;
+		var fontPath;
 
 		for (asset in project.assets)
 		{
@@ -1157,11 +1134,6 @@ class WindowsPlatform extends PlatformTarget
 		if (project.targetFlags.exists("xml"))
 		{
 			project.haxeflags.push("-xml " + targetDirectory + "/types.xml");
-		}
-
-		if (project.targetFlags.exists("json"))
-		{
-			project.haxeflags.push("--json " + targetDirectory + "/types.json");
 		}
 
 		if (Log.verbose)
@@ -1225,7 +1197,7 @@ class WindowsPlatform extends PlatformTarget
 				var name = Path.withoutDirectory(dependency.path);
 
 				context.linkedLibraries.push("./js/lib/" + name);
-				System.copyIfNewer(dependency.path, Path.combine(destination, Path.combine("js/lib", name)));
+				copyIfNewer(dependency.path, Path.combine(destination, Path.combine("js/lib", name)));
 			}
 		}
 
@@ -1268,7 +1240,7 @@ class WindowsPlatform extends PlatformTarget
 			"source/uwp-project.jsproj",
 			"source/uwp-project_TemporaryKey.pfx"
 		];
-		var fullPath:String;
+		var fullPath;
 
 		for (path in renamePaths)
 		{

@@ -138,27 +138,14 @@ class LinuxPlatform extends PlatformTarget
 			}
 		}
 
-		if (project.targetFlags.exists("neko") || project.target != cast System.hostPlatform)
+		if (project.targetFlags.exists("neko"))
 		{
 			targetType = "neko";
 		}
-		else if (project.targetFlags.exists("hl"))
+		else if (project.targetFlags.exists("hl") || targetFlags.exists("hlc"))
 		{
 			targetType = "hl";
 			is64 = true;
-			var hlVer = project.haxedefs.get("hl-ver");
-			if (hlVer == null)
-			{
-				var hlPath = project.defines.get("HL_PATH");
-				if (hlPath == null)
-				{
-					// Haxe's default target version for HashLink may be
-					// different (newer even) than the build of HashLink that
-					// is bundled with Lime. if using Lime's bundled HashLink,
-					// set hl-ver to the correct version
-					project.haxedefs.set("hl-ver", HashlinkHelper.BUNDLED_HL_VER);
-				}
-			}
 		}
 		else if (project.targetFlags.exists("nodejs"))
 		{
@@ -287,8 +274,8 @@ class LinuxPlatform extends PlatformTarget
 		}
 		else
 		{
-			var haxeArgs:Array<String> = [hxml];
-			var flags:Array<String> = [];
+			var haxeArgs = [hxml];
+			var flags = [];
 
 			if (is64)
 			{
@@ -494,7 +481,7 @@ class LinuxPlatform extends PlatformTarget
 		{
 			System.runCommand(applicationDirectory, "java", ["-jar", project.app.file + ".jar"].concat(arguments));
 		}
-		else if (project.target == cast System.hostPlatform)
+		else if (project.target == System.hostPlatform)
 		{
 			arguments = arguments.concat(["-livereload"]);
 			System.runCommand(applicationDirectory, "./" + Path.withoutDirectory(executablePath), arguments);
@@ -522,11 +509,6 @@ class LinuxPlatform extends PlatformTarget
 		if (project.targetFlags.exists("xml"))
 		{
 			project.haxeflags.push("-xml " + targetDirectory + "/types.xml");
-		}
-
-		if (project.targetFlags.exists("json"))
-		{
-			project.haxeflags.push("--json " + targetDirectory + "/types.json");
 		}
 
 		var context = generateContext();

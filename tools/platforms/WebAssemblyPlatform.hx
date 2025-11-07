@@ -135,7 +135,7 @@ class WebAssemblyPlatform extends PlatformTarget
 
 		project.path(sdkPath);
 
-		System.runCommand("", Path.combine(sdkPath, "upstream/emscripten/emcc"), ["-c", targetDirectory + "/obj/Main.cpp", "-o", targetDirectory + "/obj/Main.o"], true, false, true);
+		System.runCommand("", "emcc", ["-c", targetDirectory + "/obj/Main.cpp", "-o", targetDirectory + "/obj/Main.o"], true, false, true);
 
 		args = ["Main.o"];
 
@@ -285,7 +285,7 @@ class WebAssemblyPlatform extends PlatformTarget
 
 		// args.push ("../bin/index.html");
 
-		System.runCommand(targetDirectory + "/obj", Path.combine(sdkPath, "upstream/emscripten/emcc"), args, true, false, true);
+		System.runCommand(targetDirectory + "/obj", "emcc", args, true, false, true);
 
 		if (FileSystem.exists(outputFile))
 		{
@@ -358,7 +358,12 @@ class WebAssemblyPlatform extends PlatformTarget
 	{
 		var path = targetDirectory + "/haxe/" + buildType + ".hxml";
 
-		if (FileSystem.exists(path))
+		// try to use the existing .hxml file. however, if the project file was
+		// modified more recently than the .hxml, then the .hxml cannot be
+		// considered valid anymore. it may cause errors in editors like vscode.
+		if (FileSystem.exists(path)
+			&& (project.projectFilePath == null || !FileSystem.exists(project.projectFilePath)
+				|| (FileSystem.stat(path).mtime.getTime() > FileSystem.stat(project.projectFilePath).mtime.getTime())))
 		{
 			return File.getContent(path);
 		}
@@ -465,7 +470,7 @@ class WebAssemblyPlatform extends PlatformTarget
 					var name = Path.withoutDirectory(dependency.path);
 
 					context.linkedLibraries.push("./" + dependencyPath + "/" + name);
-					System.copyIfNewer(dependency.path, Path.combine(destination, Path.combine(dependencyPath, name)));
+					copyIfNewer(dependency.path, Path.combine(destination, Path.combine(dependencyPath, name)));
 				}
 			}
 		}

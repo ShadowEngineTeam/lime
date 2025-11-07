@@ -94,6 +94,11 @@ enum _cairo_int_status {
     CAIRO_INT_STATUS_INVALID_MESH_CONSTRUCTION,
     CAIRO_INT_STATUS_DEVICE_FINISHED,
     CAIRO_INT_STATUS_JBIG2_GLOBAL_MISSING,
+    CAIRO_INT_STATUS_PNG_ERROR,
+    CAIRO_INT_STATUS_FREETYPE_ERROR,
+    CAIRO_INT_STATUS_WIN32_GDI_ERROR,
+    CAIRO_INT_STATUS_TAG_ERROR,
+    CAIRO_INT_STATUS_DWRITE_ERROR,
 
     CAIRO_INT_STATUS_LAST_STATUS,
 
@@ -108,10 +113,10 @@ enum _cairo_int_status {
 typedef enum _cairo_int_status cairo_int_status_t;
 
 #define _cairo_status_is_error(status) \
-    (status != CAIRO_STATUS_SUCCESS && status < CAIRO_STATUS_LAST_STATUS)
+    ((status) != CAIRO_STATUS_SUCCESS && (status) < CAIRO_STATUS_LAST_STATUS)
 
 #define _cairo_int_status_is_error(status) \
-    (status != CAIRO_INT_STATUS_SUCCESS && status < CAIRO_INT_STATUS_LAST_STATUS)
+    ((status) != CAIRO_INT_STATUS_SUCCESS && (status) < CAIRO_INT_STATUS_LAST_STATUS)
 
 cairo_private cairo_status_t
 _cairo_error (cairo_status_t status);
