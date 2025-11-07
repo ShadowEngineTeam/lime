@@ -181,8 +181,9 @@ class IOSPlatform extends PlatformTarget
 		}
 
 		IOSHelper.getIOSVersion(project);
-
 		project.haxedefs.set("IPHONE_VER", project.environment.get("IPHONE_VER"));
+
+		project.haxedefs.set("HXCPP_CPP20", "1");
 
 		if (project.config.getString("ios.compiler") == "llvm" || project.config.getString("ios.compiler", "clang") == "clang")
 		{
@@ -485,6 +486,10 @@ class IOSPlatform extends PlatformTarget
 		}
 
 		context.IOS_INFO_PLIST_CHILDREN = project.config.get("ios.info-plist-children");
+
+		context.CATEGORY_TYPE = project.config.getString("ios.category_type", "public.app-category.entertainment");
+
+		context.SHARE_FILES = project.haxedefs.exists("SHARE_MOBILE_FILES");
 
 		return context;
 	}
@@ -904,7 +909,7 @@ class IOSPlatform extends PlatformTarget
 						fileName = "lib" + fileName;
 					}
 
-					System.copyIfNewer(dependency.path, projectDirectory + "/lib/" + arch + "/" + fileName);
+					copyIfNewer(dependency.path, projectDirectory + "/lib/" + arch + "/" + fileName);
 				}
 			}
 		}

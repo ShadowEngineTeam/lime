@@ -6,6 +6,7 @@
 #include <efsw/Watcher.hpp>
 #include <efsw/Thread.hpp>
 #include <efsw/Mutex.hpp>
+#include <efsw/Atomic.hpp>
 
 namespace efsw {
 
@@ -45,7 +46,7 @@ class FileWatcherImpl
 		virtual bool pathInWatches( const std::string& path ) = 0;
 
 		FileWatcher *	mFileWatcher;
-		bool			mInitOK;
+		Atomic<bool>	mInitOK;
 		bool			mIsGeneric;
 };
 

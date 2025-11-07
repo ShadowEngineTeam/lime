@@ -1,7 +1,235 @@
-xxxx-yy-zz v1.4.0 "Changes for next release"
-  vpxenc is changed to use VP9 by default.
-  Encoder controls added for 1 pass SVC.
-  Decoder control to toggle on/off loopfilter.
+2021-09-27 v1.11.0 "Smew Duck"
+  This maintenance release adds support for VBR mode in VP9 rate control
+  interface, new codec controls to get quantization parameters and loop filter
+  levels, and includes several improvements to NEON and numerous bug fixes.
+
+  - Upgrading:
+    New codec control is added to get quantization parameters and loop filter
+    levels.
+
+    VBR mode is supported in VP9 rate control library.
+
+  - Enhancement:
+    Numerous improvements for Neon optimizations.
+    Code clean-up and refactoring.
+    Calculation of rd multiplier is changed with BDRATE gains.
+
+  - Bug fixes:
+    Fix to overflow on duration.
+    Fix to several instances of -Wunused-but-set-variable.
+    Fix to avoid chroma resampling for 420mpeg2 input.
+    Fix to overflow in calc_iframe_target_size.
+    Fix to disallow skipping transform and quantization.
+    Fix some -Wsign-compare warnings in simple_encode.
+    Fix input file path in simple_encode_test.
+    Fix valid range for under/over_shoot pct.
+
+2021-03-09 v1.10.0 "Ruddy Duck"
+  This maintenance release adds support for darwin20 and new codec controls, as
+  well as numerous bug fixes.
+
+  - Upgrading:
+    New codec control is added to disable loopfilter for VP9.
+
+    New encoder control is added to disable feature to increase Q on overshoot
+    detection for CBR.
+
+    Configure support for darwin20 is added.
+
+    New codec control is added for VP9 rate control. The control ID of this
+    interface is VP9E_SET_EXTERNAL_RATE_CONTROL. To make VP9 use a customized
+    external rate control model, users will have to implement each callback
+    function in vpx_rc_funcs_t and register them using libvpx API
+    vpx_codec_control_() with the control ID.
+
+  - Enhancement:
+    Use -std=gnu++11 instead of -std=c++11 for c++ files.
+
+  - Bug fixes:
+    Override assembler with --as option of configure for MSVS.
+    Fix several compilation issues with gcc 4.8.5.
+    Fix to resetting rate control for temporal layers.
+    Fix to the rate control stats of SVC example encoder when number of spatial
+    layers is 1.
+    Fix to reusing motion vectors from the base spatial layer in SVC.
+    2 pass related flags removed from SVC example encoder.
+
+2020-07-29 v1.9.0 "Quacking Duck"
+  This release adds support for NV12, a separate library for rate control, as
+  well as incremental improvements.
+
+  - Upgrading:
+    NV12 support is added to this release.
+    A new interface is added for VP9 rate control. The new library libvp9rc.a
+    must be linked by applications.
+    Googletest is updated to v1.10.0.
+    simple_encode.cc is compiled into a new library libsimple_encode.a with
+    CONFIG_RATE_CTRL.
+
+  - Enhancement:
+    Various changes to improve VP9 SVC, rate control, quality and speed to real
+    time encoding.
+
+  - Bug fixes:
+    Fix key frame update refresh simulcast flexible svc.
+    Fix to disable_16x16part speed feature for real time encoding.
+    Fix some signed integer overflows for VP9 rate control.
+    Fix initialization of delta_q_uv.
+    Fix condition in regulate_q for cyclic refresh.
+    Various fixes to dynamic resizing for VP9 SVC.
+
+2019-12-09 v1.8.2 "Pekin Duck"
+  This release collects incremental improvements to many aspects of the library.
+
+  - Upgrading:
+    ARCH_* defines have been removed in favor of VPX_ARCH_*.
+
+2019-07-15 v1.8.1 "Orpington Duck"
+  This release collects incremental improvements to many aspects of the library.
+
+  - Upgrading:
+    VP8E_SET_CPUUSED now accepts values up to 9 for vp9.
+    VPX_CTRL_VP9E_SET_MAX_INTER_BITRATE_PCT had a spelling fix (was VP8E).
+    The --sdk-path option has been removed. If you were using it to build for
+      Android please read build/make/Android.mk for alternatives.
+    All PPC optimizations have been disabled:
+      https://bugs.chromium.org/p/webm/issues/detail?id=1522.
+
+  - Enhancements:
+    Various changes to improve encoder rate control, quality and speed
+      for practically every use case.
+
+  - Bug fixes:
+    vp9-rtc: Fix color artifacts for speed >= 8.
+
+2019-01-31 v1.8.0 "Northern Shoveler Duck"
+  This release focused on encoding performance for realtime and VOD use cases.
+
+  - Upgrading:
+    This adds and improves several vp9 controls. Most are related to SVC:
+      VP9E_SET_SVC_FRAME_DROP_LAYER:
+        - Frame dropping in SVC.
+      VP9E_SET_SVC_INTER_LAYER_PRED:
+        - Inter-layer prediction in SVC.
+      VP9E_SET_SVC_GF_TEMPORAL_REF:
+        - Enable long term temporal reference in SVC.
+      VP9E_SET_SVC_REF_FRAME_CONFIG/VP9E_GET_SVC_REF_FRAME_CONFIG:
+        - Extend and improve this control for better flexibility in setting SVC
+          pattern dynamically.
+      VP9E_SET_POSTENCODE_DROP:
+        - Allow for post-encode frame dropping (applies to non-SVC too).
+      VP9E_SET_SVC_SPATIAL_LAYER_SYNC:
+        - Enable spatial layer sync frames.
+      VP9E_SET_SVC_LAYER_ID:
+        - Extend api to specify temporal id for each spatial layers.
+      VP9E_SET_ROI_MAP:
+        - Extend Region of Interest functionality to VP9.
+
+  - Enhancements:
+    2 pass vp9 encoding has improved substantially. When using --auto-alt-ref=6,
+    we see approximately 8% for VBR and 10% for CQ. When using --auto-alt-ref=1,
+    the gains are approximately 4% for VBR and 5% for CQ.
+
+    For real-time encoding, speed 7 has improved by ~5-10%. Encodes targeted at
+    screen sharing have improved when the content changes significantly (slide
+    sharing) or scrolls. There is a new speed 9 setting for mobile devices which
+    is about 10-20% faster than speed 8.
+
+  - Bug fixes:
+    VP9 denoiser issue.
+    VP9 partition issue for 1080p.
+    VP9 rate control improvments.
+    Postprocessing Multi Frame Quality Enhancement (MFQE) issue.
+    VP8 multithread decoder issues.
+    A variety of fuzzing issues.
+
+2018-01-04 v1.7.0 "Mandarin Duck"
+  This release focused on high bit depth performance (10/12 bit) and vp9
+  encoding improvements.
+
+  - Upgrading:
+    This release is ABI incompatible due to new vp9 encoder features.
+
+    Frame parallel decoding for vp9 has been removed.
+
+  - Enhancements:
+    vp9 encoding supports additional threads with --row-mt. This can be greater
+    than the number of tiles.
+
+    Two new vp9 encoder options have been added:
+      --corpus-complexity
+      --tune-content=film
+
+    Additional tooling for respecting the vp9 "level" profiles has been added.
+
+  - Bug fixes:
+    A variety of fuzzing issues.
+    vp8 threading fix for ARM.
+    Codec control VP9_SET_SKIP_LOOP_FILTER fixed.
+    Reject invalid multi resolution configurations.
+
+2017-01-09 v1.6.1 "Long Tailed Duck"
+  This release improves upon the VP9 encoder and speeds up the encoding and
+  decoding processes.
+
+  - Upgrading:
+    This release is ABI compatible with 1.6.0.
+
+  - Enhancements:
+    Faster VP9 encoding and decoding.
+    High bit depth builds now provide similar speed for 8 bit encode and decode
+    for x86 targets. Other platforms and higher bit depth improvements are in
+    progress.
+
+  - Bug Fixes:
+    A variety of fuzzing issues.
+
+2016-07-20 v1.6.0 "Khaki Campbell Duck"
+  This release improves upon the VP9 encoder and speeds up the encoding and
+  decoding processes.
+
+  - Upgrading:
+    This release is ABI incompatible with 1.5.0 due to a new 'color_range' enum
+    in vpx_image and some minor changes to the VP8_COMP structure.
+
+    The default key frame interval for VP9 has changed from 128 to 9999.
+
+  - Enhancement:
+    A core focus has been performance for low end Intel processors. SSSE3
+    instructions such as 'pshufb' have been avoided and instructions have been
+    reordered to better accommodate the more constrained pipelines.
+
+    As a result, devices based on Celeron processors have seen substantial
+    decoding improvements. From Indian Runner Duck to Javan Whistling Duck,
+    decoding speed improved between 10 and 30%. Between Javan Whistling Duck
+    and Khaki Campbell Duck, it improved another 10 to 15%.
+
+    While Celeron benefited most, Core-i5 also improved 5% and 10% between the
+    respective releases.
+
+    Realtime performance for WebRTC for both speed and quality has received a
+    lot of attention.
+
+  - Bug Fixes:
+    A number of fuzzing issues, found variously by Mozilla, Chromium and others,
+    have been fixed and we strongly recommend updating.
+
+2015-11-09 v1.5.0 "Javan Whistling Duck"
+  This release improves upon the VP9 encoder and speeds up the encoding and
+  decoding processes.
+
+  - Upgrading:
+    This release is ABI incompatible with 1.4.0. It drops deprecated VP8
+    controls and adds a variety of VP9 controls for testing.
+
+    The vpxenc utility now prefers VP9 by default.
+
+  - Enhancements:
+    Faster VP9 encoding and decoding
+    Smaller library size by combining functions used by VP8 and VP9
+
+  - Bug Fixes:
+    A variety of fuzzing issues
 
 2015-04-03 v1.4.0 "Indian Runner Duck"
   This release includes significant improvements to the VP9 codec.
@@ -214,7 +442,7 @@ xxxx-yy-zz v1.4.0 "Changes for next release"
       of particular interest to real time streaming applications.
 
       Temporal scalability allows the encoder to produce a stream that can
-      be decimated to different frame rates, with independent rate targetting
+      be decimated to different frame rates, with independent rate targeting
       for each substream.
 
       Multiframe quality enhancement postprocessing can make visual quality

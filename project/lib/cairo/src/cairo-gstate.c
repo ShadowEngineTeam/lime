@@ -45,12 +45,6 @@
 #include "cairo-pattern-private.h"
 #include "cairo-traps-private.h"
 
-#if _XOPEN_SOURCE >= 600 || defined (_ISOC99_SOURCE)
-#define ISFINITE(x) isfinite (x)
-#else
-#define ISFINITE(x) ((x) * (x) >= 0.) /* check for NaNs */
-#endif
-
 static cairo_status_t
 _cairo_gstate_init_copy (cairo_gstate_t *gstate, cairo_gstate_t *other);
 
@@ -247,7 +241,7 @@ _cairo_gstate_save (cairo_gstate_t **gstate, cairo_gstate_t **freelist)
 
     top = *freelist;
     if (top == NULL) {
-	top = malloc (sizeof (cairo_gstate_t));
+	top = _cairo_malloc (sizeof (cairo_gstate_t));
 	if (unlikely (top == NULL))
 	    return _cairo_error (CAIRO_STATUS_NO_MEMORY);
     } else
@@ -476,7 +470,10 @@ _cairo_gstate_get_fill_rule (cairo_gstate_t *gstate)
 cairo_status_t
 _cairo_gstate_set_line_width (cairo_gstate_t *gstate, double width)
 {
-    gstate->stroke_style.line_width = width;
+    if (gstate->stroke_style.is_hairline)
+	gstate->stroke_style.pre_hairline_line_width = width;
+	else
+	gstate->stroke_style.line_width = width;
 
     return CAIRO_STATUS_SUCCESS;
 }
@@ -485,6 +482,29 @@ double
 _cairo_gstate_get_line_width (cairo_gstate_t *gstate)
 {
     return gstate->stroke_style.line_width;
+}
+
+cairo_status_t
+_cairo_gstate_set_hairline (cairo_gstate_t *gstate, cairo_bool_t set_hairline)
+{
+    if (gstate->stroke_style.is_hairline != set_hairline) {
+        gstate->stroke_style.is_hairline = set_hairline;
+
+        if (set_hairline) {
+            gstate->stroke_style.pre_hairline_line_width = gstate->stroke_style.line_width;
+            gstate->stroke_style.line_width = 0.0;
+        } else {
+            gstate->stroke_style.line_width = gstate->stroke_style.pre_hairline_line_width;
+        }
+    }
+
+    return CAIRO_STATUS_SUCCESS;
+}
+
+cairo_bool_t
+_cairo_gstate_get_hairline (cairo_gstate_t *gstate)
+{
+    return gstate->stroke_style.is_hairline;
 }
 
 cairo_status_t
@@ -943,9 +963,22 @@ _cairo_gstate_copy_transformed_pattern (cairo_gstate_t  *gstate,
 					const cairo_pattern_t *original,
 					const cairo_matrix_t  *ctm_inverse)
 {
+    /*
+     * What calculations below do can be described in pseudo-code (so using nonexistent fields) as (using column vectors):
+     * pattern->matrix = surface->device_transform *
+     * 			 pattern->matrix *
+     * 			 ctm_inverse *
+     * 			 gstate->target->device_transform_inverse
+     *
+     * The inverse of which is:
+     * pattern->matrix_inverse = gstate->target->device_transform *
+     * 				 ctm *
+     * 				 pattern->matrix_inverse *
+     * 				 surface->device_transform_inverse
+     */
+
     _cairo_gstate_copy_pattern (pattern, original);
 
-    /* apply device_transform first so that it is transformed by ctm_inverse */
     if (original->type == CAIRO_PATTERN_TYPE_SURFACE) {
 	cairo_surface_pattern_t *surface_pattern;
 	cairo_surface_t *surface;
@@ -1165,7 +1198,7 @@ _cairo_gstate_stroke (cairo_gstate_t *gstate, cairo_path_fixed_t *path)
     if (gstate->op == CAIRO_OPERATOR_DEST)
 	return CAIRO_STATUS_SUCCESS;
 
-    if (gstate->stroke_style.line_width <= 0.0)
+    if (gstate->stroke_style.line_width <= 0.0 && !gstate->stroke_style.is_hairline)
 	return CAIRO_STATUS_SUCCESS;
 
     if (_cairo_clip_is_all_clipped (gstate->clip))
@@ -1644,6 +1677,26 @@ _cairo_gstate_copy_clip_rectangle_list (cairo_gstate_t *gstate)
 	_cairo_clip_destroy (clip);
 
     return list;
+}
+
+cairo_status_t
+_cairo_gstate_tag_begin (cairo_gstate_t *gstate,
+			 const char *tag_name, const char *attributes)
+{
+    return _cairo_surface_tag (gstate->target,
+			       TRUE, /* begin */
+			       tag_name,
+			       attributes ? attributes : "");
+}
+
+cairo_status_t
+_cairo_gstate_tag_end (cairo_gstate_t *gstate,
+		       const char *tag_name)
+{
+    return _cairo_surface_tag (gstate->target,
+			       FALSE, /* begin */
+			       tag_name,
+			       NULL); /* attributes */
 }
 
 static void
@@ -2160,7 +2213,7 @@ _cairo_gstate_transform_glyphs_to_backend (cairo_gstate_t	*gstate,
 	  *num_transformed_glyphs = 0;
 	  return;
 	}
-	/* XXX We currently drop any glyphs that has its position outside
+	/* XXX We currently drop any glyphs that have their position outside
 	 * of the surface boundaries by a safety margin depending on the
 	 * font scale.  This however can fail in extreme cases where the
 	 * font has really long swashes for example...  We can correctly

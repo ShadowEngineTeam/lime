@@ -30,6 +30,7 @@ namespace lime {
 			static void GCExitBlocking ();
 			static void GCTryEnterBlocking ();
 			static void GCTryExitBlocking ();
+			static int GetTicks ();
 			static bool GetAllowScreenTimeout ();
 			static std::wstring* GetDeviceModel ();
 			static std::wstring* GetDeviceVendor ();
@@ -38,6 +39,12 @@ namespace lime {
 			#ifdef IPHONE
 			static std::wstring* GetIOSDirectory (SystemDirectory type);
 			static bool GetIOSTablet ();
+			#endif
+			#if defined(ANDROID) || defined (IPHONE)
+			static int GetFirstGyroscopeSensorId ();
+			static int GetFirstAccelerometerSensorId ();
+			#endif
+			#if defined (IPHONE)
 			static void showIOSAlert (const char* message, const char* title);
 			#endif
 			static int GetNumDisplays ();

@@ -141,10 +141,21 @@ struct _cairo_scaled_glyph {
     cairo_image_surface_t   *surface;		/* device-space image */
     cairo_path_fixed_t	    *path;		/* device-space outline */
     cairo_surface_t         *recording_surface;	/* device-space recording-surface */
+    cairo_image_surface_t   *color_surface;	/* device-space color image */
 
     const void		   *dev_private_key;
     void		   *dev_private;
     cairo_list_t            dev_privates;
+
+    cairo_color_t           foreground_color;   /* only used for color glyphs */
+    /* TRUE if the color_surface required the foreground_color to render. */
+    unsigned                uses_foreground_color : 1;
+
+    /* TRUE if this is not a color glyph, FALSE if is a color glyph or unknown.  */
+    unsigned                not_color_glyph : 1;
+
+    /* TRUE if recording_surface is a color glyph */
+    unsigned                recording_is_color : 1;
 };
 
 struct _cairo_scaled_glyph_private {
@@ -177,6 +188,8 @@ _cairo_scaled_glyph_attach_private (cairo_scaled_glyph_t *scaled_glyph,
 				   void (*destroy) (cairo_scaled_glyph_private_t *,
 						    cairo_scaled_glyph_t *,
 						    cairo_scaled_font_t *));
+cairo_private cairo_bool_t
+_cairo_scaled_font_has_color_glyphs (cairo_scaled_font_t *scaled_font);
 
 CAIRO_END_DECLS
 

@@ -345,6 +345,11 @@ namespace lime {
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		#endif
 
+		NSLog(@"Message Box");
+		NSLog(@"Title: %@", @(title));
+		NSLog(@"Message: %@", @(message));
+		NSLog(@"Message Box End");
+
 		UIAlertController* alert = [UIAlertController alertControllerWithTitle:[NSString stringWithUTF8String:title] message:[NSString stringWithUTF8String:message] preferredStyle:UIAlertControllerStyleAlert];
 
 		UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {}];

@@ -3,9 +3,7 @@ package lime.utils;
 import haxe.ds.ObjectMap;
 import haxe.io.Bytes;
 import haxe.io.Path;
-#if macro
 import haxe.macro.Compiler;
-#end
 import haxe.Timer;
 import lime.app.Event;
 import lime.media.AudioBuffer;
@@ -67,7 +65,7 @@ class Preloader #if flash extends Sprite #end
 
 		onProgress.add(update);
 
-		#if (simulate_preloader && macro)
+		#if simulate_preloader
 		var preloadTime = Std.parseInt(Compiler.getDefine("simulate_preloader"));
 
 		if (preloadTime == 1)

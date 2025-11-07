@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2005-2012 Haxe Foundation
+ * Copyright (C)2005-2017 Haxe Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -91,7 +91,7 @@ field id_get, id_set;
 field id_add, id_radd, id_sub, id_rsub, id_mult, id_rmult, id_div, id_rdiv, id_mod, id_rmod;
 EXTERN field neko_id_module;
 
-#if defined (GC_LOG) && defined(NEKO_POSIX) 
+#if defined (GC_LOG) && defined(NEKO_POSIX)
 static void handle_signal( int signal ) {
 	// reset to default handler
 	struct sigaction act;
@@ -117,7 +117,6 @@ static void null_warn_proc( char *msg, int arg ) {
 }
 
 void neko_gc_init() {
-	GC_set_warn_proc((GC_warn_proc)(void*)null_warn_proc);
 #	ifndef NEKO_WINDOWS
 	// we can't set this on windows with old GC since
 	// it's already initialized through its own DllMain
@@ -131,6 +130,7 @@ void neko_gc_init() {
 #endif
 	GC_java_finalization = 1;
 	GC_init();
+	GC_set_warn_proc((GC_warn_proc)(void*)null_warn_proc);
 	GC_no_dls = 1;
 #ifdef LOW_MEM
 	GC_dont_expand = 1;
@@ -176,7 +176,9 @@ EXTERN value alloc_empty_string( unsigned int size ) {
 	if( size > max_string_size )
 		failure("max_string_size reached");
 	s = (vstring*)gc_alloc_private_big(size+sizeof(vstring));
-	s->t = VAL_STRING | (size << TAG_BITS);
+	if( s == NULL )
+		failure("out of memory");
+	s->t = VAL_STRING | (size << NEKO_TAG_BITS);
 	(&s->c)[size] = 0;
 	return (value)s;
 }
@@ -208,7 +210,8 @@ EXTERN value alloc_array( unsigned int n ) {
 	if( n > max_array_size )
 		failure("max_array_size reached");
 	v = (value)gc_alloc_big(sizeof(varray)+(n - 1)*sizeof(value));
-	v->t = VAL_ARRAY | (n << TAG_BITS);
+	if( v == NULL ) failure("out of memory");
+	v->t = VAL_ARRAY | (n << NEKO_TAG_BITS);
 	return v;
 }
 
@@ -222,7 +225,7 @@ EXTERN value alloc_abstract( vkind k, void *data ) {
 
 EXTERN value alloc_function( void *c_prim, unsigned int nargs, const char *name ) {
 	vfunction *v;
-	if( c_prim == NULL || (nargs < 0 && nargs != VAR_ARGS) )
+	if( c_prim == NULL || ((int)nargs < 0 && nargs != VAR_ARGS) )
 		failure("alloc_function");
 	v = (vfunction*)gc_alloc(sizeof(vfunction));
 	v->t = VAL_PRIMITIVE;
@@ -425,6 +428,16 @@ EXTERN void neko_global_free() {
 
 EXTERN void neko_set_stack_base( void *s ) {
 	// deprecated
+}
+
+EXTERN vkind kind_lookup( const char *name ) {
+	kind_list *l = *kind_names;
+	while( l != NULL ) {
+		if( strcmp(l->name,name) == 0 )
+			return l->k;
+		l = l->next;
+	}
+	return NULL;
 }
 
 EXTERN void kind_share( vkind *k, const char *name ) {

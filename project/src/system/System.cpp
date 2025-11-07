@@ -15,6 +15,7 @@
 
 namespace lime {
 
+
 	#ifdef LIME_HASHLINK
 	bool System::_isHL = (hl_nan () != 0);
 	#else

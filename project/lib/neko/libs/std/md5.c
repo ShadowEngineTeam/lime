@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2005-2012 Haxe Foundation
+ * Copyright (C)2005-2017 Haxe Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -383,7 +383,7 @@ static value make_sha1( value s, value p, value l ) {
 	if( pp < 0 || ll < 0 || pp + ll < 0 || pp + ll > val_strlen(s) )
 		neko_error();
 	sha1_init(&ctx);
-	sha1_update(&ctx,(unsigned char*)val_string(l)+pp,ll);
+	sha1_update(&ctx,(unsigned char*)val_string(s)+pp,ll);
 	sha1_final(&ctx,result);
 	return copy_string( (char*)result, sizeof(SHA1_DIGEST) );
 }

@@ -1,3 +1,4 @@
+/* -*- Mode: c; tab-width: 8; c-basic-offset: 4; indent-tabs-mode: t; -*- */
 /* cairo - a vector graphics library with display and print output
  *
  * Copyright © 2006 Red Hat, Inc
@@ -33,7 +34,7 @@
  *	Adrian Johnson <ajohnson@redneon.com>
  */
 
-#define _BSD_SOURCE /* for snprintf(), strdup() */
+#define _DEFAULT_SOURCE /* for snprintf(), strdup() */
 #include "cairoint.h"
 
 #include "cairo-array-private.h"
@@ -354,6 +355,7 @@ cairo_type1_font_create_charstring (cairo_type1_font_t      *font,
 					 glyph_index,
 					 CAIRO_SCALED_GLYPH_INFO_METRICS|
 					 CAIRO_SCALED_GLYPH_INFO_PATH,
+					 NULL, /* foreground color */
 					 &scaled_glyph);
 
     /* It is ok for the .notdef glyph to not have a path available. We
@@ -363,6 +365,7 @@ cairo_type1_font_create_charstring (cairo_type1_font_t      *font,
 	status = _cairo_scaled_glyph_lookup (font->type1_scaled_font,
 					     glyph_index,
 					     CAIRO_SCALED_GLYPH_INFO_METRICS,
+                                             NULL, /* foreground color */
 					     &scaled_glyph);
     }
     if (unlikely (status))
@@ -760,7 +763,7 @@ _cairo_type1_fallback_init_internal (cairo_type1_subset_t	*type1_subset,
 
     length = font->header_size + font->data_size +
 	font->trailer_size;
-    type1_subset->data = malloc (length);
+    type1_subset->data = _cairo_malloc (length);
     if (unlikely (type1_subset->data == NULL)) {
         status = _cairo_error (CAIRO_STATUS_NO_MEMORY);
 	goto fail3;

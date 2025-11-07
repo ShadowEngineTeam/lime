@@ -96,19 +96,20 @@ class ProjectHelper
 		}
 	}
 
-	public static function recursiveSmartCopyDirectory(project:HXProject, source:String, destination:String, context:Dynamic = null, process:Bool = true, warnIfNotFound:Bool = true, itemPath:String = '')
+	public static function recursiveSmartCopyDirectory(project:HXProject, source:String, destination:String, context:Dynamic = null, process:Bool = true,
+			warnIfNotFound:Bool = true, itemPath:String = '')
 	{
 		if (!FileSystem.exists(source))
 		{
-			if (warnIfNotFound) Log.warn("Could not find directory: " + source);
+			if (warnIfNotFound)	Log.warn("Could not find directory: " + source);
 			return;
 		}
 
 		for (item in FileSystem.readDirectory(source))
 		{
-			var nextItemPath = Path.combine(itemPath, item);
-			var itemSource = Path.combine(source, item);
-			var itemDestination = Path.combine(destination, item);
+      var nextItemPath = Path.combine(itemPath, item);
+      var itemSource = Path.combine(source, item);
+      var itemDestination = Path.combine(destination, item);
 
 			if (FileSystem.isDirectory(itemSource))
 			{
@@ -116,7 +117,7 @@ class ProjectHelper
 			}
 			else
 			{
-				FileSystem.createDirectory(Path.directory(itemDestination));
+		    FileSystem.createDirectory(Path.directory(itemDestination));
 				System.copyFile(itemSource, itemDestination, context, process);
 			}
 		}

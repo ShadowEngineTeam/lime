@@ -72,8 +72,6 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-#define XLIB_COORD_MAX 32767
-
 #define DEBUG 0
 
 #if DEBUG
@@ -188,12 +186,6 @@ _cairo_surface_is_xlib (cairo_surface_t *surface);
  */
 
 #define CAIRO_ASSUME_PIXMAP	20
-
-static const XTransform identity = { {
-    { 1 << 16, 0x00000, 0x00000 },
-    { 0x00000, 1 << 16, 0x00000 },
-    { 0x00000, 0x00000, 1 << 16 },
-} };
 
 static Visual *
 _visual_for_xrender_format(Screen *screen,
@@ -793,6 +785,7 @@ _get_image_surface (cairo_xlib_surface_t    *surface,
 
 	    _cairo_xlib_shm_surface_get_ximage (&image->base, &shm_image);
 
+	    XSync (display->display, False);
 	    old_handler = XSetErrorHandler (_noop_error_handler);
 	    success = XShmGetImage (display->display,
 				    surface->drawable,
@@ -807,12 +800,14 @@ _get_image_surface (cairo_xlib_surface_t    *surface,
 	    }
 
 	    cairo_surface_destroy (&image->base);
+	    image = NULL;
 	}
     }
 
     if (surface->use_pixmap == 0) {
 	cairo_xlib_error_func_t old_handler;
 
+	XSync (display->display, False);
 	old_handler = XSetErrorHandler (_noop_error_handler);
 
 	ximage = XGetImage (display->display,
@@ -989,7 +984,7 @@ _get_image_surface (cairo_xlib_surface_t    *surface,
 		in_pixel = XGetPixel (ximage, x, y);
 		if (visual_info == NULL) {
 		    out_pixel = (
-			_field_to_8 (in_pixel & a_mask, a_width, a_shift) << 24 |
+			(uint32_t)_field_to_8 (in_pixel & a_mask, a_width, a_shift) << 24 |
 			_field_to_8_undither (in_pixel & r_mask, r_width, r_shift, dither_adjustment) << 16 |
 			_field_to_8_undither (in_pixel & g_mask, g_width, g_shift, dither_adjustment) << 8 |
 			_field_to_8_undither (in_pixel & b_mask, b_width, b_shift, dither_adjustment));
@@ -1011,7 +1006,8 @@ _get_image_surface (cairo_xlib_surface_t    *surface,
     cairo_device_release (&display->base);
 
     if (unlikely (status)) {
-	cairo_surface_destroy (&image->base);
+	if (image)
+	    cairo_surface_destroy (&image->base);
 	return _cairo_surface_create_in_error (status);
     }
 
@@ -1768,7 +1764,7 @@ found:
 	;
     }
 
-    surface = malloc (sizeof (cairo_xlib_surface_t));
+    surface = _cairo_malloc (sizeof (cairo_xlib_surface_t));
     if (unlikely (surface == NULL))
 	return _cairo_surface_create_in_error (_cairo_error (CAIRO_STATUS_NO_MEMORY));
 
@@ -1888,7 +1884,7 @@ static cairo_bool_t valid_size (int width, int height)
     /* Note: the minimum surface size allowed in the X protocol is 1x1.
      * However, as we historically did not check the minimum size we
      * allowed applications to lie and set the correct size later (one hopes).
-     * To preserve compatability we must allow applications to use
+     * To preserve compatibility we must allow applications to use
      * 0x0 surfaces.
      */
     return (width  >= 0 && width  <= XLIB_COORD_MAX &&

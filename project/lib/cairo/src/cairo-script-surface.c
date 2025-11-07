@@ -262,8 +262,9 @@ _bitmap_next_id (struct _bitmap *b,
 	prev = &b->next;
 	b = b->next;
     } while (b != NULL);
+    assert (prev != NULL);
 
-    bb = malloc (sizeof (struct _bitmap));
+    bb = _cairo_malloc (sizeof (struct _bitmap));
     if (unlikely (bb == NULL))
 	return _cairo_error (CAIRO_STATUS_NO_MEMORY);
 
@@ -708,6 +709,24 @@ _emit_line_width (cairo_script_surface_t *surface,
 }
 
 static cairo_status_t
+_emit_hairline (cairo_script_surface_t *surface, cairo_bool_t set_hairline)
+{
+    assert (target_is_active (surface));
+
+    if (surface->cr.current_style.is_hairline == set_hairline)
+    {
+	return CAIRO_STATUS_SUCCESS;
+    }
+
+    surface->cr.current_style.is_hairline = set_hairline;
+
+    _cairo_output_stream_printf (to_context (surface)->stream, 
+					"%d set-hairline\n",
+					set_hairline);
+    return CAIRO_STATUS_SUCCESS;
+}
+
+static cairo_status_t
 _emit_line_cap (cairo_script_surface_t *surface,
 		cairo_line_cap_t line_cap)
 {
@@ -857,6 +876,10 @@ _emit_stroke_style (cairo_script_surface_t *surface,
     if (unlikely (status))
 	return status;
 
+    status = _emit_hairline (surface, style->is_hairline);
+    if (unlikely (status))
+	return status;
+
     status = _emit_dash (surface,
 			 style->dash, style->num_dashes, style->dash_offset,
 			 force);
@@ -870,6 +893,8 @@ static const char *
 _format_to_string (cairo_format_t format)
 {
     switch (format) {
+    case CAIRO_FORMAT_RGBA128F: return "RGBA128F";
+    case CAIRO_FORMAT_RGB96F: return "RGB96F";
     case CAIRO_FORMAT_ARGB32:  return "ARGB32";
     case CAIRO_FORMAT_RGB30:   return "RGB30";
     case CAIRO_FORMAT_RGB24:   return "RGB24";
@@ -1104,7 +1129,7 @@ attach_snapshot (cairo_script_context_t *ctx,
     if (! ctx->attach_snapshots)
 	return;
 
-    surface = malloc (sizeof (*surface));
+    surface = _cairo_malloc (sizeof (*surface));
     if (unlikely (surface == NULL))
 	return;
 
@@ -1202,7 +1227,8 @@ static cairo_status_t
 _write_image_surface (cairo_output_stream_t *output,
 		      const cairo_image_surface_t *image)
 {
-    int stride, row, width;
+    int row, width;
+    ptrdiff_t stride;
     uint8_t row_stack[CAIRO_STACK_BUFFER_SIZE];
     uint8_t *rowdata;
     uint8_t *data;
@@ -1254,7 +1280,7 @@ _write_image_surface (cairo_output_stream_t *output,
     }
 #else
     if (stride > ARRAY_LENGTH (row_stack)) {
-	rowdata = malloc (stride);
+	rowdata = _cairo_malloc (stride);
 	if (unlikely (rowdata == NULL))
 	    return _cairo_error (CAIRO_STATUS_NO_MEMORY);
     } else
@@ -1310,6 +1336,18 @@ _write_image_surface (cairo_output_stream_t *output,
 	    for (col = 0; col < width; col++)
 		dst[col] = bswap_32 (src[col]);
 	    _cairo_output_stream_write (output, rowdata, 4*width);
+	    data += stride;
+	}
+	break;
+    case CAIRO_FORMAT_RGB96F:
+	for (row = image->height; row--; ) {
+	    _cairo_output_stream_write (output, data, 12*width);
+	    data += stride;
+	}
+	break;
+    case CAIRO_FORMAT_RGBA128F:
+	for (row = image->height; row--; ) {
+	    _cairo_output_stream_write (output, data, 16*width);
 	    data += stride;
 	}
 	break;
@@ -1418,6 +1456,12 @@ _emit_image_surface (cairo_script_surface_t *surface,
 	case CAIRO_FORMAT_RGB30:
 	case CAIRO_FORMAT_ARGB32:
 	    len = clone->width * 4;
+	    break;
+	case CAIRO_FORMAT_RGB96F:
+	    len = clone->width * 12;
+	    break;
+	case CAIRO_FORMAT_RGBA128F:
+	    len = clone->width * 16;
 	    break;
 	case CAIRO_FORMAT_INVALID:
 	default:
@@ -1817,7 +1861,7 @@ _emit_path_boxes (cairo_script_surface_t *surface,
 {
     cairo_script_context_t *ctx = to_context (surface);
     cairo_path_fixed_iter_t iter;
-    cairo_status_t status;
+    cairo_status_t status = CAIRO_STATUS_SUCCESS;
     struct _cairo_boxes_chunk *chunk;
     cairo_boxes_t boxes;
     cairo_box_t box;
@@ -2177,7 +2221,7 @@ _cairo_script_surface_finish (void *abstract_surface)
 		}
 		cairo_list_del (&surface->operand.link);
 	    } else {
-		struct deferred_finish *link = malloc (sizeof (*link));
+		struct deferred_finish *link = _cairo_malloc (sizeof (*link));
 		if (link == NULL) {
 		    status2 = _cairo_error (CAIRO_STATUS_NO_MEMORY);
 		    if (status == CAIRO_STATUS_SUCCESS)
@@ -2856,7 +2900,7 @@ _emit_type42_font (cairo_script_surface_t *surface,
     if (unlikely (status))
 	return status;
 
-    buf = malloc (size);
+    buf = _cairo_malloc (size);
     if (unlikely (buf == NULL))
 	return _cairo_error (CAIRO_STATUS_NO_MEMORY);
 
@@ -2912,7 +2956,7 @@ _emit_scaled_font_init (cairo_script_surface_t *surface,
     cairo_script_font_t *font_private;
     cairo_int_status_t status;
 
-    font_private = malloc (sizeof (cairo_script_font_t));
+    font_private = _cairo_malloc (sizeof (cairo_script_font_t));
     if (unlikely (font_private == NULL))
 	return _cairo_error (CAIRO_STATUS_NO_MEMORY);
 
@@ -3025,7 +3069,7 @@ _emit_scaled_glyph_vector (cairo_script_surface_t *surface,
 
     index = ++font_private->subset_glyph_index;
     scaled_glyph->dev_private_key = ctx;
-    scaled_glyph->dev_private = (void *) index;
+    scaled_glyph->dev_private = (void *)(uintptr_t)index;
 
     _cairo_output_stream_printf (ctx->stream,
 				 "%lu <<\n"
@@ -3073,7 +3117,7 @@ _emit_scaled_glyph_bitmap (cairo_script_surface_t *surface,
 
     index = ++font_private->subset_glyph_index;
     scaled_glyph->dev_private_key = ctx;
-    scaled_glyph->dev_private = (void *) index;
+    scaled_glyph->dev_private = (void *)(uintptr_t)index;
 
     _cairo_output_stream_printf (ctx->stream,
 				 "%lu <<\n"
@@ -3150,6 +3194,7 @@ _emit_scaled_glyphs (cairo_script_surface_t *surface,
 	status = _cairo_scaled_glyph_lookup (scaled_font,
 					     glyphs[n].index,
 					     CAIRO_SCALED_GLYPH_INFO_METRICS,
+                                             NULL, /* foreground color */
 					     &scaled_glyph);
 	if (unlikely (status))
 	    break;
@@ -3160,6 +3205,7 @@ _emit_scaled_glyphs (cairo_script_surface_t *surface,
 	status = _cairo_scaled_glyph_lookup (scaled_font,
 					     glyphs[n].index,
 					     CAIRO_SCALED_GLYPH_INFO_RECORDING_SURFACE,
+                                             NULL, /* foreground color */
 					     &scaled_glyph);
 	if (_cairo_status_is_error (status))
 	    break;
@@ -3185,6 +3231,7 @@ _emit_scaled_glyphs (cairo_script_surface_t *surface,
 	status = _cairo_scaled_glyph_lookup (scaled_font,
 					     glyphs[n].index,
 					     CAIRO_SCALED_GLYPH_INFO_SURFACE,
+                                             NULL, /* foreground color */
 					     &scaled_glyph);
 	if (_cairo_status_is_error (status))
 	    break;
@@ -3367,13 +3414,14 @@ _cairo_script_surface_show_text_glyphs (void			    *abstract_surface,
 	    status = _cairo_scaled_glyph_lookup (scaled_font,
 						 glyphs[n].index,
 						 CAIRO_SCALED_GLYPH_INFO_METRICS,
+						 NULL, /* foreground color */
 						 &scaled_glyph);
 	    if (unlikely (status)) {
 		_cairo_scaled_font_thaw_cache (scaled_font);
 		goto BAIL;
 	    }
 
-	    if ((long unsigned) scaled_glyph->dev_private > 256)
+	    if ((uintptr_t)scaled_glyph->dev_private > 256)
 		break;
 	}
     }
@@ -3390,6 +3438,7 @@ _cairo_script_surface_show_text_glyphs (void			    *abstract_surface,
 	status = _cairo_scaled_glyph_lookup (scaled_font,
 					     glyphs[n].index,
 					     CAIRO_SCALED_GLYPH_INFO_METRICS,
+                                             NULL, /* foreground color */
 					     &scaled_glyph);
 	if (unlikely (status)) {
 	    _cairo_scaled_font_thaw_cache (scaled_font);
@@ -3444,7 +3493,7 @@ _cairo_script_surface_show_text_glyphs (void			    *abstract_surface,
 	    if (font_private->has_sfnt)
 		c = glyphs[n].index;
 	    else
-		c = (uint8_t) (long unsigned) scaled_glyph->dev_private;
+		c = (uint8_t) (uintptr_t) scaled_glyph->dev_private;
 
 	    _cairo_output_stream_write (base85_stream, &c, 1);
 	} else {
@@ -3453,7 +3502,7 @@ _cairo_script_surface_show_text_glyphs (void			    *abstract_surface,
 					     glyphs[n].index);
 	    else
 		_cairo_output_stream_printf (ctx->stream, " %lu",
-					     (long unsigned) scaled_glyph->dev_private);
+					     (long unsigned) (uintptr_t)scaled_glyph->dev_private);
 	}
 
         dx = scaled_glyph->metrics.x_advance;
@@ -3642,7 +3691,7 @@ _cairo_script_surface_create_internal (cairo_script_context_t *ctx,
     if (unlikely (ctx == NULL))
 	return (cairo_script_surface_t *) _cairo_surface_create_in_error (_cairo_error (CAIRO_STATUS_NULL_POINTER));
 
-    surface = malloc (sizeof (cairo_script_surface_t));
+    surface = _cairo_malloc (sizeof (cairo_script_surface_t));
     if (unlikely (surface == NULL))
 	return (cairo_script_surface_t *) _cairo_surface_create_in_error (_cairo_error (CAIRO_STATUS_NO_MEMORY));
 
@@ -3691,7 +3740,7 @@ _cairo_script_context_create_internal (cairo_output_stream_t *stream)
 {
     cairo_script_context_t *ctx;
 
-    ctx = malloc (sizeof (cairo_script_context_t));
+    ctx = _cairo_malloc (sizeof (cairo_script_context_t));
     if (unlikely (ctx == NULL))
 	return _cairo_device_create_in_error (_cairo_error (CAIRO_STATUS_NO_MEMORY));
 
@@ -3803,7 +3852,7 @@ cairo_script_create_for_stream (cairo_write_func_t	 write_func,
  * cairo_script_write_comment:
  * @script: the script (output device)
  * @comment: the string to emit
- * @len:the length of the sting to write, or -1 to use strlen()
+ * @len:the length of the string to write, or -1 to use strlen()
  *
  * Emit a string verbatim into the script.
  *

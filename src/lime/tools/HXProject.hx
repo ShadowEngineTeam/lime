@@ -145,7 +145,7 @@ class HXProject extends Script
 			case FLASH, HTML5, FIREFOX, WEB_ASSEMBLY:
 				PlatformType.WEB;
 
-			case ANDROID, IOS, TVOS:
+			case ANDROID, BLACKBERRY, IOS, TIZEN, WEBOS, TVOS:
 				PlatformType.MOBILE;
 
 			case WINDOWS, MAC, LINUX, AIR:
@@ -212,6 +212,11 @@ class HXProject extends Script
 		samplePaths = new Array<String>();
 		splashScreens = new Array<SplashScreen>();
 		targetHandlers = new Map<String, String>();
+
+		config.set("android", { manifest:{}, application:{}, activity:{} });
+		config.get("android.manifest").xmlChildren = [];
+		config.get("android.application").xmlChildren = [];
+		config.get("android.activity").xmlChildren = [];
 
 		initializeDefines();
 	}
@@ -762,7 +767,7 @@ class HXProject extends Script
 			defines.set("uwp", "1");
 			defines.set("winjs", "1");
 		}
-		else if (platformType == DESKTOP && target != cast System.hostPlatform)
+		else if (platformType == DESKTOP && target != System.hostPlatform)
 		{
 			defines.set("native", "1");
 
@@ -776,13 +781,6 @@ class HXProject extends Script
 				defines.set("targetType", "cpp");
 				defines.set("cpp", "1");
 				defines.set("mingw", "1");
-			}
-			else
-			{
-				targetFlags.set("neko", "1");
-
-				defines.set("targetType", "neko");
-				defines.set("neko", "1");
 			}
 		}
 		else if (target == Platform.WEB_ASSEMBLY)
@@ -861,7 +859,7 @@ class HXProject extends Script
 		{
 			if (_target == null)
 			{
-				_target = cast System.hostPlatform;
+				_target = System.hostPlatform;
 			}
 
 			if (_targetFlags == null)
@@ -1072,7 +1070,7 @@ class HXProject extends Script
 	// Getters & Setters
 	private function get_host():Platform
 	{
-		return cast System.hostPlatform;
+		return System.hostPlatform;
 	}
 
 	private function get_templateContext():Dynamic

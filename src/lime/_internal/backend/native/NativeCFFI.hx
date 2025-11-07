@@ -159,7 +159,7 @@ class NativeCFFI
 
 	@:cffi private static function lime_font_render_glyphs(handle:Dynamic, indices:Dynamic, data:Dynamic):Dynamic;
 
-	@:cffi private static function lime_font_set_size(handle:Dynamic, size:Int):Void;
+	@:cffi private static function lime_font_set_size(handle:Dynamic, size:Int, dpi:Int):Void;
 
 	@:cffi private static function lime_gamepad_add_mappings(mappings:Dynamic):Void;
 
@@ -173,7 +173,7 @@ class NativeCFFI
 
 	@:cffi private static function lime_gzip_decompress(data:Dynamic, bytes:Dynamic):Dynamic;
 
-	@:cffi private static function lime_haptic_vibrate(period:Int, duration:Int):Void;
+	@:cffi private static function lime_haptic_vibrate(period:Int, duration:Int, amplitude:Float):Void;
 
 	@:cffi private static function lime_image_encode(data:Dynamic, type:Int, quality:Int, bytes:Dynamic):Dynamic;
 
@@ -223,8 +223,6 @@ class NativeCFFI
 
 	@:cffi private static function lime_joystick_get_num_hats(id:Int):Int;
 
-	@:cffi private static function lime_joystick_get_num_trackballs(id:Int):Int;
-
 	@:cffi private static function lime_joystick_event_manager_register(callback:Dynamic, eventObject:Dynamic):Void;
 
 	@:cffi private static function lime_jpeg_decode_bytes(data:Dynamic, decodeData:Bool, buffer:Dynamic):Dynamic;
@@ -255,6 +253,8 @@ class NativeCFFI
 
 	@:cffi private static function lime_sensor_event_manager_register(callback:Dynamic, eventObject:Dynamic):Void;
 
+	@:cffi private static function lime_sdl_get_ticks():Int;
+
 	@:cffi private static function lime_system_get_allow_screen_timeout():Bool;
 
 	@:cffi private static function lime_system_set_allow_screen_timeout(value:Bool):Bool;
@@ -276,6 +276,10 @@ class NativeCFFI
 	@:cffi private static function lime_system_get_num_displays():Int;
 
 	@:cffi private static function lime_system_get_device_orientation():Int;
+
+	@:cffi private static function lime_system_get_first_gyroscope_sensor_id():Int;
+
+	@:cffi private static function lime_system_get_first_accelerometer_sensor_id():Int;
 
 	@:cffi private static function lime_system_get_platform_label():Dynamic;
 
@@ -299,6 +303,8 @@ class NativeCFFI
 
 	@:cffi private static function lime_window_alert(handle:Dynamic, message:String, title:String):Void;
 
+	@:cffi private static function lime_window_set_vsync_mode(handle:Dynamic, mode:Int):Bool;
+
 	@:cffi private static function lime_window_close(handle:Dynamic):Void;
 
 	@:cffi private static function lime_window_context_flip(handle:Dynamic):Void;
@@ -312,6 +318,8 @@ class NativeCFFI
 	@:cffi private static function lime_window_create(application:Dynamic, width:Int, height:Int, flags:Int, title:String):Dynamic;
 
 	@:cffi private static function lime_window_focus(handle:Dynamic):Void;
+
+	@:cffi private static function lime_window_get_handle(handle:Dynamic):Float;
 
 	@:cffi private static function lime_window_get_context(handle:Dynamic):Float;
 
@@ -376,8 +384,6 @@ class NativeCFFI
 	@:cffi private static function lime_window_set_title(handle:Dynamic, title:String):Dynamic;
 
 	@:cffi private static function lime_window_set_visible(handle:Dynamic, visible:Bool):Bool;
-
-	@:cffi private static function lime_window_set_vsync(handle:Dynamic, vsync:Bool):Bool;
 
 	@:cffi private static function lime_window_warp_mouse(handle:Dynamic, x:Int, y:Int):Void;
 
@@ -475,7 +481,7 @@ class NativeCFFI
 		"lime_font_render_glyph", "oioo", false));
 	private static var lime_font_render_glyphs = new cpp.Callable<cpp.Object->cpp.Object->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime",
 		"lime_font_render_glyphs", "oooo", false));
-	private static var lime_font_set_size = new cpp.Callable<cpp.Object->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_font_set_size", "oiv", false));
+	private static var lime_font_set_size = new cpp.Callable<cpp.Object->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_font_set_size", "oiiv", false));
 	private static var lime_gamepad_add_mappings = new cpp.Callable<cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_gamepad_add_mappings", "ov",
 		false));
 	private static var lime_gamepad_get_device_guid = new cpp.Callable<Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_gamepad_get_device_guid", "io",
@@ -488,7 +494,7 @@ class NativeCFFI
 		false));
 	private static var lime_gzip_decompress = new cpp.Callable<cpp.Object->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_gzip_decompress", "ooo",
 		false));
-	private static var lime_haptic_vibrate = new cpp.Callable<Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_haptic_vibrate", "iiv", false));
+	private static var lime_haptic_vibrate = new cpp.Callable<Int->Int->Float->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_haptic_vibrate", "iidv", false));
 	private static var lime_image_encode = new cpp.Callable<cpp.Object->Int->Int->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_image_encode",
 		"oiioo", false));
 	private static var lime_image_load = new cpp.Callable<cpp.Object->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_image_load", "ooo", false));
@@ -529,8 +535,6 @@ class NativeCFFI
 	private static var lime_joystick_get_num_axes = new cpp.Callable<Int->Int>(cpp.Prime._loadPrime("lime", "lime_joystick_get_num_axes", "ii", false));
 	private static var lime_joystick_get_num_buttons = new cpp.Callable<Int->Int>(cpp.Prime._loadPrime("lime", "lime_joystick_get_num_buttons", "ii", false));
 	private static var lime_joystick_get_num_hats = new cpp.Callable<Int->Int>(cpp.Prime._loadPrime("lime", "lime_joystick_get_num_hats", "ii", false));
-	private static var lime_joystick_get_num_trackballs = new cpp.Callable<Int->Int>(cpp.Prime._loadPrime("lime", "lime_joystick_get_num_trackballs", "ii",
-		false));
 	private static var lime_joystick_event_manager_register = new cpp.Callable<cpp.Object->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime",
 		"lime_joystick_event_manager_register", "oov", false));
 	private static var lime_jpeg_decode_bytes = new cpp.Callable<cpp.Object->Bool->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime",
@@ -560,6 +564,7 @@ class NativeCFFI
 		"lime_render_event_manager_register", "oov", false));
 	private static var lime_sensor_event_manager_register = new cpp.Callable<cpp.Object->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime",
 		"lime_sensor_event_manager_register", "oov", false));
+	private static var lime_sdl_get_ticks = new cpp.Callable<Void->Int>(cpp.Prime._loadPrime("lime", "lime_sdl_get_ticks", "i", false));
 	private static var lime_system_get_allow_screen_timeout = new cpp.Callable<Void->Bool>(cpp.Prime._loadPrime("lime",
 		"lime_system_get_allow_screen_timeout", "b", false));
 	private static var lime_system_set_allow_screen_timeout = new cpp.Callable<Bool->Bool>(cpp.Prime._loadPrime("lime",
@@ -578,6 +583,8 @@ class NativeCFFI
 	private static var lime_system_get_ios_tablet = new cpp.Callable<Void->Bool>(cpp.Prime._loadPrime("lime", "lime_system_get_ios_tablet", "b", false));
 	private static var lime_system_get_num_displays = new cpp.Callable<Void->Int>(cpp.Prime._loadPrime("lime", "lime_system_get_num_displays", "i", false));
 	private static var lime_system_get_device_orientation = new cpp.Callable<Void->Int>(cpp.Prime._loadPrime("lime", "lime_system_get_device_orientation", "i", false));
+	private static var lime_system_get_first_gyroscope_sensor_id = new cpp.Callable<Void->Int>(cpp.Prime._loadPrime("lime", "lime_system_get_first_gyroscope_sensor_id", "i", false));
+	private static var lime_system_get_first_accelerometer_sensor_id = new cpp.Callable<Void->Int>(cpp.Prime._loadPrime("lime", "lime_system_get_first_accelerometer_sensor_id", "i", false));
 	private static var lime_system_get_platform_label = new cpp.Callable<Void->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_system_get_platform_label", "o",
 		false));
 	private static var lime_system_get_platform_name = new cpp.Callable<Void->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_system_get_platform_name", "o",
@@ -595,6 +602,8 @@ class NativeCFFI
 		"lime_touch_event_manager_register", "oov", false));
 	private static var lime_window_alert = new cpp.Callable<cpp.Object->String->String->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_window_alert", "ossv",
 		false));
+	private static var lime_window_set_vsync_mode = new cpp.Callable<cpp.Object->Int->Bool>(cpp.Prime._loadPrime("lime", "lime_window_set_vsync_mode", "oib",
+		false));
 	private static var lime_window_close = new cpp.Callable<cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_window_close", "ov", false));
 	private static var lime_window_context_flip = new cpp.Callable<cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_window_context_flip", "ov",
 		false));
@@ -607,6 +616,7 @@ class NativeCFFI
 	private static var lime_window_create = new cpp.Callable<cpp.Object->Int->Int->Int->String->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_window_create",
 		"oiiiso", false));
 	private static var lime_window_focus = new cpp.Callable<cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_window_focus", "ov", false));
+	private static var lime_window_get_handle = new cpp.Callable<cpp.Object->Float>(cpp.Prime._loadPrime("lime", "lime_window_get_handle", "od", false));
 	private static var lime_window_get_context = new cpp.Callable<cpp.Object->Float>(cpp.Prime._loadPrime("lime", "lime_window_get_context", "od", false));
 	private static var lime_window_get_context_type = new cpp.Callable<cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_window_get_context_type",
 		"oo", false));
@@ -660,8 +670,6 @@ class NativeCFFI
 	private static var lime_window_set_title = new cpp.Callable<cpp.Object->String->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_window_set_title", "oso",
 		false));
 	private static var lime_window_set_visible = new cpp.Callable<cpp.Object->Bool->Bool>(cpp.Prime._loadPrime("lime", "lime_window_set_visible", "obb",
-		false));
-	private static var lime_window_set_vsync = new cpp.Callable<cpp.Object->Bool->Bool>(cpp.Prime._loadPrime("lime", "lime_window_set_vsync", "obb",
 		false));
 	private static var lime_window_warp_mouse = new cpp.Callable<cpp.Object->Int->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_window_warp_mouse",
 		"oiiv", false));
@@ -726,14 +734,14 @@ class NativeCFFI
 	private static var lime_font_outline_decompose = CFFI.load("lime", "lime_font_outline_decompose", 2);
 	private static var lime_font_render_glyph = CFFI.load("lime", "lime_font_render_glyph", 3);
 	private static var lime_font_render_glyphs = CFFI.load("lime", "lime_font_render_glyphs", 3);
-	private static var lime_font_set_size = CFFI.load("lime", "lime_font_set_size", 2);
+	private static var lime_font_set_size = CFFI.load("lime", "lime_font_set_size", 3);
 	private static var lime_gamepad_add_mappings = CFFI.load("lime", "lime_gamepad_add_mappings", 1);
 	private static var lime_gamepad_get_device_guid = CFFI.load("lime", "lime_gamepad_get_device_guid", 1);
 	private static var lime_gamepad_get_device_name = CFFI.load("lime", "lime_gamepad_get_device_name", 1);
 	private static var lime_gamepad_event_manager_register = CFFI.load("lime", "lime_gamepad_event_manager_register", 2);
 	private static var lime_gzip_compress = CFFI.load("lime", "lime_gzip_compress", 2);
 	private static var lime_gzip_decompress = CFFI.load("lime", "lime_gzip_decompress", 2);
-	private static var lime_haptic_vibrate = CFFI.load("lime", "lime_haptic_vibrate", 2);
+	private static var lime_haptic_vibrate = CFFI.load("lime", "lime_haptic_vibrate", 3);
 	private static var lime_image_encode = CFFI.load("lime", "lime_image_encode", 4);
 	private static var lime_image_load = CFFI.load("lime", "lime_image_load", 2);
 	private static var lime_image_load_bytes = CFFI.load("lime", "lime_image_load_bytes", 2);
@@ -756,7 +764,6 @@ class NativeCFFI
 	private static var lime_joystick_get_num_axes = CFFI.load("lime", "lime_joystick_get_num_axes", 1);
 	private static var lime_joystick_get_num_buttons = CFFI.load("lime", "lime_joystick_get_num_buttons", 1);
 	private static var lime_joystick_get_num_hats = CFFI.load("lime", "lime_joystick_get_num_hats", 1);
-	private static var lime_joystick_get_num_trackballs = CFFI.load("lime", "lime_joystick_get_num_trackballs", 1);
 	private static var lime_joystick_event_manager_register = CFFI.load("lime", "lime_joystick_event_manager_register", 2);
 	private static var lime_jpeg_decode_bytes = CFFI.load("lime", "lime_jpeg_decode_bytes", 3);
 	private static var lime_jpeg_decode_file = CFFI.load("lime", "lime_jpeg_decode_file", 3);
@@ -772,6 +779,7 @@ class NativeCFFI
 	private static var lime_png_decode_file = CFFI.load("lime", "lime_png_decode_file", 3);
 	private static var lime_render_event_manager_register = CFFI.load("lime", "lime_render_event_manager_register", 2);
 	private static var lime_sensor_event_manager_register = CFFI.load("lime", "lime_sensor_event_manager_register", 2);
+	private static var lime_sdl_get_ticks = CFFI.load("lime", "lime_sdl_get_ticks", 0);
 	private static var lime_system_get_allow_screen_timeout = CFFI.load("lime", "lime_system_get_allow_screen_timeout", 0);
 	private static var lime_system_set_allow_screen_timeout = CFFI.load("lime", "lime_system_set_allow_screen_timeout", 1);
 	private static var lime_system_get_display_orientation = CFFI.load("lime", "lime_system_get_display_orientation", 1);
@@ -783,6 +791,8 @@ class NativeCFFI
 	private static var lime_system_get_ios_tablet = CFFI.load("lime", "lime_system_get_ios_tablet", 0);
 	private static var lime_system_get_num_displays = CFFI.load("lime", "lime_system_get_num_displays", 0);
 	private static var lime_system_get_device_orientation = CFFI.load("lime", "lime_system_get_device_orientation", 0);
+	private static var lime_system_get_first_gyroscope_sensor_id = CFFI.load("lime", "lime_system_get_first_gyroscope_sensor_id", 0);
+	private static var lime_system_get_first_accelerometer_sensor_id = CFFI.load("lime", "lime_system_get_first_accelerometer_sensor_id", 0);
 	private static var lime_system_get_platform_label = CFFI.load("lime", "lime_system_get_platform_label", 0);
 	private static var lime_system_get_platform_name = CFFI.load("lime", "lime_system_get_platform_name", 0);
 	private static var lime_system_get_platform_version = CFFI.load("lime", "lime_system_get_platform_version", 0);
@@ -794,6 +804,7 @@ class NativeCFFI
 	private static var lime_text_event_manager_register = CFFI.load("lime", "lime_text_event_manager_register", 2);
 	private static var lime_touch_event_manager_register = CFFI.load("lime", "lime_touch_event_manager_register", 2);
 	private static var lime_window_alert = CFFI.load("lime", "lime_window_alert", 3);
+	private static var lime_window_set_vsync_mode = CFFI.load("lime", "lime_window_set_vsync_mode", 2);
 	private static var lime_window_close = CFFI.load("lime", "lime_window_close", 1);
 	private static var lime_window_context_flip = CFFI.load("lime", "lime_window_context_flip", 1);
 	private static var lime_window_context_lock = CFFI.load("lime", "lime_window_context_lock", 1);
@@ -801,6 +812,7 @@ class NativeCFFI
 	private static var lime_window_context_unlock = CFFI.load("lime", "lime_window_context_unlock", 1);
 	private static var lime_window_create = CFFI.load("lime", "lime_window_create", 5);
 	private static var lime_window_focus = CFFI.load("lime", "lime_window_focus", 1);
+	private static var lime_window_get_handle = CFFI.load("lime", "lime_window_get_handle", 1);
 	private static var lime_window_get_context = CFFI.load("lime", "lime_window_get_context", 1);
 	private static var lime_window_get_context_type = CFFI.load("lime", "lime_window_get_context_type", 1);
 	private static var lime_window_get_display = CFFI.load("lime", "lime_window_get_display", 1);
@@ -833,7 +845,6 @@ class NativeCFFI
 	private static var lime_window_set_text_input_rect = CFFI.load("lime", "lime_window_set_text_input_rect", 2);
 	private static var lime_window_set_title = CFFI.load("lime", "lime_window_set_title", 2);
 	private static var lime_window_set_visible = CFFI.load("lime", "lime_window_set_visible", 2);
-	private static var lime_window_set_vsync = CFFI.load("lime", "lime_window_set_vsync", 2);
 	private static var lime_window_warp_mouse = CFFI.load("lime", "lime_window_warp_mouse", 3);
 	private static var lime_window_event_manager_register = CFFI.load("lime", "lime_window_event_manager_register", 2);
 	private static var lime_zlib_compress = CFFI.load("lime", "lime_zlib_compress", 2);
@@ -1055,7 +1066,7 @@ class NativeCFFI
 		return null;
 	}
 
-	@:hlNative("lime", "hl_font_set_size") private static function lime_font_set_size(handle:CFFIPointer, size:Int):Void {}
+	@:hlNative("lime", "hl_font_set_size") private static function lime_font_set_size(handle:CFFIPointer, size:Int, dpi:Int):Void {}
 
 	@:hlNative("lime", "hl_gamepad_add_mappings") private static function lime_gamepad_add_mappings(mappings:hl.NativeArray<String>):Void {}
 
@@ -1082,7 +1093,7 @@ class NativeCFFI
 		return null;
 	}
 
-	@:hlNative("lime", "hl_haptic_vibrate") private static function lime_haptic_vibrate(period:Int, duration:Int):Void {}
+	@:hlNative("lime", "hl_haptic_vibrate") private static function lime_haptic_vibrate(period:Int, duration:Int, amplitude:Float):Void {}
 
 	@:hlNative("lime", "hl_image_encode") private static function lime_image_encode(data:ImageBuffer, type:Int, quality:Int, bytes:Bytes):Bytes
 	{
@@ -1170,11 +1181,6 @@ class NativeCFFI
 		return 0;
 	}
 
-	@:hlNative("lime", "hl_joystick_get_num_trackballs") private static function lime_joystick_get_num_trackballs(id:Int):Int
-	{
-		return 0;
-	}
-
 	@:hlNative("lime", "hl_joystick_event_manager_register") private static function lime_joystick_event_manager_register(callback:Void->Void,
 		eventObject:JoystickEventInfo):Void {}
 
@@ -1235,6 +1241,11 @@ class NativeCFFI
 	@:hlNative("lime", "hl_sensor_event_manager_register") private static function lime_sensor_event_manager_register(callback:Void->Void,
 		eventObject:SensorEventInfo):Void {}
 
+	@:hlNative("lime", "hl_sdl_get_ticks") private static function lime_sdl_get_ticks():Int
+	{
+		return 0;
+	}
+
 	@:hlNative("lime", "hl_system_get_allow_screen_timeout") private static function lime_system_get_allow_screen_timeout():Bool
 	{
 		return false;
@@ -1290,6 +1301,16 @@ class NativeCFFI
 		return 0;
 	}
 
+	@:hlNative("lime", "hl_system_get_first_gyroscope_sensor_id") private static function lime_system_get_first_gyroscope_sensor_id():Int
+	{
+		return -1;
+	}
+
+	@:hlNative("lime", "hl_system_get_first_accelerometer_sensor_id") private static function lime_system_get_first_accelerometer_sensor_id():Int
+	{
+		return -1;
+	}
+
 	@:hlNative("lime", "hl_system_get_platform_label") private static function lime_system_get_platform_label():hl.Bytes
 	{
 		return null;
@@ -1333,6 +1354,8 @@ class NativeCFFI
 
 	@:hlNative("lime", "hl_window_alert") private static function lime_window_alert(handle:CFFIPointer, message:String, title:String):Void {}
 
+	@:hlNative("lime", "hl_window_set_vsync_mode") private static function lime_window_set_vsync_mode(handle:CFFIPointer, mode:Int):Bool {}
+
 	@:hlNative("lime", "hl_window_close") private static function lime_window_close(handle:CFFIPointer):Void {}
 
 	@:hlNative("lime", "hl_window_context_flip") private static function lime_window_context_flip(handle:CFFIPointer):Void {}
@@ -1353,6 +1376,11 @@ class NativeCFFI
 	}
 
 	@:hlNative("lime", "hl_window_focus") private static function lime_window_focus(handle:CFFIPointer):Void {}
+
+	@:hlNative("lime", "hl_window_get_handle") private static function lime_window_get_handle(handle:CFFIPointer):Float
+	{
+		return 0;
+	}
 
 	@:hlNative("lime", "hl_window_get_context") private static function lime_window_get_context(handle:CFFIPointer):Float
 	{
@@ -1471,11 +1499,6 @@ class NativeCFFI
 	}
 
 	@:hlNative("lime", "hl_window_set_visible") private static function lime_window_set_visible(handle:CFFIPointer, visible:Bool):Bool
-	{
-		return false;
-	}
-
-	@:hlNative("lime", "hl_window_set_vsync") private static function lime_window_set_vsync(handle:CFFIPointer, vsync:Bool):Bool
 	{
 		return false;
 	}
@@ -3190,7 +3213,7 @@ class NativeCFFI
 		return 0;
 	}
 
-	@:hlNative("lime", "hl_cairo_get_matrix") private static function lime_cairo_get_matrix(handle:CFFIPointer, out:Matrix3):Matrix3
+	@:hlNative("lime", "hl_cairo_get_matrix") private static function lime_cairo_get_matrix(handle:CFFIPointer, out:CairoMatrix3):CairoMatrix3
 	{
 		return null;
 	}
@@ -3307,7 +3330,7 @@ class NativeCFFI
 
 	@:hlNative("lime", "hl_cairo_set_line_width") private static function lime_cairo_set_line_width(handle:CFFIPointer, width:Float):Void {}
 
-	@:hlNative("lime", "hl_cairo_set_matrix") private static function lime_cairo_set_matrix(handle:CFFIPointer, matrix:Matrix3):Void {}
+	@:hlNative("lime", "hl_cairo_set_matrix") private static function lime_cairo_set_matrix(handle:CFFIPointer, matrix:CairoMatrix3):Void {}
 
 	@:hlNative("lime", "hl_cairo_set_miter_limit") private static function lime_cairo_set_miter_limit(handle:CFFIPointer, miterLimit:Float):Void {}
 
@@ -3345,7 +3368,7 @@ class NativeCFFI
 
 	@:hlNative("lime", "hl_cairo_text_path") private static function lime_cairo_text_path(handle:CFFIPointer, text:String):Void {}
 
-	@:hlNative("lime", "hl_cairo_transform") private static function lime_cairo_transform(handle:CFFIPointer, matrix:Matrix3):Void {}
+	@:hlNative("lime", "hl_cairo_transform") private static function lime_cairo_transform(handle:CFFIPointer, matrix:CairoMatrix3):Void {}
 
 	@:hlNative("lime", "hl_cairo_translate") private static function lime_cairo_translate(handle:CFFIPointer, x:Float, y:Float):Void {}
 
@@ -3491,7 +3514,7 @@ class NativeCFFI
 		return 0;
 	}
 
-	@:hlNative("lime", "hl_cairo_pattern_get_matrix") private static function lime_cairo_pattern_get_matrix(handle:CFFIPointer, out:Matrix3):Matrix3
+	@:hlNative("lime", "hl_cairo_pattern_get_matrix") private static function lime_cairo_pattern_get_matrix(handle:CFFIPointer, out:CairoMatrix3):CairoMatrix3
 	{
 		return null;
 	}
@@ -3500,7 +3523,7 @@ class NativeCFFI
 
 	@:hlNative("lime", "hl_cairo_pattern_set_filter") private static function lime_cairo_pattern_set_filter(handle:CFFIPointer, filter:Int):Void {}
 
-	@:hlNative("lime", "hl_cairo_pattern_set_matrix") private static function lime_cairo_pattern_set_matrix(handle:CFFIPointer, matrix:Matrix3):Void {}
+	@:hlNative("lime", "hl_cairo_pattern_set_matrix") private static function lime_cairo_pattern_set_matrix(handle:CFFIPointer, matrix:CairoMatrix3):Void {}
 
 	@:hlNative("lime", "hl_cairo_surface_flush") private static function lime_cairo_surface_flush(surface:CFFIPointer):Void {}
 	#end

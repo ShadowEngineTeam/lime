@@ -325,8 +325,11 @@ _cairo_default_context_set_source_surface (void *abstract_cr,
     _cairo_default_context_set_source (cr, (cairo_pattern_t *) &_cairo_pattern_black);
 
     pattern = cairo_pattern_create_for_surface (surface);
-    if (unlikely (pattern->status))
-	return pattern->status;
+    if (unlikely (pattern->status)) {
+        status = pattern->status;
+        cairo_pattern_destroy (pattern);
+        return status;
+    }
 
     cairo_matrix_init_translate (&matrix, -x, -y);
     cairo_pattern_set_matrix (pattern, &matrix);
@@ -398,6 +401,14 @@ _cairo_default_context_set_line_width (void *abstract_cr,
     cairo_default_context_t *cr = abstract_cr;
 
     return _cairo_gstate_set_line_width (cr->gstate, line_width);
+}
+
+static cairo_status_t
+_cairo_default_context_set_hairline (void *abstract_cr, cairo_bool_t set_hairline)
+{
+    cairo_default_context_t *cr = abstract_cr;
+
+    return _cairo_gstate_set_hairline (cr->gstate, set_hairline);
 }
 
 static cairo_status_t
@@ -474,6 +485,14 @@ _cairo_default_context_get_line_width (void *abstract_cr)
     return _cairo_gstate_get_line_width (cr->gstate);
 }
 
+static cairo_bool_t
+_cairo_default_context_get_hairline (void *abstract_cr)
+{
+    cairo_default_context_t *cr = abstract_cr;
+
+    return _cairo_gstate_get_hairline (cr->gstate);
+}
+
 static cairo_line_cap_t
 _cairo_default_context_get_line_cap (void *abstract_cr)
 {
@@ -523,7 +542,7 @@ _cairo_default_context_get_tolerance (void *abstract_cr)
 }
 
 
-/* Current tranformation matrix */
+/* Current transformation matrix */
 
 static cairo_status_t
 _cairo_default_context_translate (void *abstract_cr,
@@ -1156,6 +1175,24 @@ _cairo_default_context_copy_page (void *abstract_cr)
 }
 
 static cairo_status_t
+_cairo_default_context_tag_begin (void *abstract_cr,
+				  const char *tag_name, const char *attributes)
+{
+    cairo_default_context_t *cr = abstract_cr;
+
+    return _cairo_gstate_tag_begin (cr->gstate, tag_name, attributes);
+}
+
+static cairo_status_t
+_cairo_default_context_tag_end (void *abstract_cr,
+				const char *tag_name)
+{
+    cairo_default_context_t *cr = abstract_cr;
+
+    return _cairo_gstate_tag_end (cr->gstate, tag_name);
+}
+
+static cairo_status_t
 _cairo_default_context_show_page (void *abstract_cr)
 {
     cairo_default_context_t *cr = abstract_cr;
@@ -1344,6 +1381,7 @@ static const cairo_backend_t _cairo_default_context_backend = {
     _cairo_default_context_set_line_cap,
     _cairo_default_context_set_line_join,
     _cairo_default_context_set_line_width,
+    _cairo_default_context_set_hairline,
     _cairo_default_context_set_miter_limit,
     _cairo_default_context_set_opacity,
     _cairo_default_context_set_operator,
@@ -1354,6 +1392,7 @@ static const cairo_backend_t _cairo_default_context_backend = {
     _cairo_default_context_get_line_cap,
     _cairo_default_context_get_line_join,
     _cairo_default_context_get_line_width,
+    _cairo_default_context_get_hairline,
     _cairo_default_context_get_miter_limit,
     _cairo_default_context_get_opacity,
     _cairo_default_context_get_operator,
@@ -1437,6 +1476,9 @@ static const cairo_backend_t _cairo_default_context_backend = {
 
     _cairo_default_context_copy_page,
     _cairo_default_context_show_page,
+
+    _cairo_default_context_tag_begin,
+    _cairo_default_context_tag_end,
 };
 
 cairo_status_t
@@ -1460,7 +1502,7 @@ _cairo_default_context_create (void *target)
 
     cr = _freed_pool_get (&context_pool);
     if (unlikely (cr == NULL)) {
-	cr = malloc (sizeof (cairo_default_context_t));
+	cr = _cairo_malloc (sizeof (cairo_default_context_t));
 	if (unlikely (cr == NULL))
 	    return _cairo_create_in_error (_cairo_error (CAIRO_STATUS_NO_MEMORY));
     }

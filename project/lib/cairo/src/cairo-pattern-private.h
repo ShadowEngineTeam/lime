@@ -72,6 +72,7 @@ struct _cairo_pattern {
     cairo_filter_t		filter;
     cairo_extend_t		extend;
     cairo_bool_t		has_component_alpha;
+    cairo_bool_t		is_userfont_foreground;
 
     cairo_matrix_t		matrix;
     double			opacity;
@@ -256,6 +257,11 @@ _cairo_gradient_pattern_is_solid (const cairo_gradient_pattern_t *gradient,
 				  const cairo_rectangle_int_t *extents,
 				  cairo_color_t *color);
 
+cairo_private cairo_bool_t
+_cairo_pattern_is_constant_alpha (const cairo_pattern_t          *abstract_pattern,
+				  const cairo_rectangle_int_t    *extents,
+				  double                         *alpha);
+
 cairo_private void
 _cairo_gradient_pattern_fit_to_range (const cairo_gradient_pattern_t *gradient,
 				      double			      max_value,
@@ -296,21 +302,22 @@ _cairo_pattern_sampled_area (const cairo_pattern_t *pattern,
 
 cairo_private void
 _cairo_pattern_get_extents (const cairo_pattern_t	    *pattern,
-			    cairo_rectangle_int_t           *extents);
+			    cairo_rectangle_int_t           *extents,
+			    cairo_bool_t                   is_vector);
 
 cairo_private cairo_int_status_t
 _cairo_pattern_get_ink_extents (const cairo_pattern_t	    *pattern,
 				cairo_rectangle_int_t       *extents);
 
-cairo_private unsigned long
+cairo_private uintptr_t
 _cairo_pattern_hash (const cairo_pattern_t *pattern);
 
-cairo_private unsigned long
-_cairo_linear_pattern_hash (unsigned long hash,
+cairo_private uintptr_t
+_cairo_linear_pattern_hash (uintptr_t hash,
 			    const cairo_linear_pattern_t *linear);
 
-cairo_private unsigned long
-_cairo_radial_pattern_hash (unsigned long hash,
+cairo_private uintptr_t
+_cairo_radial_pattern_hash (uintptr_t hash,
 			    const cairo_radial_pattern_t *radial);
 
 cairo_private cairo_bool_t

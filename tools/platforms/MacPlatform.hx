@@ -122,26 +122,13 @@ class MacPlatform extends PlatformTarget
 			}
 		}
 
-		if (project.targetFlags.exists("neko") || project.target != cast System.hostPlatform)
+		if (project.targetFlags.exists("neko") || project.target != System.hostPlatform)
 		{
 			targetType = "neko";
 		}
 		else if (project.targetFlags.exists("hl") || project.targetFlags.exists("hlc"))
 		{
 			targetType = "hl";
-			var hlVer = project.haxedefs.get("hl-ver");
-			if (hlVer == null)
-			{
-				var hlPath = project.defines.get("HL_PATH");
-				if (hlPath == null)
-				{
-					// Haxe's default target version for HashLink may be
-					// different (newer even) than the build of HashLink that
-					// is bundled with Lime. if using Lime's bundled HashLink,
-					// set hl-ver to the correct version
-					project.haxedefs.set("hl-ver", HashlinkHelper.BUNDLED_HL_VER);
-				}
-			}
 		}
 		else if (project.targetFlags.exists("java"))
 		{
@@ -436,7 +423,7 @@ class MacPlatform extends PlatformTarget
 
 	public override function rebuild():Void
 	{
-		var commands:Array<Array<String>> = [];
+		var commands = [];
 
 		switch (System.hostArchitecture)
 		{
@@ -503,7 +490,7 @@ class MacPlatform extends PlatformTarget
 		{
 			System.runCommand(executableDirectory, "java", ["-jar", project.app.file + ".jar"].concat(arguments));
 		}
-		else if (project.target == cast System.hostPlatform)
+		else if (project.target == System.hostPlatform)
 		{
 			arguments = arguments.concat(["-livereload"]);
 			System.runCommand(executableDirectory, "./" + Path.withoutDirectory(executablePath), arguments);
@@ -519,11 +506,6 @@ class MacPlatform extends PlatformTarget
 		if (project.targetFlags.exists("xml"))
 		{
 			project.haxeflags.push("-xml " + targetDirectory + "/types.xml");
-		}
-
-		if (project.targetFlags.exists("json"))
-		{
-			project.haxeflags.push("--json " + targetDirectory + "/types.json");
 		}
 
 		for (asset in project.assets)
@@ -654,16 +636,6 @@ class MacPlatform extends PlatformTarget
 		var limeDirectory = Haxelib.getPath(new Haxelib("lime"), true);
 		var bindir = "Mac64";
 		var bundledHLDirectory = Path.combine(limeDirectory, 'templates/bin/hl/$bindir');
-		if (!FileSystem.exists(bundledHLDirectory))
-		{
-			Log.error('Directory does not exist: $bundledHLDirectory');
-			return;
-		}
-		if (!FileSystem.isDirectory(bundledHLDirectory))
-		{
-			Log.error('Not a directory: $bundledHLDirectory');
-			return;
-		}
 
 		// these are the known directories where Homebrew installs its dependencies
 		// we may need to add more in the future, but this seems to be enough for now
@@ -735,7 +707,7 @@ class MacPlatform extends PlatformTarget
 								continue;
 							}
 						}
-						if (Lambda.exists(homebrewDirs, function(dirPath:String):Bool { return StringTools.startsWith(resolvedLibPath, dirPath); }))
+						if (Lambda.exists(homebrewDirs, dirPath -> StringTools.startsWith(resolvedLibPath, dirPath)))
 						{
 							homebrewDependencyPaths.push(libPath);
 							pathsToSearchForHomebrewDependencies.push(resolvedLibPath);

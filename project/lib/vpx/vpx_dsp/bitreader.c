@@ -13,15 +13,13 @@
 
 #include "vpx_dsp/bitreader.h"
 #include "vpx_dsp/prob.h"
+#include "vpx_dsp/vpx_dsp_common.h"
 #include "vpx_ports/mem.h"
 #include "vpx_mem/vpx_mem.h"
 #include "vpx_util/endian_inl.h"
 
-int vpx_reader_init(vpx_reader *r,
-                    const uint8_t *buffer,
-                    size_t size,
-                    vpx_decrypt_cb decrypt_cb,
-                    void *decrypt_state) {
+int vpx_reader_init(vpx_reader *r, const uint8_t *buffer, size_t size,
+                    vpx_decrypt_cb decrypt_cb, void *decrypt_state) {
   if (size && !buffer) {
     return 1;
   } else {
@@ -48,27 +46,27 @@ void vpx_reader_fill(vpx_reader *r) {
   int shift = BD_VALUE_SIZE - CHAR_BIT - (count + CHAR_BIT);
 
   if (r->decrypt_cb) {
-    size_t n = MIN(sizeof(r->clear_buffer), bytes_left);
+    size_t n = VPXMIN(sizeof(r->clear_buffer), bytes_left);
     r->decrypt_cb(r->decrypt_state, buffer, r->clear_buffer, (int)n);
     buffer = r->clear_buffer;
     buffer_start = r->clear_buffer;
   }
   if (bits_left > BD_VALUE_SIZE) {
-      const int bits = (shift & 0xfffffff8) + CHAR_BIT;
-      BD_VALUE nv;
-      BD_VALUE big_endian_values;
-      memcpy(&big_endian_values, buffer, sizeof(BD_VALUE));
+    const int bits = (shift & 0xfffffff8) + CHAR_BIT;
+    BD_VALUE nv;
+    BD_VALUE big_endian_values;
+    memcpy(&big_endian_values, buffer, sizeof(BD_VALUE));
 #if SIZE_MAX == 0xffffffffffffffffULL
-        big_endian_values = HToBE64(big_endian_values);
+    big_endian_values = HToBE64(big_endian_values);
 #else
-        big_endian_values = HToBE32(big_endian_values);
+    big_endian_values = HToBE32(big_endian_values);
 #endif
-      nv = big_endian_values >> (BD_VALUE_SIZE - bits);
-      count += bits;
-      buffer += (bits >> 3);
-      value = r->value | (nv << (shift & 0x7));
+    nv = big_endian_values >> (BD_VALUE_SIZE - bits);
+    count += bits;
+    buffer += (bits >> 3);
+    value = r->value | (nv << (shift & 0x7));
   } else {
-    const int bits_over = (int)(shift + CHAR_BIT - bits_left);
+    const int bits_over = (int)(shift + CHAR_BIT - (int)bits_left);
     int loop_end = 0;
     if (bits_over >= 0) {
       count += LOTS_OF_BITS;

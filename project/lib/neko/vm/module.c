@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2005-2012 Haxe Foundation
+ * Copyright (C)2005-2017 Haxe Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -34,22 +34,9 @@ DEFINE_KIND(neko_kind_module);
 #ifdef NEKO_BSD
 #	include <sys/endian.h>
 #endif
-#ifndef LITTLE_ENDIAN
-#	define LITTLE_ENDIAN 1
-#endif
-#ifndef BIG_ENDIAN
-#	define BIG_ENDIAN 2
-#endif
-#ifdef NEKO_WINDOWS
-#	define BYTE_ORDER LITTLE_ENDIAN
-#endif
-#ifndef BYTE_ORDER
-#	warning BYTE_ORDER unknown, assuming BIG_ENDIAN
-#	define BYTE_ORDER BIG_ENDIAN
-#endif
 
 /* *_TO_LE(X) converts (X) to little endian. */
-#if BYTE_ORDER == LITTLE_ENDIAN
+#ifdef NEKO_LITTLE_ENDIAN
 #	define LONG_TO_LE(X) (X)
 #	define SHORT_TO_LE(X) (X)
 #else
@@ -98,7 +85,7 @@ extern value neko_alloc_module_function( void *m, int_val pos, int nargs );
 extern void neko_module_jit( neko_module *m );
 
 EXTERN int neko_is_big_endian() {
-#if BYTE_ORDER == LITTLE_ENDIAN
+#ifdef NEKO_LITTLE_ENDIAN
 	return 0;
 #else
 	return 1;
@@ -352,7 +339,7 @@ neko_module *neko_read_module( reader r, readp p, value loader ) {
 	READ_LONG(m->nglobals);
 	READ_LONG(m->nfields);
 	READ_LONG(m->codesize);
-	if( m->nglobals < 0 || m->nglobals > 0xFFFF || m->nfields < 0 || m->nfields > 0xFFFF || m->codesize < 0 || m->codesize > 0xFFFFFF )
+	if( (int)m->nglobals < 0 || m->nglobals > 0xFFFF || (int)m->nfields < 0 || m->nfields > 0xFFFF || (int)m->codesize < 0 || m->codesize > 0xFFFFFF )
 		ERROR();
 	tmp = (char*)malloc(sizeof(char)*(((m->codesize+1)>MAXSIZE)?(m->codesize+1):MAXSIZE));
 	m->jit = NULL;

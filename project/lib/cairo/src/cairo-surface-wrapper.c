@@ -81,9 +81,6 @@ _cairo_surface_wrapper_get_transform (cairo_surface_wrapper_t *wrapper,
 {
     cairo_matrix_init_identity (m);
 
-    if (wrapper->has_extents && (wrapper->extents.x || wrapper->extents.y))
-	cairo_matrix_translate (m, -wrapper->extents.x, -wrapper->extents.y);
-
     if (! _cairo_matrix_is_identity (&wrapper->transform))
 	cairo_matrix_multiply (m, &wrapper->transform, m);
 
@@ -109,9 +106,6 @@ _cairo_surface_wrapper_get_inverse_transform (cairo_surface_wrapper_t *wrapper,
 	assert (status == CAIRO_STATUS_SUCCESS);
 	cairo_matrix_multiply (m, &inv, m);
     }
-
-    if (wrapper->has_extents && (wrapper->extents.x || wrapper->extents.y))
-	cairo_matrix_translate (m, wrapper->extents.x, wrapper->extents.y);
 }
 
 static cairo_clip_t *
@@ -150,6 +144,9 @@ _cairo_surface_wrapper_paint (cairo_surface_wrapper_t *wrapper,
     if (_cairo_clip_is_all_clipped (dev_clip))
 	return CAIRO_INT_STATUS_NOTHING_TO_DO;
 
+    if (source->is_userfont_foreground && wrapper->foreground_source)
+        source = wrapper->foreground_source;
+
     if (wrapper->needs_transform) {
 	cairo_matrix_t m;
 
@@ -187,6 +184,9 @@ _cairo_surface_wrapper_mask (cairo_surface_wrapper_t *wrapper,
     dev_clip = _cairo_surface_wrapper_get_clip (wrapper, clip);
     if (_cairo_clip_is_all_clipped (dev_clip))
 	return CAIRO_INT_STATUS_NOTHING_TO_DO;
+
+    if (source->is_userfont_foreground && wrapper->foreground_source)
+        source = wrapper->foreground_source;
 
     if (wrapper->needs_transform) {
 	cairo_matrix_t m;
@@ -234,6 +234,9 @@ _cairo_surface_wrapper_stroke (cairo_surface_wrapper_t *wrapper,
     dev_clip = _cairo_surface_wrapper_get_clip (wrapper, clip);
     if (_cairo_clip_is_all_clipped (dev_clip))
 	return CAIRO_INT_STATUS_NOTHING_TO_DO;
+
+    if (source->is_userfont_foreground && wrapper->foreground_source)
+        source = wrapper->foreground_source;
 
     if (wrapper->needs_transform) {
 	cairo_matrix_t m;
@@ -303,6 +306,12 @@ _cairo_surface_wrapper_fill_stroke (cairo_surface_wrapper_t *wrapper,
     if (_cairo_clip_is_all_clipped (dev_clip))
 	return CAIRO_INT_STATUS_NOTHING_TO_DO;
 
+    if (fill_source->is_userfont_foreground && wrapper->foreground_source)
+        fill_source = wrapper->foreground_source;
+
+    if (stroke_source->is_userfont_foreground && wrapper->foreground_source)
+        stroke_source = wrapper->foreground_source;
+
     if (wrapper->needs_transform) {
 	cairo_matrix_t m;
 
@@ -368,6 +377,9 @@ _cairo_surface_wrapper_fill (cairo_surface_wrapper_t	*wrapper,
     if (_cairo_clip_is_all_clipped (dev_clip))
 	return CAIRO_INT_STATUS_NOTHING_TO_DO;
 
+    if (source->is_userfont_foreground && wrapper->foreground_source)
+        source = wrapper->foreground_source;
+
     if (wrapper->needs_transform) {
 	cairo_matrix_t m;
 
@@ -430,6 +442,9 @@ _cairo_surface_wrapper_show_text_glyphs (cairo_surface_wrapper_t *wrapper,
 
     cairo_surface_get_font_options (wrapper->target, &options);
     cairo_font_options_merge (&options, &scaled_font->options);
+
+    if (source->is_userfont_foreground && wrapper->foreground_source)
+        source = wrapper->foreground_source;
 
     if (wrapper->needs_transform) {
 	cairo_matrix_t m;
@@ -505,6 +520,19 @@ _cairo_surface_wrapper_show_text_glyphs (cairo_surface_wrapper_t *wrapper,
     if (dev_scaled_font != scaled_font)
 	cairo_scaled_font_destroy (dev_scaled_font);
     return status;
+}
+
+cairo_status_t
+_cairo_surface_wrapper_tag (cairo_surface_wrapper_t     *wrapper,
+			    cairo_bool_t                 begin,
+			    const char                  *tag_name,
+			    const char                  *attributes)
+{
+    if (unlikely (wrapper->target->status))
+	return wrapper->target->status;
+
+
+    return _cairo_surface_tag (wrapper->target, begin, tag_name, attributes);
 }
 
 cairo_surface_t *
@@ -585,6 +613,14 @@ _cairo_surface_wrapper_set_clip (cairo_surface_wrapper_t *wrapper,
 }
 
 void
+_cairo_surface_wrapper_set_foreground_color (cairo_surface_wrapper_t *wrapper,
+                                             const cairo_color_t *color)
+{
+    if (color)
+        wrapper->foreground_source = _cairo_pattern_create_solid (color);
+}
+
+void
 _cairo_surface_wrapper_get_font_options (cairo_surface_wrapper_t    *wrapper,
 					 cairo_font_options_t	    *options)
 {
@@ -615,6 +651,7 @@ _cairo_surface_wrapper_init (cairo_surface_wrapper_t *wrapper,
     wrapper->has_extents = FALSE;
     wrapper->extents.x = wrapper->extents.y = 0;
     wrapper->clip = NULL;
+    wrapper->foreground_source = NULL;
 
     wrapper->needs_transform = FALSE;
     if (target) {
@@ -626,17 +663,23 @@ _cairo_surface_wrapper_init (cairo_surface_wrapper_t *wrapper,
 void
 _cairo_surface_wrapper_fini (cairo_surface_wrapper_t *wrapper)
 {
+    if (wrapper->foreground_source)
+        cairo_pattern_destroy (wrapper->foreground_source);
+
     cairo_surface_destroy (wrapper->target);
 }
 
 cairo_bool_t
 _cairo_surface_wrapper_get_target_extents (cairo_surface_wrapper_t *wrapper,
+					   cairo_bool_t surface_is_unbounded,
 					   cairo_rectangle_int_t *extents)
 {
     cairo_rectangle_int_t clip;
-    cairo_bool_t has_clip;
+    cairo_bool_t has_clip = FALSE;
 
-    has_clip = _cairo_surface_get_extents (wrapper->target, &clip);
+    if (!surface_is_unbounded)
+	has_clip = _cairo_surface_get_extents (wrapper->target, &clip);
+
     if (wrapper->clip) {
 	if (has_clip) {
 	    if (! _cairo_rectangle_intersect (&clip,

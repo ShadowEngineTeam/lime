@@ -1,6 +1,5 @@
 package;
 
-#if macro
 import haxe.macro.Compiler;
 
 class AliasScript
@@ -11,9 +10,3 @@ class AliasScript
 		Sys.exit(Sys.command("haxelib", args));
 	}
 }
-#else
-class AliasScript
-{
-	public static function main() {}
-}
-#end

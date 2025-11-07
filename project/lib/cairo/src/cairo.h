@@ -292,6 +292,11 @@ typedef struct _cairo_user_data_key {
  * @CAIRO_STATUS_DEVICE_FINISHED: target device has been finished (Since 1.12)
  * @CAIRO_STATUS_JBIG2_GLOBAL_MISSING: %CAIRO_MIME_TYPE_JBIG2_GLOBAL_ID has been used on at least one image
  *   but no image provided %CAIRO_MIME_TYPE_JBIG2_GLOBAL (Since 1.14)
+ * @CAIRO_STATUS_PNG_ERROR: error occurred in libpng while reading from or writing to a PNG file (Since 1.16)
+ * @CAIRO_STATUS_FREETYPE_ERROR: error occurred in libfreetype (Since 1.16)
+ * @CAIRO_STATUS_WIN32_GDI_ERROR: error occurred in the Windows Graphics Device Interface (Since 1.16)
+ * @CAIRO_STATUS_TAG_ERROR: invalid tag name, attributes, or nesting (Since 1.16)
+ * @CAIRO_STATUS_DWRITE_ERROR: error occurred in the Windows Direct Write API (Since 1.18)
  * @CAIRO_STATUS_LAST_STATUS: this is a special value indicating the number of
  *   status values defined in this enumeration.  When using this value, note
  *   that the version of cairo at run-time may have additional status values
@@ -348,6 +353,11 @@ typedef enum _cairo_status {
     CAIRO_STATUS_INVALID_MESH_CONSTRUCTION,
     CAIRO_STATUS_DEVICE_FINISHED,
     CAIRO_STATUS_JBIG2_GLOBAL_MISSING,
+    CAIRO_STATUS_PNG_ERROR,
+    CAIRO_STATUS_FREETYPE_ERROR,
+    CAIRO_STATUS_WIN32_GDI_ERROR,
+    CAIRO_STATUS_TAG_ERROR,
+    CAIRO_STATUS_DWRITE_ERROR,
 
     CAIRO_STATUS_LAST_STATUS
 } cairo_status_t;
@@ -390,13 +400,15 @@ typedef enum _cairo_content {
  * @CAIRO_FORMAT_A1: each pixel is a 1-bit quantity holding
  *   an alpha value. Pixels are packed together into 32-bit
  *   quantities. The ordering of the bits matches the
- *   endianess of the platform. On a big-endian machine, the
+ *   endianness of the platform. On a big-endian machine, the
  *   first pixel is in the uppermost bit, on a little-endian
  *   machine the first pixel is in the least-significant bit. (Since 1.0)
  * @CAIRO_FORMAT_RGB16_565: each pixel is a 16-bit quantity
  *   with red in the upper 5 bits, then green in the middle
  *   6 bits, and blue in the lower 5 bits. (Since 1.2)
  * @CAIRO_FORMAT_RGB30: like RGB24 but with 10bpc. (Since 1.12)
+ * @CAIRO_FORMAT_RGB96F: 3 floats, R, G, B. (Since 1.17.2)
+ * @CAIRO_FORMAT_RGBA128F: 4 floats, R, G, B, A. (Since 1.17.2)
  *
  * #cairo_format_t is used to identify the memory format of
  * image data.
@@ -412,7 +424,9 @@ typedef enum _cairo_format {
     CAIRO_FORMAT_A8        = 2,
     CAIRO_FORMAT_A1        = 3,
     CAIRO_FORMAT_RGB16_565 = 4,
-    CAIRO_FORMAT_RGB30     = 5
+    CAIRO_FORMAT_RGB30     = 5,
+    CAIRO_FORMAT_RGB96F    = 6,
+    CAIRO_FORMAT_RGBA128F  = 7
 } cairo_format_t;
 
 
@@ -598,7 +612,7 @@ cairo_pop_group_to_source (cairo_t *cr);
  * translucent layers too.
  * For a more detailed explanation of the effects of each operator, including
  * the mathematical definitions, see
- * <ulink url="http://cairographics.org/operators/">http://cairographics.org/operators/</ulink>.
+ * <ulink url="https://cairographics.org/operators/">https://cairographics.org/operators/</ulink>.
  *
  * Since: 1.0
  **/
@@ -752,6 +766,9 @@ cairo_set_fill_rule (cairo_t *cr, cairo_fill_rule_t fill_rule);
 
 cairo_public void
 cairo_set_line_width (cairo_t *cr, double width);
+
+cairo_public void
+cairo_set_hairline (cairo_t *cr, cairo_bool_t set_hairline);
 
 /**
  * cairo_line_cap_t:
@@ -1018,6 +1035,17 @@ cairo_copy_clip_rectangle_list (cairo_t *cr);
 cairo_public void
 cairo_rectangle_list_destroy (cairo_rectangle_list_t *rectangle_list);
 
+/* Logical structure tagging functions */
+
+#define CAIRO_TAG_DEST "cairo.dest"
+#define CAIRO_TAG_LINK "Link"
+
+cairo_public void
+cairo_tag_begin (cairo_t *cr, const char *tag_name, const char *attributes);
+
+cairo_public void
+cairo_tag_end (cairo_t *cr, const char *tag_name);
+
 /* Font/Text functions */
 
 /**
@@ -1044,7 +1072,7 @@ typedef struct _cairo_scaled_font cairo_scaled_font_t;
  *
  * A #cairo_font_face_t specifies all aspects of a font other
  * than the size or font matrix (a font matrix is used to distort
- * a font by sheering it or scaling it unequally in the two
+ * a font by shearing it or scaling it unequally in the two
  * directions) . A font face can be set on a #cairo_t by using
  * cairo_set_font_face(); the size and font matrix are set with
  * cairo_set_font_size() and cairo_set_font_matrix().
@@ -1411,6 +1439,13 @@ cairo_font_options_set_hint_metrics (cairo_font_options_t *options,
 cairo_public cairo_hint_metrics_t
 cairo_font_options_get_hint_metrics (const cairo_font_options_t *options);
 
+cairo_public const char *
+cairo_font_options_get_variations (cairo_font_options_t *options);
+
+cairo_public void
+cairo_font_options_set_variations (cairo_font_options_t *options,
+                                   const char           *variations);
+
 /* This interface is for dealing with text as text, not caring about the
    font object inside the the cairo_t. */
 
@@ -1512,6 +1547,7 @@ cairo_font_face_status (cairo_font_face_t *font_face);
  * @CAIRO_FONT_TYPE_QUARTZ: The font is of type Quartz (Since: 1.6, in 1.2 and
  * 1.4 it was named CAIRO_FONT_TYPE_ATSUI)
  * @CAIRO_FONT_TYPE_USER: The font was create using cairo's user font api (Since: 1.8)
+ * @CAIRO_FONT_TYPE_DWRITE: The font is of type Win32 DWrite (Since: 1.18)
  *
  * #cairo_font_type_t is used to describe the type of a given font
  * face or scaled font. The font types are also known as "font
@@ -1548,7 +1584,8 @@ typedef enum _cairo_font_type {
     CAIRO_FONT_TYPE_FT,
     CAIRO_FONT_TYPE_WIN32,
     CAIRO_FONT_TYPE_QUARTZ,
-    CAIRO_FONT_TYPE_USER
+    CAIRO_FONT_TYPE_USER,
+    CAIRO_FONT_TYPE_DWRITE
 } cairo_font_type_t;
 
 cairo_public cairo_font_type_t
@@ -1716,13 +1753,35 @@ typedef cairo_status_t (*cairo_user_scaled_font_init_func_t) (cairo_scaled_font_
  *
  * The callback is mandatory, and expected to draw the glyph with code @glyph to
  * the cairo context @cr.  @cr is prepared such that the glyph drawing is done in
- * font space.  That is, the matrix set on @cr is the scale matrix of @scaled_font,
+ * font space.  That is, the matrix set on @cr is the scale matrix of @scaled_font.
  * The @extents argument is where the user font sets the font extents for
  * @scaled_font.  However, if user prefers to draw in user space, they can
- * achieve that by changing the matrix on @cr.  All cairo rendering operations
- * to @cr are permitted, however, the result is undefined if any source other
- * than the default source on @cr is used.  That means, glyph bitmaps should
- * be rendered using cairo_mask() instead of cairo_paint().
+ * achieve that by changing the matrix on @cr.
+ *
+ * All cairo rendering operations to @cr are permitted. However, when
+ * this callback is set with
+ * cairo_user_font_face_set_render_glyph_func(), the result is
+ * undefined if any source other than the default source on @cr is
+ * used.  That means, glyph bitmaps should be rendered using
+ * cairo_mask() instead of cairo_paint(). When this callback is set with
+ * cairo_user_font_face_set_render_color_glyph_func(), setting the
+ * source is a valid operation.
+ *
+ * When this callback is set with
+ * cairo_user_font_face_set_render_color_glyph_func(), the default
+ * source is the current source color of the context that is rendering
+ * the user font. That is, the same color a non-color user font will
+ * be rendered in. In most cases the callback will want to set a
+ * specific color. If the callback wishes to use the current context
+ * color after using another source, it should retain a reference to
+ * the source or use cairo_save()/cairo_restore() prior to changing
+ * the source. Note that the default source contains an internal
+ * marker to indicate that it is to be substituted with the current
+ * context source color when rendered to a surface. Querying the
+ * default source pattern will reveal a solid black color, however
+ * this is not representative of the color that will actually be
+ * used. Similarly, setting a solid black color will render black, not
+ * the current context source when the glyph is painted to a surface.
  *
  * Other non-default settings on @cr include a font size of 1.0 (given that
  * it is set up to be in font space), and font options corresponding to
@@ -1742,8 +1801,17 @@ typedef cairo_status_t (*cairo_user_scaled_font_init_func_t) (cairo_scaled_font_
  * extents, it must be ink extents, and include the extents of all drawing
  * done to @cr in the callback.
  *
- * Returns: %CAIRO_STATUS_SUCCESS upon success, or
- * %CAIRO_STATUS_USER_FONT_ERROR or any other error status on error.
+ * Where both color and non-color callbacks has been set using
+ * cairo_user_font_face_set_render_color_glyph_func(), and
+ * cairo_user_font_face_set_render_glyph_func(), the color glyph
+ * callback may return %CAIRO_STATUS_USER_FONT_NOT_IMPLEMENTED if the
+ * glyph is not a color glyph. This is the only case in which the
+ * %CAIRO_STATUS_USER_FONT_NOT_IMPLEMENTED may be returned from a
+ * render callback.
+ *
+ * Returns: %CAIRO_STATUS_SUCCESS upon success,
+ * %CAIRO_STATUS_USER_FONT_NOT_IMPLEMENTED if fallback options should be tried,
+ * or %CAIRO_STATUS_USER_FONT_ERROR or any other error status on error.
  *
  * Since: 1.8
  **/
@@ -1879,6 +1947,10 @@ cairo_user_font_face_set_render_glyph_func (cairo_font_face_t                   
 					    cairo_user_scaled_font_render_glyph_func_t  render_glyph_func);
 
 cairo_public void
+cairo_user_font_face_set_render_color_glyph_func (cairo_font_face_t                          *font_face,
+                                                  cairo_user_scaled_font_render_glyph_func_t  render_glyph_func);
+
+cairo_public void
 cairo_user_font_face_set_text_to_glyphs_func (cairo_font_face_t                            *font_face,
 					      cairo_user_scaled_font_text_to_glyphs_func_t  text_to_glyphs_func);
 
@@ -1893,6 +1965,9 @@ cairo_user_font_face_get_init_func (cairo_font_face_t *font_face);
 
 cairo_public cairo_user_scaled_font_render_glyph_func_t
 cairo_user_font_face_get_render_glyph_func (cairo_font_face_t *font_face);
+
+cairo_public cairo_user_scaled_font_render_glyph_func_t
+cairo_user_font_face_get_render_color_glyph_func (cairo_font_face_t *font_face);
 
 cairo_public cairo_user_scaled_font_text_to_glyphs_func_t
 cairo_user_font_face_get_text_to_glyphs_func (cairo_font_face_t *font_face);
@@ -1926,6 +2001,9 @@ cairo_get_fill_rule (cairo_t *cr);
 
 cairo_public double
 cairo_get_line_width (cairo_t *cr);
+
+cairo_public cairo_bool_t
+cairo_get_hairline (cairo_t *cr);
 
 cairo_public cairo_line_cap_t
 cairo_get_line_cap (cairo_t *cr);
@@ -2340,7 +2418,6 @@ cairo_surface_status (cairo_surface_t *surface);
  * @CAIRO_SURFACE_TYPE_DRM: The surface is of type Direct Render Manager, since 1.10
  * @CAIRO_SURFACE_TYPE_TEE: The surface is of type 'tee' (a multiplexing surface), since 1.10
  * @CAIRO_SURFACE_TYPE_XML: The surface is of type XML (for debugging), since 1.10
- * @CAIRO_SURFACE_TYPE_SKIA: The surface is of type Skia, since 1.10
  * @CAIRO_SURFACE_TYPE_SUBSURFACE: The surface is a subsurface created with
  *   cairo_surface_create_for_rectangle(), since 1.10
  * @CAIRO_SURFACE_TYPE_COGL: This surface is of type Cogl, since 1.12
@@ -2434,6 +2511,10 @@ cairo_surface_set_user_data (cairo_surface_t		 *surface,
 #define CAIRO_MIME_TYPE_JBIG2 "application/x-cairo.jbig2"
 #define CAIRO_MIME_TYPE_JBIG2_GLOBAL "application/x-cairo.jbig2-global"
 #define CAIRO_MIME_TYPE_JBIG2_GLOBAL_ID "application/x-cairo.jbig2-global-id"
+#define CAIRO_MIME_TYPE_CCITT_FAX "image/g3fax"
+#define CAIRO_MIME_TYPE_CCITT_FAX_PARAMS "application/x-cairo.ccitt.params"
+#define CAIRO_MIME_TYPE_EPS "application/postscript"
+#define CAIRO_MIME_TYPE_EPS_PARAMS "application/x-cairo.eps.params"
 
 cairo_public void
 cairo_surface_get_mime_data (cairo_surface_t		*surface,

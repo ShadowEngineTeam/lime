@@ -36,7 +36,7 @@
 
 /* This surface is intended to produce a verbose, hierarchical, DAG XML file
  * representing a single surface. It is intended to be used by debuggers,
- * such as cairo-sphinx, or by application test-suites that what a log of
+ * such as cairo-sphinx, or by application test-suites that want a log of
  * operations.
  */
 
@@ -209,13 +209,15 @@ static const char *
 _format_to_string (cairo_format_t format)
 {
     switch (format) {
-    case CAIRO_FORMAT_ARGB32:  return "ARGB32";
-    case CAIRO_FORMAT_RGB30:   return "RGB30";
-    case CAIRO_FORMAT_RGB24:   return "RGB24";
-    case CAIRO_FORMAT_RGB16_565:   return "RGB16_565";
-    case CAIRO_FORMAT_A8:      return "A8";
-    case CAIRO_FORMAT_A1:      return "A1";
-    case CAIRO_FORMAT_INVALID: return "INVALID";
+    case CAIRO_FORMAT_ARGB32:    return "ARGB32";
+    case CAIRO_FORMAT_RGB30:     return "RGB30";
+    case CAIRO_FORMAT_RGB24:     return "RGB24";
+    case CAIRO_FORMAT_RGB16_565: return "RGB16_565";
+    case CAIRO_FORMAT_RGB96F:    return "RGB96F";
+    case CAIRO_FORMAT_RGBA128F:  return "RGBA128F";
+    case CAIRO_FORMAT_A8:        return "A8";
+    case CAIRO_FORMAT_A1:        return "A1";
+    case CAIRO_FORMAT_INVALID:   return "INVALID";
     }
     ASSERT_NOT_REACHED;
     return "INVALID";
@@ -258,7 +260,7 @@ _cairo_xml_create_internal (cairo_output_stream_t *stream)
 {
     cairo_xml_t *xml;
 
-    xml = malloc (sizeof (cairo_xml_t));
+    xml = _cairo_malloc (sizeof (cairo_xml_t));
     if (unlikely (xml == NULL))
 	return _cairo_device_create_in_error (CAIRO_STATUS_NO_MEMORY);
 
@@ -933,7 +935,7 @@ _cairo_xml_emit_type42_font (cairo_xml_t *xml,
     if (unlikely (status))
 	return status;
 
-    buf = malloc (size);
+    buf = _cairo_malloc (size);
     if (unlikely (buf == NULL))
 	return _cairo_error (CAIRO_STATUS_NO_MEMORY);
 
@@ -1007,7 +1009,7 @@ _cairo_xml_emit_scaled_font (cairo_xml_t *xml,
     }
 
     _cairo_xml_indent (xml, -2);
-    _cairo_xml_printf (xml, "<scaled-font>");
+    _cairo_xml_printf (xml, "</scaled-font>");
 
     return status;
 }
@@ -1098,7 +1100,7 @@ _cairo_xml_surface_create_internal (cairo_device_t *device,
 {
     cairo_xml_surface_t *surface;
 
-    surface = malloc (sizeof (cairo_xml_surface_t));
+    surface = _cairo_malloc (sizeof (cairo_xml_surface_t));
     if (unlikely (surface == NULL))
 	return _cairo_surface_create_in_error (_cairo_error (CAIRO_STATUS_NO_MEMORY));
 

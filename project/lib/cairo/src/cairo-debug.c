@@ -86,15 +86,9 @@ cairo_debug_reset_static_data (void)
 
     _cairo_image_reset_static_data ();
 
-#if CAIRO_HAS_DRM_SURFACE
-    _cairo_drm_device_reset_static_data ();
-#endif
+    _cairo_image_compositor_reset_static_data ();
 
     _cairo_default_context_reset_static_data ();
-
-#if CAIRO_HAS_COGL_SURFACE
-    _cairo_cogl_context_reset_static_data ();
-#endif
 
     CAIRO_MUTEX_FINALIZE ();
 }
@@ -128,6 +122,12 @@ _cairo_debug_check_image_surface_is_defined (const cairo_surface_t *surface)
     case CAIRO_FORMAT_RGB30:
     case CAIRO_FORMAT_ARGB32:
 	width = image->width*4;
+	break;
+    case CAIRO_FORMAT_RGB96F:
+	width = image->width*12;
+	break;
+    case CAIRO_FORMAT_RGBA128F:
+	width = image->width*16;
 	break;
     case CAIRO_FORMAT_INVALID:
     default:
@@ -237,7 +237,7 @@ _print_close (void *closure)
 }
 
 void
-_cairo_debug_print_path (FILE *stream, cairo_path_fixed_t *path)
+_cairo_debug_print_path (FILE *stream, const cairo_path_fixed_t *path)
 {
     cairo_status_t status;
     cairo_box_t box;
@@ -262,7 +262,7 @@ _cairo_debug_print_path (FILE *stream, cairo_path_fixed_t *path)
 		 box.p1.x, box.p1.y, box.p2.x, box.p2.y);
     }
 
-    printf ("\n");
+    fprintf (stream, "\n");
 }
 
 void
@@ -301,4 +301,21 @@ _cairo_debug_print_polygon (FILE *stream, cairo_polygon_t *polygon)
 		 edge->dir);
 
     }
+}
+
+void
+_cairo_debug_print_matrix (FILE *file, const cairo_matrix_t *matrix)
+{
+    fprintf (file, "[%g %g %g %g %g %g]\n",
+	     matrix->xx, matrix->yx,
+	     matrix->xy, matrix->yy,
+	     matrix->x0, matrix->y0);
+}
+
+void
+_cairo_debug_print_rect (FILE *file, const cairo_rectangle_int_t *rect)
+{
+    fprintf (file, "x: %d y: %d width: %d height: %d\n",
+	     rect->x, rect->y,
+	     rect->width, rect->height);
 }

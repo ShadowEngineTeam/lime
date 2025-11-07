@@ -172,10 +172,10 @@ _cairo_path_fixed_init_copy (cairo_path_fixed_t *path,
     return CAIRO_STATUS_SUCCESS;
 }
 
-unsigned long
+uintptr_t
 _cairo_path_fixed_hash (const cairo_path_fixed_t *path)
 {
-    unsigned long hash = _CAIRO_HASH_INIT_VALUE;
+    uintptr_t hash = _CAIRO_HASH_INIT_VALUE;
     const cairo_path_buf_t *buf;
     unsigned int count;
 
@@ -325,7 +325,7 @@ _cairo_path_fixed_create (void)
 {
     cairo_path_fixed_t	*path;
 
-    path = malloc (sizeof (cairo_path_fixed_t));
+    path = _cairo_malloc (sizeof (cairo_path_fixed_t));
     if (!path) {
 	_cairo_error_throw (CAIRO_STATUS_NO_MEMORY);
 	return NULL;
@@ -1524,7 +1524,7 @@ _cairo_path_fixed_iter_is_fill_box (cairo_path_fixed_iter_t *_iter,
     /* a horizontal/vertical closed line is also a degenerate rectangle */
     switch (iter.buf->op[iter.n_op]) {
     case CAIRO_PATH_OP_CLOSE_PATH:
-	_cairo_path_fixed_iter_next_op (&iter);
+	_cairo_path_fixed_iter_next_op (&iter); /* fall through */
     case CAIRO_PATH_OP_MOVE_TO: /* implicit close */
 	box->p1 = box->p2 = points[0];
 	*_iter = iter;
