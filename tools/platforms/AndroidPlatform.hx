@@ -587,7 +587,7 @@ class AndroidPlatform extends PlatformTarget
 			limeTemplatesPath = StringTools.replace(limeTemplatesPath, "/", "\\");
 			slashAAPTTwo = StringTools.replace(slashAAPTTwo, "/", "\\");
 		}
-		context.AAPT2_OVERRIDE = StringTools.replace(limeTemplatesPath + (System.hostPlatform == MAC || System.hostPlatform == WINDOWS ? "" : System.hostArchitecture == X64 ? "64" : System.hostArchitecture == X86 ? "32" : Std.string(System.hostArchitecture)) + slashAAPTTwo + (System.hostPlatform == WINDOWS ? ".exe" : ""), "\\", "\\\\");
+		context.AAPT2_OVERRIDE = StringTools.replace(limeTemplatesPath + (System.hostPlatform == MAC || System.hostPlatform == WINDOWS ? "" : System.hostArchitecture == X64 ? "64" : System.hostArchitecture == X86 ? "32" : Std.string(System.hostArchitecture)).toLowerCase() + slashAAPTTwo + (System.hostPlatform == WINDOWS ? ".exe" : ""), "\\", "\\\\");
 
 		if (!project.environment.exists("ANDROID_SDK") || !project.environment.exists("ANDROID_NDK_ROOT"))
 		{
