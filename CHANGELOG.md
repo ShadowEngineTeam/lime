@@ -1,7 +1,7 @@
 Changelog
 =========
 
-8.3.0 (??/??/2025)
+8.3.0 (11/11/2025)
 ------------------
 
 * Added `onDisplayOrientation` and `onDeviceOrientation` events to `Application` to detect mobile device orientation changes.
