@@ -11,6 +11,8 @@
 
 		<compilerflag value="-Wno-shift-count-overflow" unless="windows" />
 
+		<compilerflag value="/wd4293" if="windows" unless="HXCPP_M64 || HXCPP_ARM64" />
+
 		<depend name="${NATIVE_TOOLKIT_PATH}/jpeg/cderror.h" />
 		<depend name="${NATIVE_TOOLKIT_PATH}/jpeg/cdjpeg.h" />
 		<depend name="${NATIVE_TOOLKIT_PATH}/custom/jpeg/jconfig.h" />

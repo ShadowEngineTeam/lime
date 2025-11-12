@@ -172,6 +172,7 @@
             <compilerflag value="-D_WIN32_WINNT=0x0600" />
             <compilerflag value="-D_CRT_SECURE_NO_WARNINGS" />
             <compilerflag value="-D_CRT_NONSTDC_NO_DEPRECATE" />
+            <compilerflag value="/wd4068" />
             <compilerflag value="/wd4098" />
 			<compilerflag value="/wd4293" />
             <compilerflag value="-Dstrcasecmp=_stricmp" />
