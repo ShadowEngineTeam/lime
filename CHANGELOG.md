@@ -40,7 +40,6 @@ Changelog
 * Removed custom implementation of `haxe.io.Bytes`.
 * Updated bundled HashLink executable version to 1.14.
 * Updated SDL submodule to version 2.30.12.
-* Updated OpenAL Soft submodule to version 1.21.1.
 
 8.2.3 (10/01/2025)
 ------------------
