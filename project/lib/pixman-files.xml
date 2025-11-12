@@ -30,6 +30,8 @@
 		<compilerflag value="-Wno-attributes" if="android" />
 		<compilerflag value="-Wno-tautological-constant-out-of-range-compare" if="mac || ios || tvos" />
 
+		<compilerflag value="/wd4799" if="windows" />
+
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-access-accessors.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-access.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-arma64-neon-asm-bilinear.S" if="PIXMAN_ARMA64_NEON" />
