@@ -81,7 +81,7 @@ class DefineMacro
 		}
 
 		if (Context.defined("android") && Context.defined("extension-androidtools"))
-			Context.fatalError('You cannot add extension-androidtools to this Lime because it is already included. Please remove it from project file.', (macro null).pos);
+			Context.fatalError("The haxelib 'extension-androidtools' is already included in this Lime. Please remove it from the project file to compile.", (macro null).pos);
 	}
 }
 #end
