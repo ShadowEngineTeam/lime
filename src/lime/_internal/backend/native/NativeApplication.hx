@@ -94,7 +94,6 @@ class NativeApplication
 
 		#if (!macro && lime_cffi)
 		handle = NativeCFFI.lime_application_create();
-		#end
 
 		#if (ios || android)
 		final accelerometerID:Int = NativeCFFI.lime_system_get_first_accelerometer_sensor_id();
@@ -106,6 +105,7 @@ class NativeApplication
 
 		if (gyroscopeID > 0)
 			Sensor.registerSensor(SensorType.GYROSCOPE, gyroscopeID);
+		#end
 		#end
 	}
 
