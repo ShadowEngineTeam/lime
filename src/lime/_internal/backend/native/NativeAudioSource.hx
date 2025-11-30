@@ -666,7 +666,7 @@ class NativeAudioSource
 
 		#if (target.threaded)
 		if (streamSources.length != 0)
-			funkin.backend.utils.ThreadUtil.execAsync(streamBuffersUpdate);
+			backend.codename.ThreadUtil.execAsync(streamBuffersUpdate);
 		#else
 		if (streamSources.length == 0)
 		{
@@ -1029,3 +1029,4 @@ class NativeAudioSource
 		return value;
 	}
 }
+
