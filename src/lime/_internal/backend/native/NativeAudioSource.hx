@@ -175,7 +175,7 @@ class NativeAudioSource
 	static var streamMutex:Mutex = new Mutex();
 	static var streamTimer:Timer;
 
-	#if !(target.threaded)
+	#if !target.threaded
 	static var wasEmpty:Bool = false;
 	static var threadRunning:Bool = false;
 	static var streamThread:Thread;
@@ -626,7 +626,7 @@ class NativeAudioSource
 		streamMutex.release();
 	}
 
-	#if !(target.threaded)
+	#if !target.threaded
 	static function streamThreadRun()
 	{
 		while (Thread.readMessage(true))
@@ -664,7 +664,7 @@ class NativeAudioSource
 			}
 		}
 
-		#if (target.threaded)
+		#if target.threaded
 		if (streamSources.length != 0)
 			backend.codename.ThreadUtil.execAsync(streamBuffersUpdate);
 		#else
@@ -1029,4 +1029,3 @@ class NativeAudioSource
 		return value;
 	}
 }
-
