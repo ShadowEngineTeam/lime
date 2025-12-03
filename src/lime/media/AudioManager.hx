@@ -1,7 +1,7 @@
 package lime.media;
 
 import lime.system.CFFIPointer;
-import haxe.MainLoop;
+import lime._internal.utils.MainLoop;
 #if (windows || mac || linux || android || ios)
 import haxe.io.Path;
 import lime.system.System;
@@ -156,7 +156,7 @@ class AudioManager
 		{
 			var device = new ALDevice(handle);
 
-			#if haxe5 haxe.EventLoop.main.run #else MainLoop.runInMainThread #end (function():Void
+			MainLoop.runInMainThread(function():Void
 			{
 				var alc = context.openal;
 
