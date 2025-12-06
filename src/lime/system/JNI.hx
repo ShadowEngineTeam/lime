@@ -7,8 +7,8 @@ import haxe.macro.Expr;
 import haxe.macro.Type;
 #else
 import lime._internal.backend.native.NativeCFFI;
-import lime._internal.utils.MainLoop;
 #end
+import lime._internal.utils.MainLoop;
 #if !lime_doc_gen
 #if target.threaded
 import sys.thread.Thread;
