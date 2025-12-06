@@ -8,7 +8,6 @@ import haxe.macro.Type;
 #else
 import lime._internal.backend.native.NativeCFFI;
 #end
-import lime._internal.utils.MainLoop;
 #if !lime_doc_gen
 #if target.threaded
 import sys.thread.Thread;
@@ -468,7 +467,7 @@ class JNISafetyTools
 					// Check the thread before running the function.
 					f.expr = macro
 						if (!lime.system.JNI.JNISafetyTools.onMainThread())
-							MainLoop.runInMainThread($i{field.name}.bind($a{args}))
+							lime._internal.utils.MainLoop.runInMainThread($i{field.name}.bind($a{args}))
 						else
 							${f.expr};
 				default:
