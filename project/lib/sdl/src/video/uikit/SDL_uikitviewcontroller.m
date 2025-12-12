@@ -230,7 +230,7 @@ SDL_HideHomeIndicatorHintChanged(void *userdata, const char *name, const char *o
     }
     return hidden;
     */
-    return YES;
+    return NO;
 }
 
 - (UIRectEdge)preferredScreenEdgesDeferringSystemGestures
