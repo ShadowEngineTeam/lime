@@ -8,6 +8,11 @@
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
 	::end::
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>launchScreenBackground</string>
+	</dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>LSApplicationCategoryType</key>
