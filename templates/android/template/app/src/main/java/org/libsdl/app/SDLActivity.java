@@ -637,19 +637,28 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
     public boolean dispatchKeyEvent(KeyEvent event) {
 
         if (SDLActivity.mBrokenLibraries) {
-           return false;
+            return false;
         }
 
         int keyCode = event.getKeyCode();
-        // Ignore certain special keys so they're handled by Android
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ||
             keyCode == KeyEvent.KEYCODE_VOLUME_UP ||
             keyCode == KeyEvent.KEYCODE_CAMERA ||
-            keyCode == KeyEvent.KEYCODE_ZOOM_IN || /* API 11 */
-            keyCode == KeyEvent.KEYCODE_ZOOM_OUT /* API 11 */
-            ) {
+            keyCode == KeyEvent.KEYCODE_ZOOM_IN ||
+            keyCode == KeyEvent.KEYCODE_ZOOM_OUT) {
             return false;
         }
+    
+        int deviceId = event.getDeviceId();
+        if (SDLControllerManager.isDeviceSDLJoystick(deviceId)) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                SDLControllerManager.onNativePadDown(deviceId, keyCode);
+            } else if (event.getAction() == KeyEvent.ACTION_UP) {
+                SDLControllerManager.onNativePadUp(deviceId, keyCode);
+            }
+            return true;
+        }
+
         return super.dispatchKeyEvent(event);
     }
 
