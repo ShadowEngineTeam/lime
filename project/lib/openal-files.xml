@@ -197,6 +197,7 @@
         <section if="android">
 
             <compilerflag value="-fsigned-char" />
+            <compilerflag value="-Wno-deprecated-literal-operator" />
 
             <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/opensl.cpp" />
 
