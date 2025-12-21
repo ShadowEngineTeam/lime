@@ -205,7 +205,7 @@ class AudioManager
 
 		try
 		{
-			final directory:String = Path.directory(Path.withoutExtension(Sys.getCwd()));
+			final directory:String = Path.directory(Path.withoutExtension(System.applicationStorageDirectory));
 			final path:String = Path.join([directory, #if windows 'alsoft.ini' #else 'alsoft.conf' #end]);
 			final content:String = alConfig.join('\n');
 
