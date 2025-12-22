@@ -53,6 +53,38 @@ jobs:
             !**/.gitignore
             lime.png
           if-no-files-found: error
+  linuxarm:
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: |
+          sudo add-apt-repository ppa:haxe/releases -y
+          sudo dpkg --add-architecture armhf
+          sudo apt update
+          sudo apt-get install -y haxe gcc-arm-linux-gnueabihf g++-urm-linux-gnueabihf libdrm-dev:armhf libgl1-mesa-dev:armhf libglu1-mesa-dev:armhf libpulse-dev:armhf libasound2-dev:armhf libx11-dev:armhf libxext-dev:armhf libxi-dev:armhf libxrandr-dev:armhf libxinerama-dev:armhf libmbedtls-dev:armhf libpng-dev:armhf libturbojpeg-dev:armhf libuv1-dev:armhf libvorbis-dev:armhf
+      - name: Install Haxe dependencies
+        run: |
+          haxelib setup ~/haxelib
+          haxelib git hxcpp https://github.com/HomuHomu833-haxelibs/hxcpp --quiet
+          haxelib git format https://github.com/HomuHomu833-haxelibs/format --quiet
+          haxelib git hxp https://github.com/HomuHomu833-haxelibs/hxp --quiet
+      - name: Enable HXCPP compile cache
+        run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
+      - name: Configure Lime
+        run: haxelib dev lime ${{ github.workspace }}
+      - name: Rebuild Lime
+        run: CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ linux32 haxelib run lime rebuild linux -armv7 -release -nocolor -nocffi -D HXCPP_ARMV7
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LinuxArm-NDLL
+          path: |
+            ndll/LinuxArm/
+            !**/.gitignore
+            lime.png
+          if-no-files-found: error
   linuxarm64:
     runs-on: ubuntu-22.04-arm
     steps:
