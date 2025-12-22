@@ -14,8 +14,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Install system dependencies
         run: |
+          sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y gcc-multilib g++-multilib libgl1-mesa-dev libglu1-mesa-dev libpulse-dev libasound2-dev libx11-dev libxext-dev libxi-dev libxrandr-dev libxinerama-dev libmbedtls-dev libpng-dev libturbojpeg-dev libuv1-dev libvorbis-dev
+          sudo apt-get install -y gcc-i686-linux-gnu g++-i686-linux-gnu libdrm-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 libpulse-dev:i386 libasound2-dev:i386 libx11-dev:i386 libxext-dev:i386 libxi-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libmbedtls-dev:i386 libpng-dev:i386 libturbojpeg-dev:i386 libuv1-dev:i386 libvorbis-dev:i386 libgl1-mesa-dev libglu1-mesa-dev libpulse-dev libasound2-dev libx11-dev libxext-dev libxi-dev libxrandr-dev libxinerama-dev libmbedtls-dev libpng-dev libturbojpeg-dev libuv1-dev libvorbis-dev
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
@@ -33,7 +34,7 @@ jobs:
         run: haxelib dev lime ${{ github.workspace }}
       - name: Rebuild Lime
         run: |
-          haxelib run lime rebuild linux -32 -release -nocolor -nocffi
+          CC=i686-linux-gnu-gcc CXX=i686-linux-gnu-g++ linux32 haxelib run lime rebuild linux -32 -release -nocolor -nocffi -D HXCPP_M32
           haxelib run lime rebuild linux -64 -release -nocolor -nocffi
       - name: Upload Artifact (x86)
         uses: actions/upload-artifact@v4
@@ -61,9 +62,8 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo add-apt-repository ppa:haxe/releases -y
-          sudo dpkg --add-architecture armhf
           sudo apt update
-          sudo apt-get install -y haxe gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libdrm-dev:armhf libgl1-mesa-dev:armhf libglu1-mesa-dev:armhf libpulse-dev:armhf libasound2-dev:armhf libx11-dev:armhf libxext-dev:armhf libxi-dev:armhf libxrandr-dev:armhf libxinerama-dev:armhf libmbedtls-dev:armhf libpng-dev:armhf libturbojpeg-dev:armhf libuv1-dev:armhf libvorbis-dev:armhf
+          sudo apt-get install -y haxe gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libdrm-dev:armhf libgl1-mesa-dev:armhf libglu1-mesa-dev:armhf libpulse-dev:armhf libasound2-dev:armhf libx11-dev:armhf libxext-dev:armhf libxi-dev:armhf libxrandr-dev:armhf libxinerama-dev:armhf libmbedtls-dev:armhf libpng-dev:armhf libturbojpeg-dev:armhf libuv1-dev:armhf libvorbis-dev:armhf libdrm-dev libgl1-mesa-dev libglu1-mesa-dev libpulse-dev libasound2-dev libx11-dev libxext-dev libxi-dev libxrandr-dev libxinerama-dev libmbedtls-dev libpng-dev libturbojpeg-dev libuv1-dev libvorbis-dev
       - name: Install Haxe dependencies
         run: |
           haxelib setup ~/haxelib
@@ -75,7 +75,9 @@ jobs:
       - name: Configure Lime
         run: haxelib dev lime ${{ github.workspace }}
       - name: Rebuild Lime
-        run: CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ linux32 haxelib run lime rebuild linux -armv7 -release -nocolor -nocffi -D HXCPP_ARMV7
+        run: |
+          CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ linux32 haxelib run lime rebuild linux -armv7 -release -nocolor -nocffi -D HXCPP_ARMV7
+          haxelib run lime rebuild linux -arm64 -release -nocolor -nocffi -D HXCPP_ARM64
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -85,28 +87,6 @@ jobs:
             !**/.gitignore
             lime.png
           if-no-files-found: error
-  linuxarm64:
-    runs-on: ubuntu-22.04-arm
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install system dependencies
-        run: |
-          sudo add-apt-repository ppa:haxe/releases -y
-          sudo apt update
-          sudo apt-get install -y haxe libdrm-dev libgl1-mesa-dev libglu1-mesa-dev libpulse-dev libasound2-dev libx11-dev libxext-dev libxi-dev libxrandr-dev libxinerama-dev libmbedtls-dev libpng-dev libturbojpeg-dev libuv1-dev libvorbis-dev
-      - name: Install Haxe dependencies
-        run: |
-          haxelib setup ~/haxelib
-          haxelib git hxcpp https://github.com/HomuHomu833-haxelibs/hxcpp --quiet
-          haxelib git format https://github.com/HomuHomu833-haxelibs/format --quiet
-          haxelib git hxp https://github.com/HomuHomu833-haxelibs/hxp --quiet
-      - name: Enable HXCPP compile cache
-        run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
-      - name: Configure Lime
-        run: haxelib dev lime ${{ github.workspace }}
-      - name: Rebuild Lime
-        run: haxelib run lime rebuild linux -arm64 -release -nocolor -nocffi -D HXCPP_ARM64
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
