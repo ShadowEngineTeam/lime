@@ -204,6 +204,10 @@ class WindowsPlatform extends PlatformTarget
 					catch (e:Dynamic) {}
 				}
 			}
+			if ((project.flags.exists("32") || architecture == Architecture.X86) || (project.flags.exists("armv7") || architecture == Architecture.ARMV7))
+			{
+				is64 = false;
+			}
 			if ((project.flags.exists("armv7") || architecture == Architecture.ARMV7) || (project.flags.exists("arm64") || architecture == Architecture.ARM64))
 			{
 				isArm = true;
@@ -522,10 +526,14 @@ class WindowsPlatform extends PlatformTarget
 				{
 					if (isArm)
 					{
+						haxeArgs.push("-D");
+						haxeArgs.push("HXCPP_ARMV7");
 						flags.push("-DHXCPP_ARMV7");
 					}
 					else
 					{
+						haxeArgs.push("-D");
+						haxeArgs.push("HXCPP_M32");
 						flags.push("-DHXCPP_M32");
 					}
 				}
@@ -592,10 +600,14 @@ class WindowsPlatform extends PlatformTarget
 				{
 					if (isArm)
 					{
+						haxeArgs.push("-D");
+						haxeArgs.push("HXCPP_ARMV7");
 						flags.push("-DHXCPP_ARMV7");
 					}
 					else
 					{
+						haxeArgs.push("-D");
+						haxeArgs.push("HXCPP_M32");
 						flags.push("-DHXCPP_M32");
 					}
 				}
