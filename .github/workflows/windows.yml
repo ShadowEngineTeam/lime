@@ -20,7 +20,7 @@ jobs:
         run: echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
       - name: Install Haxe dependencies
         run: |
-          haxelib git hxcpp https://github.com/HomuHomu833/hxcpp --quiet
+          haxelib git hxcpp https://github.com/FNF-SE/hxcpp --quiet
           haxelib git format https://github.com/FNF-SE/format --quiet
           haxelib git hxp https://github.com/FNF-SE/hxp --quiet
       - name: Enable HXCPP compile cache
