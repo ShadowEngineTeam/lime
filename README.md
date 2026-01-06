@@ -17,12 +17,12 @@ Installation
 
 1. Clone the Lime repository:
 
-        haxelib git lime https://github.com/HomuHomu833-haxe-stuff/lime
+        haxelib git lime https://github.com/FNF-SE/lime
 
 2. Install required dependencies:
 
-        haxelib git format https://github.com/HomuHomu833-haxe-stuff/format
-        haxelib git hxp https://github.com/HomuHomu833-haxe-stuff/hxp
+        haxelib git format https://github.com/FNF-SE/format
+        haxelib git hxp https://github.com/FNF-SE/hxp
 
 3. After cloning see [project/README.md](project/README.md) for details about building native binaries.
 
