@@ -77,6 +77,10 @@ typedef unsigned int uintptr_t;
 #else
 # define SIZEOF_VOIDP 4
 #endif
+#ifdef __MINGW32__
+#define HAVE_GCC_ATOMICS 1
+/* #undef HAVE_GCC_SYNC_LOCK_TEST_AND_SET */
+#endif
 
 #define HAVE_DDRAW_H 1
 #define HAVE_DINPUT_H 1
