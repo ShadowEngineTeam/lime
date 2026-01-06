@@ -115,13 +115,11 @@
 /* Define to 1 if you have the <alloca.h> header file. */
 #define HAVE_ALLOCA_H 1
 
-#ifndef __MINGW32__
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #define HAVE_ARPA_INET_H 1
 
 /* Define to 1 if you have the <arpa/tftp.h> header file. */
 #define HAVE_ARPA_TFTP_H 1
-#endif
 
 /* Define to 1 if you have the <assert.h> header file. */
 #define HAVE_ASSERT_H 1
@@ -184,7 +182,6 @@
 /* Define to 1 if you have the <err.h> header file. */
 /* #undef HAVE_ERR_H */
 
-#ifndef __MINGW32__
 /* Define to 1 if you have the fcntl function. */
 #define HAVE_FCNTL 1
 
@@ -193,7 +190,6 @@
 
 /* Define to 1 if you have a working fcntl O_NONBLOCK function. */
 #define HAVE_FCNTL_O_NONBLOCK 1
-#endif
 
 /* Define to 1 if you have the fdopen function. */
 #define HAVE_FDOPEN 1
@@ -262,7 +258,7 @@
 #define HAVE_GETHOSTNAME 1
 
 /* Define to 1 if you have a working getifaddrs function. */
-#if !defined(ANDROID) && !defined(__MINGW32__) && !defined(HX_LINUX) && !defined(WEBOS) && !defined(BLACKBERRY) && !defined(TIZEN)
+#if !defined(ANDROID) && !defined(HX_LINUX) && !defined(WEBOS) && !defined(BLACKBERRY) && !defined(TIZEN)
 #define HAVE_GETIFADDRS 1
 #endif
 
@@ -276,9 +272,7 @@
 #define HAVE_GETPPID 1
 
 /* Define to 1 if you have the `getpwuid' function. */
-#ifndef __MINGW32__
 #define HAVE_GETPWUID 1
-#endif
 
 /* Define to 1 if you have the `getpwuid_r' function. */
 /* #define HAVE_GETPWUID_R 1 */
@@ -296,9 +290,7 @@
 /* #undef HAVE_GLIBC_STRERROR_R */
 
 /* Define to 1 if you have a working gmtime_r function. */
-#ifndef __MINGW32__
 #define HAVE_GMTIME_R 1
-#endif
 
 /* Define to 1 if you have the `gnutls_alpn_set_protocols' function. */
 /* #undef HAVE_GNUTLS_ALPN_SET_PROTOCOLS */
@@ -338,7 +330,7 @@
 /* #undef HAVE_IDN2_H */
 
 /* Define to 1 if you have the <ifaddrs.h> header file. */
-#if !defined(ANDROID) && !defined(__MINGW32__) && !defined(HX_LINUX) && !defined(WEBOS) && !defined(BLACKBERRY) && !defined(TIZEN)
+#if !defined(ANDROID) && !defined(HX_LINUX) && !defined(WEBOS) && !defined(BLACKBERRY) && !defined(TIZEN)
 #define HAVE_IFADDRS_H 1
 #endif
 
@@ -364,7 +356,6 @@
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the ioctl function. */
-#ifndef __MINGW32__
 #define HAVE_IOCTL 1
 
 /* Define to 1 if you have the ioctlsocket function. */
@@ -377,15 +368,14 @@
    */
 /* #undef HAVE_IOCTLSOCKET_CAMEL_FIONBIO */
 
+/* Define to 1 if you have a working ioctlsocket FIONBIO function. */
+/* #undef HAVE_IOCTLSOCKET_FIONBIO */
+
 /* Define to 1 if you have a working ioctl FIONBIO function. */
 #define HAVE_IOCTL_FIONBIO 1
 
 /* Define to 1 if you have a working ioctl SIOCGIFADDR function. */
 #define HAVE_IOCTL_SIOCGIFADDR 1
-#else
-/* Define to 1 if you have a working ioctlsocket FIONBIO function. */
-#define HAVE_IOCTLSOCKET_FIONBIO
-#endif
 
 /* Define to 1 if you have the <io.h> header file. */
 /* #undef HAVE_IO_H */
@@ -462,7 +452,6 @@
 /* Define to 1 if you have the MSG_NOSIGNAL flag. */
 /* #undef HAVE_MSG_NOSIGNAL */
 
-#ifndef __MINGW32__
 /* Define to 1 if you have the <netdb.h> header file. */
 #define HAVE_NETDB_H 1
 
@@ -474,7 +463,6 @@
 
 /* Define to 1 if you have the <net/if.h> header file. */
 #define HAVE_NET_IF_H 1
-#endif
 
 /* Define to 1 if you have the <nghttp2/nghttp2.h> header file. */
 /* #undef HAVE_NGHTTP2_NGHTTP2_H */
@@ -523,9 +511,7 @@
 /* #undef HAVE_POLL_FINE */
 
 /* Define to 1 if you have the <poll.h> header file. */
-#ifndef __MINGW32__
 #define HAVE_POLL_H 1
-#endif
 
 /* Define to 1 if you have a working POSIX-style strerror_r function. */
 #define HAVE_POSIX_STRERROR_R 1
@@ -534,9 +520,7 @@
 #define HAVE_PTHREAD_H 1
 
 /* Define to 1 if you have the <pwd.h> header file. */
-#ifndef __MINGW32__
 #define HAVE_PWD_H 1
-#endif
 
 /* Define to 1 if you have the `RAND_egd' function. */
 /* #undef HAVE_RAND_EGD */
@@ -584,12 +568,10 @@
 #define HAVE_SIGNAL 1
 
 /* Define to 1 if you have the <signal.h> header file. */
-#ifndef __MINGW32__
 #define HAVE_SIGNAL_H 1
-#endif
 
 /* Define to 1 if you have the sigsetjmp function or macro. */
-#if !defined(ANDROID_X86) && !defined(__MINGW32__)
+#ifndef ANDROID_X86
 #define HAVE_SIGSETJMP 1
 #endif
 
@@ -606,9 +588,7 @@
 #define HAVE_SOCKET 1
 
 /* Define to 1 if you have the socketpair function. */
-#ifndef __MINGW32__
 #define HAVE_SOCKETPAIR 1
-#endif
 
 /* Define to 1 if you have the <socket.h> header file. */
 /* #undef HAVE_SOCKET_H */
@@ -686,31 +666,25 @@
 /* #undef HAVE_SYS_FILIO_H */
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
-#ifndef __MINGW32__
 #define HAVE_SYS_IOCTL_H 1
-#endif
 
 /* Define to 1 if you have the <sys/param.h> header file. */
 #define HAVE_SYS_PARAM_H 1
 
 /* Define to 1 if you have the <sys/poll.h> header file. */
-#ifndef __MINGW32__
 #define HAVE_SYS_POLL_H 1
-#endif
 
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #define HAVE_SYS_RESOURCE_H 1
 
-#ifndef __MINGW32__
 /* Define to 1 if you have the <sys/select.h> header file. */
 #define HAVE_SYS_SELECT_H 1
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
 #define HAVE_SYS_SOCKET_H 1
-#endif
 
 /* Define to 1 if you have the <sys/sockio.h> header file. */
-#if !defined(ANDROID) && !defined(__MINGW32__) && !defined(HX_LINUX) && !defined(WEBOS) && !defined(BLACKBERRY) && !defined(TIZEN) && !defined(EMSCRIPTEN)
+#if !defined(ANDROID) && !defined(HX_LINUX) && !defined(WEBOS) && !defined(BLACKBERRY) && !defined(TIZEN) && !defined(EMSCRIPTEN)
 #define HAVE_SYS_SOCKIO_H 1
 #endif
 
@@ -727,9 +701,7 @@
 #define HAVE_SYS_UIO_H 1
 
 /* Define to 1 if you have the <sys/un.h> header file. */
-#ifndef __MINGW32__
 #define HAVE_SYS_UN_H 1
-#endif
 
 /* Define to 1 if you have the <sys/utime.h> header file. */
 /* #undef HAVE_SYS_UTIME_H */
