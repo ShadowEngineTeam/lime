@@ -6,7 +6,7 @@
 #include "../../graphics/opengl/OpenGLBindings.h"
 
 #ifdef HX_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #undef CreateWindow
 #endif
 
