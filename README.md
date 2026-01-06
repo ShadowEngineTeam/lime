@@ -3,7 +3,7 @@
 Homura's Lime Fork
 ====
 
-This Lime fork was previously used for the Android and iOS ports I provided. Although it is no longer used for those ports, it is still maintained and continues to exist within the FNF Mobile community and for the [Shadow Engine](https://github.com/FNF-SE/FNF-Shadow-Engine).
+This Lime fork was previously used for the Android and iOS ports I provided. Although it is no longer used for those ports, it is still maintained and continues to exist for the Shadow Engine.
 
 
 License
