@@ -23,8 +23,10 @@
 #include "alconfig.h"
 
 #ifdef _WIN32
+#define INITGUID
 #include <windows.h>
 #include <shlobj.h>
+#include <knownfolders.h>
 #endif
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -330,19 +332,6 @@ auto GetConfigValue(const std::string_view devName, const std::string_view block
 
 
 #ifdef _WIN32
-#ifdef __MINGW32__
-#include <initguid.h>
-
-#ifndef FOLDERID_RoamingAppData
-DEFINE_GUID(FOLDERID_RoamingAppData,
-0x3EB685DB, 0x65F9, 0x4CF6, 0xA0,0x3A,0xE3,0xEF,0x65,0x72,0x9F,0x3D);
-#endif
-
-#ifndef FOLDERID_ProgramData
-DEFINE_GUID(FOLDERID_ProgramData,
-0x62AB5D82, 0xFDC1, 0x4DC3, 0xA9,0xDD,0x07,0x00,0xEE,0xBD,0xF1,0xBD);
-#endif
-#endif
 void ReadALConfig()
 {
     fs::path path;
