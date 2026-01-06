@@ -191,7 +191,7 @@ unsigned long mbedtls_timing_hardclock(void)
 
     return (unsigned long) (offset.QuadPart);
 }
-#endif /* !HAVE_HARDCLOCK && _MSC_VER && !EFIX64 && !EFI32 */
+#endif /* !HAVE_HARDCLOCK && _WIN32 && !EFIX64 && !EFI32 */
 
 #if !defined(HAVE_HARDCLOCK)
 
