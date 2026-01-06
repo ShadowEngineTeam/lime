@@ -25,6 +25,7 @@
 #if defined(WIN32)
 
 #include <curl/curl.h>
+#include <tchar.h>
 #include "system_win32.h"
 #include "version_win32.h"
 #include "curl_sspi.h"

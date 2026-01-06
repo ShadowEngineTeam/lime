@@ -132,6 +132,10 @@ SDL_AtomicTryLock(SDL_SpinLock *lock)
     /* Used for Solaris with non-gcc compilers. */
     return (SDL_bool) ((int) atomic_cas_32((volatile uint32_t*)lock, 0, 1) == 0);
 
+#elif defined(__MINGW32__) && defined(_M_ARM64)
+    /* MinGW ARM64 fix: use GCC atomic built-in */
+    return (__sync_lock_test_and_set(lock, 1) == 0);
+
 #else
 #error Please implement for your platform.
     return SDL_FALSE;

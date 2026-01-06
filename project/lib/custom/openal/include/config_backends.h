@@ -12,7 +12,7 @@
 
 #elif defined(HX_WINDOWS)
 
-#ifdef HXCPP_M64
+#if defined(HXCPP_M64) && !defined(HXCPP_ARM64)
 #include "config/backends/config_backends-windows-x86_64.h"
 #elif defined(HXCPP_ARM64)
 #include "config/backends/config_backends-windows-arm64.h"
