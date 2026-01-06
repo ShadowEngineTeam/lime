@@ -12,7 +12,7 @@
 
 #elif defined(HX_WINDOWS)
 
-#ifdef HXCPP_M64
+#if defined(HXCPP_M64) && !defined(HXCPP_ARM64)
 #include "config/simd/config_simd-windows-x86_64.h"
 #elif defined(HXCPP_ARM64)
 #include "config/simd/config_simd-windows-arm64.h"

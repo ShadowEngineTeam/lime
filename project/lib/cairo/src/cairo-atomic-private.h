@@ -285,7 +285,7 @@ typedef int64_t cairo_atomic_intptr_t;
 typedef int32_t cairo_atomic_int_t;
 
 #if SIZEOF_VOID_P==SIZEOF_INT
-typedef unsigned int cairo_atomic_intptr_t;
+typedef volatile int cairo_atomic_intptr_t;
 #elif SIZEOF_VOID_P==SIZEOF_LONG
 typedef unsigned long cairo_atomic_intptr_t;
 #elif SIZEOF_VOID_P==SIZEOF_LONG_LONG
@@ -304,16 +304,16 @@ _cairo_atomic_int_get (cairo_atomic_int_t *x)
 # define _cairo_atomic_int_get_relaxed(x) *(x)
 # define _cairo_atomic_int_set_relaxed(x, val) *(x) = (val)
 
-# define _cairo_atomic_int_inc(x) ((void) InterlockedIncrement (x))
-# define _cairo_atomic_int_dec(x) ((void) InterlockedDecrement (x))
-# define _cairo_atomic_int_dec_and_test(x) (InterlockedDecrement (x) == 0)
+# define _cairo_atomic_int_inc(x) ((void) InterlockedIncrement((volatile long*)x))
+# define _cairo_atomic_int_dec(x) ((void) InterlockedDecrement((volatile long*)x))
+# define _cairo_atomic_int_dec_and_test(x) (InterlockedDecrement((volatile long*)(x)) == 0)
 
 static cairo_always_inline cairo_bool_t
 _cairo_atomic_int_cmpxchg (cairo_atomic_int_t *x,
                            cairo_atomic_int_t oldv,
                            cairo_atomic_int_t newv)
 {
-    return InterlockedCompareExchange ((unsigned int*)x, (unsigned int)newv, (unsigned int)oldv) == oldv;
+    return InterlockedCompareExchange ((volatile long*)x, (long)newv, (long)oldv) == oldv;
 }
 
 static cairo_always_inline void *
@@ -390,7 +390,13 @@ _cairo_atomic_int_set_relaxed (cairo_atomic_int_t *x, cairo_atomic_int_t val);
 static cairo_always_inline void *
 _cairo_atomic_intptr_to_voidptr (cairo_atomic_intptr_t x)
 {
-  return (void *) x;
+  return (void *)(intptr_t)x;
+}
+
+static cairo_always_inline cairo_atomic_intptr_t
+_cairo_atomic_voidptr_to_intptr(void *x)
+{
+    return (cairo_atomic_intptr_t)(intptr_t)x;
 }
 
 static cairo_always_inline cairo_atomic_int_t

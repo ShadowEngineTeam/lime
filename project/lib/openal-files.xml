@@ -85,11 +85,11 @@
         <file name="${NATIVE_TOOLKIT_PATH}/openal/core/fpu_ctrl.cpp" />
         <file name="${NATIVE_TOOLKIT_PATH}/openal/core/buffer_storage.cpp" />
         <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_c.cpp" />
-        <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_neon.cpp" if="rpi || HXCPP_ARMV7 || HXCPP_ARM64" />
-        <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_sse.cpp" unless="rpi || android || HXCPP_ARMV7 || HXCPP_ARM64" />
-        <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_sse2.cpp" unless="rpi || android || HXCPP_ARMV7 || HXCPP_ARM64" />
-        <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_sse3.cpp" unless="rpi || android || HXCPP_ARMV7 || HXCPP_ARM64" />
-        <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_sse41.cpp" unless="rpi || android || HXCPP_ARMV7 || HXCPP_ARM64" />
+        <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_neon.cpp" if="HXCPP_ARMV7 || HXCPP_ARM64" />
+        <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_sse.cpp" unless="android || HXCPP_ARMV7 || HXCPP_ARM64" />
+        <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_sse2.cpp" unless="android || HXCPP_ARMV7 || HXCPP_ARM64" />
+        <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_sse3.cpp" unless="android || HXCPP_ARMV7 || HXCPP_ARM64" />
+        <file name="${NATIVE_TOOLKIT_PATH}/openal/core/mixer/mixer_sse41.cpp" unless="android || HXCPP_ARMV7 || HXCPP_ARM64" />
         <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/panning.cpp" />
         <file name="${NATIVE_TOOLKIT_PATH}/openal/common/ringbuffer.cpp" />
         <file name="${NATIVE_TOOLKIT_PATH}/openal/core/uhjfilter.cpp" />
@@ -172,7 +172,7 @@
             <compilerflag value="-wd4293" if="isMsvc" />
             <compilerflag value="-Dstrcasecmp=_stricmp" />
             <compilerflag value="-Dstrncasecmp=_strnicmp" />
-			<compilerflag value="/utf-8" />
+			<compilerflag value="/utf-8" if="isMsvc" />
 
         </section>
 

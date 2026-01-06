@@ -22,8 +22,8 @@
 		<compilerflag value="-Wno-attributes" unless="windows" />
 		<compilerflag value="-Wno-enum-conversion" unless="windows" />
 
-		<compilerflag value="/wd5286" if="windows" />
-		<compilerflag value="/wd5287" if="windows" />
+		<compilerflag value="-wd5286" if="isMsvc" />
+		<compilerflag value="-wd5287" if="isMsvc" />
 
 		<file name="${NATIVE_TOOLKIT_PATH}/cairo/src/cairo-analysis-surface.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/cairo/src/cairo-arc.c" />

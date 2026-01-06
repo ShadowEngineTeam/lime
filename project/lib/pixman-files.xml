@@ -29,7 +29,7 @@
 		<compilerflag value="-Wno-attributes" if="android" />
 		<compilerflag value="-Wno-tautological-constant-out-of-range-compare" if="mac || ios || tvos" />
 
-		<compilerflag value="/wd4799" if="windows" />
+		<compilerflag value="/wd4799" if="isMsvc" />
 
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-access-accessors.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-access.c" />
