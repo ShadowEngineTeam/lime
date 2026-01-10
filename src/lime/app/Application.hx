@@ -54,7 +54,7 @@ class Application extends Module
 	/**
 		Update events are dispatched each frame (usually just before rendering)
 	**/
-	public var onUpdate = new Event<#if lime_use_old_deltatime Int #else Float #end->Void>();
+	public var onUpdate = new Event<Float->Void>();
 
 	/**
 		Dispatched when a new window has been created by this application

@@ -472,7 +472,7 @@ class ThreadPool extends WorkOutput
 		Schedules (in multi-threaded mode) or runs (in single-threaded mode) the
 		job queue, then processes incoming events.
 	**/
-	private function __update(deltaTime:#if lime_use_old_deltatime Int #else Float #end):Void
+	private function __update(deltaTime:Float):Void
 	{
 		if (!isMainThread())
 		{
