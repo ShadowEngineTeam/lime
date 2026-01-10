@@ -96,7 +96,7 @@ class NativeApplication
 		handle = NativeCFFI.lime_application_create();
 		#end
 
-		#if (!lime_disable_motion_sensors && (ios || android))
+		#if (ios || android)
 		final accelerometerID:Int = NativeCFFI.lime_system_get_first_accelerometer_sensor_id();
 
 		if (accelerometerID > 0)
@@ -699,10 +699,10 @@ class NativeApplication
 
 @:keep /*private*/ class ApplicationEventInfo
 {
-	public var deltaTime:#if lime_use_old_deltatime Int #else Float #end;
+	public var deltaTime:Float;
 	public var type:ApplicationEventType;
 
-	public function new(type:ApplicationEventType = null, deltaTime:#if lime_use_old_deltatime Int #else Float #end = 0)
+	public function new(type:ApplicationEventType = null, deltaTime:Float = 0)
 	{
 		this.type = type;
 		this.deltaTime = deltaTime;
