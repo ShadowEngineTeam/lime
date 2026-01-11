@@ -241,8 +241,6 @@
 
 				<compilerflag value="-DHAVE_LIBC" />
 
-				<compilerflag value="-D__PRFCHWINTRIN_H" if="isMsvc linux_host || isMsvc mac_host"/>
-
 			</section>
 
 			<compilerflag value="-DLIME_SDL" />
