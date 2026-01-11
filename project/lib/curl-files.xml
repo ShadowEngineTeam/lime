@@ -36,7 +36,7 @@
 		<compilerflag value="-DENABLE_IPV6=1" />
 		<compilerflag value="-DNEED_THREAD_SAFE=1" />
 		<compilerflag value="-DCURL_DISABLE_LDAP" if="winrt" />
-		<compilerflag value="-DHAVE_BOOL_T" if="mingw || isMsvc linux_host || isMsvc mac_host" />
+		<compilerflag value="-DHAVE_BOOL_T" if="mingw" />
 
 		<section if="windows">
 

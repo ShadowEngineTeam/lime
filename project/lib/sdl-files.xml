@@ -115,12 +115,6 @@
             <compilerflag value="-DNATIVE_TOOLKIT_STATIC_ANGLE" if="NATIVE_TOOLKIT_STATIC_ANGLE" />
             <compilerflag value="-DSDL_VIDEO_STATIC_ANGLE" if="NATIVE_TOOLKIT_STATIC_ANGLE" />
 	
-			<compilerflag value="-mmmx" if="isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARM64" />
-            <compilerflag value="-msse" if="isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARM64" />
-            <compilerflag value="-msse2" if="isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARM64" />
-            <compilerflag value="-msse3" if="isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARM64" />
-            <compilerflag value="-mssse3" if="isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARM64" />
-
         </section>
 
         <section if="winrt">
