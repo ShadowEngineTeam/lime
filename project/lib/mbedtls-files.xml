@@ -3,6 +3,8 @@
 	<files id="native-toolkit-mbedtls">
 
 		<compilerflag value="-std=c11" unless="isMsvc" />
+		<compilerflag value="-maes" if="isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARM64" />
+		<compilerflag value="-mpclmul" if="isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARM64" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/mbedtls/include/" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/zlib/" />
 		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/aes.c" />

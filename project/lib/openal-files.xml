@@ -114,11 +114,11 @@
         <file name="${NATIVE_TOOLKIT_PATH}/openal/fmt-11.1.1/src/format.cc" />
         <file name="${NATIVE_TOOLKIT_PATH}/openal/fmt-11.1.1/src/os.cc" />
 
-        <compilerflag value="-mmmx" if="linux || mac || mingw" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
-        <compilerflag value="-msse" if="linux || mac || mingw" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
-        <compilerflag value="-msse2" if="linux || mac || mingw" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
-        <compilerflag value="-msse3" if="linux || mac || mingw" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
-        <compilerflag value="-mssse3" if="linux || mac || mingw" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+        <compilerflag value="-mmmx" if="linux || mac || mingw || isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+        <compilerflag value="-msse" if="linux || mac || mingw || isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+        <compilerflag value="-msse2" if="linux || mac || mingw || isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+        <compilerflag value="-msse3" if="linux || mac || mingw || isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+        <compilerflag value="-mssse3" if="linux || mac || mingw || isMsvc linux_host || isMsvc mac_host" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
 
         <section if="NATIVE_TOOLKIT_HAVE_SDL">
 

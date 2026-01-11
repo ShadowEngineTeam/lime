@@ -6,7 +6,7 @@
 
 		<!-- Use unistd.h anywhere except Win32. -->
 		<compilerflag value="-DZ_HAVE_UNISTD_H" unless="windows" />
-		<compilerflag value="-DZ_HAVE_UNISTD_H" if="windows HXCPP_X86_64" unless="mingw" />
+		<compilerflag value="-DZ_HAVE_UNISTD_H" if="windows HXCPP_X86_64" unless="mingw || isMsvc linux_host || isMsvc mac_host" />
 
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/adler32.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/compress.c" />

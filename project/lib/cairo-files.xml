@@ -22,9 +22,12 @@
 		<compilerflag value="-Wno-attributes" unless="windows" />
 		<compilerflag value="-Wno-enum-conversion" unless="windows" />
 
-		<compilerflag value="-Wno-error=incompatible-pointer-types" if="mingw" />
-		<compilerflag value="-Wno-incompatible-pointer-types" if="mingw" />
-		<compilerflag value="-Wno-int-to-pointer-cast" if="mingw" />
+		<compilerflag value="-DHAVE_STDINT_H" if="isMsvc linux_host || isMsvc mac_host" />
+		<compilerflag value="-DHAVE_UINT64_T" if="isMsvc linux_host || isMsvc mac_host" />
+
+		<compilerflag value="-Wno-error=incompatible-pointer-types" if="mingw || isMsvc linux_host || isMsvc mac_host" />
+		<compilerflag value="-Wno-incompatible-pointer-types" if="mingw|| isMsvc linux_host || isMsvc mac_host" />
+		<compilerflag value="-Wno-int-to-pointer-cast" if="mingw || isMsvc linux_host || isMsvc mac_host" />
 
 		<compilerflag value="-wd5286" if="isMsvc" />
 		<compilerflag value="-wd5287" if="isMsvc" />
