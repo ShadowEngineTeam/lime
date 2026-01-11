@@ -27,6 +27,10 @@
 
 #if defined(USE_X86_MMX) || defined (USE_SSE2) || defined (USE_SSSE3)
 
+#ifdef __clang__
+#include <intrin.h>
+#endif
+
 /* The CPU detection code needs to be in a file not compiled with
  * "-mmmx -msse", as gcc would generate CMOV instructions otherwise
  * that would lead to SIGILL instructions on old CPUs that don't have

@@ -137,14 +137,14 @@ _mm_mulhi_pu16 (__m64 __A, __m64 __B)
  * then define USE_M64_CASTS.
  * If __m64 is a double datatype, then define USE_M64_DOUBLE.
  */
-#ifdef _MSC_VER
+#if defined(__GNUC__) || defined(__clang__)
+# define USE_M64_CASTS
+#elif defined(_MSC_VER)
 # define M64_MEMBER m64_u64
 #elif defined(__ICC)
 # define USE_CVT_INTRINSICS
 #elif defined(USE_LOONGSON_MMI)
 # define USE_M64_DOUBLE
-#elif defined(__GNUC__)
-# define USE_M64_CASTS
 #elif defined(__SUNPRO_C)
 # if (__SUNPRO_C >= 0x5120) && !defined(__NOVECTORSIZE__)
 /* Solaris Studio 12.3 (Sun C 5.12) introduces __attribute__(__vector_size__)
