@@ -695,11 +695,6 @@ class GL
 	}
 
 	#if (lime_opengl || lime_opengles)
-	public static inline function blendBarrier():Void
-	{
-		context.blendBarrier();
-	}
-
 	public static inline function bufferData(target:Int, size:Int, srcData:DataPointer, usage:Int):Void
 	{
 		context.bufferData(target, size, srcData, usage);
