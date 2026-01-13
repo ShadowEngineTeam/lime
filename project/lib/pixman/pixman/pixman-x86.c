@@ -27,7 +27,7 @@
 
 #if defined(USE_X86_MMX) || defined (USE_SSE2) || defined (USE_SSSE3)
 
-#ifdef __clang__
+#if defined(__clang__) && defined(_WIN32)
 #include <intrin.h>
 #endif
 

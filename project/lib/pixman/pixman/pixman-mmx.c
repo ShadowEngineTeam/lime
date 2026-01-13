@@ -137,7 +137,7 @@ _mm_mulhi_pu16 (__m64 __A, __m64 __B)
  * then define USE_M64_CASTS.
  * If __m64 is a double datatype, then define USE_M64_DOUBLE.
  */
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || (defined(__clang__) && defined(_WIN32))
 # define USE_M64_CASTS
 #elif defined(_MSC_VER)
 # define M64_MEMBER m64_u64
