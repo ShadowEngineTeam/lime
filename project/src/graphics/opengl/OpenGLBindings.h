@@ -9,6 +9,10 @@
 	#include <GLES2/gl2ext.h>
 #endif
 
+#ifndef APIENTRY
+    #define APIENTRY
+#endif
+
 namespace lime {
 
 
