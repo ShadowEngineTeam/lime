@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,39 +19,36 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef SDL_config_macosx_h_
-#define SDL_config_macosx_h_
+#ifndef SDL_config_android_h_
+#define SDL_config_android_h_
 #define SDL_config_h_
 
 #include "SDL_platform.h"
 
-/* This gets us MAC_OS_X_VERSION_MIN_REQUIRED... */
-#include <AvailabilityMacros.h>
+/**
+ *  \file SDL_config_android.h
+ *
+ *  This is a configuration that can be used to build SDL for Android
+ */
 
-/* This is a set of defines to configure the SDL features */
+#include <stdarg.h>
 
-#ifdef __LP64__
-    #define SIZEOF_VOIDP 8
-#else
-    #define SIZEOF_VOIDP 4
-#endif
+#define HAVE_GCC_ATOMICS    1
 
-/* Useful headers */
 #define STDC_HEADERS    1
 #define HAVE_ALLOCA_H       1
 #define HAVE_CTYPE_H    1
-#define HAVE_FLOAT_H    1
 #define HAVE_INTTYPES_H 1
 #define HAVE_LIMITS_H   1
 #define HAVE_MATH_H 1
-#define HAVE_SIGNAL_H   1
+#define HAVE_SIGNAL_H 1
 #define HAVE_STDINT_H   1
 #define HAVE_STDIO_H    1
 #define HAVE_STRING_H   1
 #define HAVE_SYS_TYPES_H    1
-#define HAVE_LIBUNWIND_H    1
 
 /* C library functions */
+#define HAVE_DLOPEN 1
 #define HAVE_MALLOC 1
 #define HAVE_CALLOC 1
 #define HAVE_REALLOC    1
@@ -60,8 +57,10 @@
 #define HAVE_GETENV 1
 #define HAVE_SETENV 1
 #define HAVE_PUTENV 1
+#define HAVE_SETENV 1
 #define HAVE_UNSETENV   1
 #define HAVE_QSORT  1
+#define HAVE_BSEARCH 1
 #define HAVE_ABS    1
 #define HAVE_BCOPY  1
 #define HAVE_MEMSET 1
@@ -81,14 +80,13 @@
 #define HAVE_STRTOULL   1
 #define HAVE_STRTOD 1
 #define HAVE_ATOI   1
-#define HAVE_ATOF   1
+#define HAVE_ATOF 1
 #define HAVE_STRCMP 1
 #define HAVE_STRNCMP    1
 #define HAVE_STRCASECMP 1
 #define HAVE_STRNCASECMP 1
 #define HAVE_VSSCANF 1
 #define HAVE_VSNPRINTF  1
-#define HAVE_M_PI   1
 #define HAVE_ACOS   1
 #define HAVE_ACOSF  1
 #define HAVE_ASIN   1
@@ -115,8 +113,12 @@
 #define HAVE_LOGF   1
 #define HAVE_LOG10  1
 #define HAVE_LOG10F 1
+#define HAVE_LROUND 1
+#define HAVE_LROUNDF 1
 #define HAVE_POW    1
 #define HAVE_POWF   1
+#define HAVE_ROUND  1
+#define HAVE_ROUNDF 1
 #define HAVE_SCALBN 1
 #define HAVE_SCALBNF    1
 #define HAVE_SIN    1
@@ -125,26 +127,34 @@
 #define HAVE_SQRTF  1
 #define HAVE_TAN    1
 #define HAVE_TANF   1
-#define HAVE_SIGACTION  1
+#define HAVE_TRUNC    1
+#define HAVE_TRUNCF   1
+#define HAVE_SIGACTION 1
 #define HAVE_SETJMP 1
 #define HAVE_NANOSLEEP  1
 #define HAVE_SYSCONF    1
-#define HAVE_SYSCTLBYNAME 1
+#define HAVE_CLOCK_GETTIME  1
 
-#define HAVE_GCC_ATOMICS 1
+#ifdef __LP64__
+#define SIZEOF_VOIDP 8
+#else
+#define SIZEOF_VOIDP 4
+#endif
 
 /* Enable various audio drivers */
-#define SDL_AUDIO_DRIVER_COREAUDIO  1
-#define SDL_AUDIO_DRIVER_DISK   1
+#define SDL_AUDIO_DRIVER_ANDROID    1
+#define SDL_AUDIO_DRIVER_OPENSLES   1
+#define SDL_AUDIO_DRIVER_AAUDIO     1
 #define SDL_AUDIO_DRIVER_DUMMY  1
 
 /* Enable various input drivers */
-#define SDL_JOYSTICK_IOKIT  1
-#define SDL_JOYSTICK_HIDAPI  1
-#define SDL_HAPTIC_IOKIT    1
+#define SDL_JOYSTICK_ANDROID    1
+#define SDL_JOYSTICK_HIDAPI     1
+#define SDL_JOYSTICK_VIRTUAL    1
+#define SDL_HAPTIC_ANDROID  1
 
-/* Enable the dummy sensor driver */
-#define SDL_SENSOR_DUMMY  1
+/* Enable sensor driver */
+#define SDL_SENSOR_ANDROID  1
 
 /* Enable various shared object loading systems */
 #define SDL_LOADSO_DLOPEN   1
@@ -157,87 +167,25 @@
 #define SDL_TIMER_UNIX  1
 
 /* Enable various video drivers */
-#define SDL_VIDEO_DRIVER_COCOA  1
-#define SDL_VIDEO_DRIVER_DUMMY  1
-#undef SDL_VIDEO_DRIVER_X11
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC "/opt/X11/lib/libX11.6.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XEXT "/opt/X11/lib/libXext.6.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XINERAMA "/opt/X11/lib/libXinerama.1.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT2 "/opt/X11/lib/libXi.6.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR "/opt/X11/lib/libXrandr.2.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XSS "/opt/X11/lib/libXss.1.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XVIDMODE "/opt/X11/lib/libXxf86vm.1.dylib"
-#define SDL_VIDEO_DRIVER_X11_XDBE 1
-#define SDL_VIDEO_DRIVER_X11_XINERAMA 1
-#define SDL_VIDEO_DRIVER_X11_XRANDR 1
-#define SDL_VIDEO_DRIVER_X11_XSCRNSAVER 1
-#define SDL_VIDEO_DRIVER_X11_XSHAPE 1
-#define SDL_VIDEO_DRIVER_X11_XVIDMODE 1
-#define SDL_VIDEO_DRIVER_X11_HAS_XKBKEYCODETOKEYSYM 1
+#define SDL_VIDEO_DRIVER_ANDROID 1
 
-#ifdef MAC_OS_X_VERSION_10_8
-/*
- * No matter the versions targeted, this is the 10.8 or later SDK, so you have
- *  to use the external Xquartz, which is a more modern Xlib. Previous SDKs
- *  used an older Xlib.
- */
-#define SDL_VIDEO_DRIVER_X11_XINPUT2 1
-#define SDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS 1
-#define SDL_VIDEO_DRIVER_X11_CONST_PARAM_XEXTADDDISPLAY 1
-#endif
-
-#ifndef SDL_VIDEO_RENDER_OGL
-#define SDL_VIDEO_RENDER_OGL    1
-#endif
-
-#ifndef SDL_VIDEO_RENDER_OGL_ES2
-#define SDL_VIDEO_RENDER_OGL_ES2 0
-#endif
-
-#ifndef SDL_VIDEO_RENDER_METAL
-/* Metal only supported on 64-bit architectures with 10.11+ */
-#if TARGET_CPU_X86_64 && (MAC_OS_X_VERSION_MAX_ALLOWED >= 101100)
-// #define SDL_VIDEO_RENDER_METAL    1
-#else
-#define SDL_VIDEO_RENDER_METAL    0
-#endif
-#endif
-
-/* Enable OpenGL support */
-#ifndef SDL_VIDEO_OPENGL
-#define SDL_VIDEO_OPENGL    1
-#endif
-#ifndef SDL_VIDEO_OPENGL_ES2
-#define SDL_VIDEO_OPENGL_ES2    1
-#endif
-#ifndef SDL_VIDEO_OPENGL_EGL
-#define SDL_VIDEO_OPENGL_EGL    1
-#endif
-#ifndef SDL_VIDEO_OPENGL_CGL
-#define SDL_VIDEO_OPENGL_CGL    1
-#endif
-#ifndef SDL_VIDEO_OPENGL_GLX
-#define SDL_VIDEO_OPENGL_GLX    1
-#endif
+/* Enable OpenGL ES */
+#define SDL_VIDEO_OPENGL_ES2 1
+#define SDL_VIDEO_OPENGL_EGL 1
+#define SDL_VIDEO_RENDER_OGL_ES2    1
 
 /* Enable Vulkan support */
-/* Metal/MoltenVK/Vulkan only supported on 64-bit architectures with 10.11+ */
-#if TARGET_CPU_X86_64 && (MAC_OS_X_VERSION_MAX_ALLOWED >= 101100)
-// #define SDL_VIDEO_VULKAN 1
-#else
+/* Android does not support Vulkan in native code using the "armeabi" ABI. */
+#if defined(__ARM_ARCH) && __ARM_ARCH < 7
 #define SDL_VIDEO_VULKAN 0
+#else
+#define SDL_VIDEO_VULKAN 1
 #endif
 
 /* Enable system power support */
-#define SDL_POWER_MACOSX 1
+#define SDL_POWER_ANDROID 1
 
-/* enable filesystem support */
-#define SDL_FILESYSTEM_COCOA   1
+/* Enable the filesystem driver */
+#define SDL_FILESYSTEM_ANDROID   1
 
-/* Enable assembly routines */
-#define SDL_ASSEMBLY_ROUTINES   1
-#ifdef __ppc__
-#define SDL_ALTIVEC_BLITTERS    1
-#endif
-
-#endif /* SDL_config_macosx_h_ */
+#endif /* SDL_config_android_h_ */
