@@ -8,7 +8,7 @@ env:
 
 jobs:
   linux:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,7 +16,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y gcc-i686-linux-gnu g++-i686-linux-gnu libdrm-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 libpulse-dev:i386 libasound2-dev:i386 libx11-dev:i386 libxext-dev:i386 libxi-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libmbedtls-dev:i386 libpng-dev:i386 libturbojpeg-dev:i386 libuv1-dev:i386 libvorbis-dev:i386 libgl1-mesa-dev libglu1-mesa-dev libpulse-dev libasound2-dev libx11-dev libxext-dev libxi-dev libxrandr-dev libxinerama-dev libmbedtls-dev libpng-dev libturbojpeg-dev libuv1-dev libvorbis-dev --no-install-recommends --no-install-suggests
+          sudo apt-get install -y gcc-i686-linux-gnu g++-i686-linux-gnu libdrm-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 libpulse-dev:i386 libasound2-dev:i386 libx11-dev:i386 libxext-dev:i386 libxi-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libpng-dev:i386 libturbojpeg-dev:i386 libuv1-dev:i386 libvorbis-dev:i386 libgl1-mesa-dev libglu1-mesa-dev libpulse-dev libasound2-dev libx11-dev libxext-dev libxi-dev libxrandr-dev libxinerama-dev libmbedtls-dev libpng-dev libturbojpeg-dev libuv1-dev libvorbis-dev --no-install-recommends --no-install-suggests
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
@@ -55,7 +55,7 @@ jobs:
             lime.png
           if-no-files-found: error
   linuxarm:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
