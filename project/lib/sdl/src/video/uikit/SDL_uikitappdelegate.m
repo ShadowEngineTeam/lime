@@ -28,6 +28,7 @@
 #include "SDL_main.h"
 
 #import "SDL_uikitappdelegate.h"
+#import "SDL_uikitaudiosession.h"
 #import "SDL_uikitmodes.h"
 #import "SDL_uikitwindow.h"
 
