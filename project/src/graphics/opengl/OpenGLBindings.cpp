@@ -523,13 +523,27 @@ namespace lime {
 
 	HL_PRIM void HL_NAME(hl_gl_blend_barrier) () {
 
+		#ifdef NEED_EXTENSIONS
 		glBlendBarrierKHR ();
+		#elif defined(LIME_SDL) && defined(LIME_GLES) && !defined(IPHONE)
+		auto glBlendBarrierKHR = (PFNGLBLENDBARRIERKHRPROC)SDL_GL_GetProcAddress("glBlendBarrierKHR");
+		if (glBlendBarrierKHR) {
+			glBlendBarrierKHR ();
+		}
+		#endif
 
 	}
 
 	void lime_gl_blend_barrier () {
 
+		#ifdef NEED_EXTENSIONS
 		glBlendBarrierKHR ();
+		#elif defined(LIME_SDL) && defined(LIME_GLES) && !defined(IPHONE)
+		auto glBlendBarrierKHR = (PFNGLBLENDBARRIERKHRPROC)SDL_GL_GetProcAddress("glBlendBarrierKHR");
+		if (glBlendBarrierKHR) {
+			glBlendBarrierKHR ();
+		}
+		#endif
 
 	}
 
