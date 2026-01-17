@@ -9,7 +9,7 @@ This Lime fork was previously used for the Android and iOS ports I provided. Alt
 License
 =======
 
-This Lime fork is licensed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
+This Lime fork is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 
 Installation
