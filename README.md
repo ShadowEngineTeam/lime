@@ -9,7 +9,7 @@ This Lime fork was previously used for the Android and iOS ports I provided. Alt
 License
 =======
 
-This Lime Fork uses the same [MIT license](LICENSE.md) that OpenFL provides.
+This Lime fork is licensed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
 
 
 Installation
