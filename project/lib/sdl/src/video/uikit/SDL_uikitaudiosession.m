@@ -34,7 +34,7 @@ void SDL_AudioSession_Initialize(void)
 	#endif
 }
 
-void SDL_AudioSession_SetActive(bool active)
+void SDL_AudioSession_SetActive(BOOL active)
 {
 	#if TARGET_OS_IOS
 	AVAudioSession *session = [AVAudioSession sharedInstance];
