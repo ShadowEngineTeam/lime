@@ -411,11 +411,7 @@ public class GameActivity extends SDLActivity {
 
 		orientationListener.enable();
 
-		if (audioManager != null) {
-
-			audioManager.abandonAudioFocus(null);
-
-	  	}
+		requestAudioFocus();
 
 		for (Extension extension : extensions) {
 
