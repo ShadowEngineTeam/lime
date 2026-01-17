@@ -548,6 +548,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/metal/SDL_render_metal.m" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/sensor/coremotion/SDL_coremotionsensor.m" if="ios" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/uikit/SDL_uikitappdelegate.m" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/uikit/SDL_uikitaudiosession.m" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/uikit/SDL_uikitclipboard.m" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/uikit/SDL_uikitevents.m" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/uikit/SDL_uikitmessagebox.m" />
