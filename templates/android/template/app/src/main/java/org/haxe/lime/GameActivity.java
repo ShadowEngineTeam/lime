@@ -362,7 +362,7 @@ public class GameActivity extends SDLActivity {
 
 			audioManager.abandonAudioFocus(null);
 
-    	}
+		}
 
 		for (Extension extension : extensions) {
 
