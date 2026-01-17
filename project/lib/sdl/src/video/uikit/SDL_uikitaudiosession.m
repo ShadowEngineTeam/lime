@@ -9,7 +9,7 @@
 
 void SDL_AudioSession_Initialize(void)
 {
-    #if TARGET_OS_IOS
+	#if TARGET_OS_IOS
 	AVAudioSession *session = [AVAudioSession sharedInstance];
 	NSError *error = nil;
 
@@ -31,12 +31,12 @@ void SDL_AudioSession_Initialize(void)
 	} else {
 		[session setActive:YES error:nil];
 	}
-    #endif
+	#endif
 }
 
 void SDL_AudioSession_SetActive(bool active)
 {
-    #if TARGET_OS_IOS
+	#if TARGET_OS_IOS
 	AVAudioSession *session = [AVAudioSession sharedInstance];
 	NSError *error = nil;
 
@@ -45,5 +45,5 @@ void SDL_AudioSession_SetActive(bool active)
 	if (error) {
 		NSLog(@"Unable to set active of audio session: %@", error);
 	}
-    #endif
+	#endif
 }
