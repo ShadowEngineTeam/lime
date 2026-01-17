@@ -4628,14 +4628,14 @@ namespace lime {
 			gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress);
 			#endif
 
-			glEnable(GL_DEBUG_OUTPUT_KHR);
-			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_KHR);
+			//glEnable(GL_DEBUG_OUTPUT_KHR);
+			//glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_KHR);
 
-			glDebugMessageControlKHR(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH_KHR, 0, nullptr, GL_TRUE);
-			glDebugMessageControlKHR(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_MEDIUM_KHR, 0, nullptr, GL_TRUE);
-			glDebugMessageControlKHR(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_KHR, 0, nullptr, GL_TRUE);
+			//glDebugMessageControlKHR(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH_KHR, 0, nullptr, GL_TRUE);
+			//glDebugMessageControlKHR(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_MEDIUM_KHR, 0, nullptr, GL_TRUE);
+			//glDebugMessageControlKHR(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_KHR, 0, nullptr, GL_TRUE);
 
-			glDebugMessageCallbackKHR(OpenGLBindings::LogGLDebugMessage, nullptr);
+			//glDebugMessageCallbackKHR(OpenGLBindings::LogGLDebugMessage, nullptr);
 
 			initialized = true;
 
