@@ -362,16 +362,7 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    NSError *error = nil;
-
-    [audioSession setCategory:AVAudioSessionCategoryPlayback error:&error];
-
-    [audioSession setActive:YES error:&error];
-
-    if (error) {
-        NSLog(@"Error setting up audio session: %@", error.localizedDescription);
-    }
+    SDL_AudioSession_Initialize();
 
     NSBundle *bundle = [NSBundle mainBundle];
 
@@ -511,43 +502,29 @@ SDL_LoadLaunchImageNamed(NSString *name, int screenh)
 
 - (void)applicationWillResignActive:(UIApplication*)application
 {
+    SDL_AudioSession_SetActive(false);
+
     SDL_OnApplicationWillResignActive();
 }
 
 - (void)applicationDidEnterBackground:(UIApplication*)application
 {
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    NSError *error = nil;
+    SDL_AudioSession_SetActive(false);
 
-    [audioSession setCategory:AVAudioSessionCategoryPlayback
-        withOptions:AVAudioSessionCategoryOptionMixWithOthers
-            error:&error];
-
-    [audioSession setActive:YES error:&error];
-
-    if (error) {
-        NSLog(@"Error activating audio session on background: %@", error.localizedDescription);
-    }
     SDL_OnApplicationDidEnterBackground();
 }
 
 - (void)applicationWillEnterForeground:(UIApplication*)application
 {
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    NSError *error = nil;
+    SDL_AudioSession_SetActive(true);
 
-    [audioSession setCategory:AVAudioSessionCategoryPlayback error:&error];
-
-    [audioSession setActive:YES error:&error];
-
-    if (error) {
-        NSLog(@"Error activating audio session on foreground: %@", error.localizedDescription);
-    }
     SDL_OnApplicationWillEnterForeground();
 }
 
 - (void)applicationDidBecomeActive:(UIApplication*)application
 {
+    SDL_AudioSession_SetActive(true);
+
     SDL_OnApplicationDidBecomeActive();
 }
 
