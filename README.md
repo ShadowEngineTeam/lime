@@ -21,8 +21,8 @@ Installation
 
 2. Install required dependencies:
 
-        haxelib git format https://github.com/FNF-SE/format
-        haxelib git hxp https://github.com/FNF-SE/hxp
+        haxelib git format https://github.com/HaxeFoundation/format 9d69fb342d030fa120d2deafafbbffad248332b8
+        haxelib git hxp https://github.com/openfl/hxp b90dee15b5c00e2bd10b86fdfee53f2c1b551e02
 
 3. After cloning see [project/README.md](project/README.md) for details about building native binaries.
 
