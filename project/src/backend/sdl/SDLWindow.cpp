@@ -6,6 +6,35 @@
 
 namespace lime {
 
+	// #if defined (HX_WINDOWS) || defined (HX_MACOS) || defined (HX_LINUX)
+	// static SDL_EGLAttrib* SDLCALL GetPlatformAttribs()
+	// {
+	// 	// Since we cant link Angle's libs directly to Lime, we need to do this.
+
+	// 	static SDL_EGLAttrib attribs[] = {
+
+	// 		0x3203, // EGL_PLATFORM_ANGLE_TYPE_ANGLE
+
+	// 		#if defined (HX_WINDOWS) || defined (HX_LINUX)
+
+	// 		0x3450, // EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE
+
+	// 		#elif defined (HX_MACOS)
+
+	// 		0x3489, // EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE
+
+	// 		#endif
+
+	// 		0x3482, // EGL_POWER_PREFERENCE_ANGLE
+	// 		0x0002, // EGL_HIGH_POWER_ANGLE
+
+	// 		0x3038 // EGL_NONE
+
+	// 	};
+
+	// 	return attribs;
+	// }
+	// #endif
 
 	static Cursor currentCursor = DEFAULT;
 
@@ -67,11 +96,13 @@ namespace lime {
 		SDL_SetHint (SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 		#endif
 
+		#if !(defined (LIME_ANGLE) && defined (IPHONE))
+		SDL_SetHint (SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
+
 		#ifdef HX_WINDOWS
-		SDL_SetHint (SDL_HINT_VIDEO_WIN_D3DCOMPILER, "d3dcompiler_47.dll");
+		SDL_SetHint (SDL_HINT_VIDEO_WIN_D3DCOMPILER, "none");
 		#endif
 
-		#if !(defined (LIME_ANGLE) && defined (IPHONE))
 		SDL_SetHint (SDL_HINT_OPENGL_ES_DRIVER, "1");
 		#endif
 
@@ -150,6 +181,12 @@ namespace lime {
 
 			#else
 
+			// #if defined (HX_WINDOWS) || defined (HX_MACOS) || defined (HX_LINUX)
+
+			// SDL_GL_SetAttribute(SDL_GL_EGL_PLATFORM, 0x3202); // EGL_PLATFORM_ANGLE_ANGLE
+
+			// #endif
+
 			if (flags & WINDOW_FLAG_COLOR_DEPTH_32_BIT) {
 
 				SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -203,6 +240,12 @@ namespace lime {
 		#endif
 
 		#if !(defined (LIME_ANGLE) && defined (IPHONE))
+
+		// #if defined (HX_WINDOWS) || defined (HX_MACOS) || defined (HX_LINUX)
+
+		// SDL_EGL_SetEGLAttributeCallbacks(GetPlatformAttribs, NULL, NULL);
+
+		// #endif
 
 		SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 		SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);

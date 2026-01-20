@@ -26,6 +26,8 @@
 #include "SDL_cocoaopengles.h"
 #include "SDL_cocoaopengl.h"
 
+#include "SDL_cocoametalview.h"
+
 /* EGL implementation of SDL OpenGL support */
 
 int
@@ -119,7 +121,7 @@ Cocoa_GLES_SetupWindow(_THIS, SDL_Window * window)
     SDL_WindowData *windowdata = (__bridge SDL_WindowData *) window->driverdata;
     SDL_Window *current_win = SDL_GL_GetCurrentWindow();
     SDL_GLContext current_ctx = SDL_GL_GetCurrentContext();
-
+    SDL_MetalView metalview;
 
     if (_this->egl_data == NULL) {
         /* !!! FIXME: commenting out this assertion is (I think) incorrect; figure out why driver_loaded is wrong for ANGLE instead. --ryan. */
@@ -132,14 +134,24 @@ Cocoa_GLES_SetupWindow(_THIS, SDL_Window * window)
         }
         _this->gl_config.driver_loaded = 1;
     }
+
+    /* Create the Metal view for window */
+    metalview = Cocoa_Metal_CreateView(_this, window);
+    if (metalview == NULL) {
+        return SDL_SetError("Could not create Metal view for window");
+    }
   
     /* Create the GLES window surface */
-    NSView* v = windowdata.nswindow.contentView;
-    windowdata.egl_surface = SDL_EGL_CreateSurface(_this, (__bridge NativeWindowType)[v layer]);
+    windowdata.egl_surface = SDL_EGL_CreateSurface(_this, (__bridge NativeWindowType)Cocoa_Metal_GetLayer(metalview));
 
     if (windowdata.egl_surface == EGL_NO_SURFACE) {
+        Cocoa_Metal_DestroyView(_this, metalview);
         return SDL_SetError("Could not create GLES window surface");
     }
+
+    /* Right now the metal view's ref count is +2 (one from returning a new view object in CreateView, and one because it's a subview of the window.)
+     * If we release the view here to make it +1, it will be destroyed when the window is destroyed. */
+    CFBridgingRelease(metalview);
 
     return Cocoa_GLES_MakeCurrent(_this, current_win, current_ctx);
 }
