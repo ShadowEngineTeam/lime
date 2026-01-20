@@ -1,3 +1,4 @@
 -main RunScript
+-D lime_use_old_deltatime
 -neko ../run.n
 -lib hxp

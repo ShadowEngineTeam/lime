@@ -1,6 +1,7 @@
 -main SVGExport
 -neko ../svg.n
 -D lime=7.0.0
+-D lime_use_old_deltatime
 -cp ../src
 -lib hxp
 -lib openfl
