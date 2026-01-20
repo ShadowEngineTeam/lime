@@ -1,6 +1,8 @@
 package lime.media;
 
 import lime.app.Event;
+import lime.media.openal.AL;
+import lime.media.openal.ALSource;
 import lime.math.Vector4;
 
 #if !lime_debug
@@ -18,32 +20,20 @@ import lime.math.Vector4;
 **/
 class AudioSource
 {
-	private static var activeSources:Array<AudioSource> = [];
-
 	/**
 		An event that is dispatched when the audio playback is complete.
 	**/
 	public var onComplete = new Event<Void->Void>();
-
-	/**
-		An event that is dispatched when the audio playback looped.
-	**/
-	public var onLoop = new Event<Void->Void>();
-
+	
 	/**
 		The `AudioBuffer` associated with this `AudioSource`.
 	**/
 	public var buffer:AudioBuffer;
 
 	/**
-		An property if this 'AudioSource' is playing.
-	**/
-	public var playing(get, null):Bool;
-
-	/**
 		The current playback position of the audio, in milliseconds.
 	**/
-	public var currentTime(get, set):Float;
+	public var currentTime(get, set):Int;
 
 	/**
 		The gain (volume) of the audio. A value of `1.0` represents the default volume.
@@ -53,17 +43,12 @@ class AudioSource
 	/**
 		The length of the audio, in milliseconds.
 	**/
-	public var length(get, set):Null<Float>;
+	public var length(get, set):Int;
 
 	/**
 		The number of times the audio will loop. A value of `0` means the audio will not loop.
 	**/
 	public var loops(get, set):Int;
-
-	/**
-		In which audio playback time the audio will loop.
-	**/
-	public var loopTime(get, set):Float;
 
 	/**
 		The pitch of the audio. A value of `1.0` represents the default pitch.
@@ -73,22 +58,12 @@ class AudioSource
 	/**
 		The offset within the audio buffer to start playback, in samples.
 	**/
-	public var offset:Float;
+	public var offset:Int;
 
 	/**
 		The 3D position of the audio source, represented as a `Vector4`.
 	**/
 	public var position(get, set):Vector4;
-
-	/**
-		The stereo pan of the audio source.
-	**/
-	public var pan(get, set):Float;
-
-	/**
-		The latency of the audio source.
-	**/
-	public var latency(get, never):Float;
 
 	@:noCompletion private var __backend:AudioSourceBackend;
 
@@ -99,7 +74,7 @@ class AudioSource
 		@param length The length of the audio to play, in milliseconds. If `null`, the full buffer is used.
 		@param loops The number of times to loop the audio. `0` means no looping.
 	**/
-	public function new(buffer:AudioBuffer = null, offset:Float = 0, length:Null<Float> = null, loops:Int = 0)
+	public function new(buffer:AudioBuffer = null, offset:Int = 0, length:Null<Int> = null, loops:Int = 0)
 	{
 		this.buffer = buffer;
 		this.offset = offset;
@@ -111,33 +86,31 @@ class AudioSource
 			this.length = length;
 		}
 
+		this.loops = loops;
+
 		if (buffer != null)
 		{
 			init();
 		}
-
-		this.loops = loops;
 	}
 
 	/**
 		Releases any resources used by this `AudioSource`.
 	**/
-	inline public function dispose():Void
+	public function dispose():Void
 	{
 		__backend.dispose();
-		activeSources.remove(this);
 	}
 
-	@:noCompletion inline private function init():Void
+	@:noCompletion private function init():Void
 	{
 		__backend.init();
-		if (!activeSources.contains(this)) activeSources.push(this);
 	}
 
 	/**
 		Starts or resumes audio playback.
 	**/
-	inline public function play():Void
+	public function play():Void
 	{
 		__backend.play();
 	}
@@ -145,7 +118,7 @@ class AudioSource
 	/**
 		Pauses audio playback.
 	**/
-	inline public function pause():Void
+	public function pause():Void
 	{
 		__backend.pause();
 	}
@@ -153,100 +126,70 @@ class AudioSource
 	/**
 		Stops audio playback and resets the playback position to the beginning.
 	**/
-	inline public function stop():Void
+	public function stop():Void
 	{
 		__backend.stop();
 	}
 
 	// Get & Set Methods
-	@:noCompletion inline private function get_playing():Bool
-	{
-		@:privateAccess return __backend.playing;
-	}
-
-	@:noCompletion inline private function get_currentTime():Float
+	@:noCompletion private function get_currentTime():Int
 	{
 		return __backend.getCurrentTime();
 	}
 
-	@:noCompletion inline private function set_currentTime(value:Float):Float
+	@:noCompletion private function set_currentTime(value:Int):Int
 	{
 		return __backend.setCurrentTime(value);
 	}
 
-	@:noCompletion inline private function get_gain():Float
+	@:noCompletion private function get_gain():Float
 	{
 		return __backend.getGain();
 	}
 
-	@:noCompletion inline private function set_gain(value:Float):Float
+	@:noCompletion private function set_gain(value:Float):Float
 	{
 		return __backend.setGain(value);
 	}
 
-	@:noCompletion inline private function get_length():Null<Float>
+	@:noCompletion private function get_length():Int
 	{
 		return __backend.getLength();
 	}
 
-	@:noCompletion inline private function set_length(value:Null<Float>):Null<Float>
+	@:noCompletion private function set_length(value:Int):Int
 	{
 		return __backend.setLength(value);
 	}
 
-	@:noCompletion inline private function get_loops():Int
+	@:noCompletion private function get_loops():Int
 	{
 		return __backend.getLoops();
 	}
 
-	@:noCompletion inline private function set_loops(value:Int):Int
+	@:noCompletion private function set_loops(value:Int):Int
 	{
 		return __backend.setLoops(value);
 	}
 
-	@:noCompletion inline private function get_loopTime():Float
-	{
-		return __backend.getLoopTime();
-	}
-
-	@:noCompletion inline private function set_loopTime(value:Float):Float
-	{
-		return __backend.setLoopTime(value);
-	}
-
-	@:noCompletion inline private function get_pitch():Float
+	@:noCompletion private function get_pitch():Float
 	{
 		return __backend.getPitch();
 	}
 
-	@:noCompletion inline private function set_pitch(value:Float):Float
+	@:noCompletion private function set_pitch(value:Float):Float
 	{
 		return __backend.setPitch(value);
 	}
 
-	@:noCompletion inline private function get_position():Vector4
+	@:noCompletion private function get_position():Vector4
 	{
 		return __backend.getPosition();
 	}
 
-	@:noCompletion inline private function set_position(value:Vector4):Vector4
+	@:noCompletion private function set_position(value:Vector4):Vector4
 	{
 		return __backend.setPosition(value);
-	}
-
-	@:noCompletion inline private function get_pan():Float
-	{
-		return __backend.getPan();
-	}
-
-	@:noCompletion inline private function set_pan(value:Float):Float
-	{
-		return __backend.setPan(value);
-	}
-
-	@:noCompletion inline private function get_latency():Float
-	{
-		return __backend.getLatency();
 	}
 }
 
