@@ -142,7 +142,7 @@ Cocoa_GLES_SetupWindow(_THIS, SDL_Window * window)
     }
   
     /* Create the GLES window surface */
-    windowdata.egl_surface = SDL_EGL_CreateSurface(_this, (__bridge NativeWindowType)Cocoa_Metal_GetLayer(_this, metalview));
+    windowdata.egl_surface = SDL_EGL_CreateSurface(_this, (NativeWindowType)Cocoa_Metal_GetLayer(_this, metalview));
 
     if (windowdata.egl_surface == EGL_NO_SURFACE) {
         Cocoa_Metal_DestroyView(_this, metalview);
