@@ -98,7 +98,7 @@ typedef struct _UIViewController UIViewController;
 typedef Uint32 GLuint;
 #endif
 
-#if defined(SDL_VIDEO_VULKAN) || defined(SDL_VIDEO_METAL)
+#if defined(SDL_VIDEO_VULKAN) || defined(SDL_VIDEO_OPENGL_EGL) || defined(SDL_VIDEO_METAL)
 #define SDL_METALVIEW_TAG 255
 #endif
 
