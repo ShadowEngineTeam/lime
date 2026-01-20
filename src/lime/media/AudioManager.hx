@@ -182,31 +182,31 @@ class AudioManager
 	@:noCompletion
 	private static function setupConfig():Void
 	{
-		#if (windows || mac || linux || android || ios)
+		#if (lime_openal && (windows || mac || linux || android || ios))
 		final alConfig:Array<String> = [];
 
-		alConfig.push('[General]');
+		alConfig.push('[general]');
+		alConfig.push('channels=stereo');
 		alConfig.push('sample-type=float32');
 		alConfig.push('stereo-mode=speakers');
+		alConfig.push('stereo-encoding=panpot');
 		alConfig.push('hrtf=false');
 		alConfig.push('cf_level=0');
-		alConfig.push('output-limiter=false');
+		alConfig.push('resampler=fast_bsinc24');
 		alConfig.push('front-stablizer=false');
+		alConfig.push('output-limiter=false');
 		alConfig.push('volume-adjust=0');
 		alConfig.push('period_size=441');
-		alConfig.push('sources=512');
-		alConfig.push('sends=64');
-		alConfig.push('dither=false');
 
 		alConfig.push('[decoder]');
-		alConfig.push('hq-mode=true');
-		alConfig.push('distance-comp=true');
+		alConfig.push('hq-mode=false');
+		alConfig.push('distance-comp=false');
 		alConfig.push('nfc=false');
 
 		try
 		{
 			final directory:String = Path.directory(Path.withoutExtension(System.applicationStorageDirectory));
-			final path:String = Path.join([directory, #if windows 'alsoft.ini' #else 'alsoft.conf' #end]);
+			final path:String = Path.join([directory, #if windows 'audio-config.ini' #else 'audio-config.conf' #end]);
 			final content:String = alConfig.join('\n');
 
 			if (!FileSystem.exists(directory)) FileSystem.createDirectory(directory);
