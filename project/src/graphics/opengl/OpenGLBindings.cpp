@@ -1473,15 +1473,12 @@ namespace lime {
 
 		value result = alloc_empty_object ();
 
-		GLsizei maxLength = 0;
-		glGetProgramiv (program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxLength);
-
-		std::string buffer (maxLength, 0);
+		std::string buffer (GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, 0);
 		GLsizei outLen = 0;
 		GLsizei size = 0;
 		GLenum type = 0;
 
-		glGetActiveAttrib (program, index, maxLength, &outLen, &size, &type, &buffer[0]);
+		glGetActiveAttrib (program, index, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &outLen, &size, &type, &buffer[0]);
 
 		buffer.resize (outLen);
 
@@ -1496,21 +1493,16 @@ namespace lime {
 
 	HL_PRIM vdynamic* HL_NAME(hl_gl_get_active_attrib) (int program, int index) {
 
-		GLsizei maxLength = 0;
-		glGetProgramiv (program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxLength);
-
-		char* buffer = (char*)malloc (maxLength);
+		char buffer[GL_ACTIVE_ATTRIBUTE_MAX_LENGTH];
 		GLsizei outLen = 0;
 		GLsizei size = 0;
 		GLenum type = 0;
 
-		glGetActiveAttrib (program, index, maxLength, &outLen, &size, &type, &buffer[0]);
+		glGetActiveAttrib (program, index, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &outLen, &size, &type, &buffer[0]);
 
 		char* _buffer = (char*)malloc (outLen + 1);
 		memcpy (_buffer, &buffer, outLen);
 		_buffer[outLen] = '\0';
-
-		free (buffer);
 
 		const int id_size = hl_hash_utf8 ("size");
 		const int id_type = hl_hash_utf8 ("type");
@@ -4628,43 +4620,10 @@ namespace lime {
 			gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress);
 			#endif
 
-			//glEnable(GL_DEBUG_OUTPUT_KHR);
-			//glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_KHR);
-
-			//glDebugMessageControlKHR(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH_KHR, 0, nullptr, GL_TRUE);
-			//glDebugMessageControlKHR(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_MEDIUM_KHR, 0, nullptr, GL_TRUE);
-			//glDebugMessageControlKHR(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_KHR, 0, nullptr, GL_TRUE);
-
-			//glDebugMessageCallbackKHR(OpenGLBindings::LogGLDebugMessage, nullptr);
-
 			initialized = true;
 
 		}
 
-	}
-
-	#if defined(LIME_ANGLE) && defined(IPHONE)
-	void GL_APIENTRY OpenGLBindings::LogGLDebugMessage(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam)
-	#else
-	void APIENTRY OpenGLBindings::LogGLDebugMessage(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam)
-	#endif
-	{
-		printf(
-			"\n[GL DEBUG]\n"
-			"\tsource=0x%X\n"
-			"\ttype=0x%X\n"
-			"\tid=0x%X\n"
-			"\tseverity=0x%X\n"
-			"\tmessage=%.*s\n",
-			source,
-			type,
-			id,
-			severity,
-			length,
-			message
-		);
-
-		fflush(stdout);
 	}
 
 

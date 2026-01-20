@@ -98,7 +98,6 @@
 		<dependency path="dependencies/webgl-debug.js" if="html5 webgl-debug" embed="true" />
 		<dependency path="dependencies/stats.min.js" if="html5 stats" embed="true" />
 
-		<dependency path="dependencies/angle/Windows/d3dcompiler_47.dll" if="windows" />
 		<dependency path="dependencies/angle/Windows/libEGL.dll" if="windows" />
 		<dependency path="dependencies/angle/Windows/libGLESv2.dll" if="windows" />
 
@@ -107,17 +106,9 @@
 
 		<dependency path="dependencies/angle/Linux/libEGL.so" if="linux" />
 		<dependency path="dependencies/angle/Linux/libGLESv2.so" if="linux" />
-		<dependency path="dependencies/angle/Linux/libvk_swiftshader.so" if="linux" />
-		<dependency path="dependencies/angle/Linux/libVkICD_mock_icd.so" if="linux" />
 
-		<section if="ios">
-			<dependency path="dependencies/angle/iPhone/arm64/libEGL.framework" embed="true" unless="simulator" />
-			<dependency path="dependencies/angle/iPhone/arm64/libGLESv2.framework" embed="true" unless="simulator" />
-
-			<dependency path="dependencies/angle/iPhone/arm64_x86_64-simulator/libEGL.framework" embed="true" if="simulator" />
-			<dependency path="dependencies/angle/iPhone/arm64_x86_64-simulator/libGLESv2.framework" embed="true" if="simulator" />
-		</section>
-
+		<dependency path="dependencies/angle/iPhone/libEGL.xcframework" embed="true" if="ios" />
+		<dependency path="dependencies/angle/iPhone/libGLESv2.xcframework" embed="true" if="ios" />
 
 		<!-- TODO: Move to template or move all template dependencies to XML? -->
 		<!-- <dependency name="CoreBluetooth.framework" if="ios" /> -->
