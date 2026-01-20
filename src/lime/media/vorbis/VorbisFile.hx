@@ -15,9 +15,6 @@ class VorbisFile
 
 	@:noCompletion private var handle:Dynamic;
 
-	@:noCompletion var _filePath:String;
-	@:noCompletion var _bytes:Bytes;
-
 	@:noCompletion private function new(handle:Dynamic)
 	{
 		this.handle = handle;
@@ -46,16 +43,6 @@ class VorbisFile
 		#if (lime_cffi && lime_vorbis && !macro)
 		NativeCFFI.lime_vorbis_file_clear(handle);
 		#end
-		handle = null;
-		_filePath = null;
-		_bytes = null;
-	}
-
-	public function clone():VorbisFile
-	{
-		if (_filePath != null) return fromFile(_filePath);
-		if (_bytes != null) return fromBytes(_bytes);
-		return null;
 	}
 
 	public function comment(bitstream:Int = -1):VorbisComment
@@ -91,9 +78,7 @@ class VorbisFile
 
 		if (handle != null)
 		{
-			var vorbisFile = new VorbisFile(handle);
-			vorbisFile._bytes = bytes;
-			return vorbisFile;
+			return new VorbisFile(handle);
 		}
 		#end
 
@@ -107,9 +92,7 @@ class VorbisFile
 
 		if (handle != null)
 		{
-			var vorbisFile = new VorbisFile(handle);
-			vorbisFile._filePath = path;
-			return vorbisFile;
+			return new VorbisFile(handle);
 		}
 		#end
 
