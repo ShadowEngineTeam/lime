@@ -519,7 +519,7 @@ SDL_EGL_LoadLibrary(_THIS, const char *egl_path, NativeDisplayType native_displa
         if (_this->egl_data->eglGetPlatformDisplay) {
 			#if defined(SDL_VIDEO_DRIVER_COCOA) || defined(SDL_VIDEO_DRIVER_WINDOWS) || defined(SDL_VIDEO_DRIVER_X11)
 
-			static const EGLint display_attribs[] = {
+			static const EGLAttrib display_attribs[] = {
 				0x3203, // EGL_PLATFORM_ANGLE_TYPE_ANGLE
 #if defined(SDL_VIDEO_DRIVER_WINDOWS) || defined(SDL_VIDEO_DRIVER_X11)
 				0x3450, // EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE

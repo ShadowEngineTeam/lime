@@ -102,6 +102,7 @@
         <compilerflag value="-I${SDL_CONFIG_PATH}" if="SDL_CONFIG_PATH" />
 
         <compilerflag value="-DGL_GLEXT_PROTOTYPES" if="android || linux || LIME_ANGLE iphone" />
+        <compilerflag value="-DGLES_SILENCE_DEPRECATION" if="ios" />
         <compilerflag value="-DHAVE_LIBC" />
 
         <compilerflag value="-D__IPHONEOS__" if="ios || tvos" />
