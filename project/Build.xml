@@ -11,7 +11,6 @@
 
 	<set name="ios" value="1" if="iphone" />
 	<set name="tvos" value="1" if="appletv" />
-
 	<set name="LIME_CAIRO" value="1" />
 	<set name="LIME_CURL" value="1" unless="winrt" />
 	<set name="LIME_EFSW" value="1" if="windows || mac || linux" unless="winrt" />
@@ -27,7 +26,7 @@
 	<set name="LIME_OGG" value="1" />
 	<set name="LIME_OPENALSOFT" value="1" if="windows || linux || mac || android || iphone" unless="tvos" />
 	<set name="LIME_OPENAL" value="1" if="webassembly || tvos" />
-	<set name="LIME_MOJOAL" value="1" if="switch || static_link || winrt || mojoal" unless="LIME_OPENAL || LIME_OPENALSOFT" />
+	<set name="LIME_MOJOAL" value="1" if="switch || static_link || winrt || mojoal" unless="LIME_OPENAL || iphone LIME_OPENALSOFT" />
 	<unset name="LIME_OPENALSOFT" if="LIME_MOJOAL" />
 	<set name="LIME_OPENAL" value="1" if="LIME_OPENALSOFT" />
 	<set name="LIME_OPENAL" value="1" if="LIME_MOJOAL" />
