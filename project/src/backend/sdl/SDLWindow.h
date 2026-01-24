@@ -8,13 +8,6 @@
 #include <ui/Cursor.h>
 #include <ui/Window.h>
 
-#if defined (LIME_ANGLE) && defined (IPHONE)
-	#include <EGL/egl.h>
-	#include <EGL/eglext.h>
-#endif
-
-#include <vector>
-
 namespace lime {
 
 
@@ -74,18 +67,7 @@ namespace lime {
 
 		private:
 
-			#if defined (LIME_ANGLE) && defined (IPHONE)
-			std::vector<EGLAttrib> egl_display_attribs;
-			std::vector<EGLint> egl_config_attribs;
-			std::vector<EGLint> egl_context_attribs;
-
-			SDL_MetalView eglMetalView;
-			EGLDisplay eglDisplay;
-			EGLContext eglContext;
-			EGLSurface eglSurface;
-			#else
 			SDL_GLContext context;
-			#endif
 
 			int contextHeight;
 			int contextWidth;
