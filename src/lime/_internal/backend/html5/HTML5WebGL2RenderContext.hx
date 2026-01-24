@@ -634,8 +634,8 @@ extern class HTML5WebGL2RenderContext extends WebGLRenderingContext
 	public function getActiveUniformBlockName(program:GLProgram, uniformBlockIndex:Int):String;
 	public function getActiveUniformBlockParameter(program:GLProgram, uniformBlockIndex:Int, pname:Int):Dynamic;
 	public function getActiveUniforms(program:GLProgram, uniformIndices:Array<Int>, pname:Int):Dynamic;
-	public function getBufferSubData(target:Int, srcByteOffset:DataPointer, dstData:Dynamic /*SharedArrayBuffer*/, ?srcOffset:Int, ?length:Int):Void;
 	@:overload(function(target:Int, srcByteOffset:DataPointer, dstData:ArrayBuffer, ?srcOffset:Int, ?length:Int):Void {})
+	public function getBufferSubData(target:Int, srcByteOffset:DataPointer, dstData:Dynamic /*SharedArrayBuffer*/, ?srcOffset:Int, ?length:Int):Void;
 	public function getFragDataLocation(program:GLProgram, name:String):Int;
 	public function getIndexedParameter(target:Int, index:Int):Dynamic;
 	public function getInternalformatParameter(target:Int, internalformat:Int, pname:Int):Dynamic;
