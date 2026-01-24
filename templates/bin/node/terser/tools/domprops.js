@@ -4370,6 +4370,7 @@ export var domprops = [
     "getBounds",
     "getBoxQuads",
     "getBufferParameter",
+    "getBufferSubData",
     "getByteFrequencyData",
     "getByteTimeDomainData",
     "getCSSCanvasContext",

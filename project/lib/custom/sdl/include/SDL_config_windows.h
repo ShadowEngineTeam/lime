@@ -77,10 +77,6 @@ typedef unsigned int uintptr_t;
 #else
 # define SIZEOF_VOIDP 4
 #endif
-#ifdef __MINGW32__
-#define HAVE_GCC_ATOMICS 1
-/* #undef HAVE_GCC_SYNC_LOCK_TEST_AND_SET */
-#endif
 
 #define HAVE_DDRAW_H 1
 #define HAVE_DINPUT_H 1
@@ -224,10 +220,11 @@ typedef unsigned int uintptr_t;
 #ifndef SDL_VIDEO_RENDER_D3D
 #define SDL_VIDEO_RENDER_D3D    0
 #endif
-
 #ifndef SDL_VIDEO_RENDER_D3D11
 #define SDL_VIDEO_RENDER_D3D11  0
 #endif
+
+#ifndef NATIVE_TOOLKIT_SDL_ANGLE
 
 /* Enable OpenGL support */
 #ifndef SDL_VIDEO_OPENGL
@@ -240,6 +237,31 @@ typedef unsigned int uintptr_t;
 #define SDL_VIDEO_RENDER_OGL    1
 #endif
 #ifndef SDL_VIDEO_RENDER_OGL_ES2
+#define SDL_VIDEO_RENDER_OGL_ES2    0
+#endif
+#ifndef SDL_VIDEO_OPENGL_ES2
+#define SDL_VIDEO_OPENGL_ES2    0
+#endif
+#ifndef SDL_VIDEO_OPENGL_EGL
+#define SDL_VIDEO_OPENGL_EGL    0
+#endif
+
+/* Enable Vulkan support */
+#define SDL_VIDEO_VULKAN 1
+
+#else
+
+/* Enable OpenGL support (ES2/ANGLE) */
+#ifndef SDL_VIDEO_OPENGL
+#define SDL_VIDEO_OPENGL    1
+#endif
+#ifndef SDL_VIDEO_OPENGL_WGL
+#define SDL_VIDEO_OPENGL_WGL    0
+#endif
+#ifndef SDL_VIDEO_RENDER_OGL
+#define SDL_VIDEO_RENDER_OGL    0
+#endif
+#ifndef SDL_VIDEO_RENDER_OGL_ES2
 #define SDL_VIDEO_RENDER_OGL_ES2    1
 #endif
 #ifndef SDL_VIDEO_OPENGL_ES2
@@ -247,6 +269,8 @@ typedef unsigned int uintptr_t;
 #endif
 #ifndef SDL_VIDEO_OPENGL_EGL
 #define SDL_VIDEO_OPENGL_EGL    1
+#endif
+
 #endif
 
 /* Enable Vulkan support */
