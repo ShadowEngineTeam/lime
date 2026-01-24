@@ -140,9 +140,26 @@ Cocoa_GLES_SetupWindow(_THIS, SDL_Window * window)
     if (metalview == NULL) {
         return SDL_SetError("Could not create Metal view for window");
     }
-  
+    
+    /* Access the CAMetalLayer to control color space and compositing behavior */
+    CAMetalLayer *layer = (__bridge CAMetalLayer *)Cocoa_Metal_GetLayer(_this, metalview);
+    if (layer != nil) {
+        /* Force Display P3 color space to prevent washed-out rendering */
+        CGColorSpaceRef p3 = CGColorSpaceCreateWithName(kCGColorSpaceDisplayP3);
+        layer.colorspace = p3;
+        CGColorSpaceRelease(p3);
+
+        /* Disable extended dynamic range to keep SDR brightness consistent */
+        if (@available(macOS 10.15, *)) {
+            layer.wantsExtendedDynamicRangeContent = NO;
+        }
+
+        /* Mark the layer as opaque to avoid unnecessary compositor blending */
+        layer.opaque = YES;
+    }
+
     /* Create the GLES window surface */
-    windowdata.egl_surface = SDL_EGL_CreateSurface(_this, (NativeWindowType)Cocoa_Metal_GetLayer(_this, metalview));
+    windowdata.egl_surface = SDL_EGL_CreateSurface(_this, (__bridge NativeWindowType)layer);
 
     if (windowdata.egl_surface == EGL_NO_SURFACE) {
         Cocoa_Metal_DestroyView(_this, metalview);
