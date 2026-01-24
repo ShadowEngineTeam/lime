@@ -4205,7 +4205,6 @@ abstract WebGL2RenderContext(Dynamic) from Dynamic to Dynamic
 		#end
 	}
 
-
 	public inline function getContextAttributes():GLContextAttributes
 	{
 		return this.getContextAttributes();
