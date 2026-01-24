@@ -111,6 +111,14 @@
         <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" />
         <compilerflag value="-DSDL_HIDAPI_DISABLED" />
 
+        <section if="LIME_GLAD">
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/glad/include/" />
+		</section>
+
+		<section if="LIME_ANGLE">
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/angle/include/" />
+		</section>
+
         <section if="winrt">
 
             <compilerflag value="-D__WINRT__" />
