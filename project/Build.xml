@@ -499,13 +499,17 @@
 			<section if="android">
 
 				<lib name="-L../ndll/Android" />
+				<lib name="-L../dependencies/angle/Android/arm" if="HXCPP_ARMV7" />
+				<lib name="-L../dependencies/angle/Android/arm64" if="HXCPP_ARM64" />
+				<lib name="-L../dependencies/angle/Android/x86" if="HXCPP_X86" />
+				<lib name="-L../dependencies/angle/Android/x86_64" if="HXCPP_X86_64" />
 
 				<lib name="-ldl" />
 				<lib name="-llog" />
 				<lib name="-landroid" />
 				<lib name="-lm" />
-				<lib name="-lEGL" />
-				<lib name="-lGLESv2" />
+				<lib name="-lEGL_angle" />
+				<lib name="-lGLESv2_angle" />
 				<lib name="-lOpenSLES" />
 
 			</section>

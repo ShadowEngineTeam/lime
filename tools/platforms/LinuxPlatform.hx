@@ -182,8 +182,14 @@ class LinuxPlatform extends PlatformTarget
 		{
 			if (StringTools.endsWith(dependency.path, ".so"))
 			{
-				var fileName = Path.withoutDirectory(dependency.path);
-				copyIfNewer(dependency.path, applicationDirectory + "/" + fileName);
+				var pathToUse = dependency.path;
+				if (StringTools.contains(dependency.path, "dependencies/angle"))
+				{
+					var archDir = "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : "");
+					pathToUse = StringTools.replace(dependency.path, "Linux", archDir);
+				}
+				var fileName = Path.withoutDirectory(pathToUse);
+				copyIfNewer(pathToUse, applicationDirectory + "/" + fileName);
 			}
 		}
 
