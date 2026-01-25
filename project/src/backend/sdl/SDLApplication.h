@@ -58,7 +58,6 @@ namespace lime {
 			#if defined(ANDROID) || defined (IPHONE)
 			static int HandleAppLifecycleEvent (void* userdata, SDL_Event* event);
 			#endif
-
 			static void UpdateFrame ();
 			static void UpdateFrame (void*);
 
