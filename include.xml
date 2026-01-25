@@ -104,8 +104,8 @@
 		<dependency path="dependencies/angle/Mac/libEGL.dylib" if="mac" />
 		<dependency path="dependencies/angle/Mac/libGLESv2.dylib" if="mac" />
 
-		<ndll name="libEGL.so" dir="dependencies/angle/Android" if="android" />
-		<ndll name="libGLESv2.so" dir="dependencies/angle/Android" if="android" />
+		<ndll name="EGL_angle" dir="dependencies/angle" if="android" />
+		<ndll name="GLESv2_angle" dir="dependencies/angle" if="android" />
 
 		<dependency path="dependencies/angle/Linux/libEGL.so" if="linux" />
 		<dependency path="dependencies/angle/Linux/libGLESv2.so" if="linux" />
