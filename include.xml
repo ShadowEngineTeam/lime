@@ -106,6 +106,7 @@
 
 		<ndll name="EGL_angle" dir="dependencies/angle" if="android" />
 		<ndll name="GLESv2_angle" dir="dependencies/angle" if="android" />
+		<ndll name="c++_shared" dir="dependencies/angle" if="android" />
 
 		<dependency path="dependencies/angle/Linux/libEGL.so" if="linux" />
 		<dependency path="dependencies/angle/Linux/libGLESv2.so" if="linux" />
