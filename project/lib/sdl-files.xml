@@ -10,8 +10,8 @@
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_bits.h" />
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_blendmode.h" />
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_clipboard.h" />
-        <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_config_android.h" />
-        <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_config_iphoneos.h" />
+        <depend name="${NATIVE_TOOLKIT_PATH}/custom/sdl/include/SDL_config_android.h" />
+        <depend name="${NATIVE_TOOLKIT_PATH}/custom/sdl/include/SDL_config_iphoneos.h" />
         <depend name="${NATIVE_TOOLKIT_PATH}/custom/sdl/include/SDL_config_macosx.h" />
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_config_minimal.h" />
         <depend name="${NATIVE_TOOLKIT_PATH}/sdl/include/SDL_config_pandora.h" />

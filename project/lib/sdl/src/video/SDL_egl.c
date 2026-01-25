@@ -61,8 +61,8 @@
 
 #elif SDL_VIDEO_DRIVER_ANDROID || SDL_VIDEO_DRIVER_VIVANTE
 /* Android */
-#define DEFAULT_EGL "libEGL.so"
-#define DEFAULT_OGL_ES2 "libGLESv2.so"
+#define DEFAULT_EGL "libEGL_angle.so"
+#define DEFAULT_OGL_ES2 "libGLESv2_angle.so"
 #define DEFAULT_OGL_ES_PVR "libGLES_CM.so"
 #define DEFAULT_OGL_ES "libGLESv1_CM.so"
 
