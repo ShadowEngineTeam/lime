@@ -171,7 +171,7 @@ class AndroidPlatform extends PlatformTarget
 
 		for (architecture in architectures)
 		{
-			var minSDKVer = project.config.getInt("android.minimum-sdk-version", 24);
+			var minSDKVer = 29;
 			var haxeParams = [hxml, "-D", "android", "-D", 'HXCPP_ANDROID_PLATFORM=$minSDKVer'];
 			var cppParams = ["-Dandroid", '-DHXCPP_ANDROID_PLATFORM=$minSDKVer'];
 			var path = sourceSet + "/jniLibs";
@@ -412,7 +412,7 @@ class AndroidPlatform extends PlatformTarget
 
 		var commands = [];
 
-		var minSDKVer = 24;
+		var minSDKVer = 29;
 		var platformDefine = '-DHXCPP_ANDROID_PLATFORM=$minSDKVer';
 
 		if (project.targetFlags.exists("ONLY_ARM64"))
