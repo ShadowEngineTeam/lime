@@ -517,7 +517,24 @@ SDL_EGL_LoadLibrary(_THIS, const char *egl_path, NativeDisplayType native_displa
         }
 
         if (_this->egl_data->eglGetPlatformDisplay) {
-            _this->egl_data->egl_display = _this->egl_data->eglGetPlatformDisplay(platform, (void *)(uintptr_t)native_display, NULL);
+			#if defined(SDL_VIDEO_DRIVER_COCOA) || defined(SDL_VIDEO_DRIVER_WINDOWS) || defined(SDL_VIDEO_DRIVER_X11)
+
+			static const EGLint display_attribs[] = {
+				0x3203, // EGL_PLATFORM_ANGLE_TYPE_ANGLE
+#if defined(SDL_VIDEO_DRIVER_WINDOWS) || defined(SDL_VIDEO_DRIVER_X11)
+				0x3450, // EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE
+#elif defined(SDL_VIDEO_DRIVER_COCOA)
+				0x3489, // EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE
+#endif
+				0x3482, // EGL_POWER_PREFERENCE_ANGLE
+				0x0002, // EGL_HIGH_POWER_ANGLE
+				0x3038  // EGL_NONE
+			};
+
+			_this->egl_data->egl_display = _this->egl_data->eglGetPlatformDisplay((EGLenum)0x3202 /* EGL_PLATFORM_ANGLE_ANGLE */, (void*)(uintptr_t)native_display, display_attribs);
+			#else
+			_this->egl_data->egl_display = _this->egl_data->eglGetPlatformDisplay(platform, (void *)(uintptr_t)native_display, NULL);
+			#endif
         } else {
             if (SDL_EGL_HasExtension(_this, SDL_EGL_CLIENT_EXTENSION, "EGL_EXT_platform_base")) {
                 _this->egl_data->eglGetPlatformDisplayEXT = SDL_EGL_GetProcAddress(_this, "eglGetPlatformDisplayEXT");
@@ -1282,3 +1299,4 @@ SDL_EGL_DestroySurface(_THIS, EGLSurface egl_surface)
 #endif /* SDL_VIDEO_OPENGL_EGL */
 
 /* vi: set ts=4 sw=4 expandtab: */
+
