@@ -68,7 +68,6 @@ namespace lime {
 		private:
 
 			SDL_GLContext context;
-
 			int contextHeight;
 			int contextWidth;
 

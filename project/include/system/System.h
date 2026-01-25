@@ -366,7 +366,7 @@ typedef uint64_t  uintmax_t;
 #endif // _MSC_VER >= 1600 ]
 
 #endif // _MSC_STDINT_H_ ]
-#endif
+#endif // _MSC_VER
 #endif
 
 
