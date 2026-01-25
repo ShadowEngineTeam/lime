@@ -202,6 +202,7 @@
 		<section if="LIME_OPENGL">
 
 			<compilerflag value="-DLIME_OPENGL" />
+			<compilerflag value="-DGLES_SILENCE_DEPRECATION" if="ios" />
 			<compilerflag value="-I${DEVELOPER_DIR}/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS${TVOS_VER}.sdk/" if="tvos" />
 
 			<file name="src/graphics/opengl/OpenGLBindings.cpp" />
