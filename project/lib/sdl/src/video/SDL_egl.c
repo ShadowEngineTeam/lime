@@ -497,12 +497,12 @@ static EGLDisplay SDL_EGL_GetPlatformDisplayANGLE(_THIS, EGLenum platform, Nativ
     EGLDisplay display = EGL_NO_DISPLAY;
 
 	if (_this->egl_data->eglGetPlatformDisplay) {
-		display = _this->egl_data->eglGetPlatformDisplay(platform, (void *)(uintptr_t)native_display, attrib_list);
+		display = _this->egl_data->eglGetPlatformDisplay(platform, (void *)(uintptr_t)native_display, (const EGLint *)attrib_list);
 	} else {
 		if (SDL_EGL_HasExtension(_this, SDL_EGL_CLIENT_EXTENSION, "EGL_EXT_platform_base")) {
 			_this->egl_data->eglGetPlatformDisplayEXT = SDL_EGL_GetProcAddress(_this, "eglGetPlatformDisplayEXT");
 			if (_this->egl_data->eglGetPlatformDisplayEXT) {
-				display = _this->egl_data->eglGetPlatformDisplayEXT(platform, (void *)(uintptr_t)native_display, attrib_list);
+				display = _this->egl_data->eglGetPlatformDisplayEXT(platform, (void *)(uintptr_t)native_display, (const EGLint *)attrib_list);
 			}
 		}
 	}
@@ -539,26 +539,21 @@ SDL_EGL_LoadLibrary(_THIS, const char *egl_path, NativeDisplayType native_displa
 
 #if defined(SDL_VIDEO_DRIVER_COCOA)
     const EGLAttrib display_attribs[] = {
-        0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */, 0x3489 /* EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE */,
-        0x3482 /* EGL_POWER_PREFERENCE_ANGLE */, 0x0002 /* EGL_HIGH_POWER_ANGLE */,
+        0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */,
+        0x3489 /* EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE */,
+        0x3482 /* EGL_POWER_PREFERENCE_ANGLE */,0x0002 /* EGL_HIGH_POWER_ANGLE */,
         0x3038 /* EGL_NONE */
     };
 
     _this->egl_data->egl_display = SDL_EGL_GetPlatformDisplayANGLE(_this, (EGLenum)0x3202 /* EGL_PLATFORM_ANGLE_ANGLE */, native_display, display_attribs);
-#elif defined(SDL_VIDEO_DRIVER_X11)
+#elif defined(SDL_VIDEO_DRIVER_WINDOWS) || defined(SDL_VIDEO_DRIVER_X11) || defined(SDL_VIDEO_DRIVER_ANDROID)
     const EGLAttrib display_attribs[] = {
-        0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */, 0x3450 /* EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE */,
+        0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */,
+        0x3450 /* EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE */,
         0x3038 /* EGL_NONE */
     };
 
     _this->egl_data->egl_display = SDL_EGL_GetPlatformDisplayANGLE(_this, (EGLenum)0x3202 /* EGL_PLATFORM_ANGLE_ANGLE */, native_display, display_attribs);
-#elif defined(SDL_VIDEO_DRIVER_WINDOWS)
-    const EGLAttrib vulkan_attribs[] = {
-        0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */, 0x3450 /* EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE */,
-        0x3038 /* EGL_NONE */
-    };
-
-    _this->egl_data->egl_display = SDL_EGL_GetPlatformDisplayANGLE(_this, (EGLenum)0x3202 /* EGL_PLATFORM_ANGLE_ANGLE */, native_display, vulkan_attribs);
 
     if (_this->egl_data->egl_display != EGL_NO_DISPLAY) {
         already_initialized = _this->egl_data->eglInitialize(_this->egl_data->egl_display, NULL, NULL);
@@ -568,14 +563,20 @@ SDL_EGL_LoadLibrary(_THIS, const char *egl_path, NativeDisplayType native_displa
         }
     }
 
+    // This means the GPU does not support Vulkan, we'll fallback to best available option for each platform.
     if (_this->egl_data->egl_display == EGL_NO_DISPLAY)
     {
-        const EGLAttrib d3d11_attribs[] = {
-            0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */, 0x3208 /* EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE */,
+        const EGLAttrib display_attribs_alternative[] = {
+            0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */, 
+            #if defined(SDL_VIDEO_DRIVER_WINDOWS)
+            0x3208 /* EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE */,
+            #elif defined(SDL_VIDEO_DRIVER_X11) || defined(SDL_VIDEO_DRIVER_ANDROID)
+            0x320E /* EGL_PLATFORM_ANGLE_TYPE_OPENGLES_ANGLE */,
+            #endif
             0x3038 /* EGL_NONE */
         };
 
-        _this->egl_data->egl_display = SDL_EGL_GetPlatformDisplayANGLE(_this, (EGLenum)0x3202 /* EGL_PLATFORM_ANGLE_ANGLE */, native_display, d3d11_attribs);
+        _this->egl_data->egl_display = SDL_EGL_GetPlatformDisplayANGLE(_this, (EGLenum)0x3202 /* EGL_PLATFORM_ANGLE_ANGLE */, native_display, display_attribs_alternative);
     }
 #else
     if (platform) {
