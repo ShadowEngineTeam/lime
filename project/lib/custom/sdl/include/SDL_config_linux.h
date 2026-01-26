@@ -291,22 +291,24 @@
 
 /* #undef SDL_VIDEO_RENDER_D3D */
 /* #undef SDL_VIDEO_RENDER_D3D11 */
-#define SDL_VIDEO_RENDER_OGL 1
+/* #undef SDL_VIDEO_RENDER_OGL 1 */
 /* #undef SDL_VIDEO_RENDER_OGL_ES */
 #define SDL_VIDEO_RENDER_OGL_ES2 1
 /* #undef SDL_VIDEO_RENDER_DIRECTFB */
 
 /* Enable OpenGL support */
-#define SDL_VIDEO_OPENGL 1
+/* #undef SDL_VIDEO_OPENGL 1 */
 /* #undef SDL_VIDEO_OPENGL_ES */
 #define SDL_VIDEO_OPENGL_ES2 1
 /* #undef SDL_VIDEO_OPENGL_BGL */
 /* #undef SDL_VIDEO_OPENGL_CGL */
 #define SDL_VIDEO_OPENGL_EGL 1
-#define SDL_VIDEO_OPENGL_GLX 1
+/* #undef SDL_VIDEO_OPENGL_GLX 1 */
 /* #undef SDL_VIDEO_OPENGL_WGL */
 /* #undef SDL_VIDEO_OPENGL_OSMESA */
 /* #undef SDL_VIDEO_OPENGL_OSMESA_DYNAMIC */
+
+#define SDL_VIDEO_VULKAN 1
 
 /* Enable system power support */
 #define SDL_POWER_LINUX 1
