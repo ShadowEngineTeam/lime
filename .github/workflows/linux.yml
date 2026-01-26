@@ -36,6 +36,8 @@ jobs:
         run: |
           CC=i686-linux-gnu-gcc CXX=i686-linux-gnu-g++ linux32 haxelib run lime rebuild linux -32 -release -nocolor -nocffi -D HXCPP_M32
           haxelib run lime rebuild linux -64 -release -nocolor -nocffi
+          patchelf --set-rpath '$ORIGIN' ndll/Linux/lime.ndll
+          patchelf --set-rpath '$ORIGIN' ndll/Linux64/lime.ndll
       - name: Upload Artifact (x86)
         uses: actions/upload-artifact@v4
         with:
@@ -78,6 +80,8 @@ jobs:
         run: |
           CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ linux32 haxelib run lime rebuild linux -armv7 -release -nocolor -nocffi -D HXCPP_ARMV7
           haxelib run lime rebuild linux -arm64 -release -nocolor -nocffi -D HXCPP_ARM64
+          patchelf --set-rpath '$ORIGIN' ndll/LinuxArm/lime.ndll
+          patchelf --set-rpath '$ORIGIN' ndll/LinuxArm64/lime.ndll
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
