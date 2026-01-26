@@ -227,13 +227,13 @@ typedef unsigned int uintptr_t;
 
 /* Enable OpenGL support */
 #ifndef SDL_VIDEO_OPENGL
-#define SDL_VIDEO_OPENGL    1
+#define SDL_VIDEO_OPENGL    0
 #endif
 #ifndef SDL_VIDEO_OPENGL_WGL
-#define SDL_VIDEO_OPENGL_WGL    1
+#define SDL_VIDEO_OPENGL_WGL    0
 #endif
 #ifndef SDL_VIDEO_RENDER_OGL
-#define SDL_VIDEO_RENDER_OGL    1
+#define SDL_VIDEO_RENDER_OGL    0
 #endif
 #ifndef SDL_VIDEO_RENDER_OGL_ES2
 #define SDL_VIDEO_RENDER_OGL_ES2    1
