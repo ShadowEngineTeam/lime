@@ -301,7 +301,10 @@ void Android_SendResize(SDL_Window *window)
         display->display_modes[0].refresh_rate = Android_ScreenRate;
         display->current_mode                  = display->display_modes[0];
 
-        SDL_SendWindowEvent(window, SDL_WINDOWEVENT_RESIZED, Android_SurfaceWidth, Android_SurfaceHeight);
+        const char *scale_hint = SDL_GetHint("SDL_ANDROID_DRAW_SCALE");
+		float scale = scale_hint ? atof(scale_hint) : 1.0;
+
+        SDL_SendWindowEvent(window, SDL_WINDOWEVENT_RESIZED, (int)(Android_SurfaceWidth * scale), (int)(Android_SurfaceHeight * scale));
     }
 }
 
