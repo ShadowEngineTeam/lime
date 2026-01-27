@@ -541,11 +541,34 @@ SDL_EGL_LoadLibrary(_THIS, const char *egl_path, NativeDisplayType native_displa
     const EGLAttrib display_attribs[] = {
         0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */,
         0x3489 /* EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE */,
-        0x3482 /* EGL_POWER_PREFERENCE_ANGLE */,0x0002 /* EGL_HIGH_POWER_ANGLE */,
+        0x3482 /* EGL_POWER_PREFERENCE_ANGLE */,
+        0x0002 /* EGL_HIGH_POWER_ANGLE */,
         0x3038 /* EGL_NONE */
     };
 
     _this->egl_data->egl_display = SDL_EGL_GetPlatformDisplayANGLE(_this, (EGLenum)0x3202 /* EGL_PLATFORM_ANGLE_ANGLE */, native_display, display_attribs);
+
+    if (_this->egl_data->egl_display != EGL_NO_DISPLAY)
+    {
+        already_initialized = _this->egl_data->eglInitialize(_this->egl_data->egl_display, NULL, NULL);
+        if (!already_initialized)
+        {
+            _this->egl_data->eglTerminate(_this->egl_data->egl_display);
+            _this->egl_data->egl_display = EGL_NO_DISPLAY;
+        }
+    }
+
+    // This means the GPU does not support Metal (how anyway), we'll fallback to OpenGL ES.
+    if (_this->egl_data->egl_display == EGL_NO_DISPLAY)
+    {
+        const EGLAttrib display_attribs_alternative[] = {
+            0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */, 
+            0x320E /* EGL_PLATFORM_ANGLE_TYPE_OPENGLES_ANGLE */,
+            0x3038 /* EGL_NONE */
+        };
+
+        _this->egl_data->egl_display = SDL_EGL_GetPlatformDisplayANGLE(_this, (EGLenum)0x3202 /* EGL_PLATFORM_ANGLE_ANGLE */, native_display, display_attribs_alternative);
+    }
 #elif defined(SDL_VIDEO_DRIVER_WINDOWS) || defined(SDL_VIDEO_DRIVER_X11) || defined(SDL_VIDEO_DRIVER_ANDROID)
     const EGLAttrib display_attribs[] = {
         0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */,
@@ -555,9 +578,11 @@ SDL_EGL_LoadLibrary(_THIS, const char *egl_path, NativeDisplayType native_displa
 
     _this->egl_data->egl_display = SDL_EGL_GetPlatformDisplayANGLE(_this, (EGLenum)0x3202 /* EGL_PLATFORM_ANGLE_ANGLE */, native_display, display_attribs);
 
-    if (_this->egl_data->egl_display != EGL_NO_DISPLAY) {
+    if (_this->egl_data->egl_display != EGL_NO_DISPLAY)
+    {
         already_initialized = _this->egl_data->eglInitialize(_this->egl_data->egl_display, NULL, NULL);
-        if (!already_initialized) {
+        if (!already_initialized)
+        {
             _this->egl_data->eglTerminate(_this->egl_data->egl_display);
             _this->egl_data->egl_display = EGL_NO_DISPLAY;
         }
