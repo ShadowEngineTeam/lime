@@ -54,7 +54,7 @@ Android_CreateWindow(_THIS, SDL_Window * window)
 
     /* Adjust the window data to match the screen */
     const char *scale_hint = SDL_GetHint("SDL_ANDROID_DRAW_SCALE");
-	float scale = scale_hint ? atof(scale_hint) : 1.0
+	float scale = scale_hint ? atof(scale_hint) : 1.0;
     window->x = 0;
     window->y = 0;
     window->w = (int)(Android_SurfaceWidth * scale);
