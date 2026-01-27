@@ -121,7 +121,6 @@ class Window
 	@:noCompletion private var __minimized:Bool;
 	@:noCompletion private var __resizable:Bool;
 	@:noCompletion private var __scale:Float;
-	@:noCompletion private var __drawScale:Float;
 	@:noCompletion private var __title:String;
 	@:noCompletion private var __visible:Bool;
 	@:noCompletion private var __width:Int;
