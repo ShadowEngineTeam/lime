@@ -563,16 +563,12 @@ SDL_EGL_LoadLibrary(_THIS, const char *egl_path, NativeDisplayType native_displa
         }
     }
 
-    // This means the GPU does not support Vulkan, we'll fallback to best available option for each platform.
+    // This means the GPU does not support Vulkan, we'll fallback to OpenGL ES.
     if (_this->egl_data->egl_display == EGL_NO_DISPLAY)
     {
         const EGLAttrib display_attribs_alternative[] = {
             0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */, 
-            #if defined(SDL_VIDEO_DRIVER_WINDOWS)
-            0x3208 /* EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE */,
-            #elif defined(SDL_VIDEO_DRIVER_X11) || defined(SDL_VIDEO_DRIVER_ANDROID)
             0x320E /* EGL_PLATFORM_ANGLE_TYPE_OPENGLES_ANGLE */,
-            #endif
             0x3038 /* EGL_NONE */
         };
 
