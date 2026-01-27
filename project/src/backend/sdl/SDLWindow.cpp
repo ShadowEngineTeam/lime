@@ -257,8 +257,17 @@ namespace lime {
 
 		if (!sdlWindow) {
 
-			printf ("Could not create SDL window: %s.\n", SDL_GetError ());
-			return;
+			printf ("Could not create SDL window with OpenGL ES 3: %s.\nTrying to create SDL window with OpenGL ES 2...\n", SDL_GetError ());
+
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+
+			sdlWindow = SDL_CreateWindow (title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, sdlWindowFlags);
+			if (!sdlWindow) {
+
+				printf ("Could not create SDL window with OpenGL ES 2: %s.\nReturning null...\n", SDL_GetError ());
+				return;
+
+			}
 
 		}
 
