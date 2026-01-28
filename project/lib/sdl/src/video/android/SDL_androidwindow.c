@@ -53,12 +53,17 @@ Android_CreateWindow(_THIS, SDL_Window * window)
     Android_JNI_SetOrientation(window->w, window->h, window->flags & SDL_WINDOW_RESIZABLE, SDL_GetHint(SDL_HINT_ORIENTATIONS));
 
     /* Adjust the window data to match the screen */
-    const char *scale_hint = SDL_GetHint("SDL_ANDROID_DRAW_SCALE");
-	float scale = scale_hint ? atof(scale_hint) : 1.0;
     window->x = 0;
     window->y = 0;
-    window->w = (int)(Android_SurfaceWidth * scale);
-    window->h = (int)(Android_SurfaceHeight * scale);
+    if (Android_IsInMultiWindowMode() || SDL_IsDeXMode() || SDL_IsChromebook()) {
+        window->w = Android_SurfaceWidth;
+        window->h = Android_SurfaceHeight;
+    } else {
+        const char *scale_hint = SDL_GetHint("SDL_ANDROID_DRAW_SCALE");
+    	float scale = scale_hint ? atof(scale_hint) : 1.0;
+        window->w = (int)(Android_SurfaceWidth * scale);
+        window->h = (int)(Android_SurfaceHeight * scale);
+    }
 
     window->flags &= ~SDL_WINDOW_HIDDEN;
     window->flags |= SDL_WINDOW_SHOWN;          /* only one window on Android */
@@ -146,10 +151,8 @@ Android_SetWindowFullscreen(_THIS, SDL_Window *window, SDL_VideoDisplay *display
         int old_w = window->w;
         int old_h = window->h;
 
-        const char *scale_hint = SDL_GetHint("SDL_ANDROID_DRAW_SCALE");
-		float scale = scale_hint ? atof(scale_hint) : 1.0;
-        int new_w = (int)(ANativeWindow_getWidth(data->native_window) * scale);
-        int new_h = (int)(ANativeWindow_getHeight(data->native_window) * scale);
+        int new_w = ANativeWindow_getWidth(data->native_window);
+        int new_h = ANativeWindow_getHeight(data->native_window);
 
         if (new_w < 0 || new_h < 0) {
             SDL_SetError("ANativeWindow_getWidth/Height() fails");
