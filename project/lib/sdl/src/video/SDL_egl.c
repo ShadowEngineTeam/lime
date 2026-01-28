@@ -28,6 +28,7 @@
 #if SDL_VIDEO_DRIVER_ANDROID
 #include <android/native_window.h>
 #include "../video/android/SDL_androidvideo.h"
+#include "../core/android/SDL_android.h"
 #endif
 #if SDL_VIDEO_DRIVER_RPI
 #include <unistd.h>
@@ -541,7 +542,8 @@ SDL_EGL_LoadLibrary(_THIS, const char *egl_path, NativeDisplayType native_displa
     const EGLAttrib display_attribs[] = {
         0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */,
         0x3489 /* EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE */,
-        0x3482 /* EGL_POWER_PREFERENCE_ANGLE */,0x0002 /* EGL_HIGH_POWER_ANGLE */,
+        0x3482 /* EGL_POWER_PREFERENCE_ANGLE */,
+        0x0002 /* EGL_HIGH_POWER_ANGLE */,
         0x3038 /* EGL_NONE */
     };
 
@@ -1259,7 +1261,7 @@ SDL_EGL_CreateSurface(_THIS, NativeWindowType nw)
     float scale = scale_hint ? atof(scale_hint) : 1.0;
 
     /* Format based on selected egl config. */
-    if (scale > 0.0 && scale < 1.0) {
+    if (scale > 0.0 && scale < 1.0 && !(Android_IsInMultiWindowMode() || SDL_IsDeXMode() || SDL_IsChromebook())) {
         int nativeWidth = ANativeWindow_getWidth(nw);
         int nativeHeight = ANativeWindow_getHeight(nw);
         ANativeWindow_setBuffersGeometry(nw, (int)(nativeWidth * scale), (int)(nativeHeight * scale), format_wanted);
