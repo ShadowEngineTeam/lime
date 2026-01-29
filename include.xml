@@ -98,6 +98,7 @@
 		<dependency path="dependencies/webgl-debug.js" if="html5 webgl-debug" embed="true" />
 		<dependency path="dependencies/stats.min.js" if="html5 stats" embed="true" />
 
+		<dependency path="dependencies/angle/Windows/d3dcompiler_47.dll" if="windows" />
 		<dependency path="dependencies/angle/Windows/libEGL.dll" if="windows" />
 		<dependency path="dependencies/angle/Windows/libGLESv2.dll" if="windows" />
 
