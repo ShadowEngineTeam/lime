@@ -28,7 +28,6 @@
 #if SDL_VIDEO_DRIVER_ANDROID
 #include <android/native_window.h>
 #include "../video/android/SDL_androidvideo.h"
-#include "../core/android/SDL_android.h"
 #endif
 #if SDL_VIDEO_DRIVER_RPI
 #include <unistd.h>
@@ -1297,7 +1296,7 @@ SDL_EGL_CreateSurface(_THIS, NativeWindowType nw)
     float scale = scale_hint ? atof(scale_hint) : 1.0;
 
     /* Format based on selected egl config. */
-    if (scale > 0.0 && scale < 1.0 && !(Android_IsInMultiWindowMode() || SDL_IsDeXMode() || SDL_IsChromebook())) {
+    if (scale > 0.0 && scale < 1.0) {
         int nativeWidth = ANativeWindow_getWidth(nw);
         int nativeHeight = ANativeWindow_getHeight(nw);
         ANativeWindow_setBuffersGeometry(nw, (int)(nativeWidth * scale), (int)(nativeHeight * scale), format_wanted);
