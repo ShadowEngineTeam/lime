@@ -697,18 +697,6 @@ namespace lime {
 		return _hint;
 	}
 
-	void System::SetHint (const char* key, const char* value) {
-		std::string hintKey(key);
-
-    	if (hintKey.rfind("SDL_", 0) != 0) {
-
-				hintKey = "SDL_" + hintKey;
-
-    	}
-
-    	SDL_SetHint(hintKey.c_str(), value);
-	}
-
 
 
 	#if !defined(IPHONE)

@@ -3401,10 +3401,11 @@ namespace lime {
 
 	}
 
+	HL_PRIM vbyte* HL_NAME(hl_system_get_hint) (vbyte* key) {
 
-	HL_PRIM vbyte* HL_NAME(hl_system_get_hint) (hl_vstring* key) {
+		#ifndef EMSCRIPTEN
 
-		std::wstring* hint = System::GetHint ((const char*)hl_to_utf8 ((const uchar*)key->bytes));
+		std::wstring* hint = System::GetHint ((char*)key);
 
 		if (hint) {
 
@@ -3413,20 +3414,9 @@ namespace lime {
 			return result;
 		}
 
+		#endif
+
 		return 0;
-
-	}
-
-
-	void lime_system_set_hint (HxString hintKey, HxString hintValue) {
-
-		System::SetHint (hxs_utf8 (hintKey, nullptr), hxs_utf8 (hintValue, nullptr));
-
-	}
-
-	HL_PRIM void HL_NAME(hl_system_set_hint) (hl_vstring* key, hl_vstring* value) {
-
-		System::SetHint ((const char*)hl_to_utf8 ((const uchar*)key->bytes), (const char*)hl_to_utf8 ((const uchar*)value->bytes));
 
 	}
 
@@ -4229,6 +4219,7 @@ namespace lime {
 
 	}
 
+
 	void lime_window_warp_mouse (value window, int x, int y) {
 
 		Window* targetWindow = (Window*)val_data (window);
@@ -4241,53 +4232,6 @@ namespace lime {
 
 		Window* targetWindow = (Window*)window->ptr;
 		targetWindow->WarpMouse (x, y);
-
-	}
-
-
-	double lime_window_get_draw_scale (value window) {
-
-		Window* targetWindow = (Window*)val_data (window);
-		return targetWindow->GetDrawScale ();
-
-	}
-
-
-	HL_PRIM double HL_NAME(hl_window_get_draw_scale) (HL_CFFIPointer* window) {
-
-		Window* targetWindow = (Window*)window->ptr;
-		return targetWindow->GetDrawScale ();
-
-	}
-
-
-	int lime_window_get_native_width (value window) {
-
-		Window* targetWindow = (Window*)val_data (window);
-		return targetWindow->GetNativeWidth ();
-
-	}
-
-
-	HL_PRIM int HL_NAME(hl_window_get_native_width) (HL_CFFIPointer* window) {
-
-		Window* targetWindow = (Window*)window->ptr;
-		return targetWindow->GetNativeWidth ();
-
-	}
-
-
-	int lime_window_get_native_height (value window) {
-
-		Window* targetWindow = (Window*)val_data (window);
-		return targetWindow->GetNativeHeight ();
-
-	}
-
-	HL_PRIM int HL_NAME(hl_window_get_native_height) (HL_CFFIPointer* window) {
-
-		Window* targetWindow = (Window*)window->ptr;
-		return targetWindow->GetNativeHeight ();
 
 	}
 
@@ -4471,7 +4415,6 @@ namespace lime {
 	DEFINE_PRIME1 (lime_system_set_allow_screen_timeout);
 	DEFINE_PRIME1 (lime_system_get_display_orientation);
 	DEFINE_PRIME1 (lime_system_get_hint);
-	DEFINE_PRIME2v (lime_system_set_hint);
 	DEFINE_PRIME2 (lime_system_set_windows_console_mode);
 	DEFINE_PRIME2v (lime_text_event_manager_register);
 	DEFINE_PRIME2v (lime_touch_event_manager_register);
@@ -4517,9 +4460,6 @@ namespace lime {
 	DEFINE_PRIME2 (lime_window_set_title);
 	DEFINE_PRIME2 (lime_window_set_visible);
 	DEFINE_PRIME3v (lime_window_warp_mouse);
-	DEFINE_PRIME1 (lime_window_get_draw_scale);
-	DEFINE_PRIME1 (lime_window_get_native_width);
-	DEFINE_PRIME1 (lime_window_get_native_height);
 	DEFINE_PRIME1 (lime_window_get_opacity);
 	DEFINE_PRIME2v (lime_window_set_opacity);
 	DEFINE_PRIME2 (lime_zlib_compress);
@@ -4684,7 +4624,6 @@ namespace lime {
 	DEFINE_HL_PRIM (_BOOL, hl_system_set_allow_screen_timeout, _BOOL);
 	DEFINE_HL_PRIM (_I32, hl_system_get_display_orientation, _I32);
 	DEFINE_HL_PRIM (_BYTES, hl_system_get_hint, _STRING);
-	DEFINE_HL_PRIM (_VOID, hl_system_set_hint, _STRING _STRING);
 	DEFINE_HL_PRIM (_BOOL, hl_system_set_windows_console_mode, _I32 _I32);
 	DEFINE_HL_PRIM (_VOID, hl_text_event_manager_register, _FUN (_VOID, _NO_ARG) _TTEXT_EVENT);
 	DEFINE_HL_PRIM (_VOID, hl_touch_event_manager_register, _FUN (_VOID, _NO_ARG) _TTOUCH_EVENT);
@@ -4729,9 +4668,6 @@ namespace lime {
 	DEFINE_HL_PRIM (_STRING, hl_window_set_title, _TCFFIPOINTER _STRING);
 	DEFINE_HL_PRIM (_BOOL, hl_window_set_visible, _TCFFIPOINTER _BOOL);
 	DEFINE_HL_PRIM (_VOID, hl_window_warp_mouse, _TCFFIPOINTER _I32 _I32);
-	DEFINE_HL_PRIM (_F64, hl_window_get_draw_scale, _TCFFIPOINTER);
-	DEFINE_HL_PRIM (_I32, hl_window_get_native_width, _TCFFIPOINTER);
-	DEFINE_HL_PRIM (_I32, hl_window_get_native_height, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_F64, hl_window_get_opacity, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_VOID, hl_window_set_opacity, _TCFFIPOINTER _F64);
 	DEFINE_HL_PRIM (_TBYTES, hl_zlib_compress, _TBYTES _TBYTES);
