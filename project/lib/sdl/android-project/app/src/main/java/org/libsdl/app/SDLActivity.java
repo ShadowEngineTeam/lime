@@ -84,7 +84,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
 
 
         int s2 = s_copy & ~InputDevice.SOURCE_ANY; // keep class bits
-        s2 &= ~(  InputDevice.SOURCE_CLASS_BUTTON 
+        s2 &= ~(  InputDevice.SOURCE_CLASS_BUTTON
                 | InputDevice.SOURCE_CLASS_JOYSTICK
                 | InputDevice.SOURCE_CLASS_POINTER
                 | InputDevice.SOURCE_CLASS_POSITION
@@ -1097,6 +1097,14 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             return false;
         }
         return mSingleton.sendCommand(command, param);
+    }
+
+    public static boolean isInMultiWindowModeJNI() {
+        if (mSingleton == null || !mHasMultiWindow) {
+            return false;
+        }
+
+        return mSingleton.isInMultiWindowMode();
     }
 
     /**

@@ -52,11 +52,20 @@ Android_CreateWindow(_THIS, SDL_Window * window)
     /* Set orientation */
     Android_JNI_SetOrientation(window->w, window->h, window->flags & SDL_WINDOW_RESIZABLE, SDL_GetHint(SDL_HINT_ORIENTATIONS));
 
+    /* Adjust the resolution based on the configured draw scale */
+    float scale = Android_GetDrawScale();
+
     /* Adjust the window data to match the screen */
     window->x = 0;
     window->y = 0;
-    window->w = Android_SurfaceWidth;
-    window->h = Android_SurfaceHeight;
+
+    if (Android_ShouldUseDrawScale(scale)) {
+        window->w = (int)(Android_SurfaceWidth * scale);
+        window->h = (int)(Android_SurfaceHeight * scale);
+    } else {
+        window->w = Android_SurfaceWidth;
+        window->h = Android_SurfaceHeight;
+    }
 
     window->flags &= ~SDL_WINDOW_HIDDEN;
     window->flags |= SDL_WINDOW_SHOWN;          /* only one window on Android */
