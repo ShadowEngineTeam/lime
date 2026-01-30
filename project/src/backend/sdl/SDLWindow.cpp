@@ -3,9 +3,6 @@
 #include "SDLApplication.h"
 #include "system/System.h"
 #include "../../graphics/opengl/OpenGLBindings.h"
-#ifdef ANDROID
-#include <android/native_window.h>
-#endif
 
 namespace lime {
 
@@ -58,7 +55,6 @@ namespace lime {
 	#else
 	static bool displayModeSet = false;
 	#endif
-	double drawScale = 1.0;
 
 	SDLWindow::SDLWindow (Application* application, int width, int height, int flags, const char* title) {
 
@@ -1350,39 +1346,6 @@ namespace lime {
 
 	}
 
-	double SDLWindow::GetDrawScale() {
-		return GetWidth() / GetNativeWidth();
-	}
-
-	int SDLWindow::GetNativeWidth () {
-
-		#if defined(ANDROID)
-		return ANativeWindow_getWidth((ANativeWindow*)GetHandle());
-		#else
-		int width;
-		int height;
-
-		SDL_GL_GetDrawableSize (sdlWindow, &width, &height);
-
-		return width;
-		#endif
-
-	}
-
-	int SDLWindow::GetNativeHeight () {
-
-		#if defined(ANDROID)
-		return ANativeWindow_getHeight((ANativeWindow*)GetHandle());
-		#else
-		int width;
-		int height;
-
-		SDL_GL_GetDrawableSize (sdlWindow, &width, &height);
-
-		return height;
-		#endif
-
-	}
 
 	Window* CreateWindow (Application* application, int width, int height, int flags, const char* title) {
 
