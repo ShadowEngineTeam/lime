@@ -1186,21 +1186,13 @@ namespace lime {
 	bool SDLWindow::SetFullscreen (bool fullscreen) {
 
 		if (fullscreen) {
-
-			if (displayModeSet) {
-
-				SDL_SetWindowFullscreen (sdlWindow, SDL_WINDOW_FULLSCREEN);
-
-			} else {
-
-				SDL_SetWindowFullscreen (sdlWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-
-			}
-
+			
+			SDL_SetWindowFullscreen (sdlWindow, displayModeSet ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_FULLSCREEN_DESKTOP);
+		
 		} else {
-
+			
 			SDL_SetWindowFullscreen (sdlWindow, 0);
-
+		
 		}
 
 		return fullscreen;
