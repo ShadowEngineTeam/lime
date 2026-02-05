@@ -475,8 +475,7 @@ namespace lime {
 
 		#else
 
-		int res = SDL_GL_SetSwapInterval (mode);
-		return res == mode || res == 0; // 0 sometimes means a success on some contexts?
+		return SDL_GL_SetSwapInterval (mode) == 0;
 
 		#endif
 
