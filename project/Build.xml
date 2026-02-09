@@ -454,6 +454,8 @@
 
 			<section if="linux">
 
+				<flag value="-Wl,-rpath,$ORIGIN"/>
+
 				<lib name="-lpthread" />
 				<lib name="-lrt" />
 
