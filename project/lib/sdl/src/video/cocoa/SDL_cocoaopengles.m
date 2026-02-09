@@ -156,6 +156,12 @@ Cocoa_GLES_SetupWindow(_THIS, SDL_Window * window)
 
         /* Mark the layer as opaque to avoid unnecessary compositor blending */
         layer.opaque = YES;
+
+        /* Disable VSync by default to prevent frame drops on high refresh displays. */
+        layer.displaySyncEnabled = NO;
+    
+        /* Reduce buffering for lower latency (default is 3) */
+        layer.maximumDrawableCount = 2;
     }
 
     /* Create the GLES window surface */
