@@ -17,7 +17,7 @@ Installation
 
 1. Clone the Lime repository:
 
-        haxelib git lime https://github.com/FNF-SE/lime
+        haxelib git lime https://github.com/ShadowEngineTeam/lime
 
 2. Install required dependencies:
 
