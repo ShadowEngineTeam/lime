@@ -19,6 +19,8 @@ project/vc*.pdb
 *.swp
 .idea/
 *.iml
+.gradle/
+.gradle
 #tools/*.n
 #tools/*.exe
 tools/obj
