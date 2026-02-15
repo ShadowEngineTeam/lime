@@ -169,7 +169,7 @@ public class GameActivity extends SDLActivity {
 
 	}
 
-	public static FileDialog creatFileDialog(final HaxeObject haxeObject)
+	public static FileDialog createFileDialog(final HaxeObject haxeObject)
 	{
 		FileDialog fileDialog = new FileDialog(haxeObject);
 		if (filedialogs == null)

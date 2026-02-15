@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.haxe.extension.Extension;
 import org.haxe.lime.HaxeObject;
@@ -76,7 +78,7 @@ public class FileDialog extends Extension
 
 	public static FileDialog createInstance(final HaxeObject haxeObject)
 	{
-		return GameActivity.creatFileDialog(haxeObject);
+		return GameActivity.createFileDialog(haxeObject);
 	}
 
 	public void open(String filter, String defaultPath, String title)
@@ -281,7 +283,6 @@ public class FileDialog extends Extension
 	@Override
 	public boolean onActivityResult(int requestCode, int resultCode, Intent data)
 	{
-		String uri = null;
 		String path = null;
 		// byte[] bytesData = null;
 
@@ -334,7 +335,12 @@ public class FileDialog extends Extension
 						}
 						break;
 					case DOCUMENT_TREE_REQUEST_CODE:
-						//Log.d(LOG_TAG, "Got directory tree uri:" + uri.toString());
+						if (data.getData() != null)
+						{
+							path = getOriginalPath(data.getData());
+							//Log.d(LOG_TAG, "Got directory tree uri: " + data.getData() + ", resolved path: " + path);
+							getPersistableURIAccess(data.getData().toString());
+						}
 						break;
 					default:
 						break;
@@ -349,22 +355,65 @@ public class FileDialog extends Extension
 		Object[] args = new Object[4];
 		args[0] = requestCode;
 		args[1] = resultCode;
-		if (data.getData() == null)
-			args[2] = null;
-		else
+		if (data != null && data.getData() != null) {
 			args[2] = data.getData().toString();
+		} else {
+			args[2] = null;
+		}
 		if (path != null) {
-        	args[3] = path;
-    	} else if (data != null && data.getData() != null) {
-        	args[3] = data.getData().getPath();
-    	} else {
-      	  args[3] = null;
-    	}
+			args[3] = path;
+		} else if (data != null && data.getData() != null) {
+			args[3] = data.getData().getPath();
+		} else {
+			args[3] = null;
+		}
 		//Log.d(LOG_TAG, "Dispatching activity results: " + uri);
 		haxeObject.call("onJNIActivityResult", args); 
 
 		awaitingResults = false;
 		return true;
+	}
+
+	public static String getOriginalPath(Uri uri) {
+		if (uri == null) {
+			return null;
+		}
+
+		if (!"content".equals(uri.getScheme())) {
+			return uri.toString();
+		}
+
+		String authority = uri.getAuthority();
+		String path = uri.getPath();
+
+		Map<String, String> authorityMappings = new HashMap<>();
+		authorityMappings.put("com.android.externalstorage.documents", "/storage");
+		authorityMappings.put("com.android.providers.downloads.documents", "/storage/emulated/0/Download");
+		authorityMappings.put("com.android.providers.media.documents", "/storage/emulated/0");
+
+		String basePath = authorityMappings.get(authority);
+		if (basePath == null) {
+			Log.e(LOG_TAG, "Unknown authority: " + authority);
+			return null;
+		}
+
+		if (path != null && path.startsWith("/")) {
+			path = path.substring(1);
+			String[] parts = path.split(":");
+			if (parts.length == 2) {
+				String volume = parts[0];
+				String relativePath = parts[1];
+				if ("primary".equals(volume)) {
+					return basePath + "/emulated/0/" + relativePath;
+				} else if ("raw".equals(volume)) {
+					return "/" + relativePath;
+				} else {
+					return basePath + "/" + volume + "/" + relativePath;
+				}
+			}
+		}
+
+		return basePath + (path != null ? path : "");
 	}
 
 	public static String formatExtension(String extension)
