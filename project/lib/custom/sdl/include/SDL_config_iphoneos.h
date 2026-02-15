@@ -173,7 +173,7 @@
 #define SDL_VIDEO_DRIVER_DUMMY  1
 
 /* Enable OpenGL ES */
-#if !TARGET_OS_MACCATALYST
+#if !defined(TARGET_OS_MACCATALYST) && !defined(TARGET_OS_IOS)
 #define SDL_VIDEO_OPENGL_ES2 1
 #define SDL_VIDEO_RENDER_OGL_ES2    1
 #endif
