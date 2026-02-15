@@ -112,8 +112,8 @@
 		<dependency path="dependencies/angle/Linux/libEGL.so" if="linux" />
 		<dependency path="dependencies/angle/Linux/libGLESv2.so" if="linux" />
 
-		<dependency path="dependencies/angle/iPhone/libEGL.xcframework" embed="true" if="ios" />
-		<dependency path="dependencies/angle/iPhone/libGLESv2.xcframework" embed="true" if="ios" />
+		<dependency path="dependencies/angle/iPhone/libEGL.xcframework" if="ios" />
+		<dependency path="dependencies/angle/iPhone/libGLESv2.xcframework" if="ios" />
 
 		<!-- TODO: Move to template or move all template dependencies to XML? -->
 		<!-- <dependency name="CoreBluetooth.framework" if="ios" /> -->
