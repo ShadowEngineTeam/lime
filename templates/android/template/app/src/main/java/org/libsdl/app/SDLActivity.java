@@ -1426,7 +1426,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         // create buttons
 
         String[] buttonTexts = args.getStringArray("buttonTexts");
-        int[] buttonIds = args.getIntArray("buttonIds");
+        final int[] buttonIds = args.getIntArray("buttonIds");
 
         // hardcoded but idk how to do better
         if (buttonTexts.length >= 2)
@@ -1460,9 +1460,12 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             });
         }
 
-        builder.setOnDismissListener(unused -> {
-            synchronized (messageboxSelection) {
-                messageboxSelection.notify();
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                synchronized (messageboxSelection) {
+                    messageboxSelection.notify();
+                }
             }
         });
 

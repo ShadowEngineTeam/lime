@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.os.VibratorManager;
 import android.view.DisplayCutout;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -233,18 +232,7 @@ public class GameActivity extends SDLActivity {
 
 		if (checkSelfPermission(Manifest.permission.VIBRATE) == PackageManager.PERMISSION_GRANTED) {
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-
-				VibratorManager vibratorManager = (VibratorManager)mSingleton.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
-
-				if (vibratorManager != null)
-					vibrator = vibratorManager.getDefaultVibrator();
-
-			} else {
-
-				vibrator = (Vibrator)mSingleton.getSystemService(Context.VIBRATOR_SERVICE);
-
-			}
+			vibrator = (Vibrator)mSingleton.getSystemService(Context.VIBRATOR_SERVICE);
 
 		}
 
@@ -260,10 +248,6 @@ public class GameActivity extends SDLActivity {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 
 			switch ("::ANDROID_DISPLAY_CUTOUT::") {
-
-				case "always":
-					getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
-					break;
 
 				case "never":
 					getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER;

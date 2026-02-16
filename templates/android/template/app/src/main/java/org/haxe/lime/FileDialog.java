@@ -196,7 +196,7 @@ public class FileDialog extends Extension
 		mainActivity.startActivityForResult(intent, OPEN_MULTIPLE_REQUEST_CODE);
 	}
 
-	public void save(byte[] data, String mime, String defaultPath, String title)
+	public void save(final byte[] data, String mime, String defaultPath, String title)
 	{
 		Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
 		intent.addCategory(Intent.CATEGORY_OPENABLE);

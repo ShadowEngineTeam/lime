@@ -22,7 +22,6 @@ import android.util.DisplayMetrics;
 import android.view.DisplayCutout;
 import android.view.WindowInsets;
 import android.view.WindowManager;
-import android.view.WindowMetrics;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;

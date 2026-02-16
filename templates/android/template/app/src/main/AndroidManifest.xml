@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" ::foreach ANDROID_MANIFEST::::if ((value != null) && (value != ""))::::key::="::value::" ::end::::end::>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="::APP_PACKAGE::" ::foreach ANDROID_MANIFEST::::if ((value != null) && (value != ""))::::key::="::value::" ::end::::end::>
 
 	<uses-feature android:glEsVersion="0x00030000" android:required="true" />
 	<uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -18,10 +18,6 @@
 		::end::
 		::foreach ANDROID_APPLICATION_CHILDREN::::__current__::
 		::end::
-
-		<meta-data android:name="android.game_mode_config" android:resource="@xml/game_mode_config" />
-		<meta-data android:name="com.android.app.gamemode.performance.enabled" android:value="true"/>
-		<meta-data android:name="com.android.app.gamemode.battery.enabled" android:value="true"/>
 
 		<activity ::foreach ANDROID_ACTIVITY::::if ((value != null) && (value != ""))::::key::="::value::" ::end::::end::>
 
