@@ -2,9 +2,9 @@ package lime.graphics.opengl.ext;
 
 @:keep
 @:noCompletion
-class ANGLE_texture_compression_dxt3
+class EXT_texture_compression_astc_decode_mode
 {
-	public var COMPRESSED_RGBA_S3TC_DXT3_ANGLE = 0x83F2;
+	public var TEXTURE_ASTC_DECODE_PRECISION_EXT = 0x8F69;
 
 	@:noCompletion private function new() {}
 }
