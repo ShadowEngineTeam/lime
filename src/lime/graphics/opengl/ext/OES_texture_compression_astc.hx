@@ -1,0 +1,29 @@
+package lime.graphics.opengl.ext;
+
+@:keep
+@:noCompletion
+class OES_texture_compression_astc
+{
+	public var COMPRESSED_RGBA_ASTC_3x3x3_OES = 0x93C0;
+	public var COMPRESSED_RGBA_ASTC_4x3x3_OES = 0x93C1;
+	public var COMPRESSED_RGBA_ASTC_4x4x3_OES = 0x93C2;
+	public var COMPRESSED_RGBA_ASTC_4x4x4_OES = 0x93C3;
+	public var COMPRESSED_RGBA_ASTC_5x4x4_OES = 0x93C4;
+	public var COMPRESSED_RGBA_ASTC_5x5x4_OES = 0x93C5;
+	public var COMPRESSED_RGBA_ASTC_5x5x5_OES = 0x93C6;
+	public var COMPRESSED_RGBA_ASTC_6x5x5_OES = 0x93C7;
+	public var COMPRESSED_RGBA_ASTC_6x6x5_OES = 0x93C8;
+	public var COMPRESSED_RGBA_ASTC_6x6x6_OES = 0x93C9;
+	public var COMPRESSED_SRGB8_ALPHA8_ASTC_3x3x3_OES = 0x93E0;
+	public var COMPRESSED_SRGB8_ALPHA8_ASTC_4x3x3_OES = 0x93E1;
+	public var COMPRESSED_SRGB8_ALPHA8_ASTC_4x4x3_OES = 0x93E2;
+	public var COMPRESSED_SRGB8_ALPHA8_ASTC_4x4x4_OES = 0x93E3;
+	public var COMPRESSED_SRGB8_ALPHA8_ASTC_5x4x4_OES = 0x93E4;
+	public var COMPRESSED_SRGB8_ALPHA8_ASTC_5x5x4_OES = 0x93E5;
+	public var COMPRESSED_SRGB8_ALPHA8_ASTC_5x5x5_OES = 0x93E6;
+	public var COMPRESSED_SRGB8_ALPHA8_ASTC_6x5x5_OES = 0x93E7;
+	public var COMPRESSED_SRGB8_ALPHA8_ASTC_6x6x5_OES = 0x93E8;
+	public var COMPRESSED_SRGB8_ALPHA8_ASTC_6x6x6_OES = 0x93E9;
+
+	@:noCompletion private function new() {}
+}

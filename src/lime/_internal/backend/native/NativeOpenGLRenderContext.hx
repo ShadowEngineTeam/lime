@@ -3327,8 +3327,11 @@ class NativeOpenGLRenderContext
 			__extensionObjectConstructors["EXT_shader_framebuffer_fetch"] = EXT_shader_framebuffer_fetch.new;
 			__extensionObjectConstructors["EXT_shader_texture_lod"] = EXT_shader_texture_lod.new;
 			__extensionObjectConstructors["EXT_shadow_samplers"] = EXT_shadow_samplers.new;
+			__extensionObjectConstructors["EXT_texture_compression_bptc"] = EXT_texture_compression_bptc.new;
 			__extensionObjectConstructors["EXT_texture_compression_dxt1"] = EXT_texture_compression_dxt1.new;
+			__extensionObjectConstructors["EXT_texture_compression_rgtc"] = EXT_texture_compression_rgtc.new;
 			__extensionObjectConstructors["EXT_texture_compression_s3tc"] = EXT_texture_compression_s3tc.new;
+			__extensionObjectConstructors["EXT_texture_compression_s3tc_srgb"] = EXT_texture_compression_s3tc_srgb.new;
 			__extensionObjectConstructors["EXT_texture_filter_anisotropic"] = EXT_texture_filter_anisotropic.new;
 			__extensionObjectConstructors["EXT_texture_format_BGRA8888"] = EXT_texture_format_BGRA8888.new;
 			__extensionObjectConstructors["EXT_texture_rg"] = EXT_texture_rg.new;
@@ -3341,8 +3344,11 @@ class NativeOpenGLRenderContext
 			__extensionObjectConstructors["IMG_read_format"] = IMG_read_format.new;
 			__extensionObjectConstructors["IMG_shader_binary"] = IMG_shader_binary.new;
 			__extensionObjectConstructors["IMG_texture_compression_pvrtc"] = IMG_texture_compression_pvrtc.new;
+			__extensionObjectConstructors["IMG_texture_compression_pvrtc2"] = IMG_texture_compression_pvrtc2.new;
 			__extensionObjectConstructors["KHR_debug"] = KHR_debug.new;
+			__extensionObjectConstructors["EXT_texture_compression_astc_decode_mode"] = EXT_texture_compression_astc_decode_mode.new;
 			__extensionObjectConstructors["KHR_texture_compression_astc_ldr"] = KHR_texture_compression_astc_ldr.new;
+			__extensionObjectConstructors["KHR_texture_compression_astc_hdr"] = KHR_texture_compression_astc_hdr.new;
 			__extensionObjectConstructors["NV_coverage_sample"] = NV_coverage_sample.new;
 			__extensionObjectConstructors["NV_depth_nonlinear"] = NV_depth_nonlinear.new;
 			__extensionObjectConstructors["NV_draw_buffers"] = NV_draw_buffers.new;
