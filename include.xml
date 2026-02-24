@@ -112,8 +112,8 @@
 		<dependency path="dependencies/angle/Linux/libEGL.so" if="linux" />
 		<dependency path="dependencies/angle/Linux/libGLESv2.so" if="linux" />
 
-		<dependency path="dependencies/angle/iPhone/device/libEGL.framework" embed="true" if="ios" unless="iphonesim" />
-		<dependency path="dependencies/angle/iPhone/device/libGLESv2.framework" embed="true" if="ios" unless="iphonesim" />
+		<dependency path="dependencies/angle/iPhone/device/arm64/libEGL.framework" embed="true" if="ios" unless="iphonesim" />
+		<dependency path="dependencies/angle/iPhone/device/arm64/libGLESv2.framework" embed="true" if="ios" unless="iphonesim" />
 
 		<section if="iphonesim">
 			<dependency path="dependencies/angle/iPhone/simulator/arm64/libEGL.framework" embed="true" if="HXCPP_ARM64" />
