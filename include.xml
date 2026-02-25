@@ -229,7 +229,6 @@
 	<haxelib name="lime-samples" if="setup" />
 
 	<include haxelib="lime-samples" if="create" />
-
 	<section if="rebuild">
 
 		<config:project>
@@ -237,5 +236,8 @@
 		</config:project>
 
 	</section>
+
+	<haxeflag name="--macro" value="addMetadata('@:build(lime._internal.macros.TimerMacro.build())', 'haxe.Timer')" />
+	<haxeflag name="--macro" value="addMetadata('@:build(lime._internal.macros.AssetsMacro.embedBytes())', 'haxe.io.Bytes')" />
 
 </extension>
