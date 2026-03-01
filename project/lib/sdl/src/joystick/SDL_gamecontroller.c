@@ -49,6 +49,7 @@
 
 /* a list of currently opened game controllers */
 static SDL_GameController *SDL_gamecontrollers = NULL;
+static SDL_bool SDL_gamecontrollers_scanned = SDL_FALSE;
 
 typedef struct
 {
@@ -1162,6 +1163,22 @@ SDL_PrivateAddMappingForGUID(SDL_JoystickGUID jGUID, const char *mappingString, 
         } else {
             s_pSupportedControllers = pControllerMapping;
         }
+
+        if(SDL_gamecontrollers_scanned) {
+            /* Send added events for controllers currently attached */
+            int device_index;
+            int num_joysticks = SDL_NumJoysticks();
+            for (device_index = 0; device_index < num_joysticks; ++device_index) {
+                SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(device_index);
+                if (SDL_memcmp(&guid, &jGUID, sizeof(jGUID)) == 0) {
+                    SDL_Event deviceevent;
+                    deviceevent.type = SDL_CONTROLLERDEVICEADDED;
+                    deviceevent.cdevice.which = device_index;
+                    SDL_PushEvent(&deviceevent);
+                }
+            }
+        }
+
         *existing = SDL_FALSE;
     }
     return pControllerMapping;
@@ -1715,6 +1732,8 @@ SDL_GameControllerInit(void)
             SDL_PushEvent(&deviceevent);
         }
     }
+
+    SDL_gamecontrollers_scanned = SDL_TRUE;
 
     return (0);
 }
