@@ -117,9 +117,9 @@
 
 		<section if="iphonesim">
 			<dependency path="dependencies/angle/iPhone/simulator/arm64/libEGL.framework" embed="true" if="HXCPP_ARM64" />
-			<dependency path="dependencies/angle/iPhone/simulator/x64/libEGL.framework" embed="true" if="HXCPP_M64" unless="HXCPP_ARM64" />
+			<dependency path="dependencies/angle/iPhone/simulator/x64/libEGL.framework" embed="true" if="HXCPP_M64 || HXCPP_X86_64" unless="HXCPP_ARM64" />
 			<dependency path="dependencies/angle/iPhone/simulator/arm64/libGLESv2.framework" embed="true" if="HXCPP_ARM64" />
-			<dependency path="dependencies/angle/iPhone/simulator/x64/libGLESv2.framework" embed="true" if="HXCPP_M64" unless="HXCPP_ARM64" />
+			<dependency path="dependencies/angle/iPhone/simulator/x64/libGLESv2.framework" embed="true" if="HXCPP_M64 || HXCPP_X86_64" unless="HXCPP_ARM64" />
 		</section>
 
 		<!-- TODO: Move to template or move all template dependencies to XML? -->
