@@ -860,8 +860,8 @@ class IOSPlatform extends PlatformTarget
 				".iphoneos-v7s.a",
 				".iphoneos-64.a",
 				".iphonesim.a",
+				".iphonesim-x86_64.a",
 				".iphonesim-64.a",
-				".iphonesim-arm64.a",
 			][archID];
 
 			if (arch == 'arm64-sim') arch = 'arm64';
