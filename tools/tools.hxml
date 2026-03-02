@@ -4,6 +4,7 @@
 -D lime-cffi
 -D lime
 -D lime_use_old_deltatime
+--macro haxe.macro.Compiler.addMetadata("@:build(lime._internal.macros.TimerMacro.build())", "haxe.Timer")
 -cp platforms
 -cp ../src
 -lib format
