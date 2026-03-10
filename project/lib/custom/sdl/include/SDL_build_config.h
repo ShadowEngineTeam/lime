@@ -466,8 +466,8 @@
 # define SDL_SENSOR_DUMMY 1              /**< Dummy sensor driver (no native support) */
 # define SDL_VIDEO_DRIVER_COCOA 1        /**< Cocoa video driver */
 # define SDL_VIDEO_OPENGL 0              /**< OpenGL support */
-# define SDL_VIDEO_OPENGL_EGL 1               /**< EGL (Embedded OpenGL) support */
-# define SDL_VIDEO_OPENGL_ES2 1               /**< OpenGL ES 2.0 support */
+# define SDL_VIDEO_OPENGL_EGL 0          /**< EGL (Embedded OpenGL) support */
+# define SDL_VIDEO_OPENGL_ES2 1          /**< OpenGL ES 2.0 support */
 # define SDL_VIDEO_OPENGL_CGL 0          /**< Core Graphics Layer (CGL) OpenGL support */
 /** @} */
 
