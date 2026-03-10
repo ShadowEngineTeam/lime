@@ -8,7 +8,7 @@
 #include <vector>
 
 #ifdef LIME_SDL
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #endif
 
 namespace lime {
@@ -31,6 +31,45 @@ namespace lime {
 	void gc_gl_object (value object) {
 
 		gc_gl_mutex.Lock ();
+
+		if (glObjectTypes.find (object) != glObjectTypes.end ()) {
+
+			GLObjectType type = glObjectTypes[object];
+
+			if (type != TYPE_SYNC) {
+
+				GLuint id = glObjectIDs[object];
+
+				gc_gl_id.push_back (id);
+				gc_gl_type.push_back (type);
+
+				glObjects[type].erase (id);
+				glObjectIDs.erase (object);
+				glObjectTypes.erase (object);
+
+			} else {
+
+				void* ptr = glObjectPtrs[object];
+
+				gc_gl_ptr.push_back (ptr);
+
+				glObjectPtrs.erase (object);
+				glObjectTypes.erase (object);
+
+			}
+
+		}
+
+		gc_gl_mutex.Unlock ();
+
+	}
+
+
+	void hl_gc_gl_object (HL_CFFIPointer* handle) {
+
+		gc_gl_mutex.Lock ();
+
+		void* object = handle->ptr;
 
 		if (glObjectTypes.find (object) != glObjectTypes.end ()) {
 
@@ -1352,7 +1391,7 @@ namespace lime {
 	HL_PRIM HL_CFFIPointer* HL_NAME(hl_gl_fence_sync) (int condition, int flags) {
 
 		GLsync result = glFenceSync (condition, flags);
-		HL_CFFIPointer* handle = HLCFFIPointer (result, (hl_finalizer)gc_gl_object);
+		HL_CFFIPointer* handle = HLCFFIPointer (result, (hl_finalizer)hl_gc_gl_object);
 		glObjectPtrs[handle] = result;
 		return handle;
 
@@ -3349,7 +3388,7 @@ namespace lime {
 	HL_PRIM HL_CFFIPointer* HL_NAME(hl_gl_object_register) (int id, int type, void* object) {
 
 		GLObjectType _type = (GLObjectType)type;
-		HL_CFFIPointer* handle = HLCFFIPointer ((vobj*)object, (hl_finalizer)gc_gl_object);
+		HL_CFFIPointer* handle = HLCFFIPointer ((vobj*)object, (hl_finalizer)hl_gc_gl_object);
 
 		//if (glObjects[_type].find (id) != glObjects[_type].end ()) {
 			//
@@ -4600,7 +4639,9 @@ namespace lime {
 	}
 
 
-	void OpenGLBindings::Init () {
+	bool OpenGLBindings::Init () {
+
+		static bool result = true;
 
 		if (!initialized) {
 
@@ -4611,6 +4652,8 @@ namespace lime {
 			initialized = true;
 
 		}
+
+		return result;
 
 	}
 

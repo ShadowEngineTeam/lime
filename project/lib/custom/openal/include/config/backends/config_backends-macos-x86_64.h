@@ -32,4 +32,4 @@
 
 #define HAVE_WAVE 1
 
-/* undef HAVE_SDL2 */
+/* undef HAVE_SDL3 */

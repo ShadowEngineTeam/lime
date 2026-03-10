@@ -15,7 +15,7 @@ namespace lime {
 
 	ApplicationEvent::ApplicationEvent () {
 
-		deltaTime = 0;
+		deltaTime = 0.0;
 		type = UPDATE;
 
 	}
@@ -38,7 +38,7 @@ namespace lime {
 				value object = (value)ApplicationEvent::eventObject->Get ();
 
 				alloc_field (object, id_deltaTime, alloc_float (event->deltaTime));
-				alloc_field (object, id_type, alloc_float (event->type));
+				alloc_field (object, id_type, alloc_int (event->type));
 
 			} else {
 

@@ -1,11 +1,11 @@
 package lime._internal.backend.html5;
 
 import js.html.DeviceMotionEvent;
+import js.html.DeviceOrientationEvent;
 import js.html.KeyboardEvent;
 import js.Browser;
 import lime.app.Application;
 import lime.media.AudioManager;
-import lime.system.Orientation;
 import lime.system.Sensor;
 import lime.system.SensorType;
 import lime.ui.GamepadAxis;
@@ -25,6 +25,7 @@ import lime.ui.Window;
 class HTML5Application
 {
 	private var accelerometer:Sensor;
+	private var gyroscope:Sensor;
 	private var currentUpdate:Float;
 	private var deltaTime:Float;
 	private var framePeriod:Float;
@@ -47,7 +48,16 @@ class HTML5Application
 		framePeriod = -1;
 
 		AudioManager.init();
-		accelerometer = Sensor.registerSensor(SensorType.ACCELEROMETER, 0);
+
+		if (Reflect.hasField(Browser.window, "DeviceMotionEvent"))
+		{
+			accelerometer = Sensor.registerSensor(SensorType.ACCELEROMETER, 1);
+		}
+
+		if (Reflect.hasField(Browser.window, "DeviceOrientationEvent"))
+		{
+			gyroscope = Sensor.registerSensor(SensorType.GYROSCOPE, 2);
+		}
 	}
 
 	private function convertKeyCode(keyCode:Int):KeyCode
@@ -55,6 +65,10 @@ class HTML5Application
 		if (keyCode >= 65 && keyCode <= 90)
 		{
 			return keyCode + 32;
+		}
+		else if (keyCode >= 112 && keyCode <= 135)
+		{
+			return KeyCode.F1 + (keyCode - 112);
 		}
 
 		switch (keyCode)
@@ -102,7 +116,7 @@ class HTML5Application
 			case 92:
 				return KeyCode.RIGHT_META;
 			case 93:
-				return KeyCode.RIGHT_META; // this maybe should be APPLICATION if on Windows
+				return KeyCode.APPLICATION;
 			case 95:
 				return KeyCode.SLEEP;
 			case 96:
@@ -130,61 +144,13 @@ class HTML5Application
 			case 107:
 				return KeyCode.NUMPAD_PLUS;
 			case 108:
-				return KeyCode.NUMPAD_PERIOD;
+				return KeyCode.NUMPAD_COMMA;
 			case 109:
 				return KeyCode.NUMPAD_MINUS;
 			case 110:
 				return KeyCode.NUMPAD_PERIOD;
 			case 111:
 				return KeyCode.NUMPAD_DIVIDE;
-			case 112:
-				return KeyCode.F1;
-			case 113:
-				return KeyCode.F2;
-			case 114:
-				return KeyCode.F3;
-			case 115:
-				return KeyCode.F4;
-			case 116:
-				return KeyCode.F5;
-			case 117:
-				return KeyCode.F6;
-			case 118:
-				return KeyCode.F7;
-			case 119:
-				return KeyCode.F8;
-			case 120:
-				return KeyCode.F9;
-			case 121:
-				return KeyCode.F10;
-			case 122:
-				return KeyCode.F11;
-			case 123:
-				return KeyCode.F12;
-			case 124:
-				return KeyCode.F13;
-			case 125:
-				return KeyCode.F14;
-			case 126:
-				return KeyCode.F15;
-			case 127:
-				return KeyCode.F16;
-			case 128:
-				return KeyCode.F17;
-			case 129:
-				return KeyCode.F18;
-			case 130:
-				return KeyCode.F19;
-			case 131:
-				return KeyCode.F20;
-			case 132:
-				return KeyCode.F21;
-			case 133:
-				return KeyCode.F22;
-			case 134:
-				return KeyCode.F23;
-			case 135:
-				return KeyCode.F24;
 			case 144:
 				return KeyCode.NUM_LOCK;
 			case 145:
@@ -203,38 +169,28 @@ class HTML5Application
 				return KeyCode.APP_CONTROL_FORWARD;
 			case 168:
 				return KeyCode.APP_CONTROL_REFRESH;
-			case 169:
-				return KeyCode.RIGHT_PARENTHESIS; // is this correct?
 			case 170:
 				return KeyCode.ASTERISK;
 			case 171:
 				return KeyCode.GRAVE;
-			case 172:
-				return KeyCode.HOME;
 			case 173:
-				return KeyCode.MINUS; // or mute/unmute?
+				return KeyCode.MUTE;
 			case 174:
 				return KeyCode.VOLUME_DOWN;
 			case 175:
 				return KeyCode.VOLUME_UP;
 			case 176:
-				return KeyCode.AUDIO_NEXT;
+				return KeyCode.MEDIA_NEXT_TRACK;
 			case 177:
-				return KeyCode.AUDIO_PREVIOUS;
+				return KeyCode.MEDIA_PREVIOUS_TRACK;
 			case 178:
-				return KeyCode.AUDIO_STOP;
+				return KeyCode.MEDIA_STOP;
 			case 179:
-				return KeyCode.AUDIO_PLAY;
-			case 180:
-				return KeyCode.MAIL;
+				return KeyCode.MEDIA_PLAY;
 			case 181:
-				return KeyCode.AUDIO_MUTE;
-			case 182:
-				return KeyCode.VOLUME_DOWN;
-			case 183:
-				return KeyCode.VOLUME_UP;
+				return KeyCode.MUTE;
 			case 186:
-				return KeyCode.SEMICOLON; // or ñ?
+				return KeyCode.SEMICOLON;
 			case 187:
 				return KeyCode.EQUALS;
 			case 188:
@@ -249,8 +205,6 @@ class HTML5Application
 				return KeyCode.GRAVE;
 			case 193:
 				return KeyCode.QUESTION;
-			case 194:
-				return KeyCode.NUMPAD_PERIOD;
 			case 219:
 				return KeyCode.LEFT_BRACKET;
 			case 220:
@@ -278,28 +232,15 @@ class HTML5Application
 		Browser.window.addEventListener("blur", handleWindowEvent, false);
 		Browser.window.addEventListener("resize", handleWindowEvent, false);
 		Browser.window.addEventListener("beforeunload", handleWindowEvent, false);
-		Browser.window.addEventListener("canvasVisibilityChange", handleWindowEvent, false);
 
-		untyped #if haxe4 js.Syntax.code #else __js__ #end ("
-			var canvas = document.querySelector('canvas');
-			if (canvas && 'IntersectionObserver' in window) {
-				var observer = new IntersectionObserver(function(entries) {
-					var visible = entries[0].isIntersecting;
-
-					// idk if js has a event for what i want but that works for now
-					var event = new CustomEvent('canvasVisibilityChange', {
-						detail: { visible: visible }
-					});
-
-					window.dispatchEvent(event);
-				});
-				observer.observe(canvas);
-			}
-		");
-
-		if (Reflect.hasField(Browser.window, "Accelerometer"))
+		if (accelerometer != null)
 		{
-			Browser.window.addEventListener("devicemotion", handleSensorEvent, false);
+			Browser.window.addEventListener("devicemotion", handleAccelEvent, false);
+		}
+
+		if (gyroscope != null)
+		{
+			Browser.window.addEventListener("deviceorientation", handleGyroEvent, false);
 		}
 
 		#if stats
@@ -369,27 +310,6 @@ class HTML5Application
 
 	public function exit():Void {}
 
-	public function getDeviceOrientation():Orientation
-	{
-		if (Browser.window.screen.orientation != null)
-		{
-			switch (Browser.window.screen.orientation.type)
-			{
-				case PORTRAIT_PRIMARY:
-					return PORTRAIT;
-				case PORTRAIT_SECONDARY:
-					return PORTRAIT_FLIPPED;
-				case LANDSCAPE_PRIMARY:
-					return LANDSCAPE;
-				case LANDSCAPE_SECONDARY:
-					return LANDSCAPE_FLIPPED;
-				default:
-					// fall through to unknown
-			}
-		}
-		return UNKNOWN;
-	}
-
 	private function handleApplicationEvent(?__):Void
 	{
 		// TODO: Support independent window frame rates
@@ -452,7 +372,7 @@ class HTML5Application
 
 			var keyCode = cast convertKeyCode(event.keyCode != null ? event.keyCode : event.which);
 			var modifier = (event.shiftKey ? (KeyModifier.SHIFT) : 0) | (event.ctrlKey ? (KeyModifier.CTRL) : 0) | (event.altKey ? (KeyModifier.ALT) : 0) | (event.metaKey ? (KeyModifier.META) : 0);
-			var timestamp = haxe.Int64.fromFloat(event.timeStamp);
+			var timestamp = haxe.Int64.fromFloat(event.timeStamp * 1e+6);
 
 			if (event.type == "keydown")
 			{
@@ -477,12 +397,22 @@ class HTML5Application
 		}
 	}
 
-	private function handleSensorEvent(event:DeviceMotionEvent):Void
+	private function handleAccelEvent(event:DeviceMotionEvent):Void
 	{
-		accelerometer.onUpdate.dispatch(event.accelerationIncludingGravity.x, event.accelerationIncludingGravity.y, event.accelerationIncludingGravity.z);
+		if (accelerometer != null)
+		{
+			accelerometer.onUpdate.dispatch(event.accelerationIncludingGravity.x, event.accelerationIncludingGravity.y, event.accelerationIncludingGravity.z);
+		}
 	}
 
-	@:keep
+	private function handleGyroEvent(event:DeviceOrientationEvent):Void
+	{
+		if (gyroscope != null)
+		{
+			gyroscope.onUpdate.dispatch(event.beta, event.gamma, event.alpha);
+		}
+	}
+
 	private function handleWindowEvent(event:js.html.Event):Void
 	{
 		if (parent.window != null)
@@ -503,27 +433,6 @@ class HTML5Application
 						parent.window.onFocusOut.dispatch();
 						parent.window.onDeactivate.dispatch();
 						hidden = true;
-					}
-
-				case 'canvasVisibilityChange':
-					var e:js.html.CustomEvent = cast event;
-					if (!e.detail.visible)
-					{
-						if (!hidden)
-						{
-							parent.window.onFocusOut.dispatch();
-							parent.window.onDeactivate.dispatch();
-							hidden = true;
-						}
-					}
-					else
-					{
-						if (hidden)
-						{
-							parent.window.onFocusIn.dispatch();
-							parent.window.onActivate.dispatch();
-							hidden = false;
-						}
 					}
 
 				case "visibilitychange":
@@ -680,7 +589,7 @@ class HTML5Application
 									default: continue;
 								}
 
-								var timestamp = haxe.Int64.fromFloat(js.Browser.window.performance.now());
+								var timestamp = haxe.Int64.fromFloat(js.Browser.window.performance.now() * 1e+6);
 
 								if (value > 0)
 								{

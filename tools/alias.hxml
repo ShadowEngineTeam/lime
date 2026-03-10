@@ -1,6 +1,5 @@
 #-main AliasScript
 #-D command=lime
-#-D lime_use_old_deltatime
 #--macro haxe.macro.Compiler.addMetadata("@:build(lime._internal.macros.TimerMacro.build())", "haxe.Timer")
 #-neko lime.n
 #-cmd nekotools boot lime.n
@@ -9,14 +8,12 @@
 
 #-main AliasScript
 #-D command=openfl
-#-D lime_use_old_deltatime
 #--macro haxe.macro.Compiler.addMetadata("@:build(lime._internal.macros.TimerMacro.build())", "haxe.Timer")
 #-neko openfl.n
 #-cmd nekotools boot openfl.n
 
 -main AliasScript
 -D command=lime
--D lime_use_old_deltatime
 --macro haxe.macro.Compiler.addMetadata("@:build(lime._internal.macros.TimerMacro.build())", "haxe.Timer")
 -D HXCPP_M32
 -cpp obj/lime
@@ -25,7 +22,6 @@
 
 -main AliasScript
 -D command=openfl
--D lime_use_old_deltatime
 --macro haxe.macro.Compiler.addMetadata("@:build(lime._internal.macros.TimerMacro.build())", "haxe.Timer")
 -D HXCPP_M32
 -cpp obj/openfl

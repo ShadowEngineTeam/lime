@@ -15,20 +15,15 @@ import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
-import android.view.DisplayCutout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
-import android.view.OrientationEventListener;
 import android.view.View;
-import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
 import org.haxe.extension.Extension;
-import android.view.WindowManager;
 import org.libsdl.app.SDLActivity;
-import org.haxe.lime.FileDialog;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,69 +36,9 @@ public class GameActivity extends SDLActivity {
 	private static AudioManager audioManager;
 	private static AssetManager assetManager;
 	private static List<Extension> extensions;
-	// TODO: Handle the rest of the callbacks for filedialogs?
-	private static List<FileDialog> filedialogs;
-	private static DisplayMetrics metrics;
-	private static DisplayCutout displayCutout;
 	private static Vibrator vibrator;
-	private static OrientationEventListener orientationListener;
-	private static HaxeObject deviceOrientationListener;
-	private static int deviceOrientation = SDL_ORIENTATION_UNKNOWN;
 
 	public Handler handler;
-
-	public static void setDeviceOrientationListener (HaxeObject object) {
-
-		deviceOrientationListener = object;
-		if (deviceOrientationListener != null)
-		{
-			deviceOrientationListener.call1("onOrientationChanged", deviceOrientation);
-		}
-
-	}
-
-	public static double getDisplayXDPI () {
-
-		if (metrics == null) {
-
-			metrics = Extension.mainContext.getResources ().getDisplayMetrics ();
-
-		}
-
-		return metrics.xdpi;
-
-	}
-
-	public static int[] getDisplaySafeAreaInsets () {
-
-		if (displayCutout == null) {
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-
-				WindowInsets windowInsets = ((GameActivity)Extension.mainContext).getWindow().getDecorView().getRootWindowInsets();
-
-				if (windowInsets != null) {
-
-					displayCutout = windowInsets.getDisplayCutout();
-
-				}
-			}
-		}
-
-		int[] result = {0, 0, 0, 0};
-
-		if (displayCutout != null) {
-
-			result[0] = displayCutout.getSafeInsetLeft();
-			result[1] = displayCutout.getSafeInsetTop();
-			result[2] = displayCutout.getSafeInsetRight();
-			result[3] = displayCutout.getSafeInsetBottom();
-
-		}
-
-		return result;
-
-	}
 
 
 	protected String[] getLibraries () {
@@ -142,12 +77,6 @@ public class GameActivity extends SDLActivity {
 
 		}
 
-		if (filedialogs != null) {
-			for (FileDialog fileDialog : filedialogs) {
-				fileDialog.onActivityResult (requestCode, resultCode, data);
-			}
-		}
-
 		super.onActivityResult (requestCode, resultCode, data);
 
 	}
@@ -169,61 +98,11 @@ public class GameActivity extends SDLActivity {
 
 	}
 
-	public static FileDialog createFileDialog(final HaxeObject haxeObject)
-	{
-		FileDialog fileDialog = new FileDialog(haxeObject);
-		if (filedialogs == null)
-		{
-			filedialogs = new ArrayList<FileDialog> ();
-		}
-		filedialogs.add(fileDialog);
-		return fileDialog;
-	}
 
 	@SuppressWarnings("deprecation")
 	protected void onCreate (Bundle state) {
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-
-			getWindow ().addFlags (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-		}
-
 		super.onCreate (state);
-
-		orientationListener = new OrientationEventListener(this) {
-
-			public void onOrientationChanged(int degrees) {
-
-				int orientation = SDL_ORIENTATION_UNKNOWN;
-				if (degrees >= 315 || (degrees >= 0 && degrees < 45))
-				{
-					orientation = SDL_ORIENTATION_PORTRAIT;
-				}
-				else if	(degrees >= 45 && degrees < 135)
-				{
-					orientation = SDL_ORIENTATION_LANDSCAPE_FLIPPED;
-				}
-				else if	(degrees >= 135 && degrees < 225)
-				{
-					orientation = SDL_ORIENTATION_PORTRAIT_FLIPPED;
-				}
-				else if	(degrees >= 225 && degrees < 315)
-				{
-					orientation = SDL_ORIENTATION_LANDSCAPE;
-				}
-
-				if (deviceOrientation != orientation) {
-					deviceOrientation = orientation;
-					if (deviceOrientationListener != null)
-					{
-						deviceOrientationListener.call1("onOrientationChanged", deviceOrientation);
-					}
-				}
-
-			}
-
-		};
 
 		audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -257,34 +136,6 @@ public class GameActivity extends SDLActivity {
 		Extension.mainView = mLayout;
 		Extension.packageName = getApplicationContext ().getPackageName ();
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-
-			switch ("::ANDROID_DISPLAY_CUTOUT::") {
-
-				case "always":
-					getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
-					break;
-
-				case "never":
-					getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER;
-					break;
-
-				case "shortEdges":
-					getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-					break;
-
-				case "default":
-					getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT;
-					break;
-
-				default:
-					getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT;
-					break;
-
-			}
-
-		}
-
 		if (extensions == null) {
 
 			extensions = new ArrayList<Extension> ();
@@ -299,11 +150,6 @@ public class GameActivity extends SDLActivity {
 
 		}
 
-		if (filedialogs != null) {
-			for (FileDialog fileDialog : filedialogs) {
-				fileDialog.onCreate (state);
-			}
-		}
 	}
 
 
@@ -353,8 +199,6 @@ public class GameActivity extends SDLActivity {
 			vibrator.cancel ();
 
 		}
-
-		orientationListener.disable();
 
 		super.onPause ();
 
@@ -408,8 +252,6 @@ public class GameActivity extends SDLActivity {
 	@Override protected void onResume () {
 
 		super.onResume ();
-
-		orientationListener.enable();
 
 		requestAudioFocus();
 

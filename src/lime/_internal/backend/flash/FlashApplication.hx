@@ -4,7 +4,6 @@ import flash.ui.MultitouchInputMode;
 import flash.ui.Multitouch;
 import lime.app.Application;
 import lime.media.AudioManager;
-import lime.system.Orientation;
 import lime.ui.Window;
 
 @:access(lime.app.Application)
@@ -35,9 +34,4 @@ class FlashApplication
 	}
 
 	public function exit():Void {}
-
-	public function getDeviceOrientation():Orientation
-	{
-		return UNKNOWN;
-	}
 }

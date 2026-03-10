@@ -1,7 +1,6 @@
 -main SVGExport
 -neko ../svg.n
 -D lime=7.0.0
--D lime_use_old_deltatime
 --macro haxe.macro.Compiler.addMetadata("@:build(lime._internal.macros.TimerMacro.build())", "haxe.Timer")
 -cp ../src
 -lib hxp

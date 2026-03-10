@@ -16,7 +16,7 @@ namespace lime {
 
 		public:
 
-			static void Init ();
+			static bool Init ();
 
 		private:
 
