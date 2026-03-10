@@ -3,15 +3,15 @@
     <files id="native-toolkit-sdl" tags="">
         <section if="linux">
             <compilerflag value="-I/usr/include/dbus-1.0" />
+            <compilerflag value="-I/usr/lib/dbus-1.0/include" />
 
-            <section>
-                <compilerflag value="-I/usr/lib/dbus-1.0/include" />
-                <compilerflag value="-I/usr/lib/aarch64-linux-gnu/dbus-1.0/include" if="HXCPP_ARM64" />
-                <compilerflag value="-I/usr/lib/x86_64-linux-gnu/dbus-1.0/include" if="HXCPP_M64" unless="HXCPP_ARM64" />
-                <compilerflag value="-I/usr/lib/i386-linux-gnu/dbus-1.0/include" if="HXCPP_M32" />
-            </section>
+            <compilerflag value="-I/usr/lib/arm-linux-gnueabihf/dbus-1.0/include" if="HXCPP_ARMV7" />
+            <compilerflag value="-I/usr/lib/aarch64-linux-gnu/dbus-1.0/include" if="HXCPP_ARM64" />
+            <compilerflag value="-I/usr/lib/x86_64-linux-gnu/dbus-1.0/include" if="HXCPP_M64" unless="HXCPP_ARM64" />
+            <compilerflag value="-I/usr/lib/i386-linux-gnu/dbus-1.0/include" if="HXCPP_M32" />
 
             <compilerflag value="-I/usr/include/libdrm" />
+            <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/" />
         </section>
 
         <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/include/" />
@@ -19,6 +19,7 @@
         <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/src/" />
 
         <compilerflag value="-DSDL_DISABLE_ALLOCA" />
+        <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" />
 
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/SDL.c" />
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/SDL_assert.c" />
