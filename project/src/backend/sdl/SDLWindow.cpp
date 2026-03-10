@@ -49,7 +49,9 @@ namespace lime {
 
 		if (flags & WINDOW_FLAG_FULLSCREEN) sdlWindowFlags |= SDL_WINDOW_FULLSCREEN;
 		if (flags & WINDOW_FLAG_RESIZABLE) sdlWindowFlags |= SDL_WINDOW_RESIZABLE;
+		if (flags & WINDOW_FLAG_TRANSPARENT) sdlWindowFlags |= SDL_WINDOW_TRANSPARENT;
 		if (flags & WINDOW_FLAG_BORDERLESS) sdlWindowFlags |= SDL_WINDOW_BORDERLESS;
+		if (flags & WINDOW_FLAG_ALLOW_HIGHDPI) sdlWindowFlags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
 		if (flags & WINDOW_FLAG_HIDDEN) sdlWindowFlags |= SDL_WINDOW_HIDDEN;
 		if (flags & WINDOW_FLAG_MINIMIZED) sdlWindowFlags |= SDL_WINDOW_MINIMIZED;
 		if (flags & WINDOW_FLAG_MAXIMIZED) sdlWindowFlags |= SDL_WINDOW_MAXIMIZED;
@@ -87,12 +89,6 @@ namespace lime {
 			sdlWindowFlags |= SDL_WINDOW_OPENGL;
 
 			#endif
-
-			if (flags & WINDOW_FLAG_ALLOW_HIGHDPI) {
-
-				sdlWindowFlags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
-
-			}
 
 			#if !(defined (LIME_ANGLE) && defined (IPHONE))
 
@@ -288,15 +284,7 @@ namespace lime {
 
 			} else {
 
-				if (flags & WINDOW_FLAG_VSYNC) {
-
-					SetVSyncMode (WINDOW_VSYNC_ON);
-
-				} else {
-
-					SetVSyncMode (WINDOW_VSYNC_OFF);
-
-				}
+				SetVSyncMode ((flags & WINDOW_FLAG_VSYNC) ? WINDOW_VSYNC_ON : WINDOW_VSYNC_OFF);
 
 				OpenGLBindings::Init ();
 
@@ -316,15 +304,7 @@ namespace lime {
 
 			if (context && SDL_GL_MakeCurrent (sdlWindow, context)) {
 
-				if (flags & WINDOW_FLAG_VSYNC) {
-
-					SetVSyncMode (WINDOW_VSYNC_ON);
-
-				} else {
-
-					SetVSyncMode (WINDOW_VSYNC_OFF);
-
-				}
+				SetVSyncMode ((flags & WINDOW_FLAG_VSYNC) ? WINDOW_VSYNC_ON : WINDOW_VSYNC_OFF);
 
 				OpenGLBindings::Init ();
 
@@ -550,7 +530,7 @@ namespace lime {
 
 	void SDLWindow::ContextFlip () {
 
-		/*if (!sdlRenderer) {
+		if (!sdlRenderer) {
 
 			#if defined(LIME_ANGLE) && defined(IPHONE)
 
@@ -570,7 +550,7 @@ namespace lime {
 
 			#endif
 
-		} else */ if (sdlRenderer) {
+		} else if (sdlRenderer) {
 
 			SDL_RenderPresent (sdlRenderer);
 
