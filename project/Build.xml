@@ -452,6 +452,8 @@
 				<lib name="-L../templates/bin/hl/${BINDIR}" if="LIME_HASHLINK" />
 				<lib name="-lhl" if="LIME_HASHLINK" />
 
+				<lib name="-lbsd" if="LIME_SDL" />
+
 			</section>
 
 			<section if="mac">
