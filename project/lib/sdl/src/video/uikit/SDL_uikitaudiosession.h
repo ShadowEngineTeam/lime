@@ -1,6 +1,6 @@
 #pragma once
 
-#import <Foundation/Foundation.h>
+#include <stdbool.h>
 
-void SDL_AudioSession_Initialize(void);
-void SDL_AudioSession_SetActive(BOOL active);
+void SDL_AudioSession_Initialize();
+void SDL_AudioSession_SetActive(bool active);

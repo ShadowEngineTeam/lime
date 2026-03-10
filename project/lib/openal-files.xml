@@ -130,7 +130,7 @@
             <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/rpi/" if="rpi" />
             <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/windows/" if="windows" />
 
-            <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/sdl2.cpp" />
+            <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/sdl3.cpp" />
 
         </section>
 

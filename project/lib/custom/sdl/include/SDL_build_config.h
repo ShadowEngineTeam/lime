@@ -238,7 +238,7 @@
  * @name Android API Level-Dependent Features
  * @{
  */
-# if __ANDROID_API__ >= 24
+# if __ANDROID_API__ >= 28
 #  define HAVE_ICONV 1      /**< Character set conversion (API 24+) */
 #  define HAVE_ICONV_H 1    /**< iconv.h header (API 24+) */
 # endif
