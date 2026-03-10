@@ -301,8 +301,6 @@ namespace lime {
 				OpenGLBindings::Init ();
 
 				SDL_PropertiesID props = SDL_GetWindowProperties(sdlWindow);
-				OpenGLBindings::defaultFramebuffer = (int)SDL_GetNumberProperty(props, SDL_PROP_WINDOW_UIKIT_OPENGL_FRAMEBUFFER_NUMBER, 0);
-				OpenGLBindings::defaultRenderbuffer = (int)SDL_GetNumberProperty(props, SDL_PROP_WINDOW_UIKIT_OPENGL_RENDERBUFFER_NUMBER, 0);
 
 			}
 
@@ -332,8 +330,6 @@ namespace lime {
 
 				#if defined(IPHONE) || defined(APPLETV)
 				SDL_PropertiesID props = SDL_GetWindowProperties(sdlWindow);
-				OpenGLBindings::defaultFramebuffer = (int)SDL_GetNumberProperty(props, SDL_PROP_WINDOW_UIKIT_OPENGL_FRAMEBUFFER_NUMBER, 0);
-				OpenGLBindings::defaultRenderbuffer = (int)SDL_GetNumberProperty(props, SDL_PROP_WINDOW_UIKIT_OPENGL_RENDERBUFFER_NUMBER, 0);
 				#endif
 
 			} else {
