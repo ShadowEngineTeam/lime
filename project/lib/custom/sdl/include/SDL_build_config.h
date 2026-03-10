@@ -443,7 +443,7 @@
 # define SDL_POWER_WINDOWS 1                  /**< Windows power management */
 # define SDL_SENSOR_WINDOWS 1                 /**< Windows sensor support */
 # define SDL_VIDEO_DRIVER_WINDOWS 1           /**< Windows video driver */
-# define SDL_VIDEO_OPENGL 0                   /**< OpenGL support */
+# define SDL_VIDEO_OPENGL 1                   /**< OpenGL support */
 # define SDL_VIDEO_OPENGL_EGL 1               /**< EGL (Embedded OpenGL) support */
 # define SDL_VIDEO_OPENGL_ES2 1               /**< OpenGL ES 2.0 support */
 # define SDL_VIDEO_OPENGL_WGL 0               /**< Windows GL (WGL) support */
@@ -465,10 +465,10 @@
 # define SDL_POWER_MACOSX 1              /**< macOS power management */
 # define SDL_SENSOR_DUMMY 1              /**< Dummy sensor driver (no native support) */
 # define SDL_VIDEO_DRIVER_COCOA 1        /**< Cocoa video driver */
-# define SDL_VIDEO_OPENGL 0              /**< OpenGL support */
-# define SDL_VIDEO_OPENGL_EGL 0          /**< EGL (Embedded OpenGL) support */
+# define SDL_VIDEO_OPENGL 1              /**< OpenGL support */
+# define SDL_VIDEO_OPENGL_EGL 1          /**< EGL (Embedded OpenGL) support */
 # define SDL_VIDEO_OPENGL_ES2 1          /**< OpenGL ES 2.0 support */
-# define SDL_VIDEO_OPENGL_CGL 0          /**< Core Graphics Layer (CGL) OpenGL support */
+# define SDL_VIDEO_OPENGL_CGL 1          /**< Core Graphics Layer (CGL) OpenGL support */
 /** @} */
 
 #elif defined(SDL_PLATFORM_IOS)
@@ -585,10 +585,10 @@
  * @brief OpenGL rendering contexts on Linux.
  * @{
  */
-# define SDL_VIDEO_OPENGL 0         /**< OpenGL support */
+# define SDL_VIDEO_OPENGL 1         /**< OpenGL support */
 # define SDL_VIDEO_OPENGL_EGL 1     /**< EGL support */
 # define SDL_VIDEO_OPENGL_ES2 1     /**< OpenGL ES 2.0 support */
-# define SDL_VIDEO_OPENGL_GLX 0     /**< GLX (OpenGL Extension to X) support */
+# define SDL_VIDEO_OPENGL_GLX 1     /**< GLX (OpenGL Extension to X) support */
 /** @} */
 
 #endif
