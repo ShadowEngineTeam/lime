@@ -498,7 +498,7 @@
 # endif
 
 # define SDL_VIDEO_DRIVER_UIKIT 1    /**< UIKit video driver */
-# define SDL_VIDEO_OPENGL_ES2 1      /**< OpenGL ES 2.0 support */
+// # define SDL_VIDEO_OPENGL_ES2 1      /**< OpenGL ES 2.0 support */
 /** @} */
 
 #elif defined(SDL_PLATFORM_ANDROID)
