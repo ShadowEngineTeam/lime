@@ -225,11 +225,8 @@ namespace lime {
 			if (!sdlWindow) {
 
 				printf ("Could not create SDL window with OpenGL ES 2: %s.\nReturning null...\n", SDL_GetError ());
-				return;
 
 			}
-
-			return;
 
 		}
 
