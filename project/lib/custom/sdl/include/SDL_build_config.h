@@ -588,7 +588,7 @@
 # define SDL_VIDEO_OPENGL 1         /**< OpenGL support */
 # define SDL_VIDEO_OPENGL_EGL 1     /**< EGL support */
 # define SDL_VIDEO_OPENGL_ES2 1     /**< OpenGL ES 2.0 support */
-# define SDL_VIDEO_OPENGL_GLX 1     /**< GLX (OpenGL Extension to X) support */
+# define SDL_VIDEO_OPENGL_GLX 0     /**< GLX (OpenGL Extension to X) support */
 /** @} */
 
 #endif
