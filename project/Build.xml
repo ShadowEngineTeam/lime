@@ -497,7 +497,7 @@
 				<lib name="-lEGL_angle" />
 				<lib name="-lGLESv2_angle" />
 				<lib name="-lOpenSLES" />
-				<lib name="-laaudio" if="LIME_SDL" />
+				<lib name="-lAAudio" if="LIME_SDL" />
 
 			</section>
 
