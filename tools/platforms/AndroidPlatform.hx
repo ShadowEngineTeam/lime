@@ -1,4 +1,4 @@
-	wpackage;
+package;
 
 import hxp.ArrayTools;
 import hxp.Haxelib;
