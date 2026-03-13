@@ -505,7 +505,6 @@
 #  define SDL_AUDIO_DRIVER_OPENSLES 1   /**< OpenSL ES audio driver */
 #  define SDL_AUDIO_DRIVER_AAUDIO 1     /**< AAudio low-latency audio driver (Android 8.0+) */
 # endif
-# define SDL_AUDIO_DRIVER_AAUDIO 1     /**< AAudio low-latency audio driver (Android 8.0+) */
 # define SDL_CAMERA_DRIVER_ANDROID 1   /**< Android camera driver */
 # define SDL_FILESYSTEM_ANDROID 1      /**< Android filesystem operations */
 # define SDL_HAPTIC_ANDROID 1          /**< Android haptic (vibration) support */
