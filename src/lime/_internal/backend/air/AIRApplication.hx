@@ -5,7 +5,6 @@ import flash.desktop.SystemIdleMode;
 import flash.events.Event;
 import lime._internal.backend.flash.FlashApplication;
 import lime.app.Application;
-import lime.system.Orientation;
 import lime.system.System;
 
 class AIRApplication extends FlashApplication
@@ -32,22 +31,5 @@ class AIRApplication extends FlashApplication
 	public override function exit():Void
 	{
 		// TODO: Remove event handlers?
-	}
-
-	override public function getDeviceOrientation():Orientation
-	{
-		switch (parent.window.stage.deviceOrientation)
-		{
-			case DEFAULT:
-				return PORTRAIT;
-			case UPSIDE_DOWN:
-				return PORTRAIT_FLIPPED;
-			case ROTATED_LEFT:
-				return LANDSCAPE;
-			case ROTATED_RIGHT:
-				return LANDSCAPE_FLIPPED;
-			default:
-				return UNKNOWN;
-		}
 	}
 }

@@ -1,44 +1,23 @@
 #ifndef LIME_UI_FILE_DIALOG_H
 #define LIME_UI_FILE_DIALOG_H
 
-
+#include <ui/Window.h>
 #include <string>
 #include <vector>
-#include <ui/FileDialogEvent.h>
+#include <functional>
 
-
-#ifdef IPHONE
-#ifdef __OBJC__
-@class FileDialogObserver;
-#else
-typedef struct objc_object FileDialogObserver;
-#endif
-#endif
 namespace lime {
-
 
 	class FileDialog {
 
-		public:
-			#ifdef IPHONE
-			static int Create();
-			static void Open (int id_handle);
-			static void BrowseSelect (int id_handle);
-			static void BrowseSelectMultiple (int id_handle);
-			static void LaunchFileDialogOpen(FileDialogObserver *observer, bool selectMultiple);
-			// static std::wstring* OpenDirectory (std::wstring* title = 0, std::wstring* filter = 0, std::wstring* defaultPath = 0);
-			// static void OpenFiles (std::vector<std::wstring*>* files, std::wstring* title = 0, std::wstring* filter = 0, std::wstring* defaultPath = 0);
-			// static std::wstring* SaveFile (std::wstring* title = 0, std::wstring* filter = 0, std::wstring* defaultPath = 0);
-			#else
-			static std::wstring* OpenDirectory (std::wstring* title = 0, std::wstring* filter = 0, std::wstring* defaultPath = 0);
-			static std::wstring* OpenFile (std::wstring* title = 0, std::wstring* filter = 0, std::wstring* defaultPath = 0);
-			static void OpenFiles (std::vector<std::wstring*>* files, std::wstring* title = 0, std::wstring* filter = 0, std::wstring* defaultPath = 0);
-			static std::wstring* SaveFile (std::wstring* title = 0, std::wstring* filter = 0, std::wstring* defaultPath = 0);
-			#endif
+	public:
+
+		static void OpenDirectory (Window* window, std::function<void(const char* const*, int, int)> callback, const char* defaultPath = nullptr, bool allowMultiple = false);
+		static void OpenFile (Window* window, std::function<void(const char* const*, int, int)> callback, const char** names = nullptr, const char** patterns = nullptr, int filterCount = 0, const char* defaultPath = nullptr, bool allowMultiple = false);
+		static void SaveFile (Window* window, std::function<void(const char* const*, int, int)> callback, const char** names = nullptr, const char** patterns = nullptr, int filterCount = 0, const char* defaultPath = nullptr);
+
 	};
 
-
 }
-
 
 #endif

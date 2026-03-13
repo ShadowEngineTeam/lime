@@ -65,6 +65,7 @@ class AndroidPlatform extends PlatformTarget
 				hardware: true,
 				display: 0,
 				resizable: true,
+				transparent: false,
 				borderless: false,
 				orientation: Orientation.AUTO,
 				vsync: false,
@@ -171,10 +172,10 @@ class AndroidPlatform extends PlatformTarget
 
 		for (architecture in architectures)
 		{
-			var minSDKVer = 24;
-			var haxeParams = [hxml, "-D", "android", "-D", 'HXCPP_ANDROID_PLATFORM=$minSDKVer'];
-			var cppParams = ["-Dandroid", '-DHXCPP_ANDROID_PLATFORM=$minSDKVer'];
-			var path = sourceSet + "/jniLibs";
+			var minimumSDKVersion = project.config.getInt("android.minimum-sdk-version", 26);
+			var haxeParams = [hxml, "-D", "android", "-D", "PLATFORM=android-" + minimumSDKVersion, "-D", "PLATFORM_NUMBER=" + minimumSDKVersion, "-D", "HXCPP_ANDROID_PLATFORM=" + minimumSDKVersion];
+			var cppParams = ["-Dandroid", "-DPLATFORM=android-" + minimumSDKVersion, "-DPLATFORM_NUMBER=" + minimumSDKVersion, "-DHXCPP_ANDROID_PLATFORM=" + minimumSDKVersion];
+			var path = sourceSet + "/jniLibs/armeabi";
 			var suffix = ".so";
 
 			if (architecture == Architecture.ARM64)
@@ -412,8 +413,7 @@ class AndroidPlatform extends PlatformTarget
 
 		var commands = [];
 
-		var minSDKVer = 24;
-		var platformDefine = '-DHXCPP_ANDROID_PLATFORM=$minSDKVer';
+		var minimumSDKVersion = project.config.getInt("android.minimum-sdk-version", 26);
 
 		if (project.targetFlags.exists("ONLY_ARM64"))
 		{
@@ -436,10 +436,11 @@ class AndroidPlatform extends PlatformTarget
 			arm64 = armv7 = x64 = false;
 		}
 
-		if (arm64) commands.push(["-Dandroid", "-DHXCPP_ARM64", platformDefine]);
-		if (armv7) commands.push(["-Dandroid", "-DHXCPP_ARMV7", platformDefine]);
-		if (x64) commands.push(["-Dandroid", "-DHXCPP_X86_64", platformDefine]);
-		if (x86) commands.push(["-Dandroid", "-DHXCPP_X86", platformDefine]);
+		if (arm64) commands.push(["-Dandroid", "-DHXCPP_ARM64", "-DPLATFORM=android-" + minimumSDKVersion, "-DPLATFORM_NUMBER=" + minimumSDKVersion, "-DHXCPP_ANDROID_PLATFORM=" + minimumSDKVersion]);
+		if (armv7) commands.push(["-Dandroid", "-DHXCPP_ARMV7", "-DPLATFORM=android-" + minimumSDKVersion, "-DPLATFORM_NUMBER=" + minimumSDKVersion, "-DHXCPP_ANDROID_PLATFORM=" + minimumSDKVersion]);
+		if (armv5) commands.push(["-Dandroid", "-DPLATFORM=android-" + minimumSDKVersion, "-DPLATFORM_NUMBER=" + minimumSDKVersion, "-DHXCPP_ANDROID_PLATFORM=" + minimumSDKVersion]);
+		if (x64) commands.push(["-Dandroid", "-DHXCPP_X86_64", "-DPLATFORM=android-" + minimumSDKVersion, "-DPLATFORM_NUMBER=" + minimumSDKVersion, "-DHXCPP_ANDROID_PLATFORM=" + minimumSDKVersion]);
+		if (x86) commands.push(["-Dandroid", "-DHXCPP_X86", "-DPLATFORM=android-" + minimumSDKVersion, "-DPLATFORM_NUMBER=" + minimumSDKVersion, "-DHXCPP_ANDROID_PLATFORM=" + minimumSDKVersion]);
 
 		CPPHelper.rebuild(project, commands);
 	}
@@ -522,7 +523,7 @@ class AndroidPlatform extends PlatformTarget
 		context.CPP_DIR = targetDirectory + "/obj";
 		context.OUTPUT_DIR = targetDirectory;
 		context.ANDROID_INSTALL_LOCATION = project.config.getString("android.install-location", "auto");
-		context.ANDROID_MINIMUM_SDK_VERSION = project.config.getInt("android.minimum-sdk-version", 24);
+		context.ANDROID_MINIMUM_SDK_VERSION = project.config.getInt("android.minimum-sdk-version", 26);
 		context.ANDROID_TARGET_SDK_VERSION = project.config.getInt("android.target-sdk-version", 36);
 		context.ANDROID_EXTENSIONS = project.config.getArrayString("android.extension");
 		context.ANDROID_PERMISSIONS = project.config.getArrayString("android.permission", [
@@ -543,7 +544,6 @@ class AndroidPlatform extends PlatformTarget
 		context.ANDROID_GRADLE_PLUGIN = project.config.getString("android.gradle-plugin", "8.12.0");
 		context.ANDROID_USE_ANDROIDX = project.config.getString("android.useAndroidX", "true");
 		context.ANDROID_ENABLE_JETIFIER = project.config.getString("android.enableJetifier", "false");
-		context.ANDROID_DISPLAY_CUTOUT = project.config.getString("android.layoutInDisplayCutoutMode", "shortEdges");
 
 		context.ANDROID_MANIFEST = project.config.getKeyValueArray("android.manifest", {
 			"android:versionCode": project.meta.buildNumber,
@@ -555,6 +555,7 @@ class AndroidPlatform extends PlatformTarget
 			"android:label": project.meta.title,
 			"android:allowBackup": "true",
 			"android:theme": "@style/LimeAppMainTheme" + (project.window.fullscreen ? "Fullscreen" : ""),
+			"android:enableOnBackInvokedCallback": "false",
 			"android:hardwareAccelerated": "true",
 			"android:allowNativeHeapPointerTagging": context.ANDROID_TARGET_SDK_VERSION >= 30 ? "false" : null,
 			"android:requestLegacyExternalStorage": context.ANDROID_TARGET_SDK_VERSION >= 29 ? "true" : null,
@@ -567,7 +568,9 @@ class AndroidPlatform extends PlatformTarget
 		context.ANDROID_ACTIVITY = project.config.getKeyValueArray("android.activity", {
 			"android:name": "MainActivity",
 			"android:exported": "true",
-			"android:launchMode": "singleTask",
+			"android:alwaysRetainTaskState": "true",
+			"android:launchMode": "singleInstance",
+			"android:preferMinimalPostProcessing": "true",
 			"android:label": project.meta.title,
 			"android:resizeableActivity": '${project.window.resizable}',
 			"android:configChanges": project.config.getArrayString("android.configChanges",
@@ -617,29 +620,7 @@ class AndroidPlatform extends PlatformTarget
 
 		context.ANDROID_SDK_ESCAPED = StringTools.replace(context.ENV_ANDROID_SDK, "\\", "\\\\");
 		context.ANDROID_NDK_ROOT_ESCAPED = StringTools.replace(context.ENV_ANDROID_NDK_ROOT, "\\", "\\\\");
-
-		// we need to specify ndkVersion in build.gradle, and the value can be
-		// found in the NDK's source.properties file
-		var ndkSrcPropsPath = Path.join([context.ENV_ANDROID_NDK_ROOT, "source.properties"]);
-		if (FileSystem.exists(ndkSrcPropsPath))
-		{
-			try
-			{
-				var srcProps = File.getContent(ndkSrcPropsPath);
-				var lines = srcProps.split("\n");
-				for (line in lines)
-				{
-					var parts = ~/\s+=\s+/.split(StringTools.trim(line));
-					if (parts.length == 2 && parts[0] == "Pkg.Revision")
-					{
-						context.ANDROID_NDK_VERSION = parts[1];
-					}
-				}
-			}
-			catch (e:Dynamic)
-			{
-			}
-		}
+		context.ANDROID_NDK_VERSION = getNdkVer();
 
 		if (Reflect.hasField(context, "KEY_STORE")) context.KEY_STORE = StringTools.replace(context.KEY_STORE, "\\", "\\\\");
 		if (Reflect.hasField(context, "KEY_STORE_ALIAS")) context.KEY_STORE_ALIAS = StringTools.replace(context.KEY_STORE_ALIAS, "\\", "\\\\");

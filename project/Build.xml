@@ -1,12 +1,13 @@
 <xml>
 
-	<set name="PLATFORM" value="android-24" if="android" />
+	<set name="PLATFORM" value="android-26" if="android" />
 	<set name="HXCPP_CPP20" value="1" />
+	<set name="OBJC_ARC" value="1" if="apple" />
 
 	<include name="${HXCPP}/build-tool/BuildCommon.xml" />
 
-	<set name="HXCPP_ANDROID_PLATFORM" value="24" if="android" />
-	<set name="PLATFORM_NUMBER" value="24" if="android" />
+	<set name="HXCPP_ANDROID_PLATFORM" value="26" if="android" />
+	<set name="PLATFORM_NUMBER" value="26" if="android" />
 	<setenv name="MACOSX_DEPLOYMENT_TARGET" value="10.13" if="mac" />
 
 	<set name="ios" value="1" if="iphone" />
@@ -24,19 +25,15 @@
 	<set name="LIME_MBEDTLS" value="1" unless="emscripten || winrt" />
 	<!-- <set name="LIME_NEKO" value="1" if="linux" /> -->
 	<set name="LIME_OGG" value="1" />
-	<set name="LIME_OPENALSOFT" value="1" if="windows || linux || mac || android || iphone" unless="tvos" />
-	<set name="LIME_OPENAL" value="1" if="webassembly || tvos" />
-	<set name="LIME_MOJOAL" value="1" if="switch || static_link || winrt || mojoal" unless="LIME_OPENAL || iphone LIME_OPENALSOFT" />
-	<unset name="LIME_OPENALSOFT" if="LIME_MOJOAL" />
-	<set name="LIME_OPENAL" value="1" if="LIME_OPENALSOFT" />
-	<set name="LIME_OPENAL" value="1" if="LIME_MOJOAL" />
+	<set name="LIME_MOJOAL" value="1" if="mojoal" />
+	<set name="LIME_OPENALSOFT" value="1" if="windows || linux || mac || android || iphone || tvos" unless="LIME_MOJOAL" />
+	<set name="LIME_OPENAL" value="1" if="LIME_MOJOAL || LIME_OPENALSOFT || webassembly" />
 	<set name="LIME_OPENGL" value="1" />
 	<set name="LIME_PIXMAN" value="1" />
 	<set name="LIME_PNG" value="1" />
 	<set name="LIME_SDL" value="1" />
 	<set name="LIME_ANGLE" value="1" if="iphone" />
 	<set name="LIME_GLAD" value="1" unless="LIME_ANGLE" />
-	<set name="LIME_TINYFILEDIALOGS" value="1" if="windows || mac || linux" unless="winrt || emscripten" />
 	<set name="LIME_VORBIS" value="1" />
 	<!-- <set name="LIME_VPX" value="1" />
 	<set name="LIME_WEBM" value="1" /> -->
@@ -49,6 +46,7 @@
 	<set name="NATIVE_TOOLKIT_HAVE_FREETYPE" value="1" if="LIME_FREETYPE" />
 	<set name="NATIVE_TOOLKIT_HAVE_HARFBUZZ" value="1" if="LIME_HARFBUZZ" />
 	<set name="NATIVE_TOOLKIT_HAVE_MBEDTLS" value="1" if="LIME_MBEDTLS" />
+	<set name="NATIVE_TOOLKIT_HAVE_MOJOAL" value="1" if="LIME_MOJOAL" />
 	<set name="NATIVE_TOOLKIT_HAVE_PNG" value="1" if="LIME_PNG" />
 	<set name="NATIVE_TOOLKIT_HAVE_SDL" value="1" if="LIME_SDL" />
 
@@ -227,14 +225,6 @@
 			<section unless="emscripten">
 
 				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/" />
-				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/default/" unless="windows || mac || linux || rpi" />
-				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/linux/" if="linux" unless="rpi" />
-				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/windows/" if="windows" unless="winrt" />
-				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/mac/" if="mac" />
-				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/rpi/" if="rpi" />
-				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/configs/winrt/" if="winrt" />
-
-				<compilerflag value="-DHAVE_LIBC" />
 
 			</section>
 
@@ -267,15 +257,6 @@
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/angle/include/" />
 
 			<compilerflag value="-DLIME_ANGLE" />
-
-		</section>
-
-		<section if="LIME_TINYFILEDIALOGS">
-
-			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/tinyfiledialogs/" />
-			<compilerflag value="-DLIME_TINYFILEDIALOGS" />
-
-			<file name="src/ui/FileDialog.cpp" />
 
 		</section>
 
@@ -321,16 +302,14 @@
 		<file name="src/system/DocumentSystem.cpp" if="android" />
 		<file name="src/system/Locale.cpp" unless="mac || ios" />
 		<file name="src/system/Locale.mm" if="mac || ios" />
-		<file name="src/system/OrientationEvent.cpp" />
 		<file name="src/system/SensorEvent.cpp" />
 		<file name="src/system/System.cpp" unless="ios" />
 		<file name="src/system/System.mm" if="ios" />
 		<file name="src/system/ValuePointer.cpp" />
 		<file name="src/ui/DropEvent.cpp" />
+		<file name="src/ui/FileDialog.cpp" />
 		<file name="src/ui/GamepadEvent.cpp" />
 		<file name="src/ui/Haptic.mm" if="ios" />
-		<file name="src/ui/FileDialog.mm" if="ios" />
-		<file name="src/ui/FileDialogEvent.cpp" if="ios" />
 		<file name="src/ui/JoystickEvent.cpp" />
 		<file name="src/ui/KeyEvent.cpp" />
 		<file name="src/ui/MouseEvent.cpp" />
@@ -369,7 +348,6 @@
 	<include name="lib/pixman-files.xml" />
 	<include name="lib/png-files.xml" />
 	<include name="lib/sdl-files.xml" />
-	<include name="lib/tinyfiledialogs-files.xml" />
 	<include name="lib/vorbis-files.xml" />
 	<include name="lib/vpx-files.xml" />
 	<include name="lib/webm-files.xml" />
@@ -403,7 +381,6 @@
 		<files id="native-toolkit-png" if="LIME_PNG" />
 		<files id="native-toolkit-sdl" if="LIME_SDL" unless="emscripten" />
 		<files id="native-toolkit-glad" if="LIME_GLAD" />
-		<files id="native-toolkit-tinyfiledialogs" if="LIME_TINYFILEDIALOGS" />
 		<files id="native-toolkit-vorbis" if="LIME_VORBIS" />
 		<files id="native-toolkit-vpx" if="LIME_VPX" />
 		<files id="native-toolkit-webm" if="LIME_WEBM" />
@@ -465,6 +442,8 @@
 				<lib name="-L../templates/bin/hl/${BINDIR}" if="LIME_HASHLINK" />
 				<lib name="-lhl" if="LIME_HASHLINK" />
 
+				<lib name="-lbsd" if="LIME_SDL" />
+
 			</section>
 
 			<section if="mac">
@@ -477,18 +456,23 @@
 				<vflag name="-rpath" value="/opt/homebrew/lib" if="HXCPP_ARM64"/>
 
 				<vflag name="-l" value="iconv" />
-				<vflag name="-framework" value="IOKit" />
-				<vflag name="-framework" value="UniformTypeIdentifiers" />
-				<vflag name="-framework" value="Foundation" />
 				<vflag name="-framework" value="AppKit" />
 				<vflag name="-framework" value="AudioToolbox" />
 				<vflag name="-framework" value="AudioUnit" />
+				<vflag name="-framework" value="AVFoundation" />
 				<vflag name="-framework" value="Carbon" />
 				<vflag name="-framework" value="Cocoa" />
 				<vflag name="-framework" value="CoreAudio" />
+				<vflag name="-framework" value="CoreBluetooth" />
+				<vflag name="-framework" value="CoreHaptics" />
+				<vflag name="-framework" value="CoreMedia" />
 				<vflag name="-framework" value="CoreVideo" />
 				<vflag name="-framework" value="ForceFeedback" />
+				<vflag name="-framework" value="Foundation" />
+				<vflag name="-framework" value="GameController" />
+				<vflag name="-framework" value="IOKit" />
 				<vflag name="-framework" value="SystemConfiguration" />
+				<vflag name="-framework" value="UniformTypeIdentifiers" />
 
 				<lib name="/opt/local/lib/libgc.a" if="LIME_NEKO" />
 				<lib name="-lm" if="LIME_NEKO" />
@@ -513,21 +497,20 @@
 				<lib name="-lEGL_angle" />
 				<lib name="-lGLESv2_angle" />
 				<lib name="-lOpenSLES" />
+				<lib name="-laaudio" />
 
 			</section>
 
 			<section if="tvos">
 
-				<vflag name="-framework" value="UIKit" />
-				<vflag name="-framework" value="UniformTypeIdentifiers" />
-				<vflag name="-framework" value="Foundation" />
 				<vflag name="-framework" value="AudioToolbox" />
 				<vflag name="-framework" value="AudioUnit" />
 				<vflag name="-framework" value="CoreAudio" />
+				<vflag name="-framework" value="CoreBluetooth" />
 				<vflag name="-framework" value="CoreVideo" />
+				<vflag name="-framework" value="Foundation" />
 				<vflag name="-framework" value="GameController" />
-				<vflag name="-framework" value="OpenGLES" />
-				<!-- <vflag name="-framework" value="CoreBluetooth" /> -->
+				<vflag name="-framework" value="UIKit" />
 
 				<lib name="-ldl" />
 
@@ -535,16 +518,16 @@
 
 			<section if="ios">
 
-				<vflag name="-framework" value="UIKit" />
-				<vflag name="-framework" value="UniformTypeIdentifiers" />
-				<vflag name="-framework" value="Foundation" />
 				<vflag name="-framework" value="AudioToolbox" />
 				<vflag name="-framework" value="AudioUnit" />
 				<vflag name="-framework" value="CoreAudio" />
+				<vflag name="-framework" value="CoreBluetooth" />
+				<vflag name="-framework" value="CoreMedia" />
 				<vflag name="-framework" value="CoreMotion" />
 				<vflag name="-framework" value="CoreText" />
 				<vflag name="-framework" value="CoreVideo" />
-				<!-- <vflag name="-framework" value="CoreBluetooth" /> -->
+				<vflag name="-framework" value="Foundation" />
+				<vflag name="-framework" value="UIKit" />
 
 				<lib name="-ldl" />
 

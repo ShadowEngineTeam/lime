@@ -2,12 +2,11 @@
 #define LIME_SDL_APPLICATION_H
 
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <app/Application.h>
 #include <app/ApplicationEvent.h>
 #include <graphics/RenderEvent.h>
 #include <system/ClipboardEvent.h>
-#include <system/OrientationEvent.h>
 #include <system/SensorEvent.h>
 #include <ui/DropEvent.h>
 #include <ui/GamepadEvent.h>
@@ -21,6 +20,14 @@
 
 
 namespace lime {
+
+
+	struct FrameTime {
+		Uint64 current;
+		Uint64 previous;
+		Uint64 frame;
+		Uint64 target;
+	};
 
 
 	class SDLApplication : public Application {
@@ -48,35 +55,26 @@ namespace lime {
 			void ProcessJoystickEvent (SDL_Event* event);
 			void ProcessKeyEvent (SDL_Event* event);
 			void ProcessMouseEvent (SDL_Event* event);
-			#if defined(ANDROID) || defined (IPHONE)
 			void ProcessSensorEvent (SDL_Event* event);
-			#endif
 			void ProcessTextEvent (SDL_Event* event);
 			void ProcessTouchEvent (SDL_Event* event);
 			void ProcessWindowEvent (SDL_Event* event);
-			int WaitEvent (SDL_Event* event);
-			#if defined(ANDROID) || defined (IPHONE)
-			static int HandleAppLifecycleEvent (void* userdata, SDL_Event* event);
-			#endif
+
+			static bool HandleAppLifecycleEvent (void* userdata, SDL_Event* event);
 			static void UpdateFrame ();
 			static void UpdateFrame (void*);
 
 			static SDLApplication* currentApplication;
-
+			FrameTime frameTime;
 			bool active;
+
 			ApplicationEvent applicationEvent;
 			ClipboardEvent clipboardEvent;
-			Uint64 freq;
-			Uint64 currentUpdate;
-			Uint64 lastUpdate;
-			Uint64 nextUpdate;
-			double framePeriod;
 			DropEvent dropEvent;
 			GamepadEvent gamepadEvent;
 			JoystickEvent joystickEvent;
 			KeyEvent keyEvent;
 			MouseEvent mouseEvent;
-			OrientationEvent orientationEvent;
 			RenderEvent renderEvent;
 			SensorEvent sensorEvent;
 			TextEvent textEvent;
