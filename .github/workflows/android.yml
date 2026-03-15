@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
+        uses: ShadowEngineTeam/setup-haxe@main
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
       - name: Set HAXEPATH
