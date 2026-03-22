@@ -1,6 +1,3 @@
-#define AL_API  __attribute__((visibility("default")))
-#define ALC_API __attribute__((visibility("default")))
-
 /* Define the alignment attribute for externally callable functions. */
 #define FORCE_ALIGN
 
@@ -35,16 +32,25 @@
 #define HAVE_PTHREAD_SETSCHEDPARAM
 
 /* Define if we have pthread_setname_np() */
-/* #define HAVE_PTHREAD_SETNAME_NP */
+#define HAVE_PTHREAD_SETNAME_NP
 
 /* Define if we have pthread_set_name_np() */
 /* #define HAVE_PTHREAD_SET_NAME_NP */
 
 /* Define the installation data directory */
-/* #define ALSOFT_INSTALL_DATADIR */
+/* #define ALSOFT_INSTALL_DATADIR "@ALSOFT_INSTALL_DATADIR@" */
+
+/* Define if the compiler supports ELF notes */
+/* #define HAVE_DLOPEN_NOTES */
+
+/* Define to 1 if we have C++20 modules, else 0 */
+#define HAVE_CXXMODULES 0
 
 /* Define to 1 if we have DBus/RTKit, else 0 */
 #define HAVE_RTKIT 0
+
+/* Define to 1 to enable dynamic loading of optional libs, else 0 */
+#define HAVE_DYNLOAD 1
 
 /* Define to 1 if building for winuwp, else 0 */
 #define ALSOFT_UWP 0

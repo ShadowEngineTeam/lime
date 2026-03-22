@@ -1,6 +1,3 @@
-#define AL_API  __declspec(dllexport)
-#define ALC_API __declspec(dllexport)
-
 /* Define the alignment attribute for externally callable functions. */
 #define FORCE_ALIGN
 
@@ -11,28 +8,28 @@
 /* #define HAVE_PROC_PIDPATH */
 
 /* Define if we have dlfcn.h */
-/* #define HAVE_DLFCN_H */
+#define HAVE_DLFCN_H
 
 /* Define if we have pthread_np.h */
 /* #define HAVE_PTHREAD_NP_H */
 
 /* Define if we have cpuid.h */
-/* #define HAVE_CPUID_H */
+#define HAVE_CPUID_H
 
 /* Define if we have intrin.h */
-#define HAVE_INTRIN_H
+/* #define HAVE_INTRIN_H */
 
 /* Define if we have guiddef.h */
-#define HAVE_GUIDDEF_H
+/* #define HAVE_GUIDDEF_H */
 
 /* Define if we have GCC's __get_cpuid() */
-/* #define HAVE_GCC_GET_CPUID */
+#define HAVE_GCC_GET_CPUID
 
 /* Define if we have the __cpuid() intrinsic */
-#define HAVE_CPUID_INTRINSIC
+/* #define HAVE_CPUID_INTRINSIC */
 
 /* Define if we have pthread_setschedparam() */
-/* #define HAVE_PTHREAD_SETSCHEDPARAM */
+#define HAVE_PTHREAD_SETSCHEDPARAM
 
 /* Define if we have pthread_setname_np() */
 /* #define HAVE_PTHREAD_SETNAME_NP */
@@ -43,8 +40,17 @@
 /* Define the installation data directory */
 /* #define ALSOFT_INSTALL_DATADIR */
 
+/* Define if the compiler supports ELF notes */
+#define HAVE_DLOPEN_NOTES
+
+/* Define to 1 if we have C++20 modules, else 0 */
+#define HAVE_CXXMODULES 0
+
 /* Define to 1 if we have DBus/RTKit, else 0 */
-#define HAVE_RTKIT 0
+#define HAVE_RTKIT 1
+
+/* Define to 1 to enable dynamic loading of optional libs, else 0 */
+#define HAVE_DYNLOAD 1
 
 /* Define to 1 if building for winuwp, else 0 */
 #define ALSOFT_UWP 0

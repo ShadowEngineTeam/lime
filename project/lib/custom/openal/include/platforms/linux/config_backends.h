@@ -1,10 +1,8 @@
-/* Define to 1 if the given backend is enabled, else 0 */
-
 #define HAVE_ALSA 1
 
-#define HAVE_OSS 1
+#define HAVE_OSS 0
 
-#define HAVE_PIPEWIRE 0
+#define HAVE_PIPEWIRE 1
 
 #define HAVE_SOLARIS 0
 
@@ -27,15 +25,3 @@
 #define HAVE_OPENSL 0
 
 #define HAVE_OBOE 0
-
-#define HAVE_OTHERIO 0
-
-#define HAVE_WAVE 1
-
-#define HAVE_SDL2 0
-
-#ifdef NATIVE_TOOLKIT_HAVE_SDL
-#define HAVE_SDL3 1
-#else
-#define HAVE_SDL3 0
-#endif
