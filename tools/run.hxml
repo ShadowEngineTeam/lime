@@ -1,0 +1,4 @@
+-main RunScript
+--macro haxe.macro.Compiler.addMetadata("@:build(lime._internal.macros.TimerMacro.build())", "haxe.Timer")
+-neko ../run.n
+-lib hxp
