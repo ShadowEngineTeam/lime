@@ -1,0 +1,46 @@
+name: Miscellaneous CI
+on:
+  workflow_dispatch:
+  workflow_call:
+
+env:
+  HAXE_VERSION: 4.3.7
+
+jobs:
+  miscellaneous:
+    runs-on: windows-2025
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+      - name: Setup Haxe
+        uses: ShadowEngineTeam/setup-haxe@main
+        with:
+          haxe-version: ${{ env.HAXE_VERSION }}
+      - name: Set HAXEPATH
+        run: echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
+      - name: Install Haxe dependencies
+        run: |
+          haxelib git hxcpp https://github.com/ShadowEngineTeam/hxcpp --quiet
+          haxelib git format https://github.com/HaxeFoundation/format 9d69fb342d030fa120d2deafafbbffad248332b8 --quiet
+          haxelib git hxp https://github.com/openfl/hxp 47ef5ae6569cb0961761a2fbb416694df067124c --quiet
+          haxelib git openfl https://github.com/FunkinCrew/openfl 8f082708b291bd842070f96eae5d8cc74c4e3a32 --quiet
+          haxelib git svg https://github.com/openfl/svg d74c6ef5ee2e8656a69a36c79e67a09086c6a9a4 --quiet
+      - name: Enable HXCPP compile cache
+        run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
+      - name: Configure Lime
+        run: haxelib dev lime ${{ github.workspace }}
+      - name: Rebuild Miscellaneous
+        run: |
+          cd tools
+          haxe svg.hxml
+          haxe run.hxml
+          haxe tools.hxml
+      - name: Upload Artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: Miscellaneous
+          path: |
+            tools/tools.n
+            run.n
+            svg.n
+          if-no-files-found: error
