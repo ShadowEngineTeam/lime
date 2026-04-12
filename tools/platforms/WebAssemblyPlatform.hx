@@ -50,7 +50,6 @@ class WebAssemblyPlatform extends PlatformTarget
 				file: "MyApplication",
 				path: "bin",
 				preloader: "",
-				swfVersion: 17,
 				url: "",
 				init: null
 			};
@@ -61,7 +60,7 @@ class WebAssemblyPlatform extends PlatformTarget
 				height: 600,
 				parameters: "{}",
 				background: 0xFFFFFF,
-				fps: 30,
+				fps: 60,
 				hardware: true,
 				display: 0,
 				resizable: true,
@@ -70,7 +69,7 @@ class WebAssemblyPlatform extends PlatformTarget
 				orientation: Orientation.AUTO,
 				vsync: false,
 				fullscreen: false,
-				allowHighDPI: true,
+				allowHighDPI: false,
 				alwaysOnTop: false,
 				antialiasing: 0,
 				allowShaders: true,
@@ -83,9 +82,6 @@ class WebAssemblyPlatform extends PlatformTarget
 				hidden: false,
 				title: ""
 			};
-
-		defaults.window.fps = 60;
-		defaults.window.allowHighDPI = false;
 
 		for (i in 1...project.windows.length)
 		{
@@ -449,12 +445,12 @@ class WebAssemblyPlatform extends PlatformTarget
 		copyProjectAssets(destination, targetDirectory + "/obj/assets");
 	}
 
-	@ignore public override function install():Void {}
+	public override function install():Void {}
 
-	@ignore public override function trace():Void {}
+	public override function trace():Void {}
 
-	@ignore public override function uninstall():Void {}
+	public override function uninstall():Void {}
 
 	// TODO: remove this line to enable watching?
-	@ignore public override function watch():Void {}
+	public override function watch():Void {}
 }

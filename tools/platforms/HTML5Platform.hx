@@ -53,18 +53,17 @@ class HTML5Platform extends PlatformTarget
 				file: "MyApplication",
 				path: "bin",
 				preloader: "",
-				swfVersion: 17,
 				url: "",
 				init: null
 			};
 
 		defaults.window =
 			{
-				width: 800,
-				height: 600,
+				width: 0,
+				height: 0,
 				parameters: "{}",
 				background: 0xFFFFFF,
-				fps: 30,
+				fps: 60,
 				hardware: true,
 				display: 0,
 				resizable: true,
@@ -86,10 +85,6 @@ class HTML5Platform extends PlatformTarget
 				hidden: false,
 				title: ""
 			};
-
-		defaults.window.width = 0;
-		defaults.window.height = 0;
-		defaults.window.fps = 60;
 
 		for (i in 1...project.windows.length)
 		{
@@ -577,11 +572,11 @@ class HTML5Platform extends PlatformTarget
 		super.watch();
 	}
 
-	@ignore public override function install():Void {}
+	public override function install():Void {}
 
-	@ignore public override function rebuild():Void {}
+	public override function rebuild():Void {}
 
-	@ignore public override function trace():Void {}
+	public override function trace():Void {}
 
-	@ignore public override function uninstall():Void {}
+	public override function uninstall():Void {}
 }
