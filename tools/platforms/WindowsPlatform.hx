@@ -60,7 +60,6 @@ class WindowsPlatform extends PlatformTarget
 				file: "MyApplication",
 				path: "bin",
 				preloader: "",
-				swfVersion: 17,
 				url: "",
 				init: null
 			};
@@ -71,7 +70,7 @@ class WindowsPlatform extends PlatformTarget
 				height: 600,
 				parameters: "{}",
 				background: 0xFFFFFF,
-				fps: 30,
+				fps: 60,
 				hardware: true,
 				display: 0,
 				resizable: true,
@@ -80,7 +79,7 @@ class WindowsPlatform extends PlatformTarget
 				orientation: Orientation.AUTO,
 				vsync: false,
 				fullscreen: false,
-				allowHighDPI: true,
+				allowHighDPI: false,
 				alwaysOnTop: false,
 				antialiasing: 0,
 				allowShaders: true,
@@ -109,8 +108,6 @@ class WindowsPlatform extends PlatformTarget
 			default:
 				defaults.architectures = [];
 		}
-
-		defaults.window.allowHighDPI = false;
 
 		for (i in 1...project.windows.length)
 		{
@@ -547,10 +544,10 @@ class WindowsPlatform extends PlatformTarget
 		copyProjectAssets(applicationDirectory);
 	}
 
-	@ignore public override function install():Void {}
+	public override function install():Void {}
 
-	@ignore public override function trace():Void {}
+	public override function trace():Void {}
 
-	@ignore public override function uninstall():Void {}
+	public override function uninstall():Void {}
 }
 
