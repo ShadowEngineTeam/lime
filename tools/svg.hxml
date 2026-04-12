@@ -1,0 +1,11 @@
+-main SVGExport
+-neko ../svg.n
+-D lime-cairo
+-D lime-cffi
+-D lime
+--macro haxe.macro.Compiler.addMetadata("@:build(lime._internal.macros.TimerMacro.build())", "haxe.Timer")
+-cp ../src
+-lib hxp
+-lib openfl
+-lib svg
+--remap flash:openfl

@@ -1,0 +1,1395 @@
+#include "SDLWindow.h"
+#include "SDLCursor.h"
+#include "SDLApplication.h"
+#include "system/System.h"
+#include "../../graphics/opengl/OpenGLBindings.h"
+#ifdef ANDROID
+#include <android/native_window.h>
+#endif
+#include <vector>
+#include <cstring>
+
+namespace lime {
+
+
+	static Cursor currentCursor = DEFAULT;
+
+	SDL_Cursor* SDLCursor::arrowCursor = 0;
+	SDL_Cursor* SDLCursor::crosshairCursor = 0;
+	SDL_Cursor* SDLCursor::moveCursor = 0;
+	SDL_Cursor* SDLCursor::pointerCursor = 0;
+	SDL_Cursor* SDLCursor::resizeNESWCursor = 0;
+	SDL_Cursor* SDLCursor::resizeNSCursor = 0;
+	SDL_Cursor* SDLCursor::resizeNWSECursor = 0;
+	SDL_Cursor* SDLCursor::resizeWECursor = 0;
+	SDL_Cursor* SDLCursor::textCursor = 0;
+	SDL_Cursor* SDLCursor::waitCursor = 0;
+	SDL_Cursor* SDLCursor::waitArrowCursor = 0;
+	double drawScale = 1.0;
+
+	SDLWindow::SDLWindow (Application* application, int width, int height, int flags, const char* title) {
+
+		sdlTexture = 0;
+		sdlRenderer = 0;
+
+		#if defined(LIME_ANGLE) && defined(IPHONE)
+		eglMetalView = 0;
+		eglDisplay = EGL_NO_DISPLAY;
+		eglContext = EGL_NO_CONTEXT;
+		eglSurface = EGL_NO_SURFACE;
+		#else
+		context = 0;
+		#endif
+
+		contextWidth = 0;
+		contextHeight = 0;
+
+		currentApplication = application;
+		this->flags = flags;
+
+		int sdlWindowFlags = 0;
+
+		if (flags & WINDOW_FLAG_FULLSCREEN) sdlWindowFlags |= SDL_WINDOW_FULLSCREEN;
+		if (flags & WINDOW_FLAG_RESIZABLE) sdlWindowFlags |= SDL_WINDOW_RESIZABLE;
+		if (flags & WINDOW_FLAG_TRANSPARENT) sdlWindowFlags |= SDL_WINDOW_TRANSPARENT;
+		if (flags & WINDOW_FLAG_BORDERLESS) sdlWindowFlags |= SDL_WINDOW_BORDERLESS;
+		if (flags & WINDOW_FLAG_ALLOW_HIGHDPI) sdlWindowFlags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
+		if (flags & WINDOW_FLAG_HIDDEN) sdlWindowFlags |= SDL_WINDOW_HIDDEN;
+		if (flags & WINDOW_FLAG_MINIMIZED) sdlWindowFlags |= SDL_WINDOW_MINIMIZED;
+		if (flags & WINDOW_FLAG_MAXIMIZED) sdlWindowFlags |= SDL_WINDOW_MAXIMIZED;
+
+		#ifndef EMSCRIPTEN
+		if (flags & WINDOW_FLAG_ALWAYS_ON_TOP) sdlWindowFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
+		#endif
+
+		#if !(defined (LIME_ANGLE) && defined (IPHONE))
+		SDL_SetHint (SDL_HINT_VIDEO_FORCE_EGL, "1");
+		#ifdef HX_WINDOWS
+		SDL_SetHint (SDL_HINT_VIDEO_WIN_D3DCOMPILER, "none");
+		#endif
+		SDL_SetHint (SDL_HINT_OPENGL_ES_DRIVER, "1");
+		#endif
+
+		#if defined(LIME_ANGLE) && defined(IPHONE)
+
+		egl_display_attribs.push_back (EGL_PLATFORM_ANGLE_TYPE_ANGLE);
+		egl_display_attribs.push_back (EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE);
+		egl_display_attribs.push_back (EGL_POWER_PREFERENCE_ANGLE);
+		egl_display_attribs.push_back (EGL_HIGH_POWER_ANGLE);
+		egl_display_attribs.push_back (EGL_NONE);
+
+		#endif
+
+		if (flags & WINDOW_FLAG_HARDWARE) {
+
+			#if defined(LIME_ANGLE) && defined(IPHONE)
+
+			sdlWindowFlags |= SDL_WINDOW_METAL;
+
+			#else
+
+			sdlWindowFlags |= SDL_WINDOW_OPENGL;
+
+			#endif
+
+			#if !(defined (LIME_ANGLE) && defined (IPHONE))
+
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+			#endif
+
+			#if defined(LIME_ANGLE) && defined(IPHONE)
+
+			if (flags & WINDOW_FLAG_DEPTH_BUFFER) {
+
+				egl_config_attribs.push_back (EGL_DEPTH_SIZE);
+				egl_config_attribs.push_back ((flags & WINDOW_FLAG_STENCIL_BUFFER) ? 24 : 32);
+
+			}
+
+			if (flags & WINDOW_FLAG_STENCIL_BUFFER) {
+
+				egl_config_attribs.push_back (EGL_STENCIL_SIZE);
+				egl_config_attribs.push_back (8);
+
+			}
+
+			if (flags & WINDOW_FLAG_HW_AA_HIRES) {
+
+				egl_config_attribs.push_back (EGL_SAMPLE_BUFFERS);
+				egl_config_attribs.push_back (1);
+				egl_config_attribs.push_back (EGL_SAMPLES);
+				egl_config_attribs.push_back (4);
+
+			} else if (flags & WINDOW_FLAG_HW_AA) {
+
+				egl_config_attribs.push_back (EGL_SAMPLE_BUFFERS);
+				egl_config_attribs.push_back (1);
+				egl_config_attribs.push_back (EGL_SAMPLES);
+				egl_config_attribs.push_back (2);
+
+			}
+
+			if (flags & WINDOW_FLAG_COLOR_DEPTH_32_BIT) {
+
+				egl_config_attribs.push_back (EGL_RED_SIZE);
+				egl_config_attribs.push_back (8);
+				egl_config_attribs.push_back (EGL_GREEN_SIZE);
+				egl_config_attribs.push_back (8);
+				egl_config_attribs.push_back (EGL_BLUE_SIZE);
+				egl_config_attribs.push_back (8);
+				egl_config_attribs.push_back (EGL_ALPHA_SIZE);
+				egl_config_attribs.push_back (8);
+
+			} else {
+
+				egl_config_attribs.push_back (EGL_RED_SIZE);
+				egl_config_attribs.push_back (5);
+				egl_config_attribs.push_back (EGL_GREEN_SIZE);
+				egl_config_attribs.push_back (6);
+				egl_config_attribs.push_back (EGL_BLUE_SIZE);
+				egl_config_attribs.push_back (5);
+
+			}
+
+			egl_config_attribs.push_back (EGL_COLOR_BUFFER_TYPE);
+			egl_config_attribs.push_back (EGL_RGB_BUFFER);
+			egl_config_attribs.push_back (EGL_SURFACE_TYPE);
+			egl_config_attribs.push_back (EGL_WINDOW_BIT);
+			egl_config_attribs.push_back (EGL_RENDERABLE_TYPE);
+			egl_config_attribs.push_back (EGL_OPENGL_ES3_BIT);
+			egl_config_attribs.push_back (EGL_NONE);
+
+			#else
+
+			if (flags & WINDOW_FLAG_DEPTH_BUFFER) {
+
+				SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, (flags & WINDOW_FLAG_STENCIL_BUFFER) ? 24 : 32);
+
+			}
+
+			if (flags & WINDOW_FLAG_STENCIL_BUFFER) {
+
+				SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
+			}
+
+			if (flags & WINDOW_FLAG_HW_AA_HIRES) {
+
+				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
+			} else if (flags & WINDOW_FLAG_HW_AA) {
+
+				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
+
+			}
+
+			if (flags & WINDOW_FLAG_COLOR_DEPTH_32_BIT) {
+
+				SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 8);
+				SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 8);
+				SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 8);
+				SDL_GL_SetAttribute (SDL_GL_ALPHA_SIZE, 8);
+
+			} else {
+
+				SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 5);
+				SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 6);
+				SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 5);
+
+			}
+
+			#endif
+
+		}
+
+		#if defined(LIME_ANGLE) && defined(IPHONE)
+
+		egl_context_attribs.push_back (EGL_CONTEXT_CLIENT_VERSION);
+		egl_context_attribs.push_back (3);
+		egl_context_attribs.push_back (EGL_NONE);
+
+		#endif
+
+		sdlWindow = SDL_CreateWindow (title, width, height, sdlWindowFlags);
+
+		if (!sdlWindow) {
+
+			printf ("Could not create SDL window with OpenGL ES 3: %s.\nTrying to create SDL window with OpenGL ES 2...\n", SDL_GetError ());
+
+			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+
+			sdlWindow = SDL_CreateWindow (title, width, height, sdlWindowFlags);
+
+			if (!sdlWindow) {
+
+				printf ("Could not create SDL window with OpenGL ES 2: %s.\nReturning null...\n", SDL_GetError ());
+
+			}
+
+		}
+
+		if (flags & WINDOW_FLAG_HARDWARE) {
+
+			#if defined(LIME_ANGLE) && defined(IPHONE)
+
+			eglMetalView = SDL_Metal_CreateView (sdlWindow);
+
+			eglDisplay = eglGetPlatformDisplay (EGL_PLATFORM_ANGLE_ANGLE, (void *) EGL_DEFAULT_DISPLAY, egl_display_attribs.data());
+
+			if (eglDisplay == EGL_NO_DISPLAY) {
+
+				printf ("Failed to get EGL display (EGL error: 0x%04X)\n", eglGetError());
+
+			}
+
+			if (eglInitialize (eglDisplay, NULL, NULL) == false) {
+
+				 printf ("Failed to initialize EGL (EGL error: 0x%04X)\n", eglGetError());
+
+			}
+
+			EGLConfig eglConfig;
+			EGLint eglConfigCount;
+
+			if (!eglChooseConfig (eglDisplay, egl_config_attribs.data(), &eglConfig, 1, &eglConfigCount)) {
+
+				printf ("Failed to choose EGL config (EGL error: 0x%04X)\n", eglGetError());
+
+			}
+
+			eglSurface = eglCreateWindowSurface (eglDisplay, eglConfig, SDL_Metal_GetLayer (eglMetalView), NULL);
+
+			if (eglSurface == EGL_NO_SURFACE) {
+
+				printf ("Failed to create EGL surface (EGL error: 0x%04X)\n", eglGetError());
+
+			}
+
+			eglContext = eglCreateContext (eglDisplay, eglConfig, EGL_NO_CONTEXT, egl_context_attribs.data());
+
+			if (eglContext == EGL_NO_CONTEXT) {
+
+				printf ("Failed to create EGL context (EGL error: 0x%04X)\n", eglGetError());
+
+			}
+
+			if (!eglMakeCurrent (eglDisplay, eglSurface, eglSurface, eglContext)) {
+
+				printf ("Failed to make EGL context current (EGL error: 0x%04X)\n", eglGetError());
+
+			} else {
+
+				SetVSyncMode ((flags & WINDOW_FLAG_VSYNC) ? WINDOW_VSYNC_ON : WINDOW_VSYNC_OFF);
+
+				OpenGLBindings::Init ();
+
+				SDL_PropertiesID props = SDL_GetWindowProperties(sdlWindow);
+
+			}
+
+			if (eglContext || sdlRenderer) {
+
+				((SDLApplication*)currentApplication)->RegisterWindow (this);
+
+			}
+
+			#else
+
+			context = SDL_GL_CreateContext (sdlWindow);
+
+			if (context && SDL_GL_MakeCurrent (sdlWindow, context)) {
+
+				SetVSyncMode ((flags & WINDOW_FLAG_VSYNC) ? WINDOW_VSYNC_ON : WINDOW_VSYNC_OFF);
+
+				OpenGLBindings::Init ();
+
+				#if defined(IPHONE) || defined(APPLETV)
+				SDL_PropertiesID props = SDL_GetWindowProperties(sdlWindow);
+				#endif
+
+			} else {
+
+				SDL_GL_DestroyContext (context);
+				context = NULL;
+
+			}
+
+			if (context || sdlRenderer) {
+
+				((SDLApplication*)currentApplication)->RegisterWindow (this);
+
+			} else {
+
+				printf ("Could not create SDL renderer: %s.\n", SDL_GetError ());
+
+			}
+
+			#endif
+
+		}
+
+		#if defined(LIME_ANGLE) && defined(IPHONE)
+
+		if (eglContext == EGL_NO_CONTEXT) {
+
+			sdlRenderer = SDL_CreateRenderer (sdlWindow, SDL_SOFTWARE_RENDERER);
+
+		}
+
+		if (eglContext != EGL_NO_CONTEXT || sdlRenderer) {
+
+			((SDLApplication*)currentApplication)->RegisterWindow (this);
+
+		} else {
+
+			printf ("Could not create SDL renderer: %s.\n", SDL_GetError ());
+
+		}
+
+		#else
+
+		if (!context) {
+
+			sdlRenderer = SDL_CreateRenderer (sdlWindow, SDL_SOFTWARE_RENDERER);
+
+		}
+
+		if (context || sdlRenderer) {
+
+			((SDLApplication*)currentApplication)->RegisterWindow (this);
+
+		} else {
+
+			printf ("Could not create SDL renderer: %s.\n", SDL_GetError ());
+
+		}
+
+		#endif
+
+	}
+
+
+	SDLWindow::~SDLWindow () {
+
+		if (sdlWindow) {
+
+			SDL_DestroyWindow (sdlWindow);
+			sdlWindow = 0;
+
+		}
+
+		if (sdlRenderer) {
+
+			SDL_DestroyRenderer (sdlRenderer);
+
+		} else {
+
+			#if defined(LIME_ANGLE) && defined(IPHONE)
+
+			if (eglDisplay != EGL_NO_DISPLAY) {
+
+				eglMakeCurrent (eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+
+				if (eglContext != EGL_NO_CONTEXT) {
+
+					eglDestroyContext (eglDisplay, eglContext);
+					eglContext = EGL_NO_CONTEXT;
+
+				}
+
+				if (eglSurface != EGL_NO_SURFACE) {
+
+					eglDestroySurface (eglDisplay, eglSurface);
+					eglSurface = EGL_NO_SURFACE;
+
+				}
+
+				eglTerminate (eglDisplay);
+				eglDisplay = EGL_NO_DISPLAY;
+
+			}
+
+			if (eglMetalView) SDL_Metal_DestroyView (eglMetalView);
+
+			#else
+
+			if (context) SDL_GL_DestroyContext (context);
+
+			#endif
+
+		}
+
+	}
+
+
+	int SDLWindow::Alert (int type, const char* message, const char* title, const char** buttons, int count) {
+
+		SDL_MessageBoxFlags flags = SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
+
+		switch (type)
+		{
+			case 0:
+				flags |= SDL_MESSAGEBOX_ERROR;
+				break;
+
+			case 1:
+				flags |= SDL_MESSAGEBOX_WARNING;
+				break;
+
+			case 2:
+				flags |= SDL_MESSAGEBOX_INFORMATION;
+				break;
+
+		}
+
+		SDL_MessageBoxData data;
+		SDL_zero (data);
+		data.flags = flags;
+		data.title = title;
+		data.message = message;
+		data.window = sdlWindow;
+
+		std::vector<SDL_MessageBoxButtonData> sdlButtons;
+
+		sdlButtons.reserve (count);
+
+		if (count == 1) {
+
+			SDL_MessageBoxButtonData button;
+			button.flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
+			button.buttonID = 0;
+			button.text = buttons[0];
+			sdlButtons.push_back (button);
+
+		} else {
+
+			for (int i = 0; i < count; ++i) {
+
+				SDL_MessageBoxButtonData button;
+				SDL_zero (button);
+				button.buttonID = i;
+				button.text = buttons[i];
+				sdlButtons.push_back (button);
+
+			}
+
+		}
+
+		data.numbuttons = sdlButtons.size ();
+		data.buttons = sdlButtons.data ();
+
+		int buttonID;
+
+		if (!SDL_ShowMessageBox (&data, &buttonID)) {
+
+			buttonID = -1;
+
+		}
+
+		return buttonID;
+
+	}
+
+
+	bool SDLWindow::SetVSyncMode (int mode) {
+
+		#if defined(LIME_ANGLE) && defined(IPHONE)
+
+		return eglSwapInterval (eglDisplay, mode) == EGL_TRUE;
+
+		#else
+
+		return SDL_GL_SetSwapInterval (mode);
+
+		#endif
+
+	}
+
+
+	void SDLWindow::Close () {
+
+		if (sdlWindow) {
+
+			SDL_DestroyWindow (sdlWindow);
+			sdlWindow = 0;
+
+		}
+
+	}
+
+
+	bool SDLWindow::SetVisible (bool visible) {
+
+		if (visible) {
+
+			SDL_ShowWindow (sdlWindow);
+
+		} else {
+
+			SDL_HideWindow (sdlWindow);
+
+		}
+
+		return !(SDL_GetWindowFlags (sdlWindow) & SDL_WINDOW_HIDDEN);
+
+	}
+
+
+	void SDLWindow::ContextFlip () {
+
+		if (SDLApplication::isInBackground ()) return;
+
+		if (!sdlRenderer) {
+
+			#if defined(LIME_ANGLE) && defined(IPHONE)
+
+			if (eglDisplay != EGL_NO_DISPLAY && eglSurface != EGL_NO_SURFACE) {
+
+				eglSwapBuffers(eglDisplay, eglSurface);
+
+			}
+
+			#else
+
+			if (context) {
+
+				SDL_GL_SwapWindow (sdlWindow);
+
+			}
+
+			#endif
+
+		} else if (sdlRenderer) {
+
+			SDL_RenderPresent (sdlRenderer);
+
+		}
+
+	}
+
+
+	void* SDLWindow::ContextLock (bool useCFFIValue) {
+
+		if (sdlRenderer) {
+
+			int width;
+			int height;
+
+			SDL_GetCurrentRenderOutputSize (sdlRenderer, &width, &height);
+
+			if (width != contextWidth || height != contextHeight) {
+
+				if (sdlTexture) {
+
+					SDL_DestroyTexture (sdlTexture);
+
+				}
+
+				sdlTexture = SDL_CreateTexture (sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+
+				contextWidth = width;
+				contextHeight = height;
+
+			}
+
+			void *pixels;
+			int pitch;
+
+			if (useCFFIValue) {
+
+				if (SDL_LockTexture (sdlTexture, NULL, &pixels, &pitch)) {
+
+					value result = alloc_empty_object ();
+					alloc_field (result, val_id ("width"), alloc_int (contextWidth));
+					alloc_field (result, val_id ("height"), alloc_int (contextHeight));
+					alloc_field (result, val_id ("pixels"), alloc_float ((uintptr_t)pixels));
+					alloc_field (result, val_id ("pitch"), alloc_int (pitch));
+					return result;
+
+				} else {
+
+					return alloc_null ();
+
+				}
+
+			} else {
+
+				const int id_width = hl_hash_utf8 ("width");
+				const int id_height = hl_hash_utf8 ("height");
+				const int id_pixels = hl_hash_utf8 ("pixels");
+				const int id_pitch = hl_hash_utf8 ("pitch");
+
+				if (SDL_LockTexture (sdlTexture, NULL, &pixels, &pitch)) {
+
+					vdynamic* result = (vdynamic*)hl_alloc_dynobj();
+					hl_dyn_seti (result, id_width, &hlt_i32, contextWidth);
+					hl_dyn_seti (result, id_height, &hlt_i32, contextHeight);
+					hl_dyn_setd (result, id_pixels, (uintptr_t)pixels);
+					hl_dyn_seti (result, id_pitch, &hlt_i32, pitch);
+					return result;
+
+				} else {
+
+					return 0;
+
+				}
+
+			}
+
+		} else {
+
+			if (useCFFIValue) {
+
+				return alloc_null ();
+
+			} else {
+
+				return 0;
+
+			}
+
+		}
+
+	}
+
+
+	void SDLWindow::ContextMakeCurrent () {
+
+		if (sdlWindow) {
+
+			#if defined(LIME_ANGLE) && defined(IPHONE)
+
+			if (eglDisplay != EGL_NO_DISPLAY && eglSurface != EGL_NO_SURFACE && eglContext != EGL_NO_CONTEXT) {
+
+				eglMakeCurrent (eglDisplay, eglSurface, eglSurface, eglContext);
+
+			}
+
+			#else
+
+			if (context) {
+
+				SDL_GL_MakeCurrent (sdlWindow, context);
+
+			}
+
+			#endif
+
+		}
+
+	}
+
+
+	void SDLWindow::ContextUnlock () {
+
+		if (sdlTexture) {
+
+			SDL_UnlockTexture (sdlTexture);
+			SDL_RenderClear (sdlRenderer);
+			SDL_RenderTexture (sdlRenderer, sdlTexture, NULL, NULL);
+
+		}
+
+	}
+
+
+	void SDLWindow::Focus () {
+
+		SDL_RaiseWindow (sdlWindow);
+
+	}
+
+	void* SDLWindow::GetHandle () {
+
+		SDL_PropertiesID props = SDL_GetWindowProperties(sdlWindow);
+
+		#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+			void* hwnd = nullptr;
+			SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, &hwnd);
+			return hwnd;
+		#elif defined(SDL_VIDEO_DRIVER_X11)
+			unsigned long x11win = 0;
+			SDL_GetNumberProperty(props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, &x11win);
+			return (void*)(uintptr_t)x11win;
+		#elif defined(SDL_VIDEO_DRIVER_WAYLAND)
+			void* wlSurface = nullptr;
+			SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, &wlSurface);
+			return wlSurface;
+		#elif defined(SDL_VIDEO_DRIVER_ANDROID)
+			void* native = nullptr;
+			SDL_GetPointerProperty(props, SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, &native);
+			return native;
+		#elif defined(SDL_VIDEO_DRIVER_COCOA)
+			void* cocoa = nullptr;
+			SDL_GetPointerProperty(props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, &cocoa);
+			return cocoa;
+		#else
+			return nullptr;
+		#endif
+
+	}
+
+	void* SDLWindow::GetContext () {
+
+		#if defined(LIME_ANGLE) && defined(IPHONE)
+		return eglContext;
+		#else
+		return context;
+		#endif
+
+	}
+
+
+	const char* SDLWindow::GetContextType () {
+
+		#if defined(LIME_ANGLE) && defined(IPHONE)
+		if (eglDisplay != EGL_NO_DISPLAY && eglSurface != EGL_NO_SURFACE && eglContext != EGL_NO_CONTEXT) {
+		#else
+		if (context) {
+		#endif
+
+			return "opengl";
+
+		} else if (sdlRenderer) {
+
+			const char *name = SDL_GetRendererName (sdlRenderer);
+
+			if (name && strcmp (name, SDL_SOFTWARE_RENDERER)) {
+
+				return "software";
+
+			} else {
+
+				return "opengl";
+
+			}
+
+		}
+
+		return "none";
+
+	}
+
+
+	int SDLWindow::GetDisplay () {
+
+		return SDL_GetDisplayForWindow (sdlWindow);
+
+	}
+
+
+	void SDLWindow::GetDisplayMode (DisplayMode* displayMode) {
+
+		const SDL_DisplayMode *mode = SDL_GetDesktopDisplayMode (SDL_GetDisplayForWindow (sdlWindow));
+
+		displayMode->width = mode->w;
+		displayMode->height = mode->h;
+
+		switch (mode->format) {
+
+			case SDL_PIXELFORMAT_ARGB8888:
+
+				displayMode->pixelFormat = ARGB32;
+				break;
+
+			case SDL_PIXELFORMAT_BGRA8888:
+			case SDL_PIXELFORMAT_BGRX8888:
+
+				displayMode->pixelFormat = BGRA32;
+				break;
+
+			default:
+
+				displayMode->pixelFormat = RGBA32;
+
+		}
+
+		displayMode->refreshRate = mode->refresh_rate;
+
+	}
+
+
+	int SDLWindow::GetHeight () {
+
+		int width;
+		int height;
+
+		SDL_GetWindowSizeInPixels (sdlWindow, &width, &height);
+
+		return height;
+
+	}
+
+
+	uint32_t SDLWindow::GetID () {
+
+		return SDL_GetWindowID (sdlWindow);
+
+	}
+
+
+	bool SDLWindow::GetMouseLock () {
+
+		return SDL_GetWindowRelativeMouseMode (sdlWindow);
+
+	}
+
+
+	float SDLWindow::GetOpacity () {
+
+		return SDL_GetWindowOpacity (sdlWindow);
+
+	}
+
+
+	double SDLWindow::GetScale () {
+
+		int width;
+		int height;
+
+		SDL_GetWindowSize (sdlWindow, &width, &height);
+
+		if (width > 0 && height > 0) {
+
+			int outputWidth;
+			int outputHeight;
+
+			#if defined(LIME_ANGLE) && defined(IPHONE)
+			eglQuerySurface(eglDisplay, eglSurface, EGL_WIDTH, &outputWidth);
+			eglQuerySurface(eglDisplay, eglSurface, EGL_HEIGHT, &outputHeight);
+			#else
+			SDL_GetWindowSizeInPixels (sdlWindow, &outputWidth, &outputHeight);
+			#endif
+
+			double scale = double (outputWidth) / width;
+			return scale;
+
+		} else {
+
+			int outputWidth;
+			int outputHeight;
+
+			#if defined(LIME_ANGLE) && defined(IPHONE)
+			eglQuerySurface(eglDisplay, eglSurface, EGL_WIDTH, &outputWidth);
+			eglQuerySurface(eglDisplay, eglSurface, EGL_HEIGHT, &outputHeight);
+			#else
+			SDL_GetWindowSizeInPixels (sdlWindow, &outputWidth, &outputHeight);
+			#endif
+
+			int width;
+			int height;
+
+			SDL_GetWindowSize (sdlWindow, &width, &height);
+
+			if (width > 0 && height > 0) {
+
+				return double (outputWidth) / width;
+
+			}
+
+		}
+
+		return 1;
+
+	}
+
+
+	bool SDLWindow::GetTextInputEnabled () {
+
+		return SDL_TextInputActive (sdlWindow);
+
+	}
+
+
+	int SDLWindow::GetWidth () {
+
+		int width;
+		int height;
+
+		SDL_GetWindowSizeInPixels (sdlWindow, &width, &height);
+
+		return width;
+
+	}
+
+
+	int SDLWindow::GetX () {
+
+		int x;
+		int y;
+
+		SDL_GetWindowPosition (sdlWindow, &x, &y);
+
+		return x;
+
+	}
+
+
+	int SDLWindow::GetY () {
+
+		int x;
+		int y;
+
+		SDL_GetWindowPosition (sdlWindow, &x, &y);
+
+		return y;
+
+	}
+
+
+	void SDLWindow::Move (int x, int y) {
+
+		SDL_SetWindowPosition (sdlWindow, x, y);
+
+	}
+
+
+	void SDLWindow::ReadPixels (ImageBuffer *buffer, Rectangle *rect) {
+
+		if (sdlRenderer) {
+
+			SDL_Rect bounds = { 0, 0, 0, 0 };
+
+			if (rect) {
+
+				bounds.x = rect->x;
+				bounds.y = rect->y;
+				bounds.w = rect->width;
+				bounds.h = rect->height;
+
+			} else {
+
+				SDL_GetWindowSizeInPixels (sdlWindow, &bounds.w, &bounds.h);
+
+			}
+
+			buffer->Resize (bounds.w, bounds.h, 32);
+
+			buffer->data->buffer->b = (unsigned char *)(SDL_RenderReadPixels (sdlRenderer, &bounds)->pixels);
+
+		}
+
+
+	}
+
+
+	void SDLWindow::Resize (int width, int height) {
+
+		SDL_SetWindowSize (sdlWindow, width, height);
+
+	}
+
+
+	void SDLWindow::SetMinimumSize (int width, int height) {
+
+		SDL_SetWindowMinimumSize (sdlWindow, width, height);
+
+	}
+
+
+	void SDLWindow::SetMaximumSize (int width, int height) {
+
+		SDL_SetWindowMaximumSize (sdlWindow, width, height);
+
+	}
+
+
+	bool SDLWindow::SetBorderless (bool borderless) {
+
+		SDL_SetWindowBordered (sdlWindow, !borderless);
+		return borderless;
+
+	}
+
+
+	void SDLWindow::SetCursor (Cursor cursor) {
+
+		if (cursor != currentCursor) {
+
+			if (currentCursor == HIDDEN) {
+
+				SDL_ShowCursor ();
+
+			}
+
+			switch (cursor) {
+
+				case HIDDEN:
+
+					SDL_HideCursor ();
+
+				case CROSSHAIR:
+
+					if (!SDLCursor::crosshairCursor) {
+
+						SDLCursor::crosshairCursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_CROSSHAIR);
+
+					}
+
+					SDL_SetCursor (SDLCursor::crosshairCursor);
+					break;
+
+				case MOVE:
+
+					if (!SDLCursor::moveCursor) {
+
+						SDLCursor::moveCursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_MOVE);
+
+					}
+
+					SDL_SetCursor (SDLCursor::moveCursor);
+					break;
+
+				case POINTER:
+
+					if (!SDLCursor::pointerCursor) {
+
+						SDLCursor::pointerCursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_POINTER);
+
+					}
+
+					SDL_SetCursor (SDLCursor::pointerCursor);
+					break;
+
+				case RESIZE_NESW:
+
+					if (!SDLCursor::resizeNESWCursor) {
+
+						SDLCursor::resizeNESWCursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_NESW_RESIZE);
+
+					}
+
+					SDL_SetCursor (SDLCursor::resizeNESWCursor);
+					break;
+
+				case RESIZE_NS:
+
+					if (!SDLCursor::resizeNSCursor) {
+
+						SDLCursor::resizeNSCursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_NS_RESIZE);
+
+					}
+
+					SDL_SetCursor (SDLCursor::resizeNSCursor);
+					break;
+
+				case RESIZE_NWSE:
+
+					if (!SDLCursor::resizeNWSECursor) {
+
+						SDLCursor::resizeNWSECursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_NWSE_RESIZE);
+
+					}
+
+					SDL_SetCursor (SDLCursor::resizeNWSECursor);
+					break;
+
+				case RESIZE_WE:
+
+					if (!SDLCursor::resizeWECursor) {
+
+						SDLCursor::resizeWECursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_EW_RESIZE);
+
+					}
+
+					SDL_SetCursor (SDLCursor::resizeWECursor);
+					break;
+
+				case TEXT:
+
+					if (!SDLCursor::textCursor) {
+
+						SDLCursor::textCursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_TEXT);
+
+					}
+
+					SDL_SetCursor (SDLCursor::textCursor);
+					break;
+
+				case WAIT:
+
+					if (!SDLCursor::waitCursor) {
+
+						SDLCursor::waitCursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_WAIT);
+
+					}
+
+					SDL_SetCursor (SDLCursor::waitCursor);
+					break;
+
+				case WAIT_ARROW:
+
+					if (!SDLCursor::waitArrowCursor) {
+
+						SDLCursor::waitArrowCursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_PROGRESS);
+
+					}
+
+					SDL_SetCursor (SDLCursor::waitArrowCursor);
+					break;
+
+				default:
+
+					if (!SDLCursor::arrowCursor) {
+
+						SDLCursor::arrowCursor = SDL_CreateSystemCursor (SDL_SYSTEM_CURSOR_DEFAULT);
+
+					}
+
+					SDL_SetCursor (SDLCursor::arrowCursor);
+					break;
+
+			}
+
+			currentCursor = cursor;
+
+		}
+
+	}
+
+
+	void SDLWindow::SetDisplayMode (DisplayMode* displayMode) {
+
+		SDL_PixelFormat pixelFormat;
+
+		switch (displayMode->pixelFormat) {
+
+			case ARGB32:
+
+				pixelFormat = SDL_PIXELFORMAT_ARGB8888;
+				break;
+
+			case BGRA32:
+
+				pixelFormat = SDL_PIXELFORMAT_BGRA8888;
+				break;
+
+			default:
+
+				pixelFormat = SDL_PIXELFORMAT_RGBA8888;
+
+		}
+
+		SDL_DisplayMode mode = { static_cast<SDL_DisplayID>(GetDisplay()), pixelFormat, displayMode->width, displayMode->height, (float)(SDL_GetDesktopDisplayMode(1)->pixel_density), (float)(displayMode->refreshRate), 0, 0 };
+
+		if (SDL_SetWindowFullscreenMode (sdlWindow, &mode)) {
+
+			if (SDL_GetWindowFlags (sdlWindow) & SDL_WINDOW_FULLSCREEN) {
+
+				SDL_SetWindowFullscreen (sdlWindow, true);
+
+			}
+
+		}
+
+	}
+
+
+	bool SDLWindow::SetFullscreen (bool fullscreen) {
+
+		SDL_SetWindowFullscreen (sdlWindow, fullscreen);
+		return fullscreen;
+
+	}
+
+	void SDLWindow::SetIcon (ImageBuffer *imageBuffer) {
+
+		SDL_PixelFormat format = SDL_GetPixelFormatForMasks (imageBuffer->bitsPerPixel, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+
+		SDL_Surface *surface = SDL_CreateSurfaceFrom(imageBuffer->width, imageBuffer->height, format, imageBuffer->data->buffer->b, imageBuffer->Stride ());
+
+		if (surface) {
+
+			SDL_SetWindowIcon (sdlWindow, surface);
+			SDL_DestroySurface (surface);
+
+		}
+
+	}
+
+
+	bool SDLWindow::SetMaximized (bool maximized) {
+
+		if (maximized) {
+
+			SDL_MaximizeWindow (sdlWindow);
+
+		} else {
+
+			SDL_RestoreWindow (sdlWindow);
+
+		}
+
+		return maximized;
+
+	}
+
+
+	bool SDLWindow::SetMinimized (bool minimized) {
+
+		if (minimized) {
+
+			SDL_MinimizeWindow (sdlWindow);
+
+		} else {
+
+			SDL_RestoreWindow (sdlWindow);
+
+		}
+
+		return minimized;
+
+	}
+
+
+	void SDLWindow::SetMouseLock (bool mouseLock) {
+
+		if (mouseLock) {
+
+			SDL_SetWindowRelativeMouseMode (sdlWindow, true);
+
+		} else {
+
+			SDL_SetWindowRelativeMouseMode (sdlWindow, false);
+
+		}
+
+	}
+
+
+	void SDLWindow::SetOpacity (float opacity) {
+
+		SDL_SetWindowOpacity (sdlWindow, opacity);
+
+	}
+
+
+	bool SDLWindow::SetResizable (bool resizable) {
+
+		#ifndef EMSCRIPTEN
+
+		if (resizable) {
+
+			SDL_SetWindowResizable (sdlWindow, true);
+
+		} else {
+
+			SDL_SetWindowResizable (sdlWindow, false);
+
+		}
+
+		return (SDL_GetWindowFlags (sdlWindow) & SDL_WINDOW_RESIZABLE);
+
+		#else
+
+		return resizable;
+
+		#endif
+
+	}
+
+
+	void SDLWindow::SetTextInputEnabled (bool enabled) {
+
+		if (enabled) {
+
+			SDL_StartTextInput (sdlWindow);
+
+		} else {
+
+			SDL_StopTextInput (sdlWindow);
+
+		}
+
+	}
+
+
+	void SDLWindow::SetTextInputRect (Rectangle * rect) {
+
+		SDL_Rect bounds = { 0, 0, 0, 0 };
+
+		if (rect) {
+
+			bounds.x = rect->x;
+			bounds.y = rect->y;
+			bounds.w = rect->width;
+			bounds.h = rect->height;
+
+		}
+
+		SDL_SetTextInputArea(sdlWindow, &bounds, 0);
+	}
+
+
+	const char* SDLWindow::SetTitle (const char* title) {
+
+		SDL_SetWindowTitle (sdlWindow, title);
+
+		return title;
+
+	}
+
+	bool SDLWindow::SetAlwaysOnTop (bool alwaysOnTop) {
+
+		SDL_SetWindowAlwaysOnTop (sdlWindow, alwaysOnTop);
+
+		return alwaysOnTop;
+
+	}
+
+	void SDLWindow::WarpMouse (int x, int y) {
+
+		SDL_WarpMouseInWindow (sdlWindow, x, y);
+
+	}
+
+	double SDLWindow::GetDrawScale () {
+
+		return GetWidth () / GetNativeWidth ();
+
+	}
+
+	int SDLWindow::GetNativeWidth () {
+
+		#if defined(ANDROID)
+		return ANativeWindow_getWidth ((ANativeWindow*)GetHandle ());
+		#else
+		int width;
+		int height;
+
+		SDL_GetWindowSizeInPixels (sdlWindow, &width, &height);
+
+		return width;
+		#endif
+
+	}
+
+	int SDLWindow::GetNativeHeight () {
+
+		#if defined(ANDROID)
+		return ANativeWindow_getHeight ((ANativeWindow*)GetHandle ());
+		#else
+		int width;
+		int height;
+
+		SDL_GetWindowSizeInPixels (sdlWindow, &width, &height);
+
+		return height;
+		#endif
+
+	}
+
+
+	Window* MakeWindow (Application* application, int width, int height, int flags, const char* title) {
+
+		return new SDLWindow (application, width, height, flags, title);
+
+	}
+
+
+}

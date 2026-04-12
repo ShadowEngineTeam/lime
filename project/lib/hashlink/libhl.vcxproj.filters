@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="pcre">
+      <UniqueIdentifier>{0e7277a9-ef45-478a-96fb-94c4a8974464}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="std">
+      <UniqueIdentifier>{1a2be115-e928-4943-acee-27878bb374ee}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\std\array.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\buffer.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\bytes.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\cast.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\date.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\error.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\file.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\fun.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\maps.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\math.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\obj.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\regexp.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\socket.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\string.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\sys.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\types.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\ucs2.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\random.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\thread.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\process.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\debug.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\std\track.c">
+      <Filter>std</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gc.c" />
+    <ClCompile Include="include\pcre\pcre2_auto_possess.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_chartables.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_compile.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_config.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_context.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_convert.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_dfa_match.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_error.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_extuni.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_find_bracket.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_jit_compile.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_maketables.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_match.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_match_data.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_newline.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_ord2utf.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_pattern_info.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_script_run.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_serialize.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_string_utils.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_study.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_substitute.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_substring.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_tables.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_ucd.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_valid_utf.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pcre\pcre2_xclass.c">
+      <Filter>pcre</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\hl.h" />
+    <ClInclude Include="include\pcre\config.h">
+      <Filter>pcre</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pcre\pcre2.h">
+      <Filter>pcre</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pcre\pcre2_internal.h">
+      <Filter>pcre</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pcre\pcre2_intmodedep.h">
+      <Filter>pcre</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pcre\pcre2_ucp.h">
+      <Filter>pcre</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
