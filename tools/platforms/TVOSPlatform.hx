@@ -56,7 +56,6 @@ class TVOSPlatform extends PlatformTarget
 				file: "MyApplication",
 				path: "bin",
 				preloader: "",
-				swfVersion: 17,
 				url: "",
 				init: null
 			};
@@ -67,7 +66,7 @@ class TVOSPlatform extends PlatformTarget
 				height: 600,
 				parameters: "{}",
 				background: 0xFFFFFF,
-				fps: 30,
+				fps: 60,
 				hardware: true,
 				display: 0,
 				resizable: true,
@@ -654,11 +653,11 @@ class TVOSPlatform extends PlatformTarget
 
 	}*/
 
-	@ignore public override function install():Void {}
+	public override function install():Void {}
 
-	@ignore public override function trace():Void {}
+	public override function trace():Void {}
 
-	@ignore public override function uninstall():Void {}
+	public override function uninstall():Void {}
 }
 
 private typedef IconSize =
