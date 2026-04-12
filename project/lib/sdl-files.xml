@@ -434,6 +434,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/cocoa/SDL_tray.m" if="macos" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/dummy/SDL_tray.c" if="android || iphone" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/unix/SDL_tray.c" unless="android || iphone || macos || windows" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/unix/SDL_tray_dbus.c" if="linux" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/windows/SDL_tray.c" if="windows" />
         </section>
 
