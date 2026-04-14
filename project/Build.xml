@@ -391,7 +391,6 @@
 					<lib name="kernel32.lib" />
 					<lib name="ole32.lib" />
 					<lib name="oleaut32.lib" />
-					<lib name="opengl32.lib" />
 					<lib name="rpcrt4.lib" if="LIME_HARFBUZZ" />
 					<lib name="setupapi.lib" />
 					<lib name="shell32.lib" />
@@ -418,7 +417,6 @@
 					<lib name="-lkernel32" />
 					<lib name="-lole32" />
 					<lib name="-loleaut32" />
-					<lib name="-lopengl32" />
 					<lib name="-lrpcrt4" if="LIME_HARFBUZZ" />
 					<lib name="-lsetupapi" />
 					<lib name="-lshell32" />
