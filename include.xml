@@ -124,8 +124,8 @@
 		</section>
 
 		<dependency path="dependencies/angle" name="d3dcompiler_47" if="windows" />
-		<dependency path="dependencies/angle" name="libEGL" unless="android || ios" />
-		<dependency path="dependencies/angle" name="libGLESv2" unless="android || ios" />
+		<dependency path="dependencies/angle" name="libEGL" unless="android || ios || iphonesim" />
+		<dependency path="dependencies/angle" name="libGLESv2" unless="android || ios || iphonesim" />
 
 		<ndll name="EGL_angle" dir="dependencies/angle" if="android" />
 		<ndll name="GLESv2_angle" dir="dependencies/angle" if="android" />
