@@ -162,8 +162,11 @@ class MacPlatform extends PlatformTarget
 		{
 			if (StringTools.endsWith(dependency.path, ".dylib"))
 			{
-				var fileName = Path.withoutDirectory(dependency.path);
-				copyIfNewer(dependency.path, executableDirectory + "/" + fileName);
+				copyIfNewer(dependency.path, executableDirectory + "/" + Path.withoutDirectory(dependency.path));
+			}
+			else
+			{
+				copyIfNewer(Path.combine(dependency.path, "Mac" + dirSuffix + "/" + dependency.name + ".dylib"), executableDirectory + "/" + dependency.name + ".dylib");
 			}
 		}
 

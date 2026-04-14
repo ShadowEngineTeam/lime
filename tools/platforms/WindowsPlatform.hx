@@ -191,14 +191,11 @@ class WindowsPlatform extends PlatformTarget
 		{
 			if (StringTools.endsWith(dependency.path, ".dll"))
 			{
-				var pathToUse = dependency.path;
-				if (StringTools.contains(dependency.path, "dependencies/angle"))
-				{
-					var archDir = "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : "");
-					pathToUse = StringTools.replace(dependency.path, "Windows", archDir);
-				}
-				var fileName = Path.withoutDirectory(pathToUse);
-				copyIfNewer(pathToUse, applicationDirectory + "/" + fileName);
+				copyIfNewer(dependency.path, applicationDirectory + "/" + Path.withoutDirectory(dependency.path));
+			}
+			else
+			{
+				copyIfNewer(Path.combine(dependency.path, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name + ".dll"), applicationDirectory + "/" + dependency.name + ".dll");
 			}
 		}
 
