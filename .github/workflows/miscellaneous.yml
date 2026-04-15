@@ -32,8 +32,6 @@ jobs:
       - name: Rebuild Miscellaneous
         run: |
           cd tools
-          haxe svg.hxml
-          haxe run.hxml
           haxe tools.hxml
       - name: Upload Artifact
         uses: actions/upload-artifact@main
