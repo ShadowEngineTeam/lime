@@ -1705,6 +1705,11 @@ class ProjectXMLParser extends HXProject
 						dependency.allowWebWorkers = parseBool(element.att.resolve("allow-web-workers"));
 					}
 
+					if (element.has.resolve("type"))
+					{
+						dependency.type = element.att.resolve("type");
+					}
+
 					var i = dependencies.length;
 
 					while (i-- > 0)
