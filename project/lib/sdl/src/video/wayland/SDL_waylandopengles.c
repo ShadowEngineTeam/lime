@@ -36,10 +36,7 @@
 
 void Wayland_GLES_SetDefaultProfileConfig(SDL_VideoDevice *_this)
 {
-#if defined(SDL_PLATFORM_QNXNTO)
-    // QNX defaults to EGL_PLATFORM_SCREEN_QNX unless this is explicitly specified
     _this->gl_config.egl_platform = EGL_PLATFORM_WAYLAND_EXT;
-#endif
 }
 
 bool Wayland_GLES_LoadLibrary(SDL_VideoDevice *_this, const char *path)

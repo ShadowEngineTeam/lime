@@ -176,6 +176,7 @@ static bool X11_GL_LoadLibrary_EGLFallback(SDL_VideoDevice *_this, const char *p
     _this->GL_GetSwapInterval = X11_GLES_GetSwapInterval;
     _this->GL_SwapWindow = X11_GLES_SwapWindow;
     _this->GL_DestroyContext = X11_GLES_DestroyContext;
+    _this->GL_SetDefaultProfileConfig = X11_GLES_SetDefaultProfileConfig;
     _this->GL_GetEGLSurface = X11_GLES_GetEGLSurface;
     return X11_GLES_LoadLibrary(_this, path);
 #else
