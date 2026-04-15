@@ -21,6 +21,8 @@
         <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/" />
         <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/src/" />
 
+        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/angle/include/" if="LIME_ANGLE" />
+
         <compilerflag value="-DSDL_DISABLE_ALLOCA" />
         <compilerflag value="-DSDL_DISABLE_STB" />
         <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" />
