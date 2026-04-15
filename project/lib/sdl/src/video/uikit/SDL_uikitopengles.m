@@ -44,7 +44,7 @@ SDL_FunctionPointer UIKit_GL_GetProcAddress(SDL_VideoDevice *_this, const char *
 bool UIKit_GL_MakeCurrent(SDL_VideoDevice *_this, SDL_Window *window, SDL_GLContext context)
 {
     @autoreleasepool {
-        SDL_uikitopenglview *view = (__bridge_transfer SDL_uikitopenglview *)context;
+        SDL_uikitopenglview *view = (__bridge SDL_uikitopenglview *)context;
 
         if (!view || !eglMakeCurrent(view.eglDisplay, view.eglSurface, view.eglSurface, view.eglContext)) {
             return SDL_SetError("Could not make EGL context current");

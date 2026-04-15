@@ -17,7 +17,7 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-*/
+ */
 #include "SDL_internal.h"
 
 #if defined(SDL_VIDEO_DRIVER_UIKIT) && (defined(SDL_VIDEO_OPENGL_ES) || defined(SDL_VIDEO_OPENGL_ES2))
@@ -26,6 +26,8 @@
 #include <EGL/eglext.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
+#include <GLES3/gl3.h>
+#include <GLES3/gl3ext.h>
 #include <Metal/Metal.h>
 #import "SDL_uikitopenglview.h"
 #include "SDL_uikitwindow.h"
@@ -35,7 +37,6 @@
     EGLDisplay eglDisplay;
     EGLSurface eglSurface;
     EGLContext eglContext;
-    EGLSurface eglPbufferSurface;
 
     GLuint viewRenderbuffer, viewFramebuffer;
     GLuint depthRenderbuffer;
@@ -91,7 +92,7 @@
 
         self.contentScaleFactor = scale;
 
-        eglDisplay = eglGetDisplay((EGLNativeDisplayType)metalLayer.device);
+        eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
         if (eglDisplay == EGL_NO_DISPLAY) {
             SDL_SetError("Could not create EGL display");
             return nil;
@@ -141,7 +142,7 @@
             EGL_HEIGHT, (int)(frame.size.height * scale),
             EGL_NONE
         };
-        eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, (EGLNativeWindowType)metalLayer, surfaceAttribs);
+        eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, (__bridge EGLNativeWindowType)metalLayer, surfaceAttribs);
         if (eglSurface == EGL_NO_SURFACE) {
             SDL_SetError("Could not create EGL surface");
             return nil;
@@ -153,9 +154,13 @@
         }
 
         if (samples > 0) {
-            GLint maxsamples = 0;
-            glGetIntegerv(GL_MAX_SAMPLES, &maxsamples);
-            samples = SDL_min(samples, maxsamples);
+            EGLint maxsamples = 0;
+            eglGetConfigAttrib(eglDisplay, eglConfig, EGL_SAMPLES, &maxsamples);
+            if (maxsamples > 0) {
+                samples = SDL_min(samples, (int)maxsamples);
+            } else {
+                samples = 0;
+            }
         }
 
         backingWidth = (int)(frame.size.width * scale);
@@ -192,7 +197,7 @@
 
             glGenRenderbuffers(1, &msaaRenderbuffer);
             glBindRenderbuffer(GL_RENDERBUFFER, msaaRenderbuffer);
-            glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, backingWidth, backingHeight);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, backingWidth, backingHeight);
 
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, msaaRenderbuffer);
         }
@@ -247,62 +252,26 @@
 
     if (depthRenderbuffer != 0) {
         glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
-        if (samples > 0) {
-            glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, depthBufferFormat, backingWidth, backingHeight);
-        } else {
-            glRenderbufferStorage(GL_RENDERBUFFER, depthBufferFormat, backingWidth, backingHeight);
-        }
+        glRenderbufferStorage(GL_RENDERBUFFER, depthBufferFormat, backingWidth, backingHeight);
     }
 
     if (msaaRenderbuffer != 0) {
         glBindRenderbuffer(GL_RENDERBUFFER, msaaRenderbuffer);
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, backingWidth, backingHeight);
-    }
-}
-
-- (void)setDebugLabels
-{
-    if (viewFramebuffer != 0) {
-        glLabelObjectEXT(GL_FRAMEBUFFER, viewFramebuffer, 0, "context FBO");
-    }
-
-    if (viewRenderbuffer != 0) {
-        glLabelObjectEXT(GL_RENDERBUFFER, viewRenderbuffer, 0, "context color buffer");
-    }
-
-    if (depthRenderbuffer != 0) {
-        if (depthBufferFormat == GL_DEPTH24_STENCIL8_OES) {
-            glLabelObjectEXT(GL_RENDERBUFFER, depthRenderbuffer, 0, "context depth-stencil buffer");
-        } else {
-            glLabelObjectEXT(GL_RENDERBUFFER, depthRenderbuffer, 0, "context depth buffer");
-        }
-    }
-
-    if (msaaFramebuffer != 0) {
-        glLabelObjectEXT(GL_FRAMEBUFFER, msaaFramebuffer, 0, "context MSAA FBO");
-    }
-
-    if (msaaRenderbuffer != 0) {
-        glLabelObjectEXT(GL_RENDERBUFFER, msaaRenderbuffer, 0, "context MSAA renderbuffer");
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, backingWidth, backingHeight);
     }
 }
 
 - (void)swapBuffers
 {
     if (msaaFramebuffer) {
-        const GLenum attachments[] = { GL_COLOR_ATTACHMENT0 };
-
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, viewFramebuffer);
-        glBlitFramebuffer(0, 0, backingWidth, backingHeight, 0, 0, backingWidth, backingHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-        if (!retainedBacking) {
-            glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, 1, attachments);
-        }
-
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, msaaFramebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, viewFramebuffer);
     }
 
     eglSwapBuffers(eglDisplay, eglSurface);
+
+    if (msaaFramebuffer) {
+        glBindFramebuffer(GL_FRAMEBUFFER, msaaFramebuffer);
+    }
 }
 
 - (void)layoutSubviews
