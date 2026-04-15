@@ -29,6 +29,11 @@
 
 // EGL implementation of SDL OpenGL support
 
+void X11_GLES_SetDefaultProfileConfig(SDL_VideoDevice *_this)
+{
+    _this->gl_config.egl_platform = EGL_PLATFORM_X11_EXT;
+}
+
 bool X11_GLES_LoadLibrary(SDL_VideoDevice *_this, const char *path)
 {
     SDL_VideoData *data = _this->internal;
