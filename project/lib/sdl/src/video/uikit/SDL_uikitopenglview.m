@@ -27,8 +27,6 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include <GLES3/gl3.h>
-#include <GLES3/gl3ext.h>
-#include <Metal/Metal.h>
 #import "SDL_uikitopenglview.h"
 #include "SDL_uikitwindow.h"
 
