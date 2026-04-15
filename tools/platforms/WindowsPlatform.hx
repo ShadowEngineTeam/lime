@@ -193,6 +193,10 @@ class WindowsPlatform extends PlatformTarget
 			{
 				copyIfNewer(dependency.path, applicationDirectory + "/" + Path.withoutDirectory(dependency.path));
 			}
+			else if (dependency.type != null)
+			{
+				copyIfNewer(Path.combine(dependency.path, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name), applicationDirectory + "/" + dependency.name);
+			}
 			else
 			{
 				copyIfNewer(Path.combine(dependency.path, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name + ".dll"), applicationDirectory + "/" + dependency.name + ".dll");

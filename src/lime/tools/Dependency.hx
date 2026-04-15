@@ -8,6 +8,7 @@ class Dependency
 	public var allowWebWorkers:Bool;
 	public var name:String;
 	public var path:String;
+	public var type:String;
 
 	public function new(name:String, path:String)
 	{
@@ -20,6 +21,7 @@ class Dependency
 		var dependency = new Dependency(name, path);
 		dependency.embed = embed;
 		dependency.forceLoad = forceLoad;
+		dependency.type = type;
 		return dependency;
 	}
 }
