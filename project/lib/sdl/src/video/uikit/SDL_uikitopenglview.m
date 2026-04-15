@@ -169,6 +169,8 @@
 
         glGenRenderbuffers(1, &viewRenderbuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, backingWidth, backingHeight);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, viewRenderbuffer);
 
         if (useDepthBuffer || useStencilBuffer) {
             if (useStencilBuffer) {
@@ -262,7 +264,11 @@
 - (void)swapBuffers
 {
     if (msaaFramebuffer) {
-        glBindFramebuffer(GL_FRAMEBUFFER, viewFramebuffer);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, msaaFramebuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBlitFramebuffer(0, 0, backingWidth, backingHeight,
+                          0, 0, backingWidth, backingHeight,
+                          GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
     eglSwapBuffers(eglDisplay, eglSurface);
@@ -280,7 +286,8 @@
     int height = (int)(self.bounds.size.height * self.contentScaleFactor);
 
     if (width != backingWidth || height != backingHeight) {
-        EGLContext *prevContext = eglGetCurrentContext();
+        /* EGLContext is an opaque handle (void *); do not add another '*'. */
+        EGLContext prevContext = eglGetCurrentContext();
         EGLDisplay prevDisplay = eglGetCurrentDisplay();
         EGLSurface prevDraw = eglGetCurrentSurface(EGL_DRAW);
         EGLSurface prevRead = eglGetCurrentSurface(EGL_READ);
