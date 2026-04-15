@@ -499,6 +499,7 @@
 
 # define SDL_VIDEO_DRIVER_UIKIT 1    /**< UIKit video driver */
 # define SDL_VIDEO_METAL 1           /**< Metal support */
+# define SDL_VIDEO_OPENGL_ES 0       /**< OpenGL ES support */
 # define SDL_VIDEO_OPENGL_ES2 0      /**< OpenGL ES 2.0 support */
 /** @} */
 
