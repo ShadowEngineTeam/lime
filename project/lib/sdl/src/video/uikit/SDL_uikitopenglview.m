@@ -22,40 +22,45 @@
 
 #if defined(SDL_VIDEO_DRIVER_UIKIT) && (defined(SDL_VIDEO_OPENGL_ES) || defined(SDL_VIDEO_OPENGL_ES2))
 
-#include <OpenGLES/EAGLDrawable.h>
-#include <OpenGLES/ES2/glext.h>
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#include <Metal/Metal.h>
 #import "SDL_uikitopenglview.h"
 #include "SDL_uikitwindow.h"
 
 @implementation SDL_uikitopenglview
 {
-    // The renderbuffer and framebuffer used to render to this layer.
-    GLuint viewRenderbuffer, viewFramebuffer;
+    EGLDisplay eglDisplay;
+    EGLSurface eglSurface;
+    EGLContext eglContext;
+    EGLSurface eglPbufferSurface;
 
-    // The depth buffer that is attached to viewFramebuffer, if it exists.
+    GLuint viewRenderbuffer, viewFramebuffer;
     GLuint depthRenderbuffer;
 
     GLenum colorBufferFormat;
-
-    // format of depthRenderbuffer
     GLenum depthBufferFormat;
 
-    // The framebuffer and renderbuffer used for rendering with MSAA.
     GLuint msaaFramebuffer, msaaRenderbuffer;
 
-    // The number of MSAA samples.
     int samples;
 
     BOOL retainedBacking;
+
+    CAMetalLayer *metalLayer;
 }
 
-@synthesize context;
 @synthesize backingWidth;
 @synthesize backingHeight;
+@synthesize eglDisplay;
+@synthesize eglSurface;
+@synthesize eglContext;
 
 + (Class)layerClass
 {
-    return [CAEAGLLayer class];
+    return [CAMetalLayer class];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -67,112 +72,111 @@
                         aBits:(int)aBits
                     depthBits:(int)depthBits
                   stencilBits:(int)stencilBits
-                         sRGB:(int)sRGB
-                 multisamples:(int)multisamples
-                      context:(EAGLContext *)glcontext
+                          sRGB:(int)sRGB
+                  multisamples:(int)multisamples
+                       context:(EGLContext *)glcontext
 {
     if ((self = [super initWithFrame:frame])) {
         const BOOL useStencilBuffer = (stencilBits != 0);
         const BOOL useDepthBuffer = (depthBits != 0);
-        NSString *colorFormat = nil;
 
-        context = glcontext;
         samples = multisamples;
         retainedBacking = retained;
 
-        if (!context || ![EAGLContext setCurrentContext:context]) {
-            SDL_SetError("Could not create OpenGL ES drawable (could not make context current)");
+        metalLayer = (CAMetalLayer *)self.layer;
+        metalLayer.device = MTLCreateSystemDefaultDevice();
+        metalLayer.pixelFormat = MTLPixelFormatBGRA8Unorm;
+        metalLayer.framebufferOnly = !retained;
+        metalLayer.drawableSize = CGSizeMake(frame.size.width * scale, frame.size.height * scale);
+
+        self.contentScaleFactor = scale;
+
+        eglDisplay = eglGetDisplay((EGLNativeDisplayType)metalLayer.device);
+        if (eglDisplay == EGL_NO_DISPLAY) {
+            SDL_SetError("Could not create EGL display");
+            return nil;
+        }
+
+        EGLint majorVersion, minorVersion;
+        if (!eglInitialize(eglDisplay, &majorVersion, &minorVersion)) {
+            SDL_SetError("Could not initialize EGL");
+            return nil;
+        }
+
+        EGLint configAttribs[] = {
+            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+            EGL_RED_SIZE, rBits ? rBits : 5,
+            EGL_GREEN_SIZE, gBits ? gBits : 6,
+            EGL_BLUE_SIZE, bBits ? bBits : 5,
+            EGL_ALPHA_SIZE, aBits,
+            EGL_DEPTH_SIZE, depthBits,
+            EGL_STENCIL_SIZE, stencilBits,
+            EGL_SAMPLE_BUFFERS, samples > 0 ? 1 : 0,
+            EGL_SAMPLES, samples,
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+            EGL_NONE
+        };
+
+        EGLConfig eglConfig;
+        EGLint numConfigs;
+        if (!eglChooseConfig(eglDisplay, configAttribs, &eglConfig, 1, &numConfigs) || numConfigs == 0) {
+            SDL_SetError("Could not find suitable EGL config");
+            return nil;
+        }
+
+        eglBindAPI(EGL_OPENGL_ES_API);
+
+        EGLint contextAttribs[] = {
+            EGL_CONTEXT_CLIENT_VERSION, 2,
+            EGL_NONE
+        };
+        eglContext = eglCreateContext(eglDisplay, eglConfig, EGL_NO_CONTEXT, contextAttribs);
+        if (eglContext == EGL_NO_CONTEXT) {
+            SDL_SetError("Could not create EGL context");
+            return nil;
+        }
+
+        EGLint surfaceAttribs[] = {
+            EGL_WIDTH, (int)(frame.size.width * scale),
+            EGL_HEIGHT, (int)(frame.size.height * scale),
+            EGL_NONE
+        };
+        eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, (EGLNativeWindowType)metalLayer, surfaceAttribs);
+        if (eglSurface == EGL_NO_SURFACE) {
+            SDL_SetError("Could not create EGL surface");
+            return nil;
+        }
+
+        if (!eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)) {
+            SDL_SetError("Could not make EGL context current");
             return nil;
         }
 
         if (samples > 0) {
             GLint maxsamples = 0;
             glGetIntegerv(GL_MAX_SAMPLES, &maxsamples);
-
-            // Clamp the samples to the max supported count.
             samples = SDL_min(samples, maxsamples);
         }
 
-        if (sRGB > 0) {
-            colorFormat = kEAGLColorFormatSRGBA8;
-            colorBufferFormat = GL_SRGB8_ALPHA8;
-        } else if (rBits >= 8 || gBits >= 8 || bBits >= 8 || aBits > 0) {
-            // if user specifically requests rbg888 or some color format higher than 16bpp
-            colorFormat = kEAGLColorFormatRGBA8;
-            colorBufferFormat = GL_RGBA8;
-        } else {
-            // default case (potentially faster)
-            colorFormat = kEAGLColorFormatRGB565;
-            colorBufferFormat = GL_RGB565;
-        }
+        backingWidth = (int)(frame.size.width * scale);
+        backingHeight = (int)(frame.size.height * scale);
 
-        CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
-
-        eaglLayer.opaque = YES;
-        eaglLayer.drawableProperties = @{
-            kEAGLDrawablePropertyRetainedBacking : @(retained),
-            kEAGLDrawablePropertyColorFormat : colorFormat
-        };
-
-        // Set the appropriate scale (for retina display support)
-        self.contentScaleFactor = scale;
-
-        // Create the color Renderbuffer Object
-        glGenRenderbuffers(1, &viewRenderbuffer);
-        glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
-
-        if (![context renderbufferStorage:GL_RENDERBUFFER fromDrawable:eaglLayer]) {
-            SDL_SetError("Failed to create OpenGL ES drawable");
-            return nil;
-        }
-
-        // Create the Framebuffer Object
         glGenFramebuffers(1, &viewFramebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, viewFramebuffer);
 
-        // attach the color renderbuffer to the FBO
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, viewRenderbuffer);
-
-        glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
-        glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &backingHeight);
-
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            SDL_SetError("Failed creating OpenGL ES framebuffer");
-            return nil;
-        }
-
-        /* When MSAA is used we'll use a separate framebuffer for rendering to,
-         * since we'll need to do an explicit MSAA resolve before presenting. */
-        if (samples > 0) {
-            glGenFramebuffers(1, &msaaFramebuffer);
-            glBindFramebuffer(GL_FRAMEBUFFER, msaaFramebuffer);
-
-            glGenRenderbuffers(1, &msaaRenderbuffer);
-            glBindRenderbuffer(GL_RENDERBUFFER, msaaRenderbuffer);
-
-            glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, colorBufferFormat, backingWidth, backingHeight);
-
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, msaaRenderbuffer);
-        }
+        glGenRenderbuffers(1, &viewRenderbuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
 
         if (useDepthBuffer || useStencilBuffer) {
             if (useStencilBuffer) {
-                // Apparently you need to pack stencil and depth into one buffer.
                 depthBufferFormat = GL_DEPTH24_STENCIL8_OES;
             } else if (useDepthBuffer) {
-                /* iOS only uses 32-bit float (exposed as fixed point 24-bit)
-                 * depth buffers. */
                 depthBufferFormat = GL_DEPTH_COMPONENT24_OES;
             }
 
             glGenRenderbuffers(1, &depthRenderbuffer);
             glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
-
-            if (samples > 0) {
-                glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, depthBufferFormat, backingWidth, backingHeight);
-            } else {
-                glRenderbufferStorage(GL_RENDERBUFFER, depthBufferFormat, backingWidth, backingHeight);
-            }
+            glRenderbufferStorage(GL_RENDERBUFFER, depthBufferFormat, backingWidth, backingHeight);
 
             if (useDepthBuffer) {
                 glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
@@ -182,14 +186,27 @@
             }
         }
 
+        if (samples > 0) {
+            glGenFramebuffers(1, &msaaFramebuffer);
+            glBindFramebuffer(GL_FRAMEBUFFER, msaaFramebuffer);
+
+            glGenRenderbuffers(1, &msaaRenderbuffer);
+            glBindRenderbuffer(GL_RENDERBUFFER, msaaRenderbuffer);
+            glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, backingWidth, backingHeight);
+
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, msaaRenderbuffer);
+        }
+
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             SDL_SetError("Failed creating OpenGL ES framebuffer");
             return nil;
         }
 
-        glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
-
-        [self setDebugLabels];
+        if (samples > 0) {
+            glBindFramebuffer(GL_FRAMEBUFFER, msaaFramebuffer);
+        } else {
+            glBindFramebuffer(GL_FRAMEBUFFER, viewFramebuffer);
+        }
     }
 
     return self;
@@ -202,7 +219,6 @@
 
 - (GLuint)drawableFramebuffer
 {
-    // When MSAA is used, the MSAA draw framebuffer is used for drawing.
     if (msaaFramebuffer) {
         return msaaFramebuffer;
     } else {
@@ -212,8 +228,6 @@
 
 - (GLuint)msaaResolveFramebuffer
 {
-    /* When MSAA is used, the MSAA draw framebuffer is used for drawing and the
-     * view framebuffer is used as a MSAA resolve framebuffer. */
     if (msaaFramebuffer) {
         return viewFramebuffer;
     } else {
@@ -223,23 +237,16 @@
 
 - (void)updateFrame
 {
-    GLint prevRenderbuffer = 0;
-    glGetIntegerv(GL_RENDERBUFFER_BINDING, &prevRenderbuffer);
+    CGRect bounds = self.bounds;
+    CGFloat scale = self.contentScaleFactor;
 
-    glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
-    [context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
+    backingWidth = (int)(bounds.size.width * scale);
+    backingHeight = (int)(bounds.size.height * scale);
 
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &backingHeight);
-
-    if (msaaRenderbuffer != 0) {
-        glBindRenderbuffer(GL_RENDERBUFFER, msaaRenderbuffer);
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, colorBufferFormat, backingWidth, backingHeight);
-    }
+    metalLayer.drawableSize = CGSizeMake(backingWidth, backingHeight);
 
     if (depthRenderbuffer != 0) {
         glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
-
         if (samples > 0) {
             glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, depthBufferFormat, backingWidth, backingHeight);
         } else {
@@ -247,7 +254,10 @@
         }
     }
 
-    glBindRenderbuffer(GL_RENDERBUFFER, prevRenderbuffer);
+    if (msaaRenderbuffer != 0) {
+        glBindRenderbuffer(GL_RENDERBUFFER, msaaRenderbuffer);
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, backingWidth, backingHeight);
+    }
 }
 
 - (void)setDebugLabels
@@ -283,35 +293,16 @@
         const GLenum attachments[] = { GL_COLOR_ATTACHMENT0 };
 
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, viewFramebuffer);
+        glBlitFramebuffer(0, 0, backingWidth, backingHeight, 0, 0, backingWidth, backingHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-        /* OpenGL ES 3+ provides explicit MSAA resolves via glBlitFramebuffer.
-         * In OpenGL ES 1 and 2, MSAA resolves must be done via an extension. */
-        if (context.API >= kEAGLRenderingAPIOpenGLES3) {
-            int w = backingWidth;
-            int h = backingHeight;
-            glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-            if (!retainedBacking) {
-                // Discard the contents of the MSAA drawable color buffer.
-                glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, 1, attachments);
-            }
-        } else {
-            glResolveMultisampleFramebufferAPPLE();
-
-            if (!retainedBacking) {
-                glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER, 1, attachments);
-            }
+        if (!retainedBacking) {
+            glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, 1, attachments);
         }
 
-        /* We assume the "drawable framebuffer" (MSAA draw framebuffer) was
-         * previously bound... */
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, msaaFramebuffer);
     }
 
-    /* viewRenderbuffer should always be bound here. Code that binds something
-     * else is responsible for rebinding viewRenderbuffer, to reduce duplicate
-     * state changes. */
-    [context presentRenderbuffer:GL_RENDERBUFFER];
+    eglSwapBuffers(eglDisplay, eglSurface);
 }
 
 - (void)layoutSubviews
@@ -321,17 +312,20 @@
     int width = (int)(self.bounds.size.width * self.contentScaleFactor);
     int height = (int)(self.bounds.size.height * self.contentScaleFactor);
 
-    // Update the color and depth buffer storage if the layer size has changed.
     if (width != backingWidth || height != backingHeight) {
-        EAGLContext *prevContext = [EAGLContext currentContext];
-        if (prevContext != context) {
-            [EAGLContext setCurrentContext:context];
+        EGLContext *prevContext = eglGetCurrentContext();
+        EGLDisplay prevDisplay = eglGetCurrentDisplay();
+        EGLSurface prevDraw = eglGetCurrentSurface(EGL_DRAW);
+        EGLSurface prevRead = eglGetCurrentSurface(EGL_READ);
+
+        if (prevContext != eglContext || prevDraw != eglSurface) {
+            eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
         }
 
         [self updateFrame];
 
-        if (prevContext != context) {
-            [EAGLContext setCurrentContext:prevContext];
+        if (prevContext != EGL_NO_CONTEXT) {
+            eglMakeCurrent(prevDisplay, prevDraw, prevRead, prevContext);
         }
     }
 }
@@ -366,9 +360,23 @@
 
 - (void)dealloc
 {
-    if (context && context == [EAGLContext currentContext]) {
-        [self destroyFramebuffer];
-        [EAGLContext setCurrentContext:nil];
+    if (eglContext != EGL_NO_CONTEXT) {
+        if (viewFramebuffer != 0 || depthRenderbuffer != 0 || msaaFramebuffer != 0) {
+            eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
+            [self destroyFramebuffer];
+        }
+        eglDestroyContext(eglDisplay, eglContext);
+        eglContext = EGL_NO_CONTEXT;
+    }
+
+    if (eglSurface != EGL_NO_SURFACE) {
+        eglDestroySurface(eglDisplay, eglSurface);
+        eglSurface = EGL_NO_SURFACE;
+    }
+
+    if (eglDisplay != EGL_NO_DISPLAY) {
+        eglTerminate(eglDisplay);
+        eglDisplay = EGL_NO_DISPLAY;
     }
 }
 
