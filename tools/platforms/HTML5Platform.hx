@@ -431,6 +431,11 @@ class HTML5Platform extends PlatformTarget
 					context.linkedLibraries.push("./" + dependencyPath + "/" + name);
 					copyIfNewer(dependency.path, Path.combine(destination, Path.combine(dependencyPath, name)));
 				}
+				else if (dependency.type != null && FileSystem.exists(Path.combine(dependency.path, dependency.name)))
+				{
+					var name = dependency.name;
+					copyIfNewer(Path.combine(dependency.path, name), Path.combine(destination, Path.combine(dependencyPath, name)));
+				}
 			}
 		}
 

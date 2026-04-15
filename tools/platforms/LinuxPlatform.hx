@@ -180,6 +180,10 @@ class LinuxPlatform extends PlatformTarget
 			{
 				copyIfNewer(dependency.path, applicationDirectory + "/" + Path.withoutDirectory(dependency.path));
 			}
+			else if (dependency.type != null)
+			{
+				copyIfNewer(Path.combine(dependency.path, "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name), applicationDirectory + "/" + dependency.name);
+			}
 			else
 			{
 				copyIfNewer(Path.combine(dependency.path, "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name + ".so"), applicationDirectory + "/" + dependency.name + ".so");
