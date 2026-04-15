@@ -26,6 +26,7 @@
 #import <EGL/eglext.h>
 #import <GLES2/gl2.h>
 #import <GLES2/gl2ext.h>
+#import <GLES3/gl3.h>
 #import <Metal/Metal.h>
 
 #import "SDL_uikitview.h"
