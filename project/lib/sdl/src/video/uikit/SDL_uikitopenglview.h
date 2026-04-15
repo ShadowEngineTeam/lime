@@ -22,8 +22,11 @@
 #if defined(SDL_VIDEO_OPENGL_ES) || defined(SDL_VIDEO_OPENGL_ES2)
 
 #import <UIKit/UIKit.h>
-#import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES3/gl.h>
+#import <EGL/egl.h>
+#import <EGL/eglext.h>
+#import <GLES2/gl2.h>
+#import <GLES2/gl2ext.h>
+#import <Metal/Metal.h>
 
 #import "SDL_uikitview.h"
 #include "SDL_uikitvideo.h"
@@ -39,13 +42,14 @@
                         aBits:(int)aBits
                     depthBits:(int)depthBits
                   stencilBits:(int)stencilBits
-                         sRGB:(int)sRGB
-                 multisamples:(int)multisamples
-                      context:(EAGLContext *)glcontext;
+                          sRGB:(int)sRGB
+                  multisamples:(int)multisamples
+                       context:(EGLContext *)glcontext;
 
-@property(nonatomic, readonly, weak) EAGLContext *context;
+@property(nonatomic, readonly) EGLDisplay eglDisplay;
+@property(nonatomic, readonly) EGLSurface eglSurface;
+@property(nonatomic, readonly) EGLContext eglContext;
 
-// The width and height of the drawable in pixels (as opposed to points.)
 @property(nonatomic, readonly) int backingWidth;
 @property(nonatomic, readonly) int backingHeight;
 
