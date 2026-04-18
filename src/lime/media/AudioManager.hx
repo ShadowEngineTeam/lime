@@ -175,34 +175,83 @@ class AudioManager
 	@:noCompletion
 	private static function setupConfig():Void
 	{
-		#if (lime_openal && (windows || mac || linux || android || ios))
+		#if (lime_openal || lime_openalsoft)
 		final alConfig:Array<String> = [];
 
 		alConfig.push('[general]');
-		alConfig.push('channels=stereo');
+		// alConfig.push('drivers=sdl3,null');
+		#if windows
+		alConfig.push('drivers=wasapi,dsound,winmm,null');
+		#elseif linux
+		alConfig.push('drivers=pipewire,pulse,alsa,jack,oss,null');
+		#elseif (mac || ios)
+		alConfig.push('drivers=coreaudio,null');
+		#elseif android
+		alConfig.push('drivers=oboe,null');
+		#end
 		alConfig.push('sample-type=float32');
-		alConfig.push('stereo-mode=speakers');
-		alConfig.push('stereo-encoding=panpot');
-		alConfig.push('hrtf=false');
+		alConfig.push('channels=stereo');
+		alConfig.push('stereo-encoding=basic');
 		alConfig.push('cf_level=0');
-		alConfig.push('resampler=fast_bsinc24');
-		alConfig.push('front-stablizer=false');
 		alConfig.push('output-limiter=false');
+		alConfig.push('front-stablizer=false');
 		alConfig.push('volume-adjust=0');
+		#if android
+		alConfig.push('period_size=882');
+		#else
 		alConfig.push('period_size=441');
+		#end
+		alConfig.push('periods=3');
+		alConfig.push('sources=256');
+		alConfig.push('sends=2');
+		alConfig.push('dither=false');
+		#if android
+		alConfig.push('resampler=bsinc12');
+		#else
+		alConfig.push('resampler=bsinc24');
+		#end
+		alConfig.push('rt-prio=10');
+		alConfig.push('rt-time-limit=true');
 
 		alConfig.push('[decoder]');
-		alConfig.push('hq-mode=false');
-		alConfig.push('distance-comp=false');
+		alConfig.push('hq-mode=true');
+		alConfig.push('distance-comp=true');
 		alConfig.push('nfc=false');
+
+		// WASAPI
+		#if windows
+		// alConfig.push('[wasapi]');
+		// alConfig.push('exclusive-mode=true');
+		#end
+
+		// PipeWire
+		#if linux
+		alConfig.push('[pipewire]');
+		alConfig.push('rt-mix=true');
+		#end
+
+		// PulseAudio
+		#if linux
+		alConfig.push('[pulse]');
+		alConfig.push('allow-moves=false');
+		alConfig.push('fix-rate=true');
+		alConfig.push('adjust-latency=false');
+		#end
+
+		// ALSA
+		#if linux
+		alConfig.push('[alsa]');
+		alConfig.push('mmap=true');
+		#end
 
 		try
 		{
-			final directory:String = Path.directory(Path.withoutExtension(System.applicationStorageDirectory));
-			final path:String = Path.join([directory, #if windows 'audio-config.ini' #else 'audio-config.conf' #end]);
+			final directory:String = #if mobile mobile.backend.StorageUtil.getStorageDirectory() #else Sys.getCwd() #end;
+			final path:String = Path.join([directory, #if windows 'alsoft.ini' #else 'alsoft.conf' #end]);
 			final content:String = alConfig.join('\n');
 
-			if (!FileSystem.exists(directory)) FileSystem.createDirectory(directory);
+			if (!FileSystem.exists(directory))
+				FileSystem.createDirectory(directory);
 
 			if (!FileSystem.exists(path)) File.saveContent(path, content);
 
