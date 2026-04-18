@@ -10,6 +10,8 @@ class DefineMacro
 	{
 		if (!Context.defined("tools"))
 		{
+			Compiler.define("lime-shadow");
+
 			if (Context.defined("js"))
 			{
 				Compiler.define("html5");
