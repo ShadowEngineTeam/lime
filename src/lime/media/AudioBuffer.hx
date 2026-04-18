@@ -163,6 +163,14 @@ class AudioBuffer
 
 		return audioBuffer;
 		#elseif (lime_cffi && !macro)
+		#if lime_vorbis
+		var vorbisFile = VorbisFile.fromBytes(bytes);
+		if (vorbisFile != null)
+		{
+			var buffer = fromVorbisFile(vorbisFile);
+			buffer.data = UInt8Array.fromBytes(bytes);
+		}
+		#end
 		var audioBuffer = new AudioBuffer();
 		audioBuffer.data = new UInt8Array(Bytes.alloc(0));
 		return NativeCFFI.lime_audio_load_bytes(bytes, audioBuffer);
