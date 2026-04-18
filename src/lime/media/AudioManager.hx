@@ -2,12 +2,6 @@ package lime.media;
 
 import lime.system.CFFIPointer;
 import lime._internal.utils.MainLoop;
-#if (windows || mac || linux || android || ios)
-import haxe.io.Path;
-import lime.system.System;
-import sys.FileSystem;
-import sys.io.File;
-#end
 import haxe.Timer;
 import lime._internal.backend.native.NativeCFFI;
 import lime.media.openal.AL;
@@ -42,10 +36,6 @@ class AudioManager
 				#if !lime_doc_gen
 				if (context.type == OPENAL)
 				{
-					#if (windows || mac || linux || android || ios)
-					setupConfig();
-					#end
-
 					var alc = context.openal;
 					var device = alc.openDevice();
 					if (device != null)
@@ -171,93 +161,4 @@ class AudioManager
 		#end
 	}
 	#end
-
-	@:noCompletion
-	private static function setupConfig():Void
-	{
-		#if (lime_openal || lime_openalsoft)
-		final alConfig:Array<String> = [];
-
-		alConfig.push('[general]');
-		// alConfig.push('drivers=sdl3,null');
-		#if windows
-		alConfig.push('drivers=wasapi,dsound,winmm,null');
-		#elseif linux
-		alConfig.push('drivers=pipewire,pulse,alsa,jack,oss,null');
-		#elseif (mac || ios)
-		alConfig.push('drivers=coreaudio,null');
-		#elseif android
-		alConfig.push('drivers=oboe,null');
-		#end
-		alConfig.push('sample-type=float32');
-		alConfig.push('channels=stereo');
-		alConfig.push('stereo-encoding=basic');
-		alConfig.push('cf_level=0');
-		alConfig.push('output-limiter=false');
-		alConfig.push('front-stablizer=false');
-		alConfig.push('volume-adjust=0');
-		#if android
-		alConfig.push('period_size=882');
-		#else
-		alConfig.push('period_size=441');
-		#end
-		alConfig.push('periods=3');
-		alConfig.push('sources=256');
-		alConfig.push('sends=2');
-		alConfig.push('dither=false');
-		#if android
-		alConfig.push('resampler=bsinc12');
-		#else
-		alConfig.push('resampler=bsinc24');
-		#end
-		alConfig.push('rt-prio=10');
-		alConfig.push('rt-time-limit=true');
-
-		alConfig.push('[decoder]');
-		alConfig.push('hq-mode=true');
-		alConfig.push('distance-comp=true');
-		alConfig.push('nfc=false');
-
-		// WASAPI
-		#if windows
-		// alConfig.push('[wasapi]');
-		// alConfig.push('exclusive-mode=true');
-		#end
-
-		// PipeWire
-		#if linux
-		alConfig.push('[pipewire]');
-		alConfig.push('rt-mix=true');
-		#end
-
-		// PulseAudio
-		#if linux
-		alConfig.push('[pulse]');
-		alConfig.push('allow-moves=false');
-		alConfig.push('fix-rate=true');
-		alConfig.push('adjust-latency=false');
-		#end
-
-		// ALSA
-		#if linux
-		alConfig.push('[alsa]');
-		alConfig.push('mmap=true');
-		#end
-
-		try
-		{
-			final directory:String = #if mobile mobile.backend.StorageUtil.getStorageDirectory() #else Sys.getCwd() #end;
-			final path:String = Path.join([directory, #if windows 'alsoft.ini' #else 'alsoft.conf' #end]);
-			final content:String = alConfig.join('\n');
-
-			if (!FileSystem.exists(directory))
-				FileSystem.createDirectory(directory);
-
-			if (!FileSystem.exists(path)) File.saveContent(path, content);
-
-			Sys.putEnv('ALSOFT_CONF', path);
-		}
-		catch (e:Dynamic) {}
-		#end
-	}
 }
