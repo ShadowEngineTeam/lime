@@ -58,6 +58,11 @@ public:
         : EaxException{"EAX_SOURCE", message}
     { }
 };
+
+struct EaxAlLowPassParam {
+    float gain;
+    float gain_hf;
+};
 #endif // ALSOFT_EAX
 
 namespace al {
@@ -112,7 +117,7 @@ struct Source {
         -std::numbers::pi_v<float>/6.0f}};
 
     float mRadius{0.0f};
-    float mEnhWidth{0.593f};
+    float mEnhWidth{0.46f};
     float mPan{0.0f};
 
     /** Direct filter and auxiliary send info. */
