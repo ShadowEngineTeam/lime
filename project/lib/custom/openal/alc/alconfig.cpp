@@ -385,51 +385,43 @@ void LoadConfigFromFile(std::istream &f)
 
 void LoadSEALDefaultConfig()
 {
-    // SetConfigValue("drivers", "sdl3,null");
+    SetConfigValue("drivers", "sdl3,null");
     #if defined(_WIN32)
-    SetConfigValue("drivers", "wasapi,dsound,winmm,null");
+    // SetConfigValue("drivers", "wasapi,dsound,winmm,null");
     #elif defined(__linux__)
-    SetConfigValue("drivers", "pipewire,pulse,alsa,jack,oss,null");
+    // SetConfigValue("drivers", "pipewire,pulse,alsa,jack,oss,null");
     #elif defined(__APPLE__)
-    SetConfigValue("drivers", "coreaudio,null");
+    // SetConfigValue("drivers", "coreaudio,null");
     #elif defined(__ANDROID__)
-    SetConfigValue("drivers", "oboe,null");
+    // SetConfigValue("drivers", "oboe,null");
     #endif
     SetConfigValue("sample-type", "float32");
     SetConfigValue("channels", "stereo");
     SetConfigValue("stereo-encoding", "basic");
     SetConfigValue("cf_level", "0");
-    SetConfigValue("output-limiter", "false");
+    SetConfigValue("output-limiter", "true");
     SetConfigValue("front-stablizer", "false");
     SetConfigValue("volume-adjust", "0");
-    #if defined(__ANDROID__)
-    SetConfigValue("period_size", "882");
-    #else
-    SetConfigValue("period_size", "441");
-    #endif
-    SetConfigValue("periods", "3");
+    SetConfigValue("period_size", "480");
+    SetConfigValue("periods", "2");
     SetConfigValue("sources", "256");
     SetConfigValue("sends", "2");
     SetConfigValue("dither", "false");
-    #if defined(__ANDROID__)
-    SetConfigValue("resampler", "bsinc12");
-    #else
     SetConfigValue("resampler", "bsinc24");
-    #endif
-    SetConfigValue("rt-prio", "10");
+    SetConfigValue("rt-prio", "15");
     SetConfigValue("rt-time-limit", "true");
-    SetConfigValue("decoder/hq-mode", "true");
-    SetConfigValue("decoder/distance-comp", "true");
-    SetConfigValue("decoder/nfc", "false");
+    // SetConfigValue("decoder/hq-mode", "true");
+    // SetConfigValue("decoder/distance-comp", "true");
+    // SetConfigValue("decoder/nfc", "false");
     #if defined(_WIN32)
     // SetConfigValue("wasapi/exclusive-mode", "true");
     #endif
     #if defined(__linux__)
-    SetConfigValue("pipewire/rt-mix", "true");
-    SetConfigValue("pulse/allow-moves", "false");
-    SetConfigValue("pulse/fix-rate", "true");
-    SetConfigValue("pulse/adjust-latency", "false");
-    SetConfigValue("alsa/mmap", "true");
+    // SetConfigValue("pipewire/rt-mix", "true");
+    // SetConfigValue("pulse/allow-moves", "false");
+    // SetConfigValue("pulse/fix-rate", "true");
+    // SetConfigValue("pulse/adjust-latency", "false");
+    // SetConfigValue("alsa/mmap", "true");
     #endif
     ConfOpts.shrink_to_fit();
 }
