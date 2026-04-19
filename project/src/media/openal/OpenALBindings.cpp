@@ -2157,9 +2157,7 @@ namespace lime {
 	bool lime_alc_is_extension_present (value device, HxString extname) {
 
 		#ifdef LIME_OPENALSOFT
-		if (val_is_null (device)) return alcIsExtensionPresent (0, extname.__s);
-
-		ALCdevice* alcDevice = (ALCdevice*)(uintptr_t)val_data (device);
+		ALCdevice* alcDevice = val_is_null (device) ? NULL : (ALCdevice*)(uintptr_t)val_data (device);
 		return alcIsExtensionPresent (alcDevice, extname.__s);
 		#else
 		return false;
@@ -2171,9 +2169,7 @@ namespace lime {
 	HL_PRIM bool HL_NAME(hl_alc_is_extension_present) (HL_CFFIPointer* device, hl_vstring* extname) {
 
 		#ifdef LIME_OPENALSOFT
-		if (!device) return alcIsExtensionPresent (0, extname ? hl_to_utf8 (extname->bytes) : NULL);
-
-		ALCdevice* alcDevice = (ALCdevice*)(uintptr_t)device->ptr;
+		ALCdevice* alcDevice = device ? (ALCdevice*)(uintptr_t)device->ptr : NULL;
 		return alcIsExtensionPresent (alcDevice, extname ? hl_to_utf8 (extname->bytes) : NULL);
 		#else
 		return false;
@@ -2770,7 +2766,7 @@ namespace lime {
 			if (val_is_null (value1)) {
 
 				data1 = 0;
-			
+
 			} else {
 
 				data1 = (ALuint)(uintptr_t)val_data (value1);
@@ -2813,7 +2809,7 @@ namespace lime {
 		if (param == AL_AUXILIARY_SEND_FILTER) {
 
 			if (value1) {
-				
+
 				data1 = (ALuint)(uintptr_t)((HL_CFFIPointer*)value1)->ptr;
 
 			} else {
@@ -3026,12 +3022,17 @@ namespace lime {
 
 	bool lime_alc_close_device (value device) {
 
-		if (val_is_null (device)) return false;
+		if (val_is_null (device)) {
+
+			return false;
+
+		}
 
 		ALCdevice* alcDevice = (ALCdevice*)(uintptr_t)val_data (device);
 		al_gc_mutex.Lock ();
 		alcObjects.erase (alcDevice);
 		al_gc_mutex.Unlock ();
+
 		return alcCloseDevice (alcDevice);
 
 	}
@@ -3039,12 +3040,17 @@ namespace lime {
 
 	HL_PRIM bool HL_NAME(hl_alc_close_device) (HL_CFFIPointer* device) {
 
-		if (!device) return false;
+		if (!device) {
+
+			return false;
+
+		}
 
 		ALCdevice* alcDevice = (ALCdevice*)(uintptr_t)device->ptr;
 		al_gc_mutex.Lock ();
 		alcObjects.erase (alcDevice);
 		al_gc_mutex.Unlock ();
+
 		return alcCloseDevice (alcDevice);
 
 	}
@@ -3306,7 +3312,7 @@ namespace lime {
 
 	value lime_alc_get_string (value device, int param) {
 
-		ALCdevice* alcDevice = val_is_null (device) ? 0 : (ALCdevice*)(uintptr_t)val_data (device);
+		ALCdevice* alcDevice = val_is_null (device) ? NULL : (ALCdevice*)(uintptr_t)val_data (device);
 		const char* result = alcGetString (alcDevice, param);
 		return result ? alloc_string (result) : alloc_null ();
 
@@ -3315,7 +3321,7 @@ namespace lime {
 
 	HL_PRIM vbyte* HL_NAME(hl_alc_get_string) (HL_CFFIPointer* device, int param) {
 
-		ALCdevice* alcDevice = device ? (ALCdevice*)(uintptr_t)device->ptr : 0;
+		ALCdevice* alcDevice = device ? (ALCdevice*)(uintptr_t)device->ptr : NULL;
 		const char* result = alcGetString (alcDevice, param);
 		int length = strlen (result);
 		char* _result = (char*)malloc (length + 1);
@@ -3328,27 +3334,36 @@ namespace lime {
 	value lime_alc_get_string_list (value device, int param) {
 
 		#ifdef ALC_ENUMERATE_ALL_EXT
-		ALCdevice* alcDevice = val_is_null (device) ? 0 : (ALCdevice*)(uintptr_t)val_data (device);
+		ALCdevice* alcDevice = val_is_null (device) ? NULL : (ALCdevice*)(uintptr_t)val_data (device);
 		const char* values = alcGetString (alcDevice, param);
 
 		if (!values) {
+
 			return alloc_array (0);
+
 		}
 
 		int count = 0;
+
 		const char* ptr = values;
+
 		while (*ptr) {
+
 			count++;
 			ptr += strlen (ptr) + 1;
+
 		}
 
 		value result = alloc_array (count);
 		ptr = values;
 		count = 0;
+
 		while (*ptr) {
+
 			val_array_set_i (result, count, alloc_string (ptr));
 			count++;
 			ptr += strlen (ptr) + 1;
+
 		}
 
 		return result;
@@ -3362,29 +3377,38 @@ namespace lime {
 	HL_PRIM varray* HL_NAME(hl_alc_get_string_list) (HL_CFFIPointer* device, int param) {
 
 		#ifdef ALC_ENUMERATE_ALL_EXT
-		ALCdevice* alcDevice = device ? (ALCdevice*)(uintptr_t)device->ptr : 0;
+		ALCdevice* alcDevice = device ? (ALCdevice*)(uintptr_t)device->ptr : NULL;
 		const char* values = alcGetString (alcDevice, param);
 
 		if (!values) {
+
 			return hl_alloc_array (&hlt_bytes, 0);
+
 		}
 
 		int count = 0;
+
 		const char* ptr = values;
+
 		while (*ptr) {
+
 			count++;
 			ptr += strlen (ptr) + 1;
+
 		}
 
 		varray* result = hl_alloc_array(&hlt_bytes, count);
 		ptr = values;
 		count = 0;
+
 		while (*ptr) {
+
 			char* _result = (char*)malloc (strlen (ptr) + 1);
 			strcpy (_result, ptr);
 			hl_aptr (result, vbyte*)[count] = (vbyte*)_result;
 			count++;
 			ptr += strlen (ptr) + 1;
+
 		}
 
 		return result;
@@ -3474,7 +3498,7 @@ namespace lime {
 	void lime_alc_resume_device (value device) {
 
 		#ifdef LIME_OPENALSOFT
-		ALCdevice* alcDevice = (ALCdevice*)(uintptr_t)val_data (device);
+		ALCdevice* alcDevice = val_is_null (device) ? NULL : (ALCdevice*)(uintptr_t)val_data (device);
 		alcDeviceResumeSOFT (alcDevice);
 		#endif
 
