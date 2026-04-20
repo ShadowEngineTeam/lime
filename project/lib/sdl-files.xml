@@ -555,6 +555,7 @@
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandmouse.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandopengles.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandshmbuffer.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandutil.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandvideo.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandvulkan.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandwindow.c" />
