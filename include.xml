@@ -136,8 +136,8 @@
 		<dependency path="dependencies/angle" name="libEGL" unless="android || ios || iphonesim" />
 		<dependency path="dependencies/angle" name="libGLESv2" unless="android || ios || iphonesim" />
 
-		<ndll name="EGL_angle" dir="dependencies/angle" if="android" />
-		<ndll name="GLESv2_angle" dir="dependencies/angle" if="android" />
+		<ndll name="EGL" dir="dependencies/angle" if="android" />
+		<ndll name="GLESv2" dir="dependencies/angle" if="android" />
 		<ndll name="c++_shared" dir="dependencies/angle" if="android" />
 
 		<dependency path="dependencies/angle/iPhone/device/arm64/libEGL.framework" embed="true" if="ios" unless="iphonesim" />

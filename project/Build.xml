@@ -496,8 +496,8 @@
 				<lib name="-llog" />
 				<lib name="-landroid" />
 				<lib name="-lm" />
-				<lib name="-lEGL_angle" />
-				<lib name="-lGLESv2_angle" />
+				<lib name="-lEGL" />
+				<lib name="-lGLESv2" />
 				<lib name="-lOpenSLES" />
 				<!-- <lib name="-laaudio" /> -->
 
