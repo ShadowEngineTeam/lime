@@ -10,35 +10,36 @@ namespace lime {
 
 		struct utsname systemInfo;
 		uname (&systemInfo);
-		return systemInfo.machine;
+		return strdup(systemInfo.machine);
 
 	}
 
 
 	char* System::GetDeviceVendor () {
 
-		return NULL;
+		return strdup("Apple");
 
 	}
 
 
 	char* System::GetPlatformLabel () {
 
-		return NULL;
+		return strdup("iOS");
 
 	}
 
 
 	char* System::GetPlatformName () {
 
-		return NULL;
+		return strdup("iOS");
 
 	}
 
 
 	char* System::GetPlatformVersion () {
 
-		return [[[UIDevice currentDevice] systemVersion] UTF8String];
+		NSString *version = [[UIDevice currentDevice] systemVersion];
+		return strdup([version UTF8String]);
 
 	}
 
