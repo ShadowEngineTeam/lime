@@ -640,7 +640,7 @@ bool SDL_EGL_LoadLibrary(SDL_VideoDevice *_this, const char *egl_path, NativeDis
 
             _this->egl_data->egl_display = SDL_EGL_GetPlatformDisplayANGLE(_this, (EGLenum)0x3202 /* EGL_PLATFORM_ANGLE_ANGLE */, native_display, display_attribs_alternative);
         }
-#elif defined(SDL_VIDEO_DRIVER_WINDOWS) || defined(SDL_VIDEO_DRIVER_X11) || defined(SDL_VIDEO_DRIVER_ANDROID)
+#elif defined(SDL_VIDEO_DRIVER_WINDOWS) || defined(SDL_VIDEO_DRIVER_X11) || defined(SDL_VIDEO_DRIVER_WAYLAND) || defined(SDL_VIDEO_DRIVER_ANDROID)
         const EGLAttrib display_attribs[] = {
             0x3203 /* EGL_PLATFORM_ANGLE_TYPE_ANGLE */,
             0x3450 /* EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE */,
