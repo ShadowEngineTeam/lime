@@ -1,5 +1,4 @@
-#ifndef LIME_GRAPHICS_OPENGL_OPENGL_BINDINGS_H
-#define LIME_GRAPHICS_OPENGL_OPENGL_BINDINGS_H
+#pragma once
 
 #if defined(LIME_GLAD)
 	#include <glad/gles2.h>
@@ -17,11 +16,8 @@ namespace lime {
 
 		public:
 
-			static bool Init ();
-
-		private:
-
 			static bool initialized;
+			static bool Init ();
 
 	};
 
@@ -45,6 +41,3 @@ namespace lime {
 
 
 }
-
-
-#endif
