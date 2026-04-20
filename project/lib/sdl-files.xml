@@ -15,6 +15,7 @@
             </section>
 
             <compilerflag value="-I/usr/include/libdrm" />
+            <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols" />
         </section>
 
         <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/include/" />
@@ -544,8 +545,6 @@
             </section>
 
             <section if="linux">
-                <compilerflag value="-Iobj/generated/wayland" if="linux" />
-
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandclipboard.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandcolor.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylanddatamanager.c" />
@@ -560,31 +559,31 @@
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandvulkan.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/wayland/SDL_waylandwindow.c" />
 
-                <file name="obj/generated/wayland/alpha-modifier-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/color-management-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/cursor-shape-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/fractional-scale-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/frog-color-management-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/idle-inhibit-unstable-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/input-timestamps-unstable-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/keyboard-shortcuts-inhibit-unstable-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/pointer-constraints-unstable-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/pointer-gestures-unstable-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/pointer-warp-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/primary-selection-unstable-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/relative-pointer-unstable-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/single-pixel-buffer-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/tablet-v2-client-protocol.c" />
-                <file name="obj/generated/wayland/text-input-unstable-v3-client-protocol.c" />
-                <file name="obj/generated/wayland/viewporter-client-protocol.c" />
-                <file name="obj/generated/wayland/wayland-client-protocol.c" />
-                <file name="obj/generated/wayland/xdg-activation-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/xdg-decoration-unstable-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/xdg-dialog-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/xdg-foreign-unstable-v2-client-protocol.c" />
-                <file name="obj/generated/wayland/xdg-output-unstable-v1-client-protocol.c" />
-                <file name="obj/generated/wayland/xdg-shell-client-protocol.c" />
-                <file name="obj/generated/wayland/xdg-toplevel-icon-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/alpha-modifier-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/color-management-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/cursor-shape-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/fractional-scale-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/frog-color-management-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/idle-inhibit-unstable-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/input-timestamps-unstable-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/keyboard-shortcuts-inhibit-unstable-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/pointer-constraints-unstable-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/pointer-gestures-unstable-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/pointer-warp-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/primary-selection-unstable-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/relative-pointer-unstable-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/single-pixel-buffer-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/tablet-v2-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/text-input-unstable-v3-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/viewporter-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/wayland-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-activation-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-decoration-unstable-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-dialog-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-foreign-unstable-v2-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-output-unstable-v1-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-shell-client-protocol.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-toplevel-icon-v1-client-protocol.c" />
             </section>
 
             <section if="linux">
