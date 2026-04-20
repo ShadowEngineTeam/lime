@@ -18,7 +18,6 @@
 namespace lime {
 
 
-	AutoGCRoot* Application::callback = 0;
 	SDLApplication* SDLApplication::currentApplication = 0;
 	static std::atomic<bool> inBackground = false;
 
