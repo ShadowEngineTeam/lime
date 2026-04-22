@@ -1,5 +1,8 @@
 #import <UIKit/UIKit.h>
 #import <sys/utsname.h>
+
+#include <SDL3/SDL.h>
+
 #include <system/System.h>
 
 
@@ -10,36 +13,35 @@ namespace lime {
 
 		struct utsname systemInfo;
 		uname (&systemInfo);
-		return strdup(systemInfo.machine);
+		return SDL_strdup (systemInfo.machine);
 
 	}
 
 
 	char* System::GetDeviceVendor () {
 
-		return strdup("Apple");
+		return SDL_strdup ("Apple");
 
 	}
 
 
 	char* System::GetPlatformLabel () {
 
-		return strdup("iOS");
+		return SDL_strdup ("iOS");
 
 	}
 
 
 	char* System::GetPlatformName () {
 
-		return strdup("iOS");
+		return SDL_strdup ("iOS");
 
 	}
 
 
 	char* System::GetPlatformVersion () {
 
-		NSString *version = [[UIDevice currentDevice] systemVersion];
-		return strdup([version UTF8String]);
+		return SDL_strdup([[[UIDevice currentDevice] systemVersion] UTF8String]);
 
 	}
 
