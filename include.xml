@@ -14,14 +14,14 @@
 	<define name="lime-cairo" if="native" />
 	<define name="lime-canvas" if="html5" />
 	<define name="lime-cffi" if="native" />
-	<define name="lime-curl" unless="lime-console || lime-switch || emscripten || html5" />
+	<define name="lime-curl" unless="lime-console || lime-switch || html5" />
 	<define name="lime-dom" if="html5" />
 	<define name="lime-harfbuzz" if="native" />
 	<define name="lime-howlerjs" if="html5" />
 	<define name="lime-html5" if="html5" />
 	<define name="lime-native" if="native" />
 	<define name="lime-openalsoft" if="windows || linux || mac || android || ios || tvos" />
-	<define name="lime-openal" if="emscripten || lime-openalsoft" />
+	<define name="lime-openal" if="lime-openalsoft" />
 	<define name="lime-opengles" if="native" />
 	<define name="lime-vorbis" if="native" />
 	<define name="lime-webgl" if="html5" />
@@ -55,7 +55,6 @@
 	<section if="hxp" unless="lime-tools">
 
 		<target name="android" path="tools/platforms/AndroidPlatform.hx" />
-		<target name="emscripten" path="tools/platforms/EmscriptenPlatform.hx" />
 		<target name="html5" path="tools/platforms/HTML5Platform.hx" />
 		<target name="ios" path="tools/platforms/IOSPlatform.hx" />
 		<target name="linux" path="tools/platforms/LinuxPlatform.hx" />
@@ -68,7 +67,7 @@
 	<section unless="display">
 
 		<section unless="force-synchronous || force_synchronous">
-			<haxedef name="lime-threads" if="cpp || html5" unless="emscripten" />
+			<haxedef name="lime-threads" if="cpp || html5" />
 			<!-- `target.threaded` isn't available, so enumerate the targets instead. -->
 			<haxedef name="lime-threads" if="python || hl" unless="${${haxe_ver} < 4}" />
 
@@ -173,13 +172,6 @@
 					<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 				</manifest>
 			</config:android>
-		</section>
-
-		<section if="emscripten">
-
-			<dependency name="pthread" />
-			<dependency name="openal" if="lime-openal" />
-
 		</section>
 
 		<section if="lime-modular">
