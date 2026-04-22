@@ -31,13 +31,6 @@ class DefineMacro
 				{
 					Compiler.define("mobile");
 				}
-				else if (Context.defined("webassembly") || Context.defined("wasm") || Context.defined("emscripten"))
-				{
-					Compiler.define("webassembly");
-					Compiler.define("wasm");
-					Compiler.define("emscripten");
-					Compiler.define("web");
-				}
 				else
 				{
 					Compiler.define("desktop");
