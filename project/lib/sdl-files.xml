@@ -18,11 +18,11 @@
             <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols" />
         </section>
 
-        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/include/" />
-        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include/" />
-        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/src/" />
+        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/include" />
+        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include" />
+        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/src" />
 
-        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/angle/include/" if="LIME_ANGLE" />
+        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/angle/include" if="LIME_ANGLE" />
 
         <compilerflag value="-DSDL_DISABLE_ALLOCA" />
         <compilerflag value="-DSDL_DISABLE_STB" />
