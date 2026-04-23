@@ -32,9 +32,20 @@ namespace lime {
 
 	SDLApplication::SDLApplication () {
 
+		SDL_SetHint (SDL_HINT_AUDIO_CHANNELS, "2");
+		SDL_SetHint (SDL_HINT_AUDIO_FORMAT, "F32");
+		SDL_SetHint (SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES, "480");
+
+		#ifdef IPHONE
+		SDL_SetHint (SDL_HINT_AUDIO_CATEGORY, "playback");
+		#endif
+
+		SDL_SetHint (SDL_HINT_AUDIO_DEVICE_STREAM_ROLE, "Game");
+
 		SDL_SetHint (SDL_HINT_JOYSTICK_HIDAPI, "1");
 
 		#ifdef __ANDROID__
+		SDL_SetHint (SDL_HINT_ANDROID_LOW_LATENCY_AUDIO, "1");
 		SDL_SetHint (SDL_HINT_ANDROID_BLOCK_ON_PAUSE, "1");
 		#endif
 
