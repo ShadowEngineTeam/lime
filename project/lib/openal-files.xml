@@ -84,8 +84,6 @@
 
                 <compilerflag value="-Wno-deprecated-anon-enum-enum-conversion" if="apple" />
 
-                <compilerflag value="-Wno-stringop-overflow" />
-
                 <section unless="HXCPP_ARM64 || HXCPP_ARMV7">
                     <compilerflag value="-mmmx" />
                     <compilerflag value="-msse" />
