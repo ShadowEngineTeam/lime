@@ -84,6 +84,7 @@
 
             <section if="linux">
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/audio/alsa/SDL_alsa_audio.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/audio/jack/SDL_jackaudio.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/audio/pipewire/SDL_pipewire.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/audio/pulseaudio/SDL_pulseaudio.c" />
             </section>
