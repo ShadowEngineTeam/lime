@@ -46,6 +46,14 @@ namespace lime {
 
 		}
 
+		if (!surface) {
+
+			file.Close ();
+
+			return false;
+
+		}
+
 		imageBuffer->Resize (surface->w, surface->h, 32);
 
 		memcpy (imageBuffer->data->buffer->b, surface->pixels, surface->h * surface->pitch);
