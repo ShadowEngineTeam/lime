@@ -236,8 +236,6 @@ class Window
 		id = -1;
 
 		__backend = new WindowBackend(this);
-
-
 	}
 
 	public function alert(?type:MessageBoxType = INFORMATION, message:String = null, title:String = null, buttons:Array<String> = null):Int
