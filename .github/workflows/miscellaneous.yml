@@ -24,7 +24,6 @@ jobs:
           haxelib git format https://github.com/HaxeFoundation/format 9d69fb342d030fa120d2deafafbbffad248332b8 --quiet
           haxelib git hxp https://github.com/openfl/hxp 47ef5ae6569cb0961761a2fbb416694df067124c --quiet
           haxelib git openfl https://github.com/FunkinCrew/openfl 8f082708b291bd842070f96eae5d8cc74c4e3a32 --quiet
-          haxelib git svg https://github.com/openfl/svg d74c6ef5ee2e8656a69a36c79e67a09086c6a9a4 --quiet
       - name: Enable HXCPP compile cache
         run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
       - name: Configure Lime
@@ -40,5 +39,4 @@ jobs:
           path: |
             tools/tools.n
             run.n
-            svg.n
           if-no-files-found: error
