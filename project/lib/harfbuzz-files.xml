@@ -15,7 +15,7 @@
 			<section unless="isMsvc">
 
 				<compilerflag value="-DHAVE_UNISTD_H" />
-				
+
 				<compilerflag value="-DHAVE_SYS_MMAN_H" unless="mingw" />
 
 			</section>
