@@ -43,7 +43,6 @@ jobs:
           git add ndll
           git add tools/tools.n
           git add run.n
-          git add svg.n
           git commit --author="${USERNAME} <${USERID}+$(echo "$USERNAME" | sed 's/ /-/g')@users.noreply.github.com>" -m "Built and Pushed New NDLL's." || {
               echo "Didn't commit anything, skipping git push."
               exit 0
