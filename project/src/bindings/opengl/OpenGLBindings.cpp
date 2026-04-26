@@ -1531,6 +1531,7 @@ namespace lime {
 		_buffer[outLen] = '\0';
 
 		vdynamic *result = (vdynamic*)hl_alloc_dynobj();
+
 		hl_dyn_seti (result, hl_hash_utf8 ("size"), &hlt_i32, size);
 		hl_dyn_seti (result, hl_hash_utf8 ("type"), &hlt_i32, type);
 		hl_dyn_setp (result, hl_hash_utf8 ("name"), &hlt_bytes, _buffer);
@@ -1575,7 +1576,6 @@ namespace lime {
 		_buffer[outLen] = '\0';
 
 		vdynamic *result = (vdynamic*)hl_alloc_dynobj();
-
 		hl_dyn_seti (result, hl_hash_utf8 ("size"), &hlt_i32, size);
 		hl_dyn_seti (result, hl_hash_utf8 ("type"), &hlt_i32, type);
 		hl_dyn_setp (result, hl_hash_utf8 ("name"), &hlt_bytes, _buffer);
