@@ -1,5 +1,5 @@
 <xml>
-	<error value="HashLink not supported on ARM" if="rpi || HXCPP_ARM64" />
+	<error value="HashLink not supported on ARM" if="HXCPP_ARMV7 || HXCPP_ARM64" />
 
 	<set name="HXCPP_CPP20" value="1" />
 
@@ -102,12 +102,10 @@
 		<compilerflag value="-DMBEDTLS_THREADING_C" />
 		<compilerflag value="-DMBEDTLS_THREADING_PTHREAD" unless="windows" />
 		<compilerflag value="-DMBEDTLS_THREADING_ALT" if="windows" />
-		<compilerflag value="/std:c11" if="windows" />
 		<file name="${HASHLINK_PATH}/libs/ssl/ssl.c" />
 	</files>
 
 	<files id="mysql">
-		<compilerflag value="-std=gnu17" unless="windows" />
 		<compilerflag value="-I${HASHLINK_PATH}/src" />
 		<compilerflag value="-I/usr/local/include" if="mac" />
 
