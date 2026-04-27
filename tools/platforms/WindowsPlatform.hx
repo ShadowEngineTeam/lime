@@ -224,7 +224,7 @@ class WindowsPlatform extends PlatformTarget
 
 			if (noOutput) return;
 
-			HashlinkHelper.copyHashlink(project, targetDirectory, applicationDirectory, executablePath, is64);
+			HashlinkHelper.copyHashlink(project, targetDirectory, applicationDirectory, executablePath, is64, isArm);
 
 			if (project.targetFlags.exists("hlc"))
 			{
