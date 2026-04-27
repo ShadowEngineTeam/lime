@@ -147,7 +147,6 @@ static void *get_thread_stackptr( thread_handle *t, void **eip ) {
 	*eip = (void*)c.Eip;
 	return (void*)c.Esp;
 #	endif
-#endif
 #elif defined(HL_LINUX)
 #	if defined(__aarch64__)
 	mcontext_t *mc = &shared_context.context.uc_mcontext;
