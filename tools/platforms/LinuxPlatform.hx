@@ -194,11 +194,11 @@ class LinuxPlatform extends PlatformTarget
 		{
 			if (targetType == "hl")
 			{
-				ProjectHelper.copyLibrary(project, ndll, "Linux" + (is64 ? "64" : ""), "", ".hdll", applicationDirectory, project.debug, ".hdll");
+				ProjectHelper.copyLibrary(project, ndll, "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".hdll", applicationDirectory, project.debug, ".hdll");
 			}
 			else
 			{
-				ProjectHelper.copyLibrary(project, ndll, "Linux" + (( System.hostArchitecture == ARMV7 || System.hostArchitecture == ARM64)?"Arm":"") + (is64 ? "64" : ""), "", ".ndll", applicationDirectory, project.debug);
+				ProjectHelper.copyLibrary(project, ndll, "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".ndll", applicationDirectory, project.debug);
 			}
 		}
 
@@ -208,7 +208,7 @@ class LinuxPlatform extends PlatformTarget
 
 			if (noOutput) return;
 
-			HashlinkHelper.copyHashlink(project, targetDirectory, applicationDirectory, executablePath, is64);
+			HashlinkHelper.copyHashlink(project, targetDirectory, applicationDirectory, executablePath, is64, isArm);
 
 			if (project.targetFlags.exists("hlc"))
 			{
