@@ -911,13 +911,6 @@ namespace lime {
 	#endif
 
 
-	void SDLApplication::UpdateFrame (void*) {
-
-		UpdateFrame ();
-
-	}
-
-
 	Application* CreateApplication () {
 
 		return new SDLApplication ();
