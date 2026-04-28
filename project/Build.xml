@@ -429,7 +429,7 @@
 
 				</section>
 
-				<lib name="-lbsd" if="LIME_SDL" />
+				<!--<lib name="-lbsd" if="LIME_SDL" />-->
 
 			</section>
 
