@@ -47,6 +47,14 @@
 
         </section>
 
+		<section if="linux" unless="HXCPP_ARM64 || HXCPP_ARMV7">
+            <compilerflag value="-mmmx" />
+            <compilerflag value="-msse" />
+            <compilerflag value="-msse2" />
+		    <compilerflag value="-msse3" />
+		    <compilerflag value="-mssse3" />
+        </section>
+
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/SDL.c" />
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/SDL_assert.c" />
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/SDL_error.c" />
