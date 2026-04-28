@@ -36,7 +36,7 @@ jobs:
         run: haxelib dev lime ${{ github.workspace }}
       - name: Rebuild Lime
         run: |
-          CC="clang-22 --target=i686-linux-gnu -march=pentium4" CXX="clang++-22 --target=i686-linux-gnu -march=pentium4" LDFLAGS="-fuse-ld=lld" linux32 haxelib run lime rebuild linux -32 -release -nocolor -nocffi -D HXCPP_M32
+          CC="clang-22 --target=i686-linux-gnu" CXX="clang++-22 --target=i686-linux-gnu" LDFLAGS="-fuse-ld=lld" linux32 haxelib run lime rebuild linux -32 -release -nocolor -nocffi -D HXCPP_M32
           CC=clang-22 CXX=clang++-22 haxelib run lime rebuild linux -64 -release -nocolor -nocffi -D HXCPP_M64
       - name: Upload Artifact (x86)
         uses: actions/upload-artifact@main
