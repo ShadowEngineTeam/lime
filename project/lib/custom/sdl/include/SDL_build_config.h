@@ -426,8 +426,8 @@
  * @brief SDL subsystems that are disabled in this build configuration.
  * @{
  */
-#define SDL_GPU_DISABLED 1      /**< GPU/Graphics subsystem is disabled */
 #define SDL_CAMERA_DISABLED 1   /**< Camera subsystem is disabled */
+#define SDL_GPU_DISABLED 1      /**< GPU/Graphics subsystem is disabled */
 #define SDL_RENDER_DISABLED 1   /**< Render subsystem is disabled */
 /** @} */
 

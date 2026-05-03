@@ -385,15 +385,19 @@ void LoadConfigFromFile(std::istream &f)
 
 void LoadSEALDefaultConfig()
 {
-    SetConfigValue("drivers", "sdl3,null");
-    #if defined(_WIN32)
+    // #if defined(_WIN32)
     // SetConfigValue("drivers", "wasapi,dsound,winmm,null");
-    #elif defined(__linux__)
+    // #elif defined(__linux__)
     // SetConfigValue("drivers", "pipewire,pulse,alsa,jack,oss,null");
-    #elif defined(__APPLE__)
+    // #elif defined(__APPLE__)
     // SetConfigValue("drivers", "coreaudio,null");
-    #elif defined(__ANDROID__)
+    // #elif defined(__ANDROID__)
     // SetConfigValue("drivers", "oboe,null");
+    // #endif
+    #ifndef __APPLE__
+    SetConfigValue("drivers", "sdl3,null");
+    #else
+    SetConfigValue("drivers", "coreaudio,null");
     #endif
     SetConfigValue("sample-type", "float32");
     SetConfigValue("channels", "stereo");
