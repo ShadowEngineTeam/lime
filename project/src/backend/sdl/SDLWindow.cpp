@@ -734,10 +734,11 @@ namespace lime {
 	const char* SDLWindow::GetContextType () {
 
 		#if defined(LIME_ANGLE) && defined(IPHONE)
-		if (eglDisplay != EGL_NO_DISPLAY && eglSurface != EGL_NO_SURFACE && eglContext != EGL_NO_CONTEXT) {
+		if (eglDisplay != EGL_NO_DISPLAY && eglSurface != EGL_NO_SURFACE && eglContext != EGL_NO_CONTEXT)
 		#else
-		if (context) {
+		if (context)
 		#endif
+		{
 
 			return "opengl";
 
@@ -834,51 +835,6 @@ namespace lime {
 
 
 	double SDLWindow::GetScale () {
-
-		int width;
-		int height;
-
-		SDL_GetWindowSize (sdlWindow, &width, &height);
-
-		if (width > 0 && height > 0) {
-
-			int outputWidth;
-			int outputHeight;
-
-			#if defined(LIME_ANGLE) && defined(IPHONE)
-			eglQuerySurface (eglDisplay, eglSurface, EGL_WIDTH, &outputWidth);
-			eglQuerySurface (eglDisplay, eglSurface, EGL_HEIGHT, &outputHeight);
-			#else
-			SDL_GetWindowSizeInPixels (sdlWindow, &outputWidth, &outputHeight);
-			#endif
-
-			double scale = double (outputWidth) / width;
-			return scale;
-
-		} else {
-
-			int outputWidth;
-			int outputHeight;
-
-			#if defined(LIME_ANGLE) && defined(IPHONE)
-			eglQuerySurface(eglDisplay, eglSurface, EGL_WIDTH, &outputWidth);
-			eglQuerySurface(eglDisplay, eglSurface, EGL_HEIGHT, &outputHeight);
-			#else
-			SDL_GetWindowSizeInPixels (sdlWindow, &outputWidth, &outputHeight);
-			#endif
-
-			int width;
-			int height;
-
-			SDL_GetWindowSize (sdlWindow, &width, &height);
-
-			if (width > 0 && height > 0) {
-
-				return double (outputWidth) / width;
-
-			}
-
-		}
 
 		return 1;
 
