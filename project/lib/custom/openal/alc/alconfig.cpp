@@ -394,11 +394,7 @@ void LoadSEALDefaultConfig()
     // #elif defined(__ANDROID__)
     // SetConfigValue("drivers", "oboe,null");
     // #endif
-    #ifndef __APPLE__
     SetConfigValue("drivers", "sdl3,null");
-    #else
-    SetConfigValue("drivers", "coreaudio,null");
-    #endif
     SetConfigValue("sample-type", "float32");
     SetConfigValue("channels", "stereo");
     SetConfigValue("stereo-encoding", "basic");
