@@ -1,7 +1,5 @@
-import groovy.swing.SwingBuilder
-import java.awt.GridBagLayout
-import java.awt.GridBagConstraints
-import javax.swing.border.EmptyBorder
+import javax.swing.JOptionPane
+import javax.swing.JPasswordField
 
 apply plugin: 'com.android.application'
 
@@ -80,10 +78,12 @@ android {
         	buildConfig = true
 	}
 
-	android.applicationVariants.all { variant ->
-		variant.outputs.all { output ->
-			if (outputFileName != null && outputFileName.endsWith('.apk')) {
-				outputFileName =  "::APP_FILE::-" + variant.buildType.name + ".apk"
+	androidComponents {
+		onVariants(selector().all()) { variant ->
+			variant.outputs.forEach { output ->
+				if (output.outputFileName.get().endsWith('.apk')) {
+					output.outputFileName.set("::APP_FILE::-${variant.buildType}.apk")
+				}
 			}
 		}
 	}
@@ -95,7 +95,7 @@ android {
 
 dependencies {
 	::if (ANDROID_USE_ANDROIDX)::
-	implementation "androidx.core:core:1.17.0"
+	implementation "androidx.core:core:1.18.0"
 	implementation "androidx.documentfile:documentfile:1.1.0"
 	::end::
 	implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -125,57 +125,21 @@ tasks.whenTaskAdded { task ->
 }
 
 def getPassword(message) {
-	def password = '';
-	if (System.console() == null) {
-		new SwingBuilder().edt {
-			dialog(
-				title: 'Enter password',
-				alwaysOnTop: true,
-				size: [350, 150],
-				resizable: false,
-				locationRelativeTo: null,
-				pack: true,
-				modal: true,
-				show: true
-			) {
-				lookAndFeel('system')
-
-				panel(border: new EmptyBorder(10, 10, 10, 10)) {
-					gridBagLayout()
-					def gbc = new GridBagConstraints();
-
-					gbc.gridx = 0
-					gbc.gridy = 0
-					gbc.fill = GridBagConstraints.HORIZONTAL
-					gbc.insets = [0, 0, 10, 0]
-					label(
-						text: '<html>' +
-						'<body style="width: 350px">' +
-						message +
-						'</body>' +
-						'</html>',
-						constraints: gbc)
-
-					gbc.gridy = 1
-					input = passwordField(constraints: gbc)
-
-					gbc.gridy = 2
-					gbc.fill = GridBagConstraints.NONE
-					gbc.insets = [0, 0, 0, 0]
-					gbc.ipadx = 50
-					button = button(
-						defaultButton: true,
-						text: 'OK',
-						actionPerformed: {
-							password = input.password
-							dispose()
-						},
-						constraints: gbc)
-				}
-			}
-		}
-	} else {
-		password = System.console().readPassword(message)
-	}
-	return new String(password)
+    def password = ''
+    if (System.console() == null) {
+        def field = new JPasswordField()
+        def result = JOptionPane.showConfirmDialog(
+            null,
+            field,
+            message,
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE
+        )
+        if (result == JOptionPane.OK_OPTION) {
+            password = new String(field.getPassword())
+        }
+    } else {
+        password = System.console().readPassword(message)
+    }
+    return password
 }
