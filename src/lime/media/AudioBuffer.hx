@@ -256,8 +256,8 @@ class AudioBuffer
 		var audioBuffer = new AudioBuffer();
 		audioBuffer.channels = info.channels;
 		audioBuffer.sampleRate = info.rate;
-		audioBuffer.bitsPerSample = 16;
-		audioBuffer.dataFormat = PCM;
+		audioBuffer.bitsPerSample = 32;
+		audioBuffer.dataFormat = IEEEFloat;
 		audioBuffer.__srcVorbisFile = vorbisFile;
 
 		return audioBuffer;
