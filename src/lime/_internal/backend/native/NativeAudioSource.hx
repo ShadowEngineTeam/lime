@@ -100,6 +100,10 @@ class NativeAudioSource
 			{
 				format = AL.FORMAT_MONO16;
 			}
+			else if (parent.buffer.bitsPerSample == 32)
+			{
+				format = AL.FORMAT_MONO_FLOAT32;
+			}
 		}
 		else if (parent.buffer.channels == 2)
 		{
@@ -110,6 +114,10 @@ class NativeAudioSource
 			else if (parent.buffer.bitsPerSample == 16)
 			{
 				format = AL.FORMAT_STEREO16;
+			}
+			else if (parent.buffer.bitsPerSample == 32)
+			{
+				format = AL.FORMAT_STEREO_FLOAT32;
 			}
 		}
 
