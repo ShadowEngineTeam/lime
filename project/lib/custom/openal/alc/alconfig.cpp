@@ -385,16 +385,17 @@ void LoadConfigFromFile(std::istream &f)
 
 void LoadSEALDefaultConfig()
 {
-    // #if defined(_WIN32)
-    // SetConfigValue("drivers", "wasapi,dsound,winmm,null");
-    // #elif defined(__linux__)
-    // SetConfigValue("drivers", "pipewire,pulse,alsa,jack,oss,null");
-    // #elif defined(__APPLE__)
+    #if defined(_WIN32)
+    SetConfigValue("drivers", "wasapi,dsound,winmm,null");
+    #elif defined(__linux__)
+    SetConfigValue("drivers", "pipewire,pulse,alsa,jack,oss,null");
+    #elif defined(__APPLE__)
     // SetConfigValue("drivers", "coreaudio,null");
-    // #elif defined(__ANDROID__)
+    SetConfigValue("drivers", "sdl3,null"); // coreaudio itself gives no audio output. weird.
+    #elif defined(__ANDROID__)
     // SetConfigValue("drivers", "oboe,null");
-    // #endif
-    SetConfigValue("drivers", "sdl3,null");
+    SetConfigValue("drivers", "sdl3,null"); // the reason for this is that Oboe lowers the quality when output device gets switched.
+    #endif
     SetConfigValue("sample-type", "float32");
     SetConfigValue("channels", "stereo");
     SetConfigValue("stereo-encoding", "basic");
@@ -402,7 +403,7 @@ void LoadSEALDefaultConfig()
     SetConfigValue("output-limiter", "true");
     SetConfigValue("front-stablizer", "false");
     SetConfigValue("volume-adjust", "0");
-    SetConfigValue("period_size", "480");
+    SetConfigValue("period_size", "256");
     SetConfigValue("periods", "2");
     SetConfigValue("sources", "256");
     SetConfigValue("sends", "2");
@@ -410,18 +411,18 @@ void LoadSEALDefaultConfig()
     SetConfigValue("resampler", "bsinc24");
     SetConfigValue("rt-prio", "15");
     SetConfigValue("rt-time-limit", "true");
-    // SetConfigValue("decoder/hq-mode", "true");
-    // SetConfigValue("decoder/distance-comp", "true");
-    // SetConfigValue("decoder/nfc", "false");
+    SetConfigValue("decoder/hq-mode", "true");
+    SetConfigValue("decoder/distance-comp", "true");
+    SetConfigValue("decoder/nfc", "false");
     #if defined(_WIN32)
-    // SetConfigValue("wasapi/exclusive-mode", "true");
+    SetConfigValue("wasapi/exclusive-mode", "true");
     #endif
     #if defined(__linux__)
-    // SetConfigValue("pipewire/rt-mix", "true");
-    // SetConfigValue("pulse/allow-moves", "false");
-    // SetConfigValue("pulse/fix-rate", "true");
-    // SetConfigValue("pulse/adjust-latency", "false");
-    // SetConfigValue("alsa/mmap", "true");
+    SetConfigValue("pipewire/rt-mix", "true");
+    SetConfigValue("pulse/allow-moves", "false");
+    SetConfigValue("pulse/fix-rate", "true");
+    SetConfigValue("pulse/adjust-latency", "false");
+    SetConfigValue("alsa/mmap", "true");
     #endif
     ConfOpts.shrink_to_fit();
 }
