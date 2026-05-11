@@ -403,7 +403,7 @@ void LoadSEALDefaultConfig()
     SetConfigValue("output-limiter", "true");
     SetConfigValue("front-stablizer", "false");
     SetConfigValue("volume-adjust", "0");
-    SetConfigValue("period_size", "256");
+    SetConfigValue("period_size", "240");
     SetConfigValue("periods", "2");
     SetConfigValue("sources", "256");
     SetConfigValue("sends", "2");
@@ -415,7 +415,7 @@ void LoadSEALDefaultConfig()
     SetConfigValue("decoder/distance-comp", "true");
     SetConfigValue("decoder/nfc", "false");
     #if defined(_WIN32)
-    SetConfigValue("wasapi/exclusive-mode", "true");
+    // SetConfigValue("wasapi/exclusive-mode", "true");
     #endif
     #if defined(__linux__)
     SetConfigValue("pipewire/rt-mix", "true");
