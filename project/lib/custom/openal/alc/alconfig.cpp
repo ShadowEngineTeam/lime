@@ -403,7 +403,7 @@ void LoadSEALDefaultConfig()
     SetConfigValue("output-limiter", "true");
     SetConfigValue("front-stablizer", "false");
     SetConfigValue("volume-adjust", "0");
-    SetConfigValue("period_size", "240");
+    SetConfigValue("period_size", "480");
     SetConfigValue("periods", "2");
     SetConfigValue("sources", "256");
     SetConfigValue("sends", "2");
