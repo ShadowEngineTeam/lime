@@ -577,8 +577,8 @@ class NativeApplication
 			{
 				case WINDOW_ACTIVATE:
 					advanceTimer();
-					window.onActivate.dispatch();
 					AudioManager.onActivate();
+					window.onActivate.dispatch();
 
 				case WINDOW_CLOSE:
 					window.close();
