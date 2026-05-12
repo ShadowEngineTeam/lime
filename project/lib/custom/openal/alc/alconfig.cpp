@@ -387,7 +387,7 @@ void LoadSEALDefaultConfig()
 {
     #if defined(_WIN32)
     SetConfigValue("drivers", "wasapi,dsound,winmm,null");
-    #elif defined(__linux__)
+    #elif defined(__linux__) && !defined(__ANDROID__)
     SetConfigValue("drivers", "pipewire,pulse,alsa,jack,oss,null");
     #elif defined(__APPLE__)
     // SetConfigValue("drivers", "coreaudio,null");
