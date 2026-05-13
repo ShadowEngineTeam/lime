@@ -25,11 +25,16 @@
 #define NGAGE_SCREEN_WIDTH  176
 #define NGAGE_SCREEN_HEIGHT 208
 
+#ifndef SDL_HINT_RENDER_NGAGE_SHOW_FPS
+#define SDL_HINT_RENDER_NGAGE_SHOW_FPS "SDL_RENDER_NGAGE_SHOW_FPS"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "../SDL_sysrender.h"
+#include "SDL3/SDL_render.h"
 
 typedef struct NGAGE_RendererData
 {
@@ -63,6 +68,9 @@ typedef struct NGAGE_TextureData
     CFbsBitmap *bitmap;
     CFbsBitGc *gc;
     CFbsDevice *device;
+    CFbsBitmap *mask_bitmap;
+    bool has_color_key;
+    bool mask_dirty;
 
 } NGAGE_TextureData;
 
@@ -93,7 +101,9 @@ bool NGAGE_Copy(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *srcrect,
 bool NGAGE_CopyEx(SDL_Renderer *renderer, SDL_Texture *texture, NGAGE_CopyExData *copydata);
 bool NGAGE_CreateTextureData(NGAGE_TextureData *data, const int width, const int height, const int access);
 void NGAGE_DestroyTextureData(NGAGE_TextureData *data);
-void* NGAGE_GetBitmapDataAddress(NGAGE_TextureData *data);
+void *NGAGE_GetBitmapDataAddress(NGAGE_TextureData *data);
+int NGAGE_GetBitmapScanLineLength(NGAGE_TextureData *data);
+void NGAGE_DrawGeometry(NGAGE_Vertex *verts, const int count);
 void NGAGE_DrawLines(NGAGE_Vertex *verts, const int count);
 void NGAGE_DrawPoints(NGAGE_Vertex *verts, const int count);
 void NGAGE_FillRects(NGAGE_Vertex *verts, const int count);
@@ -103,6 +113,8 @@ void NGAGE_SetDrawColor(const Uint32 color);
 void NGAGE_PumpEventsInternal(void);
 void NGAGE_SuspendScreenSaverInternal(bool suspend);
 void NGAGE_SetRenderTargetInternal(NGAGE_TextureData *target);
+void *NGAGE_GetBackbufferAddress(void);
+int NGAGE_GetBackbufferPitch(void);
 
 #ifdef __cplusplus
 }

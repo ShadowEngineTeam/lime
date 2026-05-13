@@ -116,6 +116,7 @@ static bool NGAGE_CreateRenderer(SDL_Renderer *renderer, SDL_Window *window, SDL
     renderer->npot_texture_wrap_unsupported = true;
 
     SDL_AddSupportedTextureFormat(renderer, SDL_PIXELFORMAT_XRGB4444);
+    SDL_AddSupportedTextureFormat(renderer, SDL_PIXELFORMAT_ARGB4444);
     SDL_SetNumberProperty(SDL_GetRendererProperties(renderer), SDL_PROP_RENDERER_MAX_TEXTURE_SIZE_NUMBER, 1024);
     SDL_SetHintWithPriority(SDL_HINT_RENDER_LINE_METHOD, "2", SDL_HINT_OVERRIDE);
 
@@ -161,6 +162,12 @@ static bool NGAGE_CreateTexture(SDL_Renderer *renderer, SDL_Texture *texture, SD
     }
 
     texture->internal = data;
+
+    // ARGB4444 textures are color-keyed: alpha=0 pixels are transparent.
+    if (texture->format == SDL_PIXELFORMAT_ARGB4444) {
+        data->has_color_key = true;
+        data->mask_dirty = true;
+    }
 
     return true;
 }
@@ -299,6 +306,35 @@ static bool NGAGE_QueueCopyEx(SDL_Renderer *renderer, SDL_RenderCommand *cmd, SD
 
 static bool NGAGE_QueueGeometry(SDL_Renderer *renderer, SDL_RenderCommand *cmd, SDL_Texture *texture, const float *xy, int xy_stride, const SDL_FColor *color, int color_stride, const float *uv, int uv_stride, int num_vertices, const void *indices, int num_indices, int size_indices, float scale_x, float scale_y)
 {
+    int count = indices ? num_indices : num_vertices;
+    NGAGE_Vertex *verts = (NGAGE_Vertex *)SDL_AllocateRenderVertices(renderer, count * sizeof(NGAGE_Vertex), 0, &cmd->data.draw.first);
+    if (!verts) {
+        return false;
+    }
+    cmd->data.draw.count = count;
+
+    for (int i = 0; i < count; i++) {
+        int src_idx = i;
+        if (indices) {
+            if (size_indices == 4) {
+                src_idx = ((const Uint32 *)indices)[i];
+            } else if (size_indices == 2) {
+                src_idx = ((const Uint16 *)indices)[i];
+            } else {
+                src_idx = ((const Uint8 *)indices)[i];
+            }
+        }
+        const float *pos = (const float *)(((const Uint8 *)xy) + src_idx * xy_stride);
+        const SDL_FColor *c = (const SDL_FColor *)(((const Uint8 *)color) + src_idx * color_stride);
+
+        verts[i].x = (int)(pos[0] * scale_x);
+        verts[i].y = (int)(pos[1] * scale_y);
+        verts[i].color.r = (Uint8)(c->r * 255.0f);
+        verts[i].color.g = (Uint8)(c->g * 255.0f);
+        verts[i].color.b = (Uint8)(c->b * 255.0f);
+        verts[i].color.a = (Uint8)(c->a * 255.0f);
+    }
+
     return true;
 }
 
@@ -431,6 +467,17 @@ static bool NGAGE_RunCommandQueue(SDL_Renderer *renderer, SDL_RenderCommand *cmd
 
         case SDL_RENDERCMD_GEOMETRY:
         {
+            NGAGE_Vertex *verts = (NGAGE_Vertex *)(((Uint8 *)vertices) + cmd->data.draw.first);
+            const int count = cmd->data.draw.count;
+
+            if (phdata->viewport && (phdata->viewport->x || phdata->viewport->y)) {
+                for (int i = 0; i < count; i++) {
+                    verts[i].x += phdata->viewport->x;
+                    verts[i].y += phdata->viewport->y;
+                }
+            }
+
+            NGAGE_DrawGeometry(verts, count);
             break;
         }
         }
@@ -454,7 +501,7 @@ static bool NGAGE_UpdateTexture(SDL_Renderer *renderer, SDL_Texture *texture, co
     }
 
     const int bytes_per_pixel = 2;
-    const int bitmap_pitch = texture->w * bytes_per_pixel;
+    const int bitmap_pitch = NGAGE_GetBitmapScanLineLength(phdata);
 
     const Uint8 *src = (const Uint8 *)pixels;
     dst += rect->y * bitmap_pitch + rect->x * bytes_per_pixel;
@@ -465,6 +512,8 @@ static bool NGAGE_UpdateTexture(SDL_Renderer *renderer, SDL_Texture *texture, co
         src += pitch;
         dst += bitmap_pitch;
     }
+
+    phdata->mask_dirty = true;
 
     return true;
 }
@@ -483,7 +532,7 @@ static bool NGAGE_LockTexture(SDL_Renderer *renderer, SDL_Texture *texture, cons
     }
 
     const int bytes_per_pixel = 2;
-    const int bitmap_pitch = texture->w * bytes_per_pixel;
+    const int bitmap_pitch = NGAGE_GetBitmapScanLineLength(phdata);
 
     *pixels = (void *)(data + rect->y * bitmap_pitch + rect->x * bytes_per_pixel);
     *pitch = bitmap_pitch;
@@ -492,6 +541,10 @@ static bool NGAGE_LockTexture(SDL_Renderer *renderer, SDL_Texture *texture, cons
 
 static void NGAGE_UnlockTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 {
+    NGAGE_TextureData *phdata = (NGAGE_TextureData *)texture->internal;
+    if (phdata) {
+        phdata->mask_dirty = true;
+    }
 }
 
 static bool NGAGE_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture)
