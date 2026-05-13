@@ -21,6 +21,12 @@ import js.Browser;
 @:access(lime.media.openal.ALDevice)
 class AudioManager
 {
+	@:noCompletion
+	private static var resumeOnFocus:Bool = false;
+
+	@:noCompletion
+	private static var active:Bool = true;
+
 	public static var context:AudioContext;
 
 	public static function init(context:AudioContext = null)
@@ -64,6 +70,9 @@ class AudioManager
 
 	public static function resume():Void
 	{
+		if (active)
+			return;
+
 		#if !lime_doc_gen
 		if (context != null && context.type == OPENAL)
 		{
@@ -78,6 +87,8 @@ class AudioManager
 			}
 		}
 		#end
+
+		active = true;
 	}
 
 	public static function shutdown():Void
@@ -107,6 +118,9 @@ class AudioManager
 
 	public static function suspend():Void
 	{
+		if (!active)
+			return;
+
 		#if !lime_doc_gen
 		if (context != null && context.type == OPENAL)
 		{
@@ -125,6 +139,27 @@ class AudioManager
 			}
 		}
 		#end
+
+		active = false;
+	}
+
+	@:noCompletion
+	private static function onActivate():Void
+	{
+		if (resumeOnFocus)
+		{
+			resumeOnFocus = false;
+
+			AudioManager.resume();
+		}
+	}
+
+	@:noCompletion
+	private static function onDeactivate():Void
+	{
+		resumeOnFocus = AudioManager.active;
+
+		AudioManager.suspend();
 	}
 
 	@:noCompletion
