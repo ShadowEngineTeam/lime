@@ -577,6 +577,7 @@ class NativeApplication
 			{
 				case WINDOW_ACTIVATE:
 					advanceTimer();
+					@:privateAccess
 					AudioManager.onActivate();
 					window.onActivate.dispatch();
 
@@ -585,6 +586,7 @@ class NativeApplication
 
 				case WINDOW_DEACTIVATE:
 					window.onDeactivate.dispatch();
+					@:privateAccess
 					AudioManager.onDeactivate();
 					pauseTimer = System.getTimer();
 
