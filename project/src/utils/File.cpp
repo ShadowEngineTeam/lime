@@ -41,13 +41,6 @@ namespace lime {
 	}
 
 
-	File::~File () {
-
-		Close();
-
-	}
-
-
 	int64_t File::GetSize () {
 
 		return handle ? SDL_GetIOSize ((SDL_IOStream *)handle) : -1;
