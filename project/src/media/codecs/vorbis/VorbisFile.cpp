@@ -21,7 +21,8 @@ namespace lime {
 
 	static int VorbisFile_Close (File* file) {
 
-		return (int)file->Close ();
+		delete file;
+		return 0;
 
 	}
 
@@ -49,6 +50,7 @@ namespace lime {
 
 		if (!file->handle) {
 
+			delete file;
 			return 0;
 
 		}
@@ -58,9 +60,7 @@ namespace lime {
 
 		if (ov_open_callbacks (file, vorbisFile, NULL, 0, VORBIS_FILE_CALLBACKS) != 0) {
 
-			file->Close();
 			delete vorbisFile;
-
 			return 0;
 
 		}
@@ -76,6 +76,7 @@ namespace lime {
 
 		if (!file->handle) {
 
+			delete file;
 			return 0;
 
 		}
@@ -85,9 +86,7 @@ namespace lime {
 
 		if (ov_open_callbacks (file, vorbisFile, NULL, 0, VORBIS_FILE_CALLBACKS) != 0) {
 
-			file->Close();
 			delete vorbisFile;
-
 			return 0;
 
 		}
