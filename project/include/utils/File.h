@@ -15,7 +15,6 @@ namespace lime {
 
 			File (const char* path, const char* mode);
 			File (Bytes* bytes);
-			~File ();
 
 			int64_t GetSize ();
 			bool Close ();
