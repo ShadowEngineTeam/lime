@@ -315,7 +315,7 @@ class HTML5Platform extends PlatformTarget
 
 						var ext = "." + Path.extension(asset.sourcePath);
 						var source = Path.withoutExtension(asset.sourcePath);
-						var extensions = [ext, ".eot", ".woff", ".svg"];
+						var extensions = [ext, ".eot", ".woff", ".woff2", ".svg"];
 
 						for (extension in extensions)
 						{
@@ -464,8 +464,8 @@ class HTML5Platform extends PlatformTarget
 					var ext = "." + Path.extension(asset.sourcePath);
 					var source = Path.withoutExtension(asset.sourcePath);
 
-					var hasFormat = [false, false, false, false];
-					var extensions = [ext, ".eot", ".svg", ".woff"];
+					var hasFormat = [false, false, false, false, false];
+					var extensions = [ext, ".eot", ".svg", ".woff", ".woff2"];
 					var extension:String;
 
 					for (i in 0...extensions.length)
@@ -508,6 +508,7 @@ class HTML5Platform extends PlatformTarget
 								var urls:Array<String> = [];
 								if (hasFormat[1]) urls.push("url('" + embeddedAsset.targetPath + ".eot?#iefix') format('embedded-opentype')");
 								if (hasFormat[3]) urls.push("url('" + embeddedAsset.targetPath + ".woff') format('woff')");
+								if (hasFormat[4]) urls.push("url('" + embeddedAsset.targetPath + ".woff2') format('woff2')");
 								urls.push("url('" + embeddedAsset.targetPath + ext + "') format('truetype')");
 								if (hasFormat[2]) urls.push("url('" + embeddedAsset.targetPath + ".svg#" + StringTools.urlEncode(embeddedAsset.fontName)
 									+ "') format('svg')");
