@@ -36,34 +36,14 @@ class HTML5Helper
 
 	public static function generateWebfonts(project:HXProject, font:Asset):Void
 	{
-		var suffix = switch (System.hostPlatform)
+		var limeTemplatesPathWebify:String = Path.combine(Haxelib.getPath(new Haxelib("lime")), "templates/bin/webify/" + Std.string(System.hostPlatform).toLowerCase());
+		var slashWebify:String = '/webify';
+		if (System.hostPlatform == WINDOWS)
 		{
-			case WINDOWS: "-windows.exe";
-			case MAC: "-mac";
-			case LINUX: "-linux";
-			default: return;
+			limeTemplatesPathWebify = StringTools.replace(limeTemplatesPathWebify, "/", "\\");
+			slashWebify = StringTools.replace(slashWebify, "/", "\\");
 		}
-
-		if (suffix == "-linux")
-		{
-			if (System.hostArchitecture == X86)
-			{
-				suffix += "32";
-			}
-			else if (System.hostArchitecture == ARM64)
-			{
-				suffix += "arm64";
-			}
-			else
-			{
-				suffix += "64";
-			}
-		}
-
-		var templatePaths = [
-			Path.combine(Haxelib.getPath(new Haxelib(#if lime "lime" #else "hxp" #end)), #if lime "templates" #else "" #end)
-		].concat(project.templatePaths);
-		var webify = System.findTemplate(templatePaths, "bin/webify" + suffix);
+		var webify:String = StringTools.replace(limeTemplatesPathWebify + (System.hostArchitecture == X64 ? "64" : System.hostArchitecture == X86 ? "32" : Std.string(System.hostArchitecture)).toLowerCase() + slashWebify + (System.hostPlatform == WINDOWS ? ".exe" : ""), "\\", "\\\\");
 		if (System.hostPlatform != WINDOWS)
 		{
 			Sys.command("chmod", ["+x", webify]);
