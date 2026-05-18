@@ -63,7 +63,7 @@ namespace lime {
 
 		SDL_SetEventFilter (HandleAppLifecycleEvent, NULL);
 
-		#if defined(HX_WINDOWS) || defined(HX_MACOS) || defined(HX_LINUX)
+		#if defined(HX_WINDOWS) || defined(HX_MACOS)
 		SDL_AddEventWatch (HandleEventWatcher, NULL);
 		#endif
 
@@ -898,7 +898,7 @@ namespace lime {
 	}
 
 
-	#if defined(HX_WINDOWS) || defined(HX_MACOS) || defined(HX_LINUX)
+	#if defined(HX_WINDOWS) || defined(HX_MACOS)
 	bool SDLApplication::HandleEventWatcher (void *userdata, SDL_Event *event) {
 
 		if (!inBackground) {
