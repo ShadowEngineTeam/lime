@@ -49,7 +49,7 @@
 #include <utils/compress/LZMA.h>
 #include <utils/compress/Zlib.h>
 
-#ifdef LIME_VORBIS
+#ifdef LIME_OGG
 #include <media/containers/OGG.h>
 #endif
 
@@ -337,7 +337,7 @@ namespace lime {
 
 		}
 
-		#ifdef LIME_VORBIS
+		#ifdef LIME_OGG
 		if (OGG::Decode (&resource, &audioBuffer)) {
 
 			return audioBuffer.Value (buffer);
@@ -360,7 +360,7 @@ namespace lime {
 
 		}
 
-		#ifdef LIME_VORBIS
+		#ifdef LIME_OGG
 		if (OGG::Decode (&resource, buffer)) {
 
 			return buffer;
@@ -387,7 +387,7 @@ namespace lime {
 
 		}
 
-		#ifdef LIME_VORBIS
+		#ifdef LIME_OGG
 		if (OGG::Decode (&resource, &audioBuffer)) {
 
 			return audioBuffer.Value (buffer);
@@ -410,7 +410,7 @@ namespace lime {
 
 		}
 
-		#ifdef LIME_VORBIS
+		#ifdef LIME_OGG
 		if (OGG::Decode (&resource, buffer)) {
 
 			return buffer;
@@ -4853,13 +4853,6 @@ extern "C" int lime_opengl_register_prims ();
 extern "C" int lime_opengl_register_prims () { return 0; }
 #endif
 
-#ifdef LIME_VORBIS
-extern "C" int lime_vorbis_register_prims ();
-#else
-extern "C" int lime_vorbis_register_prims () { return 0; }
-#endif
-
-
 extern "C" int lime_register_prims () {
 
 	lime_cairo_register_prims ();
@@ -4867,7 +4860,6 @@ extern "C" int lime_register_prims () {
 	lime_harfbuzz_register_prims ();
 	lime_openal_register_prims ();
 	lime_opengl_register_prims ();
-	lime_vorbis_register_prims ();
 
 	return 0;
 
