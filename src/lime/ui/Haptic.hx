@@ -15,9 +15,12 @@ class Haptic
 	private static var lime_haptic_vibrate:Int->Int->Int->Void;
 	#end
 
-	public static function vibrate(period:Int, duration:Int, amplitude:Int = -1):Void
+	public static function vibrate(period:Int, duration:Int #if android, ?amplitude:Int #end):Void
 	{
 		#if android
+		if (amplitude == null)
+			amplitude = -1;
+
 		if (lime_haptic_vibrate == null)
 		{
 			lime_haptic_vibrate = JNI.createStaticMethod("org/haxe/lime/GameActivity", "vibrate", "(III)V");
@@ -25,7 +28,7 @@ class Haptic
 
 		try
 		{
-			lime_haptic_vibrate(period, duration);
+			lime_haptic_vibrate(period, duration, amplitude);
 		}
 		catch (e:Dynamic)
 		{
