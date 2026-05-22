@@ -62,7 +62,14 @@ class HTML5AudioSource
 		var cacheVolume = untyped parent.buffer.__srcHowl._volume;
 		untyped parent.buffer.__srcHowl._volume = parent.gain;
 
-		id = parent.buffer.__srcHowl.play();
+		if (parent.buffer.__srcHowlerDefaultSprite != null)
+		{
+			id = parent.buffer.__srcHowl.play(parent.buffer.__srcHowlerDefaultSprite);
+		}
+		else
+		{
+			id = parent.buffer.__srcHowl.play();
+		}
 
 		untyped parent.buffer.__srcHowl._volume = cacheVolume;
 		// setGain (parent.gain);
