@@ -192,7 +192,7 @@ class NativeAudioSource
 	// Get & Set Methods
 	public function getCurrentTime():Int
 	{
-		if (completed)
+		if (completed || (handle != null && AL.getSourcei(handle, AL.SOURCE_STATE) == AL.STOPPED && loops <= 0))
 		{
 			return getLength();
 		}
