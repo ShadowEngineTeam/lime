@@ -68,6 +68,7 @@
                 <compilerflag value="/utf-8" />
 
                 <compilerflag value="/wd4267" />
+				<compilerflag value="/wd4875" />
 
             </section>
 

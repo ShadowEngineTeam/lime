@@ -439,7 +439,7 @@ class WindowsPlatform extends PlatformTarget
 			commands.push(["-Dwindows", "-DHXCPP_ARMV7"]);
 		}
 
-		if (!targetFlags.exists("64") && !targetFlags.exists("x86_64") && System.hostArchitecture == X86)
+		if (!targetFlags.exists("64") && !targetFlags.exists("x86_64") && project.architectures.indexOf(Architecture.X86) != -1)
 		{
 			var args:Array<String> = ["-Dwindows", "-DHXCPP_M32"];
 
@@ -460,7 +460,7 @@ class WindowsPlatform extends PlatformTarget
 		}
 
 		if (!targetFlags.exists("32") && !targetFlags.exists("x86_32")
-			&& System.hostArchitecture == X64)
+			&& project.architectures.indexOf(Architecture.X64) != -1)
 		{
 			var args:Array<String> = ["-Dwindows", "-DHXCPP_M64"];
 
