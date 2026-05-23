@@ -78,12 +78,7 @@ class HTML5AudioSource
 
 		parent.buffer.__srcHowl.on("end", howl_onEnd, id);
 
-		// Calling setCurrentTime causes html5 audio to replay from this position on next frame
-		#if force_html5_audio
-		if (time == 0) setCurrentTime(time);
-		#else
 		setCurrentTime(time);
-		#end
 		#end
 	}
 
@@ -206,7 +201,19 @@ class HTML5AudioSource
 		#if lime_howlerjs
 		if (parent.buffer != null && parent.buffer.__srcHowl != null)
 		{
-			return Std.int(parent.buffer.__srcHowl.duration() * 1000);
+			var howl = parent.buffer.__srcHowl;
+
+			if (parent.buffer.__srcHowlerDefaultSprite != null)
+			{
+				var sprite = untyped howl._sprite[parent.buffer.__srcHowlerDefaultSprite];
+
+				if (sprite != null)
+				{
+					return Std.int(sprite[1]);
+				}
+			}
+
+			return Std.int(howl.duration() * 1000);
 		}
 		#end
 
