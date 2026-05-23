@@ -356,12 +356,12 @@ class LinuxPlatform extends PlatformTarget
 		}
 		else
 		{
-			if ((!targetFlags.exists("armv7") && System.hostArchitecture == ARM64) || targetFlags.exists("arm64"))
+			if ((!targetFlags.exists("armv7") && project.architectures.indexOf(Architecture.ARM64) != -1) || targetFlags.exists("arm64"))
 			{
 				commands.push(["-Dlinux", "-DHXCPP_ARM64"]);
 			}
 
-			if ((!targetFlags.exists("arm64") && System.hostArchitecture == ARMV7) || targetFlags.exists("armv7"))
+			if ((!targetFlags.exists("arm64") && project.architectures.indexOf(Architecture.ARMV7) != -1) || targetFlags.exists("armv7"))
 			{
 				commands.push(["-Dlinux", "-DHXCPP_ARMV7"]);
 			}
