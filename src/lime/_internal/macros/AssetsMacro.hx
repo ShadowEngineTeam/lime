@@ -25,8 +25,10 @@ class AssetsMacro
 	{
 		return macro $v{Std.int(Math.random() * 1000000)};
 	}
+	#end
 
-	macro public static function embedBytes():Array<Field>
+	#if macro
+	public static function embedBytes():Array<Field>
 	{
 		var fields = embedData(":file");
 		if (fields == null) return null;
