@@ -12,23 +12,20 @@ import lime.utils.Log;
 class Haptic
 {
 	#if android
-	private static var lime_haptic_vibrate:Int->Int->Int->Void;
+	private static var lime_haptic_vibrate:Int->Int->Void;
 	#end
 
-	public static function vibrate(period:Int, duration:Int #if android, ?amplitude:Int #end):Void
+	public static function vibrate(period:Int, duration:Int):Void
 	{
 		#if android
-		if (amplitude == null)
-			amplitude = -1;
-
 		if (lime_haptic_vibrate == null)
 		{
-			lime_haptic_vibrate = JNI.createStaticMethod("org/haxe/lime/GameActivity", "vibrate", "(III)V");
+			lime_haptic_vibrate = JNI.createStaticMethod("org/haxe/lime/GameActivity", "vibrate", "(II)V");
 		}
 
 		try
 		{
-			lime_haptic_vibrate(period, duration, amplitude);
+			lime_haptic_vibrate(period, duration);
 		}
 		catch (e:Dynamic)
 		{
