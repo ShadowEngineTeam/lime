@@ -271,19 +271,6 @@ namespace lime {
 			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
 
 				ProcessWindowEvent(event);
-
-				SDL_Event event;
-
-				if (SDL_PollEvent(&event)) {
-
-					if (event.type != SDL_EVENT_QUIT) {
-
-						HandleEvent(&event);
-
-					}
-
-				}
-
 				break;
 
 			case SDL_EVENT_QUIT:
@@ -796,7 +783,7 @@ namespace lime {
 	void SDLApplication::RenderFrame () {
 
 		applicationEvent.type = UPDATE;
-		applicationEvent.deltaTime = std::fmax (0.0, (double)frameTime.frame / 1e6);
+		applicationEvent.deltaTime = std::fmin ((double)frameTime.frame / 1e6, 250.0);
 		ApplicationEvent::Dispatch (&applicationEvent);
 
 		renderEvent.type = RENDER;
