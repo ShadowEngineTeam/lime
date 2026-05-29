@@ -126,13 +126,13 @@
 			<dependency path="dependencies/angle" name="libvk_swiftshader" />
 			<dependency path="dependencies/angle" name="vk_swiftshader_icd.json" type="json" />
 		</section>
-		<dependency path="dependencies/angle" name="libc++_shared" if="android" />
 		<dependency path="dependencies/angle" name="libVkICD_mock_icd" if="mac" />
 		<dependency path="dependencies/angle" name="libEGL" unless="android || ios || iphonesim" />
 		<dependency path="dependencies/angle" name="libGLESv2" unless="android || ios || iphonesim" />
 
 		<ndll name="EGL" dir="dependencies/angle" if="android" />
 		<ndll name="GLESv2" dir="dependencies/angle" if="android" />
+		<ndll name="c++_shared" dir="dependencies/angle" if="android" />
 
 		<dependency path="dependencies/angle/iPhone/device/arm64/libEGL.framework" embed="true" if="ios" unless="iphonesim" />
 		<dependency path="dependencies/angle/iPhone/device/arm64/libGLESv2.framework" embed="true" if="ios" unless="iphonesim" />
