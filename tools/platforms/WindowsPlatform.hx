@@ -161,6 +161,11 @@ class WindowsPlatform extends PlatformTarget
 			}
 		}
 
+		if (targetType == "cpp" && (project.flags.exists("32") || project.flags.exists("x86_32")))
+		{
+			is64 = false;
+		}
+
 		var defaultTargetDirectory = switch (targetType)
 		{
 			case "cpp": "windows";
