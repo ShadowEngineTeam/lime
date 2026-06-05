@@ -750,6 +750,34 @@ class HXProject extends Script
 		defines.set("target", Std.string(target).toLowerCase());
 		defines.set("platform", defines.get("target"));
 
+		if (architectures.length == 0)
+		{
+			switch (target)
+			{
+				case IOS, TVOS:
+					if (targetFlags.exists("simulator"))
+					{
+						architectures = [new Architecture(Std.string(System.hostArchitecture))];
+					}
+					else
+					{
+						architectures = [Architecture.ARM64];
+					}
+				case ANDROID:
+					if (targetFlags.exists("emulator"))
+					{
+						architectures = [Architecture.X64, Architecture.ARM64];
+					}
+					else
+					{
+						architectures = [Architecture.ARM64, Architecture.ARMV7];
+					}
+				case WINDOWS, MAC, LINUX:
+					architectures = [new Architecture(Std.string(System.hostArchitecture))];
+				default:
+			}
+		}
+
 		switch (System.hostPlatform)
 		{
 			case WINDOWS:
