@@ -141,12 +141,12 @@
 			</section>
 
 			<section if="simulator">
-				<section if="HXCPP_ARM64">
+				<section if="arm64">
 					<dependency path="dependencies/angle/iPhone/simulator/arm64/libGLESv2.framework" embed="true" />
 					<dependency path="dependencies/angle/iPhone/simulator/arm64/libEGL.framework" embed="true" />
 				</section>
 
-				<section if="HXCPP_ARM64 || HXCPP_X86_64">
+				<section if="x86_64">
 					<dependency path="dependencies/angle/iPhone/simulator/x64/libGLESv2.framework" />
 					<dependency path="dependencies/angle/iPhone/simulator/x64/libEGL.framework" />
 				</section>

@@ -91,6 +91,16 @@ enum abstract Architecture(String) to String
 		return this == X86 || this == X64;
 	}
 
+	public function getConditionName():String
+	{
+		return switch (this)
+		{
+			case X64: "x86_64";
+			case X86: "x86_32";
+			default: this.toLowerCase();
+		}
+	}
+
 	@:noCompletion public macro function match(self:Expr, expr:Expr):Expr
 	{
 		return macro switch ($self)

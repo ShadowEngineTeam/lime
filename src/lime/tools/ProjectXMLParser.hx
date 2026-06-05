@@ -67,7 +67,8 @@ class ProjectXMLParser extends HXProject
 						&& check != "true"
 						&& !defines.exists(check)
 						&& (environment == null || !environment.exists(check))
-						&& check != command)
+						&& check != command
+						&& !checkArchitectureCondition(check))
 					{
 						matchRequired = false;
 					}
@@ -110,7 +111,8 @@ class ProjectXMLParser extends HXProject
 						&& check != "true"
 						&& !defines.exists(check)
 						&& (environment == null || !environment.exists(check))
-						&& check != command)
+						&& check != command
+						&& !checkArchitectureCondition(check))
 					{
 						matchRequired = false;
 					}
@@ -147,6 +149,23 @@ class ProjectXMLParser extends HXProject
 		}
 
 		return true;
+	}
+
+	private function checkArchitectureCondition(check:String):Bool
+	{
+		var lower = check.toLowerCase();
+		if (lower == "x86_64") return architectures.indexOf(Architecture.X64) != -1;
+		if (lower == "x86_32") return architectures.indexOf(Architecture.X86) != -1;
+		var arch = new Architecture(check);
+		return arch != null && architectures.indexOf(arch) != -1;
+	}
+
+	private function syncArchitectureDefines():Void
+	{
+		for (arch in architectures)
+		{
+			defines.set(arch.getConditionName(), "1");
+		}
 	}
 
 	private function findIncludeFile(base:String):String
@@ -967,6 +986,7 @@ class ProjectXMLParser extends HXProject
 
 					if (path != null && path != "" && FileSystem.exists(path) && !FileSystem.isDirectory(path))
 					{
+						syncArchitectureDefines();
 						var includeProject = new ProjectXMLParser(path, defines);
 
 						if (includeProject != null && haxelib != null)
@@ -1204,6 +1224,8 @@ class ProjectXMLParser extends HXProject
 							Log.warn("Ignoring unknown architecture: " + exclude);
 						}
 					}
+
+					syncArchitectureDefines();
 
 				case "launchImage", "splashscreen", "splashScreen":
 					var path = "";
