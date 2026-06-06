@@ -116,6 +116,19 @@ class MacPlatform extends PlatformTarget
 			}
 		}
 
+		if (project.targetFlags.exists("64") || project.targetFlags.exists("x86_64"))
+		{
+			targetArchitecture = X64;
+		}
+		else if (project.targetFlags.exists("arm64"))
+		{
+			targetArchitecture = ARM64;
+		}
+		else if (project.targetFlags.exists("32") || project.targetFlags.exists("x86_32"))
+		{
+			targetArchitecture = X86;
+		}
+
 		if (project.targetFlags.exists("hl") || project.targetFlags.exists("hlc"))
 		{
 			targetType = "hl";
