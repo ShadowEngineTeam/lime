@@ -236,11 +236,30 @@ namespace lime {
 		}
 
 		EGLConfig eglConfig;
-		EGLint eglConfigCount;
+		EGLint eglConfigCount = 0;
 
-		if (!eglChooseConfig (eglDisplay, egl_config_attribs.data (), &eglConfig, 1, &eglConfigCount)) {
+		if (!eglChooseConfig (eglDisplay, egl_config_attribs.data (), &eglConfig, 1, &eglConfigCount) || eglConfigCount == 0) {
 
-			printf ("Failed to choose EGL config (EGL error: 0x%04X)\n", eglGetError ());
+			printf ("Failed to choose EGL config (EGL error: 0x%04X), retrying with a minimal config\n", eglGetError ());
+
+			EGLint egl_minimal_attribs[] = {
+				EGL_RED_SIZE, 8,
+				EGL_GREEN_SIZE, 8,
+				EGL_BLUE_SIZE, 8,
+				EGL_ALPHA_SIZE, 8,
+				EGL_DEPTH_SIZE, 16,
+				EGL_STENCIL_SIZE, 8,
+				EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
+				EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+				EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+				EGL_NONE
+			};
+
+			if (!eglChooseConfig (eglDisplay, egl_minimal_attribs, &eglConfig, 1, &eglConfigCount) || eglConfigCount == 0) {
+
+				printf ("Failed to choose minimal EGL config (EGL error: 0x%04X)\n", eglGetError ());
+
+			}
 
 		}
 
