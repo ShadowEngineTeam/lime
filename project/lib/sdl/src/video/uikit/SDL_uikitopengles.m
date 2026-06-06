@@ -46,9 +46,15 @@ bool UIKit_GL_MakeCurrent(SDL_VideoDevice *_this, SDL_Window *window, SDL_GLCont
     @autoreleasepool {
         SDL_uikitopenglview *view = (__bridge SDL_uikitopenglview *)context;
 
-        if (!view || !eglMakeCurrent(view.eglDisplay, view.eglSurface, view.eglSurface, view.eglContext)) {
+        if (!view) {
             return SDL_SetError("Could not make EGL context current");
         }
+
+        if (!eglMakeCurrent(view.eglDisplay, view.eglSurface, view.eglSurface, view.eglContext)) {
+            return SDL_SetError("Could not make EGL context current");
+        }
+
+        [view setSDLWindow:window];
     }
 
     return true;
@@ -123,11 +129,10 @@ SDL_GLContext UIKit_GL_CreateContext(SDL_VideoDevice *_this, SDL_Window *window)
         SDL_SetNumberProperty(props, SDL_PROP_WINDOW_UIKIT_OPENGL_RESOLVE_FRAMEBUFFER_NUMBER, view.msaaResolveFramebuffer);
 
         if (!UIKit_GL_MakeCurrent(_this, window, (__bridge SDL_GLContext)view)) {
-            UIKit_GL_DestroyContext(_this, (__bridge SDL_GLContext)view);
             return NULL;
         }
 
-        return (__bridge SDL_GLContext)view;
+        return (SDL_GLContext)CFBridgingRetain(view);
     }
 }
 
@@ -136,8 +141,10 @@ bool UIKit_GL_DestroyContext(SDL_VideoDevice *_this, SDL_GLContext context)
     @autoreleasepool {
         SDL_uikitopenglview *view = (__bridge SDL_uikitopenglview *)context;
         if (view) {
-            view = nil;
+            eglMakeCurrent(view.eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+            [view setSDLWindow:NULL];
         }
+        CFRelease(context);
     }
     return true;
 }

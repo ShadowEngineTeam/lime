@@ -167,9 +167,11 @@
         glGenFramebuffers(1, &viewFramebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, viewFramebuffer);
 
+        colorBufferFormat = GL_RGBA8;
+
         glGenRenderbuffers(1, &viewRenderbuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, backingWidth, backingHeight);
+        glRenderbufferStorage(GL_RENDERBUFFER, colorBufferFormat, backingWidth, backingHeight);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, viewRenderbuffer);
 
         if (useDepthBuffer || useStencilBuffer) {
@@ -250,6 +252,11 @@
 
     metalLayer.drawableSize = CGSizeMake(backingWidth, backingHeight);
 
+    if (viewRenderbuffer != 0) {
+        glBindRenderbuffer(GL_RENDERBUFFER, viewRenderbuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, colorBufferFormat, backingWidth, backingHeight);
+    }
+
     if (depthRenderbuffer != 0) {
         glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
         glRenderbufferStorage(GL_RENDERBUFFER, depthBufferFormat, backingWidth, backingHeight);
@@ -263,19 +270,17 @@
 
 - (void)swapBuffers
 {
-    if (msaaFramebuffer) {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, msaaFramebuffer);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glBlitFramebuffer(0, 0, backingWidth, backingHeight,
-                          0, 0, backingWidth, backingHeight,
-                          GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    }
+    GLuint readFBO = msaaFramebuffer ? msaaFramebuffer : viewFramebuffer;
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, readFBO);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, backingWidth, backingHeight,
+                      0, 0, backingWidth, backingHeight,
+                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
     eglSwapBuffers(eglDisplay, eglSurface);
 
-    if (msaaFramebuffer) {
-        glBindFramebuffer(GL_FRAMEBUFFER, msaaFramebuffer);
-    }
+    glBindFramebuffer(GL_FRAMEBUFFER, readFBO);
 }
 
 - (void)layoutSubviews
