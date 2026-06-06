@@ -270,17 +270,19 @@
 
 - (void)swapBuffers
 {
-    GLuint readFBO = msaaFramebuffer ? msaaFramebuffer : viewFramebuffer;
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, readFBO);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, backingWidth, backingHeight,
-                      0, 0, backingWidth, backingHeight,
-                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    if (msaaFramebuffer) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, msaaFramebuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBlitFramebuffer(0, 0, backingWidth, backingHeight,
+                          0, 0, backingWidth, backingHeight,
+                          GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    }
 
     eglSwapBuffers(eglDisplay, eglSurface);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, readFBO);
+    if (msaaFramebuffer) {
+        glBindFramebuffer(GL_FRAMEBUFFER, msaaFramebuffer);
+    }
 }
 
 - (void)layoutSubviews
