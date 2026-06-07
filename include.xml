@@ -97,6 +97,7 @@
 			<dependency name="GameController.framework" />
 			<dependency name="MediaPlayer.framework" />
 			<dependency name="Metal.framework" />
+			<dependency name="OpenGLES.framework" />
 			<dependency name="QuartzCore.framework" />
 			<dependency name="Security.framework" />
 			<dependency name="UIKit.framework" />
@@ -134,7 +135,7 @@
 		<ndll name="GLESv2" dir="dependencies/angle" if="android" />
 		<ndll name="c++_shared" dir="dependencies/angle" if="android" />
 
-		<section if="ios">
+		<!--<section if="ios">
 			<section unless="simulator">
 				<dependency path="dependencies/angle/iPhone/device/arm64/libEGL.framework" embed="true" if="ios" />
 				<dependency path="dependencies/angle/iPhone/device/arm64/libGLESv2.framework" embed="true" if="ios" />
@@ -151,7 +152,7 @@
 					<dependency path="dependencies/angle/iPhone/simulator/x64/libEGL.framework" />
 				</section>
 			</section>
-		</section>
+		</section>-->
 
 		<section if="mac">
 			<define name="MACOSX_DEPLOYMENT_TARGET" value="12.0" unless="MACOSX_DEPLOYMENT_TARGET" />
