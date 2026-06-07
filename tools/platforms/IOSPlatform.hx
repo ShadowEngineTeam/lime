@@ -770,9 +770,9 @@ class IOSPlatform extends PlatformTarget
 			if (arch == "x86_64" && (!context.X64 || !project.targetFlags.exists("simulator"))) continue;
 
 			var libExt = [
-				".iphoneos-64.a",
+				".iphoneos-arm64.a",
 				".iphonesim-arm64.a",
-				".iphonesim-64.a"
+				".iphonesim-x86_64.a"
 			][archID];
 
 			System.mkdir(projectDirectory + "/lib/" + arch);
