@@ -56,9 +56,9 @@ class AudioSource
 	public var pitch(get, set):Float;
 
 	/**
-		The offset within the audio buffer to start playback, in samples.
+		The offset within the audio buffer to start playback, in milliseconds.
 	**/
-	public var offset:Int;
+	public var offset:Float;
 
 	/**
 		The 3D position of the audio source, represented as a `Vector4`.
@@ -75,11 +75,11 @@ class AudioSource
 	/**
 		Creates a new `AudioSource` instance.
 		@param buffer The `AudioBuffer` to associate with this `AudioSource`.
-		@param offset The starting offset within the audio buffer, in samples.
+		@param offset The starting offset within the audio buffer, in milliseconds.
 		@param length The length of the audio to play, in milliseconds. If `null`, the full buffer is used.
 		@param loops The number of times to loop the audio. `0` means no looping.
 	**/
-	public function new(buffer:AudioBuffer = null, offset:Int = 0, length:Null<Int> = null, loops:Int = 0)
+	public function new(buffer:AudioBuffer = null, offset:Float = 0, length:Null<Int> = null, loops:Int = 0)
 	{
 		this.buffer = buffer;
 		this.offset = offset;
