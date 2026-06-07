@@ -206,6 +206,7 @@
 			<compilerflag value="-DLIME_SDL" />
 			<compilerflag value="-DSDL_DISABLE_ALLOCA" />
 			<compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" />
+			<compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" unless="LIME_ANGLE" />
 
 			<file name="src/backend/sdl/SDLApplication.cpp" />
 			<file name="src/backend/sdl/SDLWindow.cpp" />
