@@ -50,7 +50,7 @@ namespace lime {
 		if (flags & WINDOW_FLAG_MAXIMIZED) sdlWindowFlags |= SDL_WINDOW_MAXIMIZED;
 		if (flags & WINDOW_FLAG_ALWAYS_ON_TOP) sdlWindowFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
 
-		#if !(defined(LIME_ANGLE) && defined(IPHONE))
+		#if !defined(IPHONE) && !defined(APPLETV)
 		SDL_SetHint (SDL_HINT_VIDEO_FORCE_EGL, "1");
 		#ifdef HX_WINDOWS
 		SDL_SetHint (SDL_HINT_VIDEO_WIN_D3DCOMPILER, "none");
