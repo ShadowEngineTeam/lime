@@ -235,7 +235,7 @@ namespace lime {
 
 		}
 
-		EGLConfig eglConfig;
+		EGLConfig eglConfig = 0;
 		EGLint eglConfigCount = 0;
 
 		if (!eglChooseConfig (eglDisplay, egl_config_attribs.data (), &eglConfig, 1, &eglConfigCount) || eglConfigCount == 0) {
