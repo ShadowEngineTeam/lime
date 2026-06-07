@@ -7,6 +7,9 @@
 	#define GL_GLEXT_PROTOTYPES 1
 	#include <GLES3/gl3.h>
 	#include <GLES2/gl2ext.h>
+#elif defined (IPHONE) || defined(APPLETV)
+	#include <OpenGLES/ES3/gl.h>
+	#include <OpenGLES/ES3/glext.h>
 #endif
 
 namespace lime {

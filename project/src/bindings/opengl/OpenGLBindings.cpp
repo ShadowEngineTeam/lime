@@ -463,14 +463,18 @@ namespace lime {
 
 	void lime_gl_blend_barrier () {
 
+		#if defined(LIME_GLAD) || defined(LIME_ANGLE)
 		glBlendBarrierKHR ();
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_blend_barrier) () {
 
+		#if defined(LIME_GLAD) || defined(LIME_ANGLE)
 		glBlendBarrierKHR ();
+		#endif
 
 	}
 
