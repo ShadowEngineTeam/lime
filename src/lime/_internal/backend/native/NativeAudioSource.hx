@@ -29,7 +29,6 @@ class NativeAudioSource
 	private var parent:AudioSource;
 	private var playing:Bool;
 	private var position:Vector4;
-	private var samples:Float;
 
 	public function new(parent:AudioSource)
 	{
@@ -117,8 +116,6 @@ class NativeAudioSource
 
 		dataLength = parent.buffer.data.length;
 
-		samples = (dataLength * 8.0) / (parent.buffer.channels * parent.buffer.bitsPerSample);
-
 		if (!Application.current.onUpdate.has(checkPlay))
 		{
 			Application.current.onUpdate.add(checkPlay);
@@ -197,10 +194,7 @@ class NativeAudioSource
 		}
 		else if (handle != null)
 		{
-			var offset = AL.getSourcef(handle, AL.BYTE_OFFSET);
-			var ratio = (offset / dataLength);
-			var totalSeconds = samples / parent.buffer.sampleRate;
-			var time = (totalSeconds * ratio * 1000) - parent.offset;
+			var time = (AL.getSourcef(handle, AL.SEC_OFFSET) * 1000.0) - parent.offset;
 
 			return time < 0 ? 0 : time;
 		}
@@ -214,16 +208,8 @@ class NativeAudioSource
 		{
 			AL.sourceRewind(handle);
 
-			var secondOffset = (value + parent.offset) / 1000;
-			var totalSeconds = samples / parent.buffer.sampleRate;
+			AL.sourcef(handle, AL.SEC_OFFSET, (value + parent.offset) / 1000.0);
 
-			if (secondOffset < 0) secondOffset = 0;
-			if (secondOffset > totalSeconds) secondOffset = totalSeconds;
-
-			var ratio = (secondOffset / totalSeconds);
-			var totalOffset = Std.int(dataLength * ratio);
-
-			AL.sourcef(handle, AL.BYTE_OFFSET, totalOffset);
 			if (playing) AL.sourcePlay(handle);
 		}
 
@@ -274,7 +260,11 @@ class NativeAudioSource
 			return length;
 		}
 
-		return (samples / parent.buffer.sampleRate * 1000) - parent.offset;
+		var bytesPerFrame = parent.buffer.channels * (parent.buffer.bitsPerSample / 8.0);
+
+		var totalFrames = dataLength / bytesPerFrame;
+
+		return ((totalFrames / parent.buffer.sampleRate) * 1000.0) - parent.offset;
 	}
 
 	public function setLength(value:Float):Float
