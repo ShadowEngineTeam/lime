@@ -256,16 +256,15 @@ SDL_GLContext UIKit_GL_CreateContext(SDL_VideoDevice *_this, SDL_Window *window)
 bool UIKit_GL_DestroyContext(SDL_VideoDevice *_this, SDL_GLContext context)
 {
     @autoreleasepool {
+        /* The context was retained in SDL_GL_CreateContext, so we release it
+         * here. The context's view will be detached from its window when the
+         * context is deallocated. */
         #if defined(LIME_ANGLE)
         SDL_uikitopenglview *view = (__bridge SDL_uikitopenglview *)context;
         if (view) {
             eglMakeCurrent(view.eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
             [view setSDLWindow:NULL];
         }
-        #else
-        /* The context was retained in SDL_GL_CreateContext, so we release it
-         * here. The context's view will be detached from its window when the
-         * context is deallocated. */
         #endif
         CFRelease(context);
     }
@@ -275,12 +274,6 @@ bool UIKit_GL_DestroyContext(SDL_VideoDevice *_this, SDL_GLContext context)
 void UIKit_GL_RestoreCurrentContext(void)
 {
     @autoreleasepool {
-        #if defined(LIME_ANGLE)
-        SDL_uikitopenglview *view = (__bridge SDL_uikitopenglview *)SDL_GL_GetCurrentContext();
-        if (view != nil && view.eglContext != eglGetCurrentContext()) {
-            eglMakeCurrent(view.eglDisplay, view.eglSurface, view.eglSurface, view.eglContext);
-        }
-        #else
         /* Some iOS system functionality (such as Dictation on the on-screen
          keyboard) uses its own OpenGL ES context but doesn't restore the
          previous one when it's done. This is a workaround to make sure the
@@ -288,6 +281,12 @@ void UIKit_GL_RestoreCurrentContext(void)
          finished running its own code for the frame. If this isn't done, the
          app may crash or have other nasty symptoms when Dictation is used.
          */
+        #if defined(LIME_ANGLE)
+        SDL_uikitopenglview *view = (__bridge SDL_uikitopenglview *)SDL_GL_GetCurrentContext();
+        if (view != nil && view.eglContext != eglGetCurrentContext()) {
+            eglMakeCurrent(view.eglDisplay, view.eglSurface, view.eglSurface, view.eglContext);
+        }
+        #else
         EAGLContext *context = (__bridge EAGLContext *)SDL_GL_GetCurrentContext();
         if (context != NULL && [EAGLContext currentContext] != context) {
             [EAGLContext setCurrentContext:context];
