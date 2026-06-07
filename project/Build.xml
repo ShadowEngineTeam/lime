@@ -33,7 +33,7 @@
 	<set name="LIME_SDL" value="1" />
 	<set name="LIME_SDL_IMAGE" value="1" if="LIME_SDL" />
 	<!--<set name="LIME_ANGLE" value="1" if="iphone" />-->
-	<set name="LIME_GLAD" value="1" unless="LIME_ANGLE" />
+	<set name="LIME_GLAD" value="1" unless="iphone || appletv" />
 	<set name="LIME_ZLIB" value="1" />
 
 	<set name="OUTPUT_DIR" value="../ndll" unless="OUTPUT_DIR" />
@@ -194,7 +194,7 @@
 
 			<compilerflag value="-DLIME_OPENGL" />
 			<compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" />
-			<compilerflag value="-I${DEVELOPER_DIR}/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS${TVOS_VER}.sdk/" if="tvos" />
+			<compilerflag value="-I${DEVELOPER_DIR}/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS${TVOS_VER}.sdk/" if="appletv" />
 
 			<file name="src/bindings/opengl/OpenGLBindings.cpp" />
 
