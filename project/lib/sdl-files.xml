@@ -38,7 +38,12 @@
 
         <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/src" />
 
-        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/angle/include" if="LIME_ANGLE" />
+        <section if="LIME_ANGLE">
+
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/angle/include/" />
+			<compilerflag value="-DLIME_ANGLE" />
+
+		</section>
 
         <section>
 
