@@ -176,11 +176,11 @@
 #define SDL_VIDEO_DRIVER_DUMMY 1
 
 /* Enable OpenGL ES */
-/*#if !TARGET_OS_MACCATALYST && !TARGET_OS_VISION
+#if !TARGET_OS_MACCATALYST && !TARGET_OS_VISION
 #define SDL_VIDEO_OPENGL_ES2 1
 #define SDL_VIDEO_OPENGL_ES 1
 #define SDL_VIDEO_RENDER_OGL_ES2 1
-#endif*/
+#endif
 
 /* Metal supported on 64-bit devices running iOS 8.0 and tvOS 9.0 and newer
    Also supported in simulator from iOS 13.0 and tvOS 13.0
