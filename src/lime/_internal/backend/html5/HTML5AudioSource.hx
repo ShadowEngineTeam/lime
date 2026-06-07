@@ -147,7 +147,7 @@ class HTML5AudioSource
 		}
 		else if (parent.buffer != null && parent.buffer.__srcHowl != null)
 		{
-			var time = (parent.buffer.__srcHowl.seek(id) * 1000) - parent.offset;
+			var time = (parent.buffer.__srcHowl.seek(id) * 1000.0) - parent.offset;
 			if (time < 0) return 0;
 			return time;
 		}
@@ -162,7 +162,7 @@ class HTML5AudioSource
 		if (parent.buffer != null && parent.buffer.__srcHowl != null)
 		{
 			// if (playing) buffer.__srcHowl.play (id);
-			var pos = (value + parent.offset) / 1000;
+			var pos = (value + parent.offset) / 1000.0;
 			if (pos < 0) pos = 0;
 			parent.buffer.__srcHowl.seek(pos, id);
 		}
