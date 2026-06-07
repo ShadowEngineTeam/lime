@@ -48,7 +48,8 @@
         <section>
 
             <compilerflag value="-DSDL_DISABLE_ALLOCA" />
-            <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" />
+            <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" unless="iphone" />
+            <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" if="iphone LIME_ANGLE" />
             <compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" unless="LIME_ANGLE" />
 
             <section>
