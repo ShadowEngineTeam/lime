@@ -32,8 +32,18 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+#if !defined(__ANDROID__) || __ANDROID_API__ >= 29
+#include <spawn.h>
+#endif
+
 #include "../SDL_sysprocess.h"
 #include "../../io/SDL_iostream_c.h"
+
+#if defined(HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR_NP) && \
+    !defined(HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR)
+#define HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR
+#define posix_spawn_file_actions_addchdir posix_spawn_file_actions_addchdir_np
+#endif
 
 #define READ_END 0
 #define WRITE_END 1
@@ -114,20 +124,41 @@ static bool GetStreamFD(SDL_PropertiesID props, const char *property, int *resul
     return true;
 }
 
-// Helper to close unused file descriptors in the child process
-static void CloseUnusedFileDescriptors(void)
+#if !defined(__ANDROID__) || __ANDROID_API__ >= 29
+
+static bool AddFileDescriptorCloseActions(posix_spawn_file_actions_t *fa)
 {
-    int maxfd = (int)sysconf(_SC_OPEN_MAX);
-    for (int fd = STDERR_FILENO + 1; fd < maxfd; ++fd) {
-        int flags = fcntl(fd, F_GETFD);
-        if (flags < 0) {
-            continue;
+    DIR *dir = opendir("/proc/self/fd");
+    if (dir) {
+        struct dirent *entry;
+        while ((entry = readdir(dir)) != NULL) {
+            int fd = SDL_atoi(entry->d_name);
+            if (fd <= STDERR_FILENO) {
+                continue;
+            }
+
+            int flags = fcntl(fd, F_GETFD);
+            if (flags < 0 || (flags & FD_CLOEXEC)) {
+                continue;
+            }
+            if (posix_spawn_file_actions_addclose(fa, fd) != 0) {
+                closedir(dir);
+                return SDL_SetError("posix_spawn_file_actions_addclose failed: %s", strerror(errno));
+            }
         }
-        // Close if not already CLOEXEC
-        if (!(flags & FD_CLOEXEC)) {
-            close(fd);
+        closedir(dir);
+    } else {
+        for (int fd = (int)(sysconf(_SC_OPEN_MAX) - 1); fd > STDERR_FILENO; --fd) {
+            int flags = fcntl(fd, F_GETFD);
+            if (flags < 0 || (flags & FD_CLOEXEC)) {
+                continue;
+            }
+            if (posix_spawn_file_actions_addclose(fa, fd) != 0) {
+                return SDL_SetError("posix_spawn_file_actions_addclose failed: %s", strerror(errno));
+            }
         }
     }
+    return true;
 }
 
 bool SDL_SYS_CreateProcessWithProperties(SDL_Process *process, SDL_PropertiesID props)
@@ -159,6 +190,43 @@ bool SDL_SYS_CreateProcessWithProperties(SDL_Process *process, SDL_PropertiesID 
     }
     process->internal = data;
 
+    posix_spawnattr_t attr;
+    posix_spawn_file_actions_t fa;
+
+    if (posix_spawnattr_init(&attr) != 0) {
+        SDL_SetError("posix_spawnattr_init failed: %s", strerror(errno));
+        goto posix_spawn_fail_none;
+    }
+
+    if (posix_spawn_file_actions_init(&fa) != 0) {
+        SDL_SetError("posix_spawn_file_actions_init failed: %s", strerror(errno));
+        goto posix_spawn_fail_attr;
+    }
+
+    if (working_directory) {
+#ifdef HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR
+#ifdef SDL_PLATFORM_APPLE
+        if (__builtin_available(macOS 10.15, *)) {
+            if (posix_spawn_file_actions_addchdir_np(&fa, working_directory) != 0) {
+                SDL_SetError("posix_spawn_file_actions_addchdir failed: %s", strerror(errno));
+                goto posix_spawn_fail_all;
+            }
+        } else {
+            SDL_SetError("Setting the working directory is only supported on macOS 10.15 and newer");
+            goto posix_spawn_fail_all;
+        }
+#else
+        if (posix_spawn_file_actions_addchdir(&fa, working_directory) != 0) {
+            SDL_SetError("posix_spawn_file_actions_addchdir failed: %s", strerror(errno));
+            goto posix_spawn_fail_all;
+        }
+#endif // SDL_PLATFORM_APPLE
+#else
+        SDL_SetError("Setting the working directory is not supported");
+        goto posix_spawn_fail_all;
+#endif
+    }
+
     // Background processes don't have access to the terminal
     if (process->background) {
         if (stdin_option == SDL_PROCESS_STDIO_INHERITED) {
@@ -172,170 +240,185 @@ bool SDL_SYS_CreateProcessWithProperties(SDL_Process *process, SDL_PropertiesID 
         }
     }
 
-    // Create pipes if needed
-    if (stdin_option == SDL_PROCESS_STDIO_APP) {
+    switch (stdin_option) {
+    case SDL_PROCESS_STDIO_REDIRECT:
+        if (!GetStreamFD(props, SDL_PROP_PROCESS_CREATE_STDIN_POINTER, &fd)) {
+            goto posix_spawn_fail_all;
+        }
+        if (posix_spawn_file_actions_adddup2(&fa, fd, STDIN_FILENO) != 0) {
+            SDL_SetError("posix_spawn_file_actions_adddup2 failed: %s", strerror(errno));
+            goto posix_spawn_fail_all;
+        }
+        break;
+    case SDL_PROCESS_STDIO_APP:
         if (!CreatePipe(stdin_pipe)) {
-            goto fail;
+            goto posix_spawn_fail_all;
         }
+        if (posix_spawn_file_actions_adddup2(&fa, stdin_pipe[READ_END], STDIN_FILENO) != 0) {
+            SDL_SetError("posix_spawn_file_actions_adddup2 failed: %s", strerror(errno));
+            goto posix_spawn_fail_all;
+        }
+        break;
+    case SDL_PROCESS_STDIO_NULL:
+        if (posix_spawn_file_actions_addopen(&fa, STDIN_FILENO, "/dev/null", O_RDONLY, 0) != 0) {
+            SDL_SetError("posix_spawn_file_actions_addopen failed: %s", strerror(errno));
+            goto posix_spawn_fail_all;
+        }
+        break;
+    case SDL_PROCESS_STDIO_INHERITED:
+    default:
+        break;
     }
-    if (stdout_option == SDL_PROCESS_STDIO_APP) {
+
+    switch (stdout_option) {
+    case SDL_PROCESS_STDIO_REDIRECT:
+        if (!GetStreamFD(props, SDL_PROP_PROCESS_CREATE_STDOUT_POINTER, &fd)) {
+            goto posix_spawn_fail_all;
+        }
+        if (posix_spawn_file_actions_adddup2(&fa, fd, STDOUT_FILENO) != 0) {
+            SDL_SetError("posix_spawn_file_actions_adddup2 failed: %s", strerror(errno));
+            goto posix_spawn_fail_all;
+        }
+        break;
+    case SDL_PROCESS_STDIO_APP:
         if (!CreatePipe(stdout_pipe)) {
-            goto fail;
+            goto posix_spawn_fail_all;
         }
+        if (posix_spawn_file_actions_adddup2(&fa, stdout_pipe[WRITE_END], STDOUT_FILENO) != 0) {
+            SDL_SetError("posix_spawn_file_actions_adddup2 failed: %s", strerror(errno));
+            goto posix_spawn_fail_all;
+        }
+        break;
+    case SDL_PROCESS_STDIO_NULL:
+        if (posix_spawn_file_actions_addopen(&fa, STDOUT_FILENO, "/dev/null", O_WRONLY, 0644) != 0) {
+            SDL_SetError("posix_spawn_file_actions_addopen failed: %s", strerror(errno));
+            goto posix_spawn_fail_all;
+        }
+        break;
+    case SDL_PROCESS_STDIO_INHERITED:
+    default:
+        break;
     }
-    if (stderr_option == SDL_PROCESS_STDIO_APP) {
-        if (!CreatePipe(stderr_pipe)) {
-            goto fail;
+
+    if (redirect_stderr) {
+        if (posix_spawn_file_actions_adddup2(&fa, STDOUT_FILENO, STDERR_FILENO) != 0) {
+            SDL_SetError("posix_spawn_file_actions_adddup2 failed: %s", strerror(errno));
+            goto posix_spawn_fail_all;
+        }
+    } else {
+        switch (stderr_option) {
+        case SDL_PROCESS_STDIO_REDIRECT:
+            if (!GetStreamFD(props, SDL_PROP_PROCESS_CREATE_STDERR_POINTER, &fd)) {
+                goto posix_spawn_fail_all;
+            }
+            if (posix_spawn_file_actions_adddup2(&fa, fd, STDERR_FILENO) != 0) {
+                SDL_SetError("posix_spawn_file_actions_adddup2 failed: %s", strerror(errno));
+                goto posix_spawn_fail_all;
+            }
+            break;
+        case SDL_PROCESS_STDIO_APP:
+            if (!CreatePipe(stderr_pipe)) {
+                goto posix_spawn_fail_all;
+            }
+            if (posix_spawn_file_actions_adddup2(&fa, stderr_pipe[WRITE_END], STDERR_FILENO) != 0) {
+                SDL_SetError("posix_spawn_file_actions_adddup2 failed: %s", strerror(errno));
+                goto posix_spawn_fail_all;
+            }
+            break;
+        case SDL_PROCESS_STDIO_NULL:
+            if (posix_spawn_file_actions_addopen(&fa, STDERR_FILENO, "/dev/null", O_WRONLY, 0644) != 0) {
+                SDL_SetError("posix_spawn_file_actions_addopen failed: %s", strerror(errno));
+                goto posix_spawn_fail_all;
+            }
+            break;
+        case SDL_PROCESS_STDIO_INHERITED:
+        default:
+            break;
         }
     }
 
-    // Fork the process
-    pid_t pid = fork();
-    if (pid < 0) {
-        SDL_SetError("fork() failed: %s", strerror(errno));
-        goto fail;
+    if (!AddFileDescriptorCloseActions(&fa)) {
+        goto posix_spawn_fail_all;
     }
 
-    if (pid == 0) {
-        // Child Process
-        if (process->background) {
+    // Spawn the new process
+    if (process->background) {
+        int status = -1;
+        #ifdef SDL_PLATFORM_APPLE  // Apple has vfork marked as deprecated and (as of macOS 10.12) is almost identical to calling fork() anyhow.
+        const pid_t pid = fork();
+        const char *forkname = "fork";
+        #else
+        const pid_t pid = vfork();
+        const char *forkname = "vfork";
+        #endif
+        switch (pid) {
+        case -1:
+            SDL_SetError("%s() failed: %s", forkname, strerror(errno));
+            goto posix_spawn_fail_all;
+
+        case 0:
+            // Detach from the terminal and launch the process
             setsid();
-        }
+            if (posix_spawnp(&data->pid, args[0], &fa, &attr, args, envp) != 0) {
+                _exit(errno);
+            }
+            _exit(0);
 
-        // Change working directory if specified
-        if (working_directory) {
-            if (chdir(working_directory) != 0) {
-                _exit(127);
-            }
-        }
-
-        // Close unused file descriptors
-        CloseUnusedFileDescriptors();
-
-        // Setup stdin
-        switch (stdin_option) {
-        case SDL_PROCESS_STDIO_REDIRECT:
-            if (!GetStreamFD(props, SDL_PROP_PROCESS_CREATE_STDIN_POINTER, &fd)) {
-                _exit(127);
-            }
-            if (dup2(fd, STDIN_FILENO) < 0) {
-                _exit(127);
-            }
-            break;
-        case SDL_PROCESS_STDIO_APP:
-            if (dup2(stdin_pipe[READ_END], STDIN_FILENO) < 0) {
-                _exit(127);
-            }
-            break;
-        case SDL_PROCESS_STDIO_NULL:
-            if (open("/dev/null", O_RDONLY) != STDIN_FILENO) {
-                _exit(127);
-            }
-            break;
         default:
-            break;
-        }
-
-        // Setup stdout
-        switch (stdout_option) {
-        case SDL_PROCESS_STDIO_REDIRECT:
-            if (!GetStreamFD(props, SDL_PROP_PROCESS_CREATE_STDOUT_POINTER, &fd)) {
-                _exit(127);
+            if (waitpid(pid, &status, 0) < 0) {
+                SDL_SetError("waitpid() failed: %s", strerror(errno));
+                goto posix_spawn_fail_all;
             }
-            if (dup2(fd, STDOUT_FILENO) < 0) {
-                _exit(127);
+            if (status != 0) {
+                SDL_SetError("posix_spawn() failed: %s", strerror(status));
+                goto posix_spawn_fail_all;
             }
             break;
-        case SDL_PROCESS_STDIO_APP:
-            if (dup2(stdout_pipe[WRITE_END], STDOUT_FILENO) < 0) {
-                _exit(127);
-            }
-            break;
-        case SDL_PROCESS_STDIO_NULL:
-            if (open("/dev/null", O_WRONLY) != STDOUT_FILENO) {
-                _exit(127);
-            }
-            break;
-        default:
-            break;
         }
-
-        // Setup stderr
-        if (redirect_stderr) {
-            if (dup2(STDOUT_FILENO, STDERR_FILENO) < 0) {
-                _exit(127);
-            }
-        } else {
-            switch (stderr_option) {
-            case SDL_PROCESS_STDIO_REDIRECT:
-                if (!GetStreamFD(props, SDL_PROP_PROCESS_CREATE_STDERR_POINTER, &fd)) {
-                    _exit(127);
-                }
-                if (dup2(fd, STDERR_FILENO) < 0) {
-                    _exit(127);
-                }
-                break;
-            case SDL_PROCESS_STDIO_APP:
-                if (dup2(stderr_pipe[WRITE_END], STDERR_FILENO) < 0) {
-                    _exit(127);
-                }
-                break;
-            case SDL_PROCESS_STDIO_NULL:
-                if (open("/dev/null", O_WRONLY) != STDERR_FILENO) {
-                    _exit(127);
-                }
-                break;
-            default:
-                break;
-            }
+    } else {
+        if (posix_spawnp(&data->pid, args[0], &fa, &attr, args, envp) != 0) {
+            SDL_SetError("posix_spawn() failed: %s", strerror(errno));
+            goto posix_spawn_fail_all;
         }
-
-        // Close pipe ends in child
-        if (stdin_option == SDL_PROCESS_STDIO_APP) {
-            close(stdin_pipe[READ_END]);
-        }
-        if (stdout_option == SDL_PROCESS_STDIO_APP) {
-            close(stdout_pipe[WRITE_END]);
-        }
-        if (stderr_option == SDL_PROCESS_STDIO_APP) {
-            close(stderr_pipe[WRITE_END]);
-        }
-
-        // Execute
-        execvp(args[0], args);
-        _exit(127); // exec failed
     }
-
-    // Parent Process
-    data->pid = pid;
     SDL_SetNumberProperty(process->props, SDL_PROP_PROCESS_PID_NUMBER, data->pid);
 
-    // Close pipe ends in parent
     if (stdin_option == SDL_PROCESS_STDIO_APP) {
-        close(stdin_pipe[READ_END]);
         if (!SetupStream(process, stdin_pipe[WRITE_END], "wb", SDL_PROP_PROCESS_STDIN_POINTER)) {
             close(stdin_pipe[WRITE_END]);
         }
+        close(stdin_pipe[READ_END]);
     }
 
     if (stdout_option == SDL_PROCESS_STDIO_APP) {
-        close(stdout_pipe[WRITE_END]);
         if (!SetupStream(process, stdout_pipe[READ_END], "rb", SDL_PROP_PROCESS_STDOUT_POINTER)) {
             close(stdout_pipe[READ_END]);
         }
+        close(stdout_pipe[WRITE_END]);
     }
 
     if (stderr_option == SDL_PROCESS_STDIO_APP) {
-        close(stderr_pipe[WRITE_END]);
         if (!SetupStream(process, stderr_pipe[READ_END], "rb", SDL_PROP_PROCESS_STDERR_POINTER)) {
             close(stderr_pipe[READ_END]);
         }
+        close(stderr_pipe[WRITE_END]);
     }
 
+    posix_spawn_file_actions_destroy(&fa);
+    posix_spawnattr_destroy(&attr);
     SDL_free(envp);
+
     return true;
 
-fail:
+    /* --------------------------------------------------------------------- */
+
+posix_spawn_fail_all:
+    posix_spawn_file_actions_destroy(&fa);
+
+posix_spawn_fail_attr:
+    posix_spawnattr_destroy(&attr);
+
+posix_spawn_fail_none:
     if (stdin_pipe[READ_END] >= 0) {
         close(stdin_pipe[READ_END]);
     }
@@ -354,9 +437,265 @@ fail:
     if (stderr_pipe[WRITE_END] >= 0) {
         close(stderr_pipe[WRITE_END]);
     }
+    SDL_free(process->internal);
+    process->internal = NULL;
     SDL_free(envp);
     return false;
 }
+
+#else
+
+static void CloseAllFileDescriptors(void)
+{
+    DIR *dir = opendir("/proc/self/fd");
+    if (dir) {
+        struct dirent *entry;
+        while ((entry = readdir(dir)) != NULL) {
+            int fd = SDL_atoi(entry->d_name);
+            if (fd > STDERR_FILENO && fd != dirfd(dir)) {
+                close(fd);
+            }
+        }
+        closedir(dir);
+    } else {
+        long maxfd = sysconf(_SC_OPEN_MAX);
+        for (int fd = (int)(maxfd - 1); fd > STDERR_FILENO; --fd) {
+            close(fd);
+        }
+    }
+}
+
+bool SDL_SYS_CreateProcessWithProperties(SDL_Process *process, SDL_PropertiesID props)
+{
+    char * const *args = SDL_GetPointerProperty(props, SDL_PROP_PROCESS_CREATE_ARGS_POINTER, NULL);
+    SDL_Environment *env = SDL_GetPointerProperty(props, SDL_PROP_PROCESS_CREATE_ENVIRONMENT_POINTER, SDL_GetEnvironment());
+    char **envp = NULL;
+    const char *working_directory = SDL_GetStringProperty(props, SDL_PROP_PROCESS_CREATE_WORKING_DIRECTORY_STRING, NULL);
+    SDL_ProcessIO stdin_option = (SDL_ProcessIO)SDL_GetNumberProperty(props, SDL_PROP_PROCESS_CREATE_STDIN_NUMBER, SDL_PROCESS_STDIO_NULL);
+    SDL_ProcessIO stdout_option = (SDL_ProcessIO)SDL_GetNumberProperty(props, SDL_PROP_PROCESS_CREATE_STDOUT_NUMBER, SDL_PROCESS_STDIO_INHERITED);
+    SDL_ProcessIO stderr_option = (SDL_ProcessIO)SDL_GetNumberProperty(props, SDL_PROP_PROCESS_CREATE_STDERR_NUMBER, SDL_PROCESS_STDIO_INHERITED);
+    bool redirect_stderr = SDL_GetBooleanProperty(props, SDL_PROP_PROCESS_CREATE_STDERR_TO_STDOUT_BOOLEAN, false) &&
+                           !SDL_HasProperty(props, SDL_PROP_PROCESS_CREATE_STDERR_NUMBER);
+    int stdin_pipe[2] = { -1, -1 };
+    int stdout_pipe[2] = { -1, -1 };
+    int stderr_pipe[2] = { -1, -1 };
+    int stdin_fd = -1;
+    int stdout_fd = -1;
+    int stderr_fd = -1;
+
+    envp = SDL_GetEnvironmentVariables(env);
+    if (!envp) {
+        return false;
+    }
+
+    SDL_ProcessData *data = SDL_calloc(1, sizeof(*data));
+    if (!data) {
+        SDL_free(envp);
+        return false;
+    }
+    process->internal = data;
+
+    if (process->background) {
+        if (stdin_option == SDL_PROCESS_STDIO_INHERITED) {
+            stdin_option = SDL_PROCESS_STDIO_NULL;
+        }
+        if (stdout_option == SDL_PROCESS_STDIO_INHERITED) {
+            stdout_option = SDL_PROCESS_STDIO_NULL;
+        }
+        if (stderr_option == SDL_PROCESS_STDIO_INHERITED) {
+            stderr_option = SDL_PROCESS_STDIO_NULL;
+        }
+    }
+
+    switch (stdin_option) {
+    case SDL_PROCESS_STDIO_REDIRECT:
+        if (!GetStreamFD(props, SDL_PROP_PROCESS_CREATE_STDIN_POINTER, &stdin_fd)) {
+            goto fork_fail;
+        }
+        break;
+    case SDL_PROCESS_STDIO_APP:
+        if (!CreatePipe(stdin_pipe)) {
+            goto fork_fail;
+        }
+        break;
+    case SDL_PROCESS_STDIO_NULL:
+    case SDL_PROCESS_STDIO_INHERITED:
+    default:
+        break;
+    }
+
+    switch (stdout_option) {
+    case SDL_PROCESS_STDIO_REDIRECT:
+        if (!GetStreamFD(props, SDL_PROP_PROCESS_CREATE_STDOUT_POINTER, &stdout_fd)) {
+            goto fork_fail;
+        }
+        break;
+    case SDL_PROCESS_STDIO_APP:
+        if (!CreatePipe(stdout_pipe)) {
+            goto fork_fail;
+        }
+        break;
+    case SDL_PROCESS_STDIO_NULL:
+    case SDL_PROCESS_STDIO_INHERITED:
+    default:
+        break;
+    }
+
+    switch (stderr_option) {
+    case SDL_PROCESS_STDIO_REDIRECT:
+        if (!GetStreamFD(props, SDL_PROP_PROCESS_CREATE_STDERR_POINTER, &stderr_fd)) {
+            goto fork_fail;
+        }
+        break;
+    case SDL_PROCESS_STDIO_APP:
+        if (!CreatePipe(stderr_pipe)) {
+            goto fork_fail;
+        }
+        break;
+    case SDL_PROCESS_STDIO_NULL:
+    case SDL_PROCESS_STDIO_INHERITED:
+    default:
+        break;
+    }
+
+    pid_t pid = fork();
+    if (pid < 0) {
+        SDL_SetError("fork() failed: %s", strerror(errno));
+        goto fork_fail;
+    }
+
+    if (pid == 0) {
+        if (stdin_pipe[WRITE_END] >= 0) close(stdin_pipe[WRITE_END]);
+        if (stdout_pipe[READ_END] >= 0) close(stdout_pipe[READ_END]);
+        if (stderr_pipe[READ_END] >= 0) close(stderr_pipe[READ_END]);
+
+        switch (stdin_option) {
+        case SDL_PROCESS_STDIO_REDIRECT:
+            if (stdin_fd != STDIN_FILENO) {
+                dup2(stdin_fd, STDIN_FILENO);
+            }
+            break;
+        case SDL_PROCESS_STDIO_APP:
+            dup2(stdin_pipe[READ_END], STDIN_FILENO);
+            break;
+        case SDL_PROCESS_STDIO_NULL: {
+            int nullfd = open("/dev/null", O_RDONLY);
+            if (nullfd >= 0) {
+                dup2(nullfd, STDIN_FILENO);
+                if (nullfd > STDERR_FILENO) close(nullfd);
+            }
+            break;
+        }
+        case SDL_PROCESS_STDIO_INHERITED:
+        default:
+            break;
+        }
+
+        switch (stdout_option) {
+        case SDL_PROCESS_STDIO_REDIRECT:
+            if (stdout_fd != STDOUT_FILENO) {
+                dup2(stdout_fd, STDOUT_FILENO);
+            }
+            break;
+        case SDL_PROCESS_STDIO_APP:
+            dup2(stdout_pipe[WRITE_END], STDOUT_FILENO);
+            break;
+        case SDL_PROCESS_STDIO_NULL: {
+            int nullfd = open("/dev/null", O_WRONLY);
+            if (nullfd >= 0) {
+                dup2(nullfd, STDOUT_FILENO);
+                if (nullfd > STDERR_FILENO) close(nullfd);
+            }
+            break;
+        }
+        case SDL_PROCESS_STDIO_INHERITED:
+        default:
+            break;
+        }
+
+        if (redirect_stderr) {
+            dup2(STDOUT_FILENO, STDERR_FILENO);
+        } else {
+            switch (stderr_option) {
+            case SDL_PROCESS_STDIO_REDIRECT:
+                if (stderr_fd != STDERR_FILENO) {
+                    dup2(stderr_fd, STDERR_FILENO);
+                }
+                break;
+            case SDL_PROCESS_STDIO_APP:
+                dup2(stderr_pipe[WRITE_END], STDERR_FILENO);
+                break;
+            case SDL_PROCESS_STDIO_NULL: {
+                int nullfd = open("/dev/null", O_WRONLY);
+                if (nullfd >= 0) {
+                    dup2(nullfd, STDERR_FILENO);
+                    if (nullfd > STDERR_FILENO) close(nullfd);
+                }
+                break;
+            }
+            case SDL_PROCESS_STDIO_INHERITED:
+            default:
+                break;
+            }
+        }
+
+        CloseAllFileDescriptors();
+
+        if (working_directory) {
+            chdir(working_directory);
+        }
+
+        if (process->background) {
+            setsid();
+        }
+
+        execvp(args[0], args);
+        _exit(errno);
+    }
+
+    data->pid = pid;
+
+    if (stdin_pipe[READ_END] >= 0) close(stdin_pipe[READ_END]);
+    if (stdout_pipe[WRITE_END] >= 0) close(stdout_pipe[WRITE_END]);
+    if (stderr_pipe[WRITE_END] >= 0) close(stderr_pipe[WRITE_END]);
+
+    SDL_SetNumberProperty(process->props, SDL_PROP_PROCESS_PID_NUMBER, data->pid);
+
+    if (stdin_option == SDL_PROCESS_STDIO_APP) {
+        if (!SetupStream(process, stdin_pipe[WRITE_END], "wb", SDL_PROP_PROCESS_STDIN_POINTER)) {
+            close(stdin_pipe[WRITE_END]);
+        }
+    }
+
+    if (stdout_option == SDL_PROCESS_STDIO_APP) {
+        if (!SetupStream(process, stdout_pipe[READ_END], "rb", SDL_PROP_PROCESS_STDOUT_POINTER)) {
+            close(stdout_pipe[READ_END]);
+        }
+    }
+
+    if (stderr_option == SDL_PROCESS_STDIO_APP) {
+        if (!SetupStream(process, stderr_pipe[READ_END], "rb", SDL_PROP_PROCESS_STDERR_POINTER)) {
+            close(stderr_pipe[READ_END]);
+        }
+    }
+
+    SDL_free(envp);
+    return true;
+
+fork_fail:
+    if (stdin_pipe[READ_END] >= 0) close(stdin_pipe[READ_END]);
+    if (stdin_pipe[WRITE_END] >= 0) close(stdin_pipe[WRITE_END]);
+    if (stdout_pipe[READ_END] >= 0) close(stdout_pipe[READ_END]);
+    if (stdout_pipe[WRITE_END] >= 0) close(stdout_pipe[WRITE_END]);
+    if (stderr_pipe[READ_END] >= 0) close(stderr_pipe[READ_END]);
+    if (stderr_pipe[WRITE_END] >= 0) close(stderr_pipe[WRITE_END]);
+    SDL_free(process->internal);
+    process->internal = NULL;
+    SDL_free(envp);
+    return false;
+}
+
+#endif
 
 bool SDL_SYS_KillProcess(SDL_Process *process, bool force)
 {
