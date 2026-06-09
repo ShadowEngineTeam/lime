@@ -119,7 +119,7 @@ static BOOL UIKit_ShowMessageBoxAlertController(const SDL_MessageBoxData *messag
         [alertwindow makeKeyAndVisible];
     }
 
-    [window.rootViewController presentViewController:alert animated:YES completion:nil];
+    [window.rootViewController presentViewController:alert animated:NO completion:nil];
     UIKit_WaitUntilMessageBoxClosed(messageboxdata, &clickedindex);
 
     if (alertwindow) {
@@ -147,24 +147,6 @@ static void SDLCALL UIKit_ShowMessageBoxMainThreadCallback(void *userdata)
     }
 }
 
-#ifdef SDL_PLATFORM_IOS
-bool UIKit_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonID)
-{
-    // Message boxes dont seem to work on iOS 18.5 or lower
-    // Only iOS 26 seems to work just fine
-    // This is to be fixed later
-    if (@available(iOS 26.0, *)) {
-        UIKit_ShowMessageBoxData data = { messageboxdata, buttonID, false };
-        if (!SDL_RunOnMainThread(UIKit_ShowMessageBoxMainThreadCallback, &data, true)) {
-            return false;
-        } else if (!data.result) {
-            return SDL_SetError("Could not show message box.");
-        }
-        return true;
-    }
-    return false;
-}
-#else
 bool UIKit_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonID)
 {
     UIKit_ShowMessageBoxData data = { messageboxdata, buttonID, false };
@@ -175,6 +157,5 @@ bool UIKit_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonI
     }
     return true;
 }
-#endif
 
 #endif // SDL_VIDEO_DRIVER_UIKIT
