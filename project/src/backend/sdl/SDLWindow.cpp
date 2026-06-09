@@ -194,7 +194,7 @@ namespace lime {
 		if (!sdlWindow) {
 
 			//#if defined(IPHONE) || defined(APPLETV)
-			printf ("Could not create SDL Window with OpenGL ES 3: %s.\nTrying to create SDL Window using OpenGL ES 2...", SDL_GetError ());
+			SDL_Log ("Could not create SDL Window with OpenGL ES 3: %s.\nTrying to create SDL Window using OpenGL ES 2...", SDL_GetError ());
 			/*#else
 			SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL Window", SDL_GetError (), NULL);
 			#endif*/
@@ -206,7 +206,7 @@ namespace lime {
 			if (!sdlWindow) {
 
 				//#if defined(IPHONE) || defined(APPLETV)
-				printf ("Could not create SDL Window with OpenGL ES 2: %s.\nReturning null...\n", SDL_GetError ());
+				SDL_Log ("Could not create SDL Window with OpenGL ES 2: %s.\nReturning null...\n", SDL_GetError ());
 				/*#else
 				SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL Window", SDL_GetError (), NULL);
 				#endif*/
@@ -225,13 +225,13 @@ namespace lime {
 
 		if (eglDisplay == EGL_NO_DISPLAY) {
 
-			printf ("Failed to get EGL display (EGL error: 0x%04X)\n", eglGetError ());
+			SDL_Log ("Failed to get EGL display (EGL error: 0x%04X)\n", eglGetError ());
 
 		}
 
 		if (eglInitialize (eglDisplay, NULL, NULL) == false) {
 
-			printf ("Failed to initialize EGL (EGL error: 0x%04X)\n", eglGetError ());
+			SDL_Log ("Failed to initialize EGL (EGL error: 0x%04X)\n", eglGetError ());
 
 		}
 
@@ -240,14 +240,14 @@ namespace lime {
 
 		if (!eglChooseConfig (eglDisplay, egl_config_attribs.data (), &eglConfig, 1, &eglConfigCount) || eglConfigCount == 0) {
 
-			printf ("Failed to choose EGL config (EGL error: 0x%04X), retrying with OpenGL ES 2\n", eglGetError ());
+			SDL_Log ("Failed to choose EGL config (EGL error: 0x%04X), retrying with OpenGL ES 2\n", eglGetError ());
 
 			egl_config_attribs[egl_config_attribs.size () - 2] = EGL_OPENGL_ES2_BIT;
 			egl_config_attribs[egl_config_attribs.size () - 1] = EGL_NONE;
 
 			if (!eglChooseConfig (eglDisplay, egl_config_attribs.data (), &eglConfig, 1, &eglConfigCount) || eglConfigCount == 0) {
 
-				printf ("Failed to choose EGL config with OpenGL ES 2 (EGL error: 0x%04X)\n", eglGetError ());
+				SDL_Log ("Failed to choose EGL config with OpenGL ES 2 (EGL error: 0x%04X)\n", eglGetError ());
 
 			} else {
 
@@ -261,7 +261,7 @@ namespace lime {
 
 		if (eglSurface == EGL_NO_SURFACE) {
 
-			printf ("Failed to create EGL surface (EGL error: 0x%04X)\n", eglGetError ());
+			SDL_Log ("Failed to create EGL surface (EGL error: 0x%04X)\n", eglGetError ());
 
 		}
 
@@ -269,13 +269,13 @@ namespace lime {
 
 		if (eglContext == EGL_NO_CONTEXT) {
 
-			printf ("Failed to create EGL context (EGL error: 0x%04X)\n", eglGetError ());
+			SDL_Log ("Failed to create EGL context (EGL error: 0x%04X)\n", eglGetError ());
 
 		}
 
 		if (!eglMakeCurrent (eglDisplay, eglSurface, eglSurface, eglContext)) {
 
-			printf ("Failed to make EGL context current (EGL error: 0x%04X)\n", eglGetError ());
+			SDL_Log ("Failed to make EGL context current (EGL error: 0x%04X)\n", eglGetError ());
 
 		} else {
 
@@ -302,7 +302,7 @@ namespace lime {
 		} else {
 
 			//#if defined(IPHONE) || defined(APPLETV)
-			printf ("Could not create SDL GL Context: %s\n", SDL_GetError ());
+			SDL_Log ("Could not create SDL GL Context: %s\n", SDL_GetError ());
 			/*#else
 			SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL GL Context", SDL_GetError (), sdlWindow);
 			#endif*/
@@ -339,7 +339,7 @@ namespace lime {
 
 		} else {
 
-			printf ("Could not create SDL renderer: %s.\n", SDL_GetError ());
+			SDL_Log ("Could not create SDL renderer: %s.\n", SDL_GetError ());
 
 		}
 
@@ -357,7 +357,7 @@ namespace lime {
 
 		} else {
 
-			printf ("Could not create SDL renderer: %s.\n", SDL_GetError ());
+			SDL_Log ("Could not create SDL renderer: %s.\n", SDL_GetError ());
 
 		}
 

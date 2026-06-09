@@ -57,7 +57,7 @@ namespace lime {
 
 		if (!SDL_Init (initFlags)) {
 
-			printf ("Could not initialize SDL: %s.\n", SDL_GetError ());
+			SDL_Log ("Could not initialize SDL: %s.\n", SDL_GetError ());
 
 		}
 
