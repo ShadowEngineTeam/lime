@@ -240,24 +240,21 @@ namespace lime {
 
 		if (!eglChooseConfig (eglDisplay, egl_config_attribs.data (), &eglConfig, 1, &eglConfigCount) || eglConfigCount == 0) {
 
-			printf ("Failed to choose EGL config (EGL error: 0x%04X), retrying with a minimal config\n", eglGetError ());
+			printf ("Failed to choose EGL config (EGL error: 0x%04X), retrying with OpenGL ES 2\n", eglGetError ());
 
-			EGLint egl_minimal_attribs[] = {
-				EGL_RED_SIZE, 8,
-				EGL_GREEN_SIZE, 8,
-				EGL_BLUE_SIZE, 8,
-				EGL_ALPHA_SIZE, 8,
-				EGL_DEPTH_SIZE, 16,
-				EGL_STENCIL_SIZE, 8,
-				EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
-				EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-				EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
-				EGL_NONE
-			};
+			egl_config_attribs[egl_config_attribs.size () - 2] = EGL_OPENGL_ES2_BIT;
+			egl_config_attribs[egl_config_attribs.size () - 1] = EGL_NONE;
 
-			if (!eglChooseConfig (eglDisplay, egl_minimal_attribs, &eglConfig, 1, &eglConfigCount) || eglConfigCount == 0) {
+			if (!eglChooseConfig (eglDisplay, egl_config_attribs.data (), &eglConfig, 1, &eglConfigCount) || eglConfigCount == 0) {
 
-				printf ("Failed to choose minimal EGL config (EGL error: 0x%04X)\n", eglGetError ());
+				printf ("Failed to choose EGL config with OpenGL ES 2 (EGL error: 0x%04X)\n", eglGetError ());
+
+			} else {
+
+				egl_context_attribs.clear ();
+				egl_context_attribs.push_back (EGL_CONTEXT_CLIENT_VERSION);
+				egl_context_attribs.push_back (2);
+				egl_context_attribs.push_back (EGL_NONE);
 
 			}
 
