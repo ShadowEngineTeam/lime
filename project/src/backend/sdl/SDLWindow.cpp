@@ -251,10 +251,7 @@ namespace lime {
 
 			} else {
 
-				egl_context_attribs.clear ();
-				egl_context_attribs.push_back (EGL_CONTEXT_CLIENT_VERSION);
-				egl_context_attribs.push_back (2);
-				egl_context_attribs.push_back (EGL_NONE);
+				egl_context_attribs[1] = 2;
 
 			}
 
