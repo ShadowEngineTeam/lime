@@ -845,6 +845,19 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
 
         // Try a transition to resumed state
         if (mNextNativeState == NativeState.RESUMED) {
+            // Recover mIsSurfaceReady when returning from startActivityForResult (e.g. Android Settings
+            // for MANAGE_APP_ALL_FILES_ACCESS) — surfaceChanged() may not re-fire even though the
+            // surface is still physically valid, leaving the resume gate permanently blocked.
+            if (!mSurface.mIsSurfaceReady && mIsResumedCalled && (mHasFocus || mHasMultiWindow)) {
+                try {
+                    if (mSurface.getHolder().getSurface().isValid()) {
+                        Log.v(TAG, "handleNativeState: surface valid but mIsSurfaceReady=false, recovering");
+                        mSurface.mIsSurfaceReady = true;
+                    }
+                } catch (Exception e) {
+                    // Surface not yet available — leave mIsSurfaceReady as-is
+                }
+            }
             if (mSurface.mIsSurfaceReady && (mHasFocus || mHasMultiWindow) && mIsResumedCalled) {
                 if (mSDLThread == null) {
                     // This is the entry point to the C app.
