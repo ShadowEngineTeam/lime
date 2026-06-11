@@ -6005,7 +6005,9 @@ bool SDL_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonID)
 
     SDL_ClearError();
 
+    #if SDL_PLATFORM_IOS
     SDL_Log("SDL_ShowMessageBox: \"%s\" - \"%s\"", messageboxdata->title, messageboxdata->message);
+    #endif
 
     if (_this && _this->ShowMessageBox) {
         result = _this->ShowMessageBox(_this, messageboxdata, buttonID);
