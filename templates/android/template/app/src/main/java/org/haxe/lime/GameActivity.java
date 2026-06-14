@@ -425,7 +425,7 @@ public class GameActivity extends SDLActivity {
 
 		if (audioManager != null) {
 
-			audioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+			audioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 		}
 
 	}
