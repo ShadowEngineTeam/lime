@@ -44,6 +44,7 @@ struct SDL_WindowData
     int swap_interval;
 #endif
     bool backup_done;
+    bool surface_valid; // false between surfaceDestroyed() and the next surfaceChanged(); guards rendering into an abandoned ANativeWindow
     ANativeWindow *native_window;
 
 };
