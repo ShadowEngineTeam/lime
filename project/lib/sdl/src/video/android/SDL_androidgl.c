@@ -66,15 +66,6 @@ bool Android_GLES_SwapWindow(SDL_VideoDevice *_this, SDL_Window *window)
 
     Android_LockActivityMutex();
 
-    /* If the Android surface has been destroyed (e.g. backgrounding / rapid recents switching),
-     * its ANativeWindow BufferQueue is already abandoned. Presenting here would block ANGLE/Vulkan
-     * inside eglSwapBuffers while holding this mutex, wedging the pause handshake and ultimately
-     * tearing down the EGL surface while still current -> corrupted textures. Skip until valid. */
-    if (!window->internal->surface_valid || window->internal->egl_surface == EGL_NO_SURFACE) {
-        Android_UnlockActivityMutex();
-        return true;
-    }
-
     /* The following two calls existed in the original Java code
      * If you happen to have a device that's affected by their removal,
      * please report to our bug tracker. -- Gabriel
