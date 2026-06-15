@@ -41,7 +41,6 @@ class NativeWindow
 	private var frameRate:Float;
 	private var mouseLock:Bool;
 	private var parent:Window;
-	private var __contextAttributes:Dynamic;
 
 	public function new(parent:Window)
 	{
@@ -143,7 +142,6 @@ class NativeWindow
 
 		contextAttributes.type = context.type;
 		context.attributes = contextAttributes;
-		__contextAttributes = contextAttributes;
 		parent.context = context;
 
 		setFrameRate(Reflect.hasField(attributes, "frameRate") ? attributes.frameRate : 60);
@@ -155,47 +153,6 @@ class NativeWindow
 		// See, for example: openfl/openfl#2697
 		// it appears that SDL 3 may behave differently, if we ever upgrade.
 		setTextInputEnabled(false);
-	}
-
-	/**
-		Rebuilds `parent.context` after the native GL context was lost and recreated
-		(see the Android/ANGLE resume path). A brand new `RenderContext` identity is
-		required so that consumers like OpenFL detect the change and re-upload their
-		GPU resources instead of reusing now-dead texture/buffer handles.
-	**/
-	public function recreateContext():Void
-	{
-		#if (!macro && lime_cffi && (lime_opengl || lime_opengles) && !display)
-		var context = new RenderContext();
-		context.window = parent;
-
-		var gl = new NativeOpenGLRenderContext();
-
-		#if lime_opengl
-		context.gl = gl;
-		#end
-
-		context.gles2 = gl;
-		context.webgl = gl;
-		context.type = gl.type;
-		context.version = Std.string(gl.version);
-
-		if (gl.type == OPENGLES && gl.version >= 3)
-		{
-			context.gles3 = gl;
-			context.webgl2 = gl;
-		}
-
-		GL.context = gl;
-
-		if (__contextAttributes != null)
-		{
-			__contextAttributes.type = context.type;
-			context.attributes = __contextAttributes;
-		}
-
-		parent.context = context;
-		#end
 	}
 
 	public function alert(type:lime.ui.MessageBoxType, message:String, title:String, buttons:Array<String>):Int
