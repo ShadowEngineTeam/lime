@@ -383,9 +383,14 @@ class NativeApplication
 						{
 							case OPENGL, OPENGLES, WEBGL:
 								#if (lime_cffi && (lime_opengl || lime_opengles) && !display)
-								var gl = window.context.gl;
-								(gl : NativeOpenGLRenderContext).__contextLost();
-								if (GL.context == gl) GL.context = null;
+								// context.gl is only populated on lime_opengl (desktop) builds; on
+								// lime_opengles (Android) it's null and the GL lives in gles2/webgl.
+								var gl:NativeOpenGLRenderContext = window.context.gl != null ? cast window.context.gl : cast window.context.gles2;
+								if (gl != null)
+								{
+									gl.__contextLost();
+									if (GL.context == gl) GL.context = null;
+								}
 								#end
 
 							default:
