@@ -37,34 +37,17 @@ static void android_egl_context_restore(SDL_Window *window)
 {
     if (window) {
         SDL_WindowData *data = window->internal;
-
-        /* ANGLE virtualizes the EGLContext, so eglMakeCurrent() on the saved context
-         * succeeds even after Android destroyed and recreated the ANativeWindow during
-         * (rapid) background/foreground switching. The old "reuse the context if
-         * MakeCurrent succeeds" path then left that context bound to an abandoned surface
-         * (logcat: "BufferQueue has been abandoned" / NATIVE_WINDOW_MIN_UNDEQUEUED_BUFFERS
-         * "No such device") and never reported a reset, so the app's GPU resources stayed
-         * orphaned -> corrupted/stale textures.
-         *
-         * Force a clean teardown + recreate of the GL context against the current surface,
-         * and always notify the app via SDL_EVENT_RENDER_DEVICE_RESET so it can re-upload
-         * its GPU resources. */
         SDL_GL_MakeCurrent(window, NULL);
-
-        if (data->egl_context) {
-            SDL_GL_DestroyContext((SDL_GLContext)data->egl_context);
-            data->egl_context = EGL_NO_CONTEXT;
+        if (!SDL_GL_MakeCurrent(window, (SDL_GLContext)data->egl_context)) {
+            // The context is no longer valid, create a new one
+            data->egl_context = (EGLContext)SDL_GL_CreateContext(window);
+            SDL_GL_MakeCurrent(window, (SDL_GLContext)data->egl_context);
+            SDL_Event event;
+            SDL_zero(event);
+            event.type = SDL_EVENT_RENDER_DEVICE_RESET;
+            event.render.windowID = SDL_GetWindowID(window);
+            SDL_PushEvent(&event);
         }
-
-        data->egl_context = (EGLContext)SDL_GL_CreateContext(window);
-        SDL_GL_MakeCurrent(window, (SDL_GLContext)data->egl_context);
-
-        SDL_Event event;
-        SDL_zero(event);
-        event.type = SDL_EVENT_RENDER_DEVICE_RESET;
-        event.render.windowID = SDL_GetWindowID(window);
-        SDL_PushEvent(&event);
-
         data->backup_done = false;
 
         SDL_GL_SetSwapInterval(data->swap_interval);
