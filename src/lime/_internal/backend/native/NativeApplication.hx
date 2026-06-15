@@ -396,6 +396,10 @@ class NativeApplication
 					}
 
 				case RENDER_CONTEXT_RESTORED:
+					// RENDER_CONTEXT_LOST nulled window.context; rebuild it (with a fresh
+					// identity) so the GL context is valid again and consumers re-upload
+					// their GPU resources rather than reusing dead handles.
+					window.__backend.recreateContext();
 					window.onRenderContextRestored.dispatch(window.context);
 			}
 		}
