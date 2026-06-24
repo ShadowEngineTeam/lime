@@ -1,5 +1,6 @@
 import javax.swing.JOptionPane
 import javax.swing.JPasswordField
+import org.objectweb.asm.*
 
 apply plugin: 'com.android.application'
 
@@ -122,6 +123,47 @@ tasks.whenTaskAdded { task ->
 			}
 		}
 	}
+}
+
+def patchSDLActivity(task) {
+	task.doLast {
+		def classDir = task.destinationDirectory.get().asFile
+		def classFile = file("${classDir}/org/libsdl/app/SDLActivity.class")
+		if (classFile.exists()) {
+			logger.lifecycle("Patching SDLActivity.class to add getContext()Landroid/content/Context;")
+			def bytes = classFile.bytes
+			def reader = new ClassReader(bytes)
+			def writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS)
+			reader.accept(new ClassVisitor(Opcodes.ASM7, writer) {
+				@Override
+				void visitEnd() {
+					super.visitEnd()
+					MethodVisitor mv = super.visitMethod(
+						Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC,
+						"getContext",
+						"()Landroid/content/Context;",
+						null, null
+					)
+					mv.visitCode()
+					mv.visitMethodInsn(
+						Opcodes.INVOKESTATIC,
+						"org/libsdl/app/SDLActivity",
+						"getContext",
+						"()Landroid/app/Activity;",
+						false
+					)
+					mv.visitInsn(Opcodes.ARETURN)
+					mv.visitMaxs(1, 1)
+					mv.visitEnd()
+				}
+			}, 0)
+			classFile.bytes = writer.toByteArray()
+		}
+	}
+}
+
+afterEvaluate {
+	tasks.matching { it.name in ["compileDebugJavaWithJavac", "compileReleaseJavaWithJavac"] }.configureEach { patchSDLActivity(it) }
 }
 
 def getPassword(message) {
