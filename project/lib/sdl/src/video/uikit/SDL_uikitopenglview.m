@@ -178,6 +178,8 @@
             return nil;
         }
 
+        eglSwapInterval(eglDisplay, 0);
+
         if (samples > 0) {
             EGLint maxsamples = 0;
             eglGetConfigAttrib(eglDisplay, eglConfig, EGL_SAMPLES, &maxsamples);

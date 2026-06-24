@@ -189,7 +189,7 @@ static void SDLCALL SDL_HideHomeIndicatorHintChanged(void *userdata, const char 
 
             } else {
 
-                displayLink.preferredFrameRateRange = CAFrameRateRangeMake(frame_rate, frame_rate, frame_rate);
+                displayLink.preferredFrameRateRange = CAFrameRateRangeMake(frame_rate / 2, frame_rate, frame_rate);
 
             }
 
