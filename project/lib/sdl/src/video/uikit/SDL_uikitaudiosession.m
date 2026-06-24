@@ -4,9 +4,26 @@
 #import <AVFAudio/AVFAudio.h>
 
 #if TARGET_OS_IOS
+#include "SDL_internal.h"
+#include "../../events/SDL_keyboard_c.h"
 #import <UIKit/UIKit.h>
 
 static id sAudioInterruptionObserver = nil;
+
+static void SDL_AudioSession_NotifyFocusChange(bool focused)
+{
+	int count = 0;
+	SDL_Window **windows = SDL_GetWindows(&count);
+	if (windows == NULL) {
+		return;
+	}
+
+	for (int i = 0; i < count; i++) {
+		SDL_SetKeyboardFocus(focused ? windows[i] : NULL);
+	}
+
+	SDL_free(windows);
+}
 
 static void SDL_AudioSession_RegisterInterruptionObserver(void)
 {
@@ -28,16 +45,19 @@ static void SDL_AudioSession_RegisterInterruptionObserver(void)
 
 			AVAudioSessionInterruptionType type = (AVAudioSessionInterruptionType)typeValue.unsignedIntegerValue;
 
-			// On Began iOS has already deactivated our session; nothing to do.
-			// On Ended iOS does NOT reactivate for us, so re-focus the session
-			// when the system says it is safe to resume.
-			if (type == AVAudioSessionInterruptionTypeEnded) {
+			if (type == AVAudioSessionInterruptionTypeBegan) {
+				// iOS has already deactivated/stopped our audio unit for us.
+				// Drop focus so lime's AudioManager state (and "active" flag)
+				// stays in sync with reality.
+				SDL_AudioSession_NotifyFocusChange(false);
+			} else if (type == AVAudioSessionInterruptionTypeEnded) {
 				NSNumber *optionsValue = notification.userInfo[AVAudioSessionInterruptionOptionKey];
 				AVAudioSessionInterruptionOptions options =
 					optionsValue ? (AVAudioSessionInterruptionOptions)optionsValue.unsignedIntegerValue : 0;
 
 				if (options & AVAudioSessionInterruptionOptionShouldResume) {
 					SDL_AudioSession_SetActive(true);
+					SDL_AudioSession_NotifyFocusChange(true);
 				}
 			}
 		}];
