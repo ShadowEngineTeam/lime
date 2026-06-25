@@ -34,6 +34,7 @@
 #include <array>
 #include <bit>
 #include <cctype>
+#include <cerrno>
 #include <cstdint>
 #include <cstdlib>
 #include <fstream>
@@ -487,14 +488,18 @@ auto ConfigValueStr(const std::string_view devName, const std::string_view block
 auto ConfigValueI32(std::string_view const devName, std::string_view const blockName,
     std::string_view const keyName) -> std::optional<int>
 {
-    if(auto&& val = GetConfigValue(devName, blockName, keyName); !val.empty()) try {
-        return std::stoi(val, nullptr, 0);
-    }
-    catch(std::out_of_range&) {
-        WARN("Option is out of range of i32: {} = {}", keyName, val);
-    }
-    catch(std::exception&) {
-        WARN("Option is not an i32: {} = {}", keyName, val);
+    if(auto&& val = GetConfigValue(devName, blockName, keyName); !val.empty())
+    {
+        char *end{};
+        errno = 0;
+        const long long ival = std::strtoll(val.c_str(), &end, 0);
+        if(end == val.c_str())
+            WARN("Option is not an i32: {} = {}", keyName, val);
+        else if(errno == ERANGE || ival < std::numeric_limits<int>::min()
+            || ival > std::numeric_limits<int>::max())
+            WARN("Option is out of range of i32: {} = {}", keyName, val);
+        else
+            return static_cast<int>(ival);
     }
 
     return std::nullopt;
@@ -503,17 +508,17 @@ auto ConfigValueI32(std::string_view const devName, std::string_view const block
 auto ConfigValueU32(std::string_view const devName, std::string_view const blockName,
     std::string_view const keyName) -> std::optional<unsigned>
 {
-    if(auto&& val = GetConfigValue(devName, blockName, keyName); !val.empty()) try {
-        return gsl::narrow<unsigned>(std::stoul(val, nullptr, 0));
-    }
-    catch(std::out_of_range&) {
-        WARN("Option is out of range of u32: {} = {}", keyName, val);
-    }
-    catch(gsl::narrowing_error&) {
-        WARN("Option is out of range of u32: {} = {}", keyName, val);
-    }
-    catch(std::exception&) {
-        WARN("Option is not an u32: {} = {}", keyName, val);
+    if(auto&& val = GetConfigValue(devName, blockName, keyName); !val.empty())
+    {
+        char *end{};
+        errno = 0;
+        const unsigned long long uval = std::strtoull(val.c_str(), &end, 0);
+        if(end == val.c_str())
+            WARN("Option is not an u32: {} = {}", keyName, val);
+        else if(errno == ERANGE || uval > std::numeric_limits<unsigned>::max())
+            WARN("Option is out of range of u32: {} = {}", keyName, val);
+        else
+            return static_cast<unsigned>(uval);
     }
     return std::nullopt;
 }
@@ -521,11 +526,14 @@ auto ConfigValueU32(std::string_view const devName, std::string_view const block
 auto ConfigValueF32(std::string_view const devName, std::string_view const blockName,
     std::string_view const keyName) -> std::optional<float>
 {
-    if(auto&& val = GetConfigValue(devName, blockName, keyName); !val.empty()) try {
-        return std::stof(val);
-    }
-    catch(std::exception&) {
-        WARN("Option is not a float: {} = {}", keyName, val);
+    if(auto&& val = GetConfigValue(devName, blockName, keyName); !val.empty())
+    {
+        char *end{};
+        const float fval = std::strtof(val.c_str(), &end);
+        if(end == val.c_str())
+            WARN("Option is not a float: {} = {}", keyName, val);
+        else
+            return fval;
     }
     return std::nullopt;
 }
@@ -533,21 +541,19 @@ auto ConfigValueF32(std::string_view const devName, std::string_view const block
 auto ConfigValueBool(std::string_view const devName, std::string_view const blockName,
     std::string_view const keyName) -> std::optional<bool>
 {
-    if(auto&& val = GetConfigValue(devName, blockName, keyName); !val.empty()) try {
-        return al::case_compare(val, "on"sv) == 0 || al::case_compare(val, "yes"sv) == 0
-            || al::case_compare(val, "true"sv) == 0 || std::stoll(val) != 0;
-    }
-    catch(std::out_of_range&) {
-        /* If out of range, the value is some non-0 (true) value and it doesn't
-         * matter that it's too big or small.
-         */
-        return true;
-    }
-    catch(std::exception&) {
-        /* If stoll fails to convert for any other reason, it's some other word
-         * that's treated as false.
-         */
-        return false;
+    if(auto&& val = GetConfigValue(devName, blockName, keyName); !val.empty())
+    {
+        if(al::case_compare(val, "on"sv) == 0 || al::case_compare(val, "yes"sv) == 0
+            || al::case_compare(val, "true"sv) == 0)
+            return true;
+        char *end{};
+        errno = 0;
+        const long long ival = std::strtoll(val.c_str(), &end, 10);
+        if(end == val.c_str())
+            return false;
+        if(errno == ERANGE)
+            return true;
+        return ival != 0;
     }
     return std::nullopt;
 }
@@ -555,15 +561,19 @@ auto ConfigValueBool(std::string_view const devName, std::string_view const bloc
 auto GetConfigValueBool(const std::string_view devName, const std::string_view blockName,
     const std::string_view keyName, bool def) -> bool
 {
-    if(auto&& val = GetConfigValue(devName, blockName, keyName); !val.empty()) try {
-        return al::case_compare(val, "on"sv) == 0 || al::case_compare(val, "yes"sv) == 0
-            || al::case_compare(val, "true"sv) == 0 || std::stoll(val) != 0;
-    }
-    catch(std::out_of_range&) {
-        return true;
-    }
-    catch(std::exception&) {
-        return false;
+    if(auto&& val = GetConfigValue(devName, blockName, keyName); !val.empty())
+    {
+        if(al::case_compare(val, "on"sv) == 0 || al::case_compare(val, "yes"sv) == 0
+            || al::case_compare(val, "true"sv) == 0)
+            return true;
+        char *end{};
+        errno = 0;
+        const long long ival = std::strtoll(val.c_str(), &end, 10);
+        if(end == val.c_str())
+            return false;
+        if(errno == ERANGE)
+            return true;
+        return ival != 0;
     }
     return def;
 }
