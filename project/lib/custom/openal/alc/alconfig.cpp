@@ -394,8 +394,7 @@ void LoadSEALDefaultConfig()
     // SetConfigValue("drivers", "coreaudio,null");
     SetConfigValue("drivers", "sdl3,null"); // coreaudio itself gives no audio output. weird.
     #elif defined(__ANDROID__)
-    // SetConfigValue("drivers", "oboe,null");
-    SetConfigValue("drivers", "sdl3,null"); // the reason for this is that Oboe lowers the quality when output device gets switched.
+    SetConfigValue("drivers", "sdl3,oboe,opensl,null"); // the reason for this is that Oboe lowers the quality when output device gets switched.
     #endif
     SetConfigValue("sample-type", "float32");
     SetConfigValue("channels", "stereo");

@@ -164,7 +164,7 @@
                 <section if="android">
 
                     <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/oboe.cpp" />
-                    <!--<file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/opensl.cpp" />-->
+                    <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/opensl.cpp" />
 
                 </section>
 
