@@ -64,26 +64,13 @@ void OboePlayback::onErrorAfterClose(oboe::AudioStream*, oboe::Result const erro
 
     if(error == oboe::Result::ErrorDisconnected)
     {
-        /* The audio device changed (e.g. headphones plugged/unplugged).
-         * Attempt to reopen the stream on the new default device before
-         * treating this as a fatal disconnect. */
-        TRACE("Stream disconnected, attempting restart on new device...");
-        try
-        {
-            if(reset())
-            {
-                start();
-                return; // successfully switched to new device
-            }
-        }
-        catch(al::backend_exception& e)
-        {
-            ERR("Failed to restart stream after disconnect: {}", e.what());
-        }
-
-        /* Restart failed, propagate as a real device error. */
-        mDevice->handleDisconnect("Oboe AudioStream was disconnected: {}",
-            oboe::convertToText(error));
+        /* Device changed (e.g. headphones). Let the app reopen on the main
+         * thread for a fresh full-quality stream, instead of rebuilding here on
+         * the callback thread (which races the mixer and device state).
+         */
+        TRACE("Stream disconnected, signaling default device change for reopen");
+        alc::Event(alc::EventType::DefaultDeviceChanged, alc::DeviceType::Playback,
+            "Oboe output device disconnected");
     }
 }
 
@@ -405,6 +392,14 @@ auto OboeBackendFactory::createBackend(gsl::not_null<DeviceBase*> const device,
     if(type == BackendType::Capture)
         return BackendPtr{new OboeCapture{device}};
     return BackendPtr{};
+}
+
+auto OboeBackendFactory::queryEventSupport(alc::EventType const eventType, BackendType const)
+    -> alc::EventSupport
+{
+    if(eventType == alc::EventType::DefaultDeviceChanged)
+        return alc::EventSupport::FullSupport;
+    return alc::EventSupport::NoSupport;
 }
 
 auto OboeBackendFactory::getFactory() -> BackendFactory&

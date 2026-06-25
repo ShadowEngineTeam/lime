@@ -12,6 +12,8 @@ struct OboeBackendFactory final : BackendFactory {
 
     auto createBackend(gsl::not_null<DeviceBase*> device, BackendType type) -> BackendPtr final;
 
+    auto queryEventSupport(alc::EventType eventType, BackendType type) -> alc::EventSupport final;
+
     static auto getFactory() -> BackendFactory&;
 };
 
