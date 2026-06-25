@@ -29,6 +29,8 @@
 
 #include "../../core/android/SDL_android.h"
 
+#include "SDL_androidvideo.h"
+
 // See Android's MotionEvent class for constants
 #define ACTION_DOWN       0
 #define ACTION_UP         1
@@ -214,6 +216,19 @@ void Android_OnMouse(SDL_Window *window, int state, int action, float x, float y
 
     if (!window) {
         return;
+    }
+
+    // The draw scale shrinks the window/framebuffer (see SDL_androidwindow.c), but
+    // mouse coordinates arrive in full-surface View pixels. Scale absolute positions
+    // into the same space so the pointer matches what's rendered. Relative-mode deltas
+    // are already in motion units, and ACTION_SCROLL reuses x/y as wheel amounts; neither
+    // must be scaled.
+    if (!relative && action != ACTION_SCROLL) {
+        float scale = Android_GetDrawScale();
+        if (Android_ShouldUseDrawScale(scale)) {
+            x *= scale;
+            y *= scale;
+        }
     }
 
     switch (action) {

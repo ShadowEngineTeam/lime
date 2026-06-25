@@ -25,6 +25,7 @@
 #include "SDL_androidpen.h"
 #include "../../events/SDL_pen_c.h"
 #include "../../core/android/SDL_android.h"
+#include "SDL_androidvideo.h"
 
 #define ACTION_DOWN   0
 #define ACTION_UP     1
@@ -38,6 +39,15 @@ void Android_OnPen(SDL_Window *window, int pen_id_in, SDL_PenDeviceType device_t
 {
     if (!window) {
         return;
+    }
+
+    // The draw scale shrinks the window/framebuffer (see SDL_androidwindow.c), but pen
+    // coordinates arrive in full-surface View pixels. Scale them into the same space so
+    // the pointer matches what's rendered.
+    float scale = Android_GetDrawScale();
+    if (Android_ShouldUseDrawScale(scale)) {
+        x *= scale;
+        y *= scale;
     }
 
     // pointer index starts from zero.
