@@ -82,7 +82,7 @@ class CFFI
 		}
 		else
 		{
-			#if (cpp && (iphone || webassembly || android || static_link || tvos))
+			#if (cpp && (iphone || android || static_link || tvos))
 			return cpp.Lib.load(library, method, args);
 			#end
 
