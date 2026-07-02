@@ -175,6 +175,10 @@ class NativeApplication
 
 				parent.onUpdate.dispatch(applicationEventInfo.deltaTime);
 
+				#if HXCPP_TRACY
+				cpp.vm.tracy.TracyProfiler.frameMark();
+				#end
+
 			default:
 		}
 	}
