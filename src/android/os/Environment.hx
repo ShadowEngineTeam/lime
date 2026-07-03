@@ -8,10 +8,6 @@ import lime.system.JNI;
  * using JNI calls.
  */
 #if android
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 class Environment
 {
 	/**

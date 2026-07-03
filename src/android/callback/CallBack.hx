@@ -13,10 +13,6 @@ using StringTools;
  * activity results and permissions results from native code.
  */
 #if android
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 class CallBack
 {
 	/**
@@ -57,10 +53,6 @@ class CallBack
  */
 @:keep
 @:noCompletion
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 private class CallBackHandler #if !macro implements JNISafety #end
 {
 	public function new():Void {}

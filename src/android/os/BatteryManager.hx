@@ -7,10 +7,6 @@ import lime.system.JNI;
  * Utility class for accessing battery information using JNI.
  */
 #if android
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 class BatteryManager
 {
 	/**

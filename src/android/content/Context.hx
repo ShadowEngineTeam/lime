@@ -7,10 +7,6 @@ import lime.system.JNI;
  * This class provides access to directories associated with the application context using JNI calls.
  */
 #if android
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 class Context
 {
 	/**

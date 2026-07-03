@@ -6,10 +6,6 @@ import lime._internal.backend.android.JNICache;
  * Utility class providing access to various build-related information via JNI.
  */
 #if android
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 class Build
 {
 	/**
@@ -148,10 +144,6 @@ class Build
 /**
  * Utility class providing Android version-related constants and information.
  */
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 class VERSION
 {
 	/**
@@ -227,10 +219,6 @@ class VERSION
 /**
  * Constants for Android SDK version codes.
  */
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 class VERSION_CODES
 {
 	public static final BASE:Int = 1;
