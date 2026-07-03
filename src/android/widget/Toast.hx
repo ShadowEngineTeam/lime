@@ -6,10 +6,6 @@ import lime._internal.backend.android.JNICache;
  * Utility class for displaying toast messages on Android via JNI.
  */
 #if android
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 class Toast
 {
 	/**

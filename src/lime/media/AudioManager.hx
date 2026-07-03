@@ -13,10 +13,6 @@ import lime.app.Application;
 import js.Browser;
 #end
 
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 @:access(lime._internal.backend.native.NativeCFFI)
 @:access(lime.media.openal.ALDevice)
 class AudioManager

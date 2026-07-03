@@ -8,10 +8,6 @@ using StringTools;
  * A utility class for interacting with Android settings via JNI.
  */
 #if android
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 class Settings
 {
 	/** 

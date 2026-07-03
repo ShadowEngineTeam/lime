@@ -6,10 +6,6 @@ import lime.system.JNI;
  * A utility class for caching JNI method and field references.
  */
 #if android
-#if !lime_debug
-@:fileXml('tags="haxe,release"')
-@:noDebug
-#end
 class JNICache
 {
 	@:noCompletion
