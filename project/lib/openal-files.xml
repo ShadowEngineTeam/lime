@@ -1,9 +1,5 @@
 <xml>
 
-    <section if="android LIME_OPENALSOFT">
-        <error value="NDK version 20 or higher is required." unless="NDKV20+" />
-    </section>
-
     <files id="native-toolkit-openal">
 
         <section>
@@ -38,6 +34,7 @@
             </section>
 
             <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include" if="NATIVE_TOOLKIT_HAVE_SDL" />
+            <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/include" if="NATIVE_TOOLKIT_HAVE_SDL" />
 
         </section>
 
@@ -165,6 +162,7 @@
 
                     <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/oboe.cpp" />
                     <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/opensl.cpp" />
+                    <file name="${NATIVE_TOOLKIT_PATH}/custom/openal/alc/backends/aaudio.cpp" />
 
                 </section>
 
@@ -214,7 +212,7 @@
 
             <section>
 
-                <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/alc.cpp" />
+                <file name="${NATIVE_TOOLKIT_PATH}/custom/openal/alc/alc.cpp" />
                 <file name="${NATIVE_TOOLKIT_PATH}/custom/openal/alc/alconfig.cpp" />
                 <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/alu.cpp" />
                 <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/context.cpp" />
