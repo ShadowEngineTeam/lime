@@ -411,8 +411,10 @@ bool OpenSLPlayback::reset()
 
     mRing = nullptr;
 
-    mDevice->FmtChans = DevFmtStereo;
-    mDevice->FmtType = DevFmtShort;
+   if(!mDevice->mFlags.test(DeviceFlag::ChannelsRequest))
+        mDevice->FmtChans = DevFmtStereo;
+    if(!mDevice->mFlags.test(DeviceFlag::SampleTypeRequest))
+        mDevice->FmtType = DevFmtShort;
 
     setDefaultWFXChannelOrder();
     mFrameSize = mDevice->frameSizeFromFmt();

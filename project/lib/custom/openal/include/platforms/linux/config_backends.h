@@ -24,4 +24,6 @@
 
 #define HAVE_OPENSL 0
 
+#define HAVE_AAUDIO 0
+
 #define HAVE_OBOE 0
