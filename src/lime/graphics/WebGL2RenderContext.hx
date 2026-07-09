@@ -252,7 +252,7 @@ abstract WebGL2RenderContext(HTML5WebGL2RenderContext) from HTML5WebGL2RenderCon
 		return cast gl;
 	}
 }
-#elseif (!lime_doc_gen || lime_opengl || lime_opengles || lime_webgl)
+#elseif (!lime_doc_gen || lime_webgl)
 import haxe.Int64;
 import lime.graphics.opengl.*;
 import lime.utils.ArrayBuffer;
@@ -4978,12 +4978,6 @@ abstract WebGL2RenderContext(Dynamic) from Dynamic to Dynamic
 		return context.webgl2;
 	}
 
-	#if (!doc_gen && (lime_opengl || lime_opengles))
-	@:from private static function fromOpenGLES3RenderContext(gl:OpenGLES3RenderContext):WebGL2RenderContext
-	{
-		return cast gl;
-	}
-	#end
 
 	@:from private static function fromGL(gl:Class<GL>):WebGL2RenderContext
 	{

@@ -1,6 +1,6 @@
 package lime.graphics.opengl;
 
-#if (!lime_doc_gen || lime_opengl || lime_opengles || lime_webgl)
+#if (!lime_doc_gen || lime_webgl)
 import haxe.io.Bytes;
 import haxe.Int64;
 import lime.utils.ArrayBufferView;
@@ -9,10 +9,7 @@ import lime.utils.BytePointer;
 import lime.utils.DataPointer;
 import lime.utils.Float32Array;
 import lime.utils.Int32Array;
-#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
-import lime._internal.backend.native.NativeCFFI;
-import lime.system.CFFIPointer;
-#end
+
 
 @:allow(lime.ui.Window)
 class GL
@@ -581,11 +578,7 @@ class GL
 	public static inline var INVALID_INDEX = 0xFFFFFFFF;
 	public static inline var TIMEOUT_IGNORED = -1;
 	public static inline var MAX_CLIENT_WAIT_TIMEOUT_WEBGL = 0x9247;
-	#if lime_opengl
-	public static var context(default, null):OpenGLRenderContext;
-	#elseif lime_opengles
-	public static var context(default, null):OpenGLES3RenderContext;
-	#elseif lime_webgl
+	#if lime_webgl
 	public static var context(default, null):WebGL2RenderContext;
 	#else
 	public static var context(default, null):Dynamic;
@@ -694,29 +687,10 @@ class GL
 		context.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function blendBarrier():Void
-	{
-		context.blendBarrier();
-	}
-
-	public static inline function bufferData(target:Int, size:Int, srcData:DataPointer, usage:Int):Void
-	{
-		context.bufferData(target, size, srcData, usage);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function bufferDataWEBGL(target:Int, srcData:Dynamic, usage:Int, ?srcOffset:Int, ?length:Int):Void
 	{
 		context.bufferData(target, srcData, usage, srcOffset, length);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function bufferSubData(target:Int, dstByteOffset:Int, size:Int, srcData:DataPointer):Void
-	{
-		context.bufferSubData(target, dstByteOffset, size, srcData);
 	}
 	#end
 
@@ -742,13 +716,6 @@ class GL
 		context.clearBufferfi(buffer, drawbuffer, depth, stencil);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function clearBufferfv(buffer:Int, drawbuffer:Int, value:DataPointer):Void
-	{
-		context.clearBufferfv(buffer, drawbuffer, value);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function clearBufferfvWEBGL(buffer:Int, drawbuffer:Int, values:Dynamic, ?srcOffset:Int):Void
 	{
@@ -756,24 +723,10 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function clearBufferiv(buffer:Int, drawbuffer:Int, value:DataPointer):Void
-	{
-		context.clearBufferiv(buffer, drawbuffer, value);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function clearBufferivWEBGL(buffer:Int, drawbuffer:Int, values:Dynamic, ?srcOffset:Int):Void
 	{
 		context.clearBufferiv(buffer, drawbuffer, values, srcOffset);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function clearBufferuiv(buffer:Int, drawbuffer:Int, value:DataPointer):Void
-	{
-		context.clearBufferuiv(buffer, drawbuffer, value);
 	}
 	#end
 
@@ -796,14 +749,7 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function clearDepthf(depth:Float):Void
-	{
-		context.clearDepthf(depth);
-	}
-	#end
-
-	public static inline function clearStencil(s:Int):Void
+public static inline function clearStencil(s:Int):Void
 	{
 		context.clearStencil(s);
 	}
@@ -823,27 +769,11 @@ class GL
 		context.compileShader(shader);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function compressedTexImage2D(target:Int, level:Int, internalformat:Int, width:Int, height:Int, border:Int, imageSize:Int,
-			data:DataPointer):Void
-	{
-		context.compressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function compressedTexImage2DWEBGL(target:Int, level:Int, internalformat:Int, width:Int, height:Int, border:Int, srcData:Dynamic,
 			?srcOffset:Int, ?srcLengthOverride:Int):Void
 	{
 		context.compressedTexImage2D(target, level, internalformat, width, height, border, srcData, srcOffset, srcLengthOverride);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function compressedTexImage3D(target:Int, level:Int, internalformat:Int, width:Int, height:Int, depth:Int, border:Int, imageSize:Int,
-			data:DataPointer):Void
-	{
-		context.compressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data);
 	}
 	#end
 
@@ -855,27 +785,11 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function compressedTexSubImage2D(target:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Int, imageSize:Int,
-			data:DataPointer):Void
-	{
-		context.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function compressedTexSubImage2DWEBGL(target:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Int,
 			srcData:Dynamic, ?srcOffset:Int, ?srcLengthOverride:Int):Void
 	{
 		context.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, srcData, srcOffset, srcLengthOverride);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function compressedTexSubImage3D(target:Int, level:Int, xoffset:Int, yoffset:Int, zoffset:Int, width:Int, height:Int, depth:Int,
-			format:Int, imageSize:Int, data:DataPointer):Void
-	{
-		context.compressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data);
 	}
 	#end
 
@@ -887,14 +801,7 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function copyBufferSubData(readTarget:Int, writeTarget:Int, readOffset:DataPointer, writeOffset:DataPointer, size:Int):Void
-	{
-		context.copyBufferSubData(readTarget, writeTarget, readOffset, writeOffset, size);
-	}
-	#end
-
-	public static inline function copyTexImage2D(target:Int, level:Int, internalformat:Int, x:Int, y:Int, width:Int, height:Int, border:Int):Void
+public static inline function copyTexImage2D(target:Int, level:Int, internalformat:Int, x:Int, y:Int, width:Int, height:Int, border:Int):Void
 	{
 		context.copyTexImage2D(target, level, internalformat, x, y, width, height, border);
 	}
@@ -1036,14 +943,7 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function depthRangef(zNear:Float, zFar:Float):Void
-	{
-		context.depthRangef(zNear, zFar);
-	}
-	#end
-
-	public static inline function detachShader(program:GLProgram, shader:GLShader):Void
+public static inline function detachShader(program:GLProgram, shader:GLShader):Void
 	{
 		context.detachShader(program, shader);
 	}
@@ -1158,21 +1058,7 @@ class GL
 		return context.getActiveUniform(program, index);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getActiveUniformBlocki(program:GLProgram, uniformBlockIndex:Int, pname:Int):Int
-	{
-		return context.getActiveUniformBlocki(program, uniformBlockIndex, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getActiveUniformBlockiv(program:GLProgram, uniformBlockIndex:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getActiveUniformBlockiv(program, uniformBlockIndex, pname, params);
-	}
-	#end
-
-	public static inline function getActiveUniformBlockName(program:GLProgram, uniformBlockIndex:Int):String
+public static inline function getActiveUniformBlockName(program:GLProgram, uniformBlockIndex:Int):String
 	{
 		return context.getActiveUniformBlockName(program, uniformBlockIndex);
 	}
@@ -1187,14 +1073,7 @@ class GL
 		return context.getActiveUniforms(program, uniformIndices, pname);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getActiveUniformsiv(program:GLProgram, uniformIndices:Array<Int>, pname:Int, params:DataPointer):Void
-	{
-		context.getActiveUniformsiv(program, uniformIndices, pname, params);
-	}
-	#end
-
-	public static inline function getAttachedShaders(program:GLProgram):Array<GLShader>
+public static inline function getAttachedShaders(program:GLProgram):Array<GLShader>
 	{
 		return context.getAttachedShaders(program);
 	}
@@ -1204,54 +1083,12 @@ class GL
 		return context.getAttribLocation(program, name);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getBoolean(pname:Int):Bool
-	{
-		return context.getBoolean(pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getBooleanv(pname:Int, params:DataPointer):Void
-	{
-		context.getBooleanv(pname, params);
-	}
-	#end
-
-	public static inline function getBufferParameter(target:Int, pname:Int):Dynamic
+public static inline function getBufferParameter(target:Int, pname:Int):Dynamic
 	{
 		return context.getBufferParameter(target, pname);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getBufferParameteri(target:Int, pname:Int):Int
-	{
-		return context.getBufferParameteri(target, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getBufferParameteri64v(target:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getBufferParameteri64v(target, pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getBufferParameteriv(target:Int, pname:Int, data:DataPointer):Void
-	{
-		context.getBufferParameteriv(target, pname, data);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getBufferPointerv(target:Int, pname:Int):DataPointer
-	{
-		return context.getBufferPointerv(target, pname);
-	}
-	#end
-
-	public static inline function getContextAttributes():GLContextAttributes
+public static inline function getContextAttributes():GLContextAttributes
 	{
 		return context.getContextAttributes();
 	}
@@ -1266,21 +1103,7 @@ class GL
 		return context.getExtension(name);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getFloat(pname:Int):Float
-	{
-		return context.getFloat(pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getFloatv(pname:Int, params:DataPointer):Void
-	{
-		context.getFloatv(pname, params);
-	}
-	#end
-
-	public static inline function getFragDataLocation(program:GLProgram, name:String):Int
+public static inline function getFragDataLocation(program:GLProgram, name:String):Int
 	{
 		return context.getFragDataLocation(program, name);
 	}
@@ -1290,89 +1113,12 @@ class GL
 		return context.getFramebufferAttachmentParameter(target, attachment, pname);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getFramebufferAttachmentParameteri(target:Int, attachment:Int, pname:Int):Int
-	{
-		return context.getFramebufferAttachmentParameteri(target, attachment, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getFramebufferAttachmentParameteriv(target:Int, attachment:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getFramebufferAttachmentParameteriv(target, attachment, pname, params);
-	}
-	#end
-
-	public static inline function getIndexedParameter(target:Int, index:Int):Dynamic
+public static inline function getIndexedParameter(target:Int, index:Int):Dynamic
 	{
 		return context.getIndexedParameter(target, index);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getInteger(pname:Int):Int
-	{
-		return context.getInteger(pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getInteger64(pname:Int):Int64
-	{
-		return context.getInteger64(pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getInteger64i(pname:Int):Int64
-	{
-		return context.getInteger64i(pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getInteger64i_v(pname:Int, index:Int, params:DataPointer):Void
-	{
-		context.getInteger64i_v(pname, index, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getInteger64v(pname:Int, params:DataPointer):Void
-	{
-		context.getInteger64v(pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getIntegeri_v(pname:Int, index:Int, params:DataPointer):Void
-	{
-		context.getIntegeri_v(pname, index, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getIntegerv(pname:Int, params:DataPointer):Void
-	{
-		context.getIntegerv(pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getInternalformati(target:Int, internalformat:Int, pname:Int):Int
-	{
-		return context.getInternalformati(target, internalformat, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getInternalformativ(target:Int, internalformat:Int, pname:Int, bufSize:Int, params:DataPointer):Void
-	{
-		context.getInternalformativ(target, internalformat, pname, bufSize, params);
-	}
-	#end
-
-	public static inline function getInternalformatParameter(target:Int, internalformat:Int, pname:Int):Dynamic
+public static inline function getInternalformatParameter(target:Int, internalformat:Int, pname:Int):Dynamic
 	{
 		return context.getInternalformatParameter(target, internalformat, pname);
 	}
@@ -1382,28 +1128,7 @@ class GL
 		return context.getParameter(pname);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getProgrami(program:GLProgram, pname:Int):Int
-	{
-		return context.getProgrami(program, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getProgramiv(program:GLProgram, pname:Int, params:DataPointer):Void
-	{
-		context.getProgramiv(program, pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getProgramBinary(program:GLProgram, binaryFormat:Int):Bytes
-	{
-		return context.getProgramBinary(program, binaryFormat);
-	}
-	#end
-
-	public static inline function getProgramInfoLog(program:GLProgram):String
+public static inline function getProgramInfoLog(program:GLProgram):String
 	{
 		return context.getProgramInfoLog(program);
 	}
@@ -1418,35 +1143,7 @@ class GL
 		return context.getQuery(target, pname);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getQueryi(target:Int, pname:Int):Int
-	{
-		return context.getQueryi(target, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getQueryiv(target:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getQueryiv(target, pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getQueryObjectui(query:GLQuery, pname:Int):Int
-	{
-		return context.getQueryObjectui(query, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getQueryObjectuiv(query:GLQuery, pname:Int, params:DataPointer):Void
-	{
-		context.getQueryObjectuiv(query, pname, params);
-	}
-	#end
-
-	public static inline function getQueryParameter(query:GLQuery, pname:Int):Dynamic
+public static inline function getQueryParameter(query:GLQuery, pname:Int):Dynamic
 	{
 		return context.getQueryParameter(query, pname);
 	}
@@ -1456,68 +1153,12 @@ class GL
 		return context.getRenderbufferParameter(target, pname);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getRenderbufferParameteri(target:Int, pname:Int):Int
-	{
-		return context.getRenderbufferParameteri(target, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getRenderbufferParameteriv(target:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getRenderbufferParameteriv(target, pname, params);
-	}
-	#end
-
-	public static inline function getSamplerParameter(sampler:GLSampler, pname:Int):Dynamic
+public static inline function getSamplerParameter(sampler:GLSampler, pname:Int):Dynamic
 	{
 		return context.getSamplerParameter(sampler, pname);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getSamplerParameterf(sampler:GLSampler, pname:Int):Float
-	{
-		return context.getSamplerParameterf(sampler, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getSamplerParameterfv(sampler:GLSampler, pname:Int, params:DataPointer):Void
-	{
-		context.getSamplerParameterfv(sampler, pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getSamplerParameteri(sampler:GLSampler, pname:Int):Int
-	{
-		return context.getSamplerParameteri(sampler, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getSamplerParameteriv(sampler:GLSampler, pname:Int, params:DataPointer):Void
-	{
-		context.getSamplerParameteriv(sampler, pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getShaderi(shader:GLShader, pname:Int):Int
-	{
-		return context.getShaderi(shader, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getShaderiv(shader:GLShader, pname:Int, params:DataPointer):Void
-	{
-		context.getShaderiv(shader, pname, params);
-	}
-	#end
-
-	public static inline function getShaderInfoLog(shader:GLShader):String
+public static inline function getShaderInfoLog(shader:GLShader):String
 	{
 		return context.getShaderInfoLog(shader);
 	}
@@ -1537,21 +1178,7 @@ class GL
 		return context.getShaderSource(shader);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getString(name:Int):String
-	{
-		return context.getString(name);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getStringi(name:Int, index:Int):String
-	{
-		return context.getStringi(name, index);
-	}
-	#end
-
-	public static inline function getSupportedExtensions():Array<String>
+public static inline function getSupportedExtensions():Array<String>
 	{
 		return context.getSupportedExtensions();
 	}
@@ -1561,54 +1188,12 @@ class GL
 		return context.getSyncParameter(sync, pname);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getSyncParameteri(sync:GLSync, pname:Int):Int
-	{
-		return context.getSyncParameteri(sync, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getSyncParameteriv(sync:GLSync, pname:Int, params:DataPointer):Void
-	{
-		context.getSyncParameteriv(sync, pname, params);
-	}
-	#end
-
-	public static inline function getTexParameter(target:Int, pname:Int):Dynamic
+public static inline function getTexParameter(target:Int, pname:Int):Dynamic
 	{
 		return context.getTexParameter(target, pname);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getTexParameterf(target:Int, pname:Int):Float
-	{
-		return context.getTexParameterf(target, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getTexParameterfv(target:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getTexParameterfv(target, pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getTexParameteri(target:Int, pname:Int):Int
-	{
-		return context.getTexParameteri(target, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getTexParameteriv(target:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getTexParameteriv(target, pname, params);
-	}
-	#end
-
-	public static inline function getTransformFeedbackVarying(program:GLProgram, index:Int):GLActiveInfo
+public static inline function getTransformFeedbackVarying(program:GLProgram, index:Int):GLActiveInfo
 	{
 		return context.getTransformFeedbackVarying(program, index);
 	}
@@ -1618,49 +1203,7 @@ class GL
 		return context.getUniform(program, location);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getUniformf(program:GLProgram, location:GLUniformLocation):Float
-	{
-		return context.getUniformf(program, location);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getUniformfv(program:GLProgram, location:GLUniformLocation, params:DataPointer):Void
-	{
-		context.getUniformfv(program, location, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getUniformi(program:GLProgram, location:GLUniformLocation):Int
-	{
-		return context.getUniformi(program, location);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getUniformiv(program:GLProgram, location:GLUniformLocation, params:DataPointer):Void
-	{
-		context.getUniformiv(program, location, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getUniformui(program:GLProgram, location:GLUniformLocation):Int
-	{
-		return context.getUniformui(program, location);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getUniformuiv(program:GLProgram, location:GLUniformLocation, params:DataPointer):Void
-	{
-		context.getUniformuiv(program, location, params);
-	}
-	#end
-
-	public static inline function getUniformBlockIndex(program:GLProgram, uniformBlockName:String):Int
+public static inline function getUniformBlockIndex(program:GLProgram, uniformBlockName:String):Int
 	{
 		return context.getUniformBlockIndex(program, uniformBlockName);
 	}
@@ -1680,62 +1223,6 @@ class GL
 		return context.getVertexAttrib(index, pname);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getVertexAttribf(index:Int, pname:Int):Float
-	{
-		return context.getVertexAttribf(index, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getVertexAttribfv(index:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getVertexAttribfv(index, pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getVertexAttribi(index:Int, pname:Int):Int
-	{
-		return context.getVertexAttribi(index, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getVertexAttribIi(index:Int, pname:Int):Int
-	{
-		return context.getVertexAttribIi(index, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getVertexAttribIiv(index:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getVertexAttribIiv(index, pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getVertexAttribIui(index:Int, pname:Int):Int
-	{
-		return context.getVertexAttribIui(index, pname);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getVertexAttribIuiv(index:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getVertexAttribIuiv(index, pname, params);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function getVertexAttribiv(index:Int, pname:Int, params:DataPointer):Void
-	{
-		context.getVertexAttribiv(index, pname, params);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function getVertexAttribOffset(index:Int, pname:Int):DataPointer
 	{
@@ -1743,14 +1230,7 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function getVertexAttribPointerv(index:Int, pname:Int):DataPointer
-	{
-		return context.getVertexAttribPointerv(index, pname);
-	}
-	#end
-
-	public static inline function hint(target:Int, mode:Int):Void
+public static inline function hint(target:Int, mode:Int):Void
 	{
 		context.hint(target, mode);
 	}
@@ -1840,14 +1320,7 @@ class GL
 		context.linkProgram(program);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function mapBufferRange(target:Int, offset:DataPointer, length:Int, access:Int):DataPointer
-	{
-		return context.mapBufferRange(target, offset, length, access);
-	}
-	#end
-
-	public static inline function pauseTransformFeedback():Void
+public static inline function pauseTransformFeedback():Void
 	{
 		context.pauseTransformFeedback();
 	}
@@ -1862,31 +1335,10 @@ class GL
 		context.polygonOffset(factor, units);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function programBinary(program:GLProgram, binaryFormat:Int, binary:DataPointer, length:Int):Void
-	{
-		context.programBinary(program, binaryFormat, binary, length);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function programParameteri(program:GLProgram, pname:Int, value:Int):Void
-	{
-		context.programParameteri(program, pname, value);
-	}
-	#end
-
-	public static inline function readBuffer(src:Int):Void
+public static inline function readBuffer(src:Int):Void
 	{
 		context.readBuffer(src);
 	}
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function readPixels(x:Int, y:Int, width:Int, height:Int, format:Int, type:Int, pixels:BytePointer):Void
-	{
-		context.readPixels(x, y, width, height, format, type, pixels);
-	}
-	#end
 
 	#if lime_webgl
 	public static inline function readPixelsWEBGL(x:Int, y:Int, width:Int, height:Int, format:Int, type:Int, pixels:Dynamic, ?dstOffset:Int):Void
@@ -1895,14 +1347,7 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function releaseShaderCompiler():Void
-	{
-		context.releaseShaderCompiler();
-	}
-	#end
-
-	public static inline function renderbufferStorage(target:Int, internalformat:Int, width:Int, height:Int):Void
+public static inline function renderbufferStorage(target:Int, internalformat:Int, width:Int, height:Int):Void
 	{
 		context.renderbufferStorage(target, internalformat, width, height);
 	}
@@ -1937,14 +1382,7 @@ class GL
 		context.scissor(x, y, width, height);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function shaderBinary(shaders:Array<GLShader>, binaryformat:Int, binary:DataPointer, length:Int):Void
-	{
-		context.shaderBinary(shaders, binaryformat, binary, length);
-	}
-	#end
-
-	public static inline function shaderSource(shader:GLShader, source:String):Void
+public static inline function shaderSource(shader:GLShader, source:String):Void
 	{
 		context.shaderSource(shader, source);
 	}
@@ -1979,27 +1417,11 @@ class GL
 		context.stencilOpSeparate(face, fail, zfail, zpass);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function texImage2D(target:Int, level:Int, internalformat:Int, width:Int, height:Int, border:Int, format:Int, type:Int,
-			data:DataPointer):Void
-	{
-		context.texImage2D(target, level, internalformat, width, height, border, format, type, data);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function texImage2DWEBGL(target:Int, level:Int, internalformat:Int, width:Int, height:Int, border:Dynamic, ?format:Int, ?type:Int,
 			?srcData:Dynamic, ?srcOffset:Int):Void
 	{
 		context.texImage2D(target, level, internalformat, width, height, border, format, type, srcData, srcOffset);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function texImage3D(target:Int, level:Int, internalformat:Int, width:Int, height:Int, depth:Int, border:Int, format:Int, type:Int,
-			data:DataPointer):Void
-	{
-		context.texImage3D(target, level, internalformat, width, height, depth, border, format, type, data);
 	}
 	#end
 
@@ -2031,27 +1453,11 @@ class GL
 		context.texParameteri(target, pname, param);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function texSubImage2D(target:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Int, type:Int,
-			pixels:ArrayBufferView):Void
-	{
-		context.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function texSubImage2DWEBGL(target:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Dynamic, ?type:Int,
 			?srcData:Dynamic, ?srcOffset:Int):Void
 	{
 		context.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, srcData, srcOffset);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function texSubImage3D(target:Int, level:Int, xoffset:Int, yoffset:Int, zoffset:Int, width:Int, height:Int, depth:Int, format:Int,
-			type:Int, data:DataPointer):Void
-	{
-		context.texSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, data);
 	}
 	#end
 
@@ -2073,13 +1479,6 @@ class GL
 		context.uniform1f(location, v0);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform1fv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform1fv(location, count, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniform1fvWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
@@ -2091,13 +1490,6 @@ class GL
 	{
 		context.uniform1i(location, v0);
 	}
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform1iv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform1iv(location, count, v);
-	}
-	#end
 
 	#if lime_webgl
 	public static inline function uniform1ivWEBGL(location:GLUniformLocation, ?data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
@@ -2111,13 +1503,6 @@ class GL
 		context.uniform1ui(location, v0);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform1uiv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform1uiv(location, count, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniform1uivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
@@ -2129,13 +1514,6 @@ class GL
 	{
 		context.uniform2f(location, v0, v1);
 	}
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform2fv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform2fv(location, count, v);
-	}
-	#end
 
 	#if lime_webgl
 	public static inline function uniform2fvWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
@@ -2149,13 +1527,6 @@ class GL
 		context.uniform2i(location, x, y);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform2iv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform2iv(location, count, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniform2ivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
@@ -2167,13 +1538,6 @@ class GL
 	{
 		context.uniform2ui(location, x, y);
 	}
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform2uiv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform2uiv(location, count, v);
-	}
-	#end
 
 	#if lime_webgl
 	public static inline function uniform2uivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
@@ -2187,13 +1551,6 @@ class GL
 		context.uniform3f(location, v0, v1, v2);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform3fv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform3fv(location, count, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniform3fvWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
@@ -2205,13 +1562,6 @@ class GL
 	{
 		context.uniform3i(location, v0, v1, v2);
 	}
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform3iv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform3iv(location, count, v);
-	}
-	#end
 
 	#if lime_webgl
 	public static inline function uniform3ivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
@@ -2225,13 +1575,6 @@ class GL
 		context.uniform3ui(location, v0, v1, v2);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform3uiv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform3uiv(location, count, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniform3uivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
@@ -2243,13 +1586,6 @@ class GL
 	{
 		context.uniform4f(location, v0, v1, v2, v3);
 	}
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform4fv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform4fv(location, count, v);
-	}
-	#end
 
 	#if lime_webgl
 	public static inline function uniform4fvWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
@@ -2263,13 +1599,6 @@ class GL
 		context.uniform4i(location, v0, v1, v2, v3);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform4iv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform4iv(location, count, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniform4ivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
@@ -2281,13 +1610,6 @@ class GL
 	{
 		context.uniform4ui(location, v0, v1, v2, v3);
 	}
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniform4uiv(location:GLUniformLocation, count:Int, v:DataPointer):Void
-	{
-		context.uniform4uiv(location, count, v);
-	}
-	#end
 
 	#if lime_webgl
 	public static inline function uniform4uivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
@@ -2301,24 +1623,10 @@ class GL
 		context.uniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding);
 	}
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniformMatrix2fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
-	{
-		context.uniformMatrix2fv(location, count, transpose, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniformMatrix2fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
 		context.uniformMatrix2fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniformMatrix2x3fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
-	{
-		context.uniformMatrix2x3fv(location, count, transpose, v);
 	}
 	#end
 
@@ -2329,24 +1637,10 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniformMatrix2x4fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
-	{
-		context.uniformMatrix2x4fv(location, count, transpose, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniformMatrix2x4fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
 		context.uniformMatrix2x4fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniformMatrix3fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
-	{
-		context.uniformMatrix3fv(location, count, transpose, v);
 	}
 	#end
 
@@ -2357,24 +1651,10 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniformMatrix3x2fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
-	{
-		context.uniformMatrix3x2fv(location, count, transpose, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniformMatrix3x2fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
 		context.uniformMatrix3x2fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniformMatrix3x4fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
-	{
-		context.uniformMatrix3x4fv(location, count, transpose, v);
 	}
 	#end
 
@@ -2385,24 +1665,10 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniformMatrix4fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
-	{
-		context.uniformMatrix4fv(location, count, transpose, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniformMatrix4fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
 		context.uniformMatrix4fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
-
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniformMatrix4x2fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
-	{
-		context.uniformMatrix4x2fv(location, count, transpose, v);
 	}
 	#end
 
@@ -2413,13 +1679,6 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function uniformMatrix4x3fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
-	{
-		context.uniformMatrix4x3fv(location, count, transpose, v);
-	}
-	#end
-
 	#if lime_webgl
 	public static inline function uniformMatrix4x3fvWEBGL(location:GLUniformLocation, transpose:Dynamic, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
 	{
@@ -2427,14 +1686,7 @@ class GL
 	}
 	#end
 
-	#if (lime_opengl || lime_opengles)
-	public static inline function unmapBuffer(target:Int):Bool
-	{
-		return context.unmapBuffer(target);
-	}
-	#end
-
-	public static inline function useProgram(program:GLProgram):Void
+public static inline function useProgram(program:GLProgram):Void
 	{
 		context.useProgram(program);
 	}
@@ -2597,7 +1849,7 @@ class GL
 @:dox(hide) @:noCompletion class GLObject
 {
 	@:noCompletion private var id:Int;
-	@:noCompletion private var ptr:#if (lime_cffi && (lime_opengl || lime_opengles) && !macro) CFFIPointer #else Dynamic #end;
+	@:noCompletion private var ptr:Dynamic;
 	@:noCompletion private var refs:Array<GLObject>;
 
 	@:noCompletion private function new(id:Int)
@@ -2607,22 +1859,7 @@ class GL
 
 	public static function fromInt(type:GLObjectType, id:Int):GLObject
 	{
-		if (id == 0) return null;
-
-		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
-		var object = NativeCFFI.lime_gl_object_from_id(id, type);
-
-		if (object != null)
-		{
-			return object;
-		}
-
-		object = new GLObject(id);
-		object.ptr = NativeCFFI.lime_gl_object_register(id, type, object);
-		return object;
-		#else
 		return null;
-		#end
 	}
 }
 

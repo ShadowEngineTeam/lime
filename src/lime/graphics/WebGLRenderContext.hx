@@ -1,6 +1,6 @@
 package lime.graphics;
 
-#if (!lime_doc_gen || lime_opengl || lime_opengles || lime_webgl)
+#if (!lime_doc_gen || lime_webgl)
 import lime.graphics.opengl.*;
 import lime.utils.ArrayBufferView;
 import lime.utils.Float32Array;
@@ -181,37 +181,5 @@ abstract WebGLRenderContext(WebGL2RenderContext)
 		return cast GL.context;
 	}
 
-	#if (!doc_gen && lime_opengl)
-	@:from private static function fromOpenGLContext(gl:OpenGLRenderContext):WebGLRenderContext
-	{
-		#if (sys && lime_cffi && lime_opengl)
-		return cast gl;
-		#else
-		return null;
-		#end
-	}
-	#end
-
-	#if (!doc_gen && (lime_opengl || lime_opengles))
-	@:from private static function fromOpenGLES2Context(gl:OpenGLES2RenderContext):WebGLRenderContext
-	{
-		#if (sys && lime_cffi && lime_opengl)
-		return cast gl;
-		#else
-		return null;
-		#end
-	}
-	#end
-
-	#if (!doc_gen && (lime_opengl || lime_opengles))
-	@:from private static function fromOpenGLES3Context(gl:OpenGLES3RenderContext):WebGLRenderContext
-	{
-		#if (sys && lime_cffi && lime_opengl)
-		return cast gl;
-		#else
-		return null;
-		#end
-	}
-	#end
 }
 #end

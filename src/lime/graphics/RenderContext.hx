@@ -17,7 +17,7 @@ class RenderContext
 	public var attributes(default, null):RenderContextAttributes;
 
 	/**
-		Access to the current bgfx render context, if available
+		Access to the current BGFX render context, if available
 	**/
 	#if (!lime_doc_gen || native)
 	public var bgfx(default, null):BGFXRenderContext;
