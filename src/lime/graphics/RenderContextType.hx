@@ -26,15 +26,6 @@ enum abstract RenderContextType(String) from String to String
 	var WEBGL = "webgl";
 
 	/**
-		Legacy identifiers: no native GL context exists anymore (BGFX replaced
-		it), but frameworks still compare against these as "hardware renderer"
-		tags. `window.context.type` never carries these values.
-	**/
-	var OPENGL = "opengl";
-
-	var OPENGLES = "opengles";
-
-	/**
 		Describes a bgfx render context (Direct3D, Metal or Vulkan under the hood)
 	**/
 	var BGFX = "bgfx";
