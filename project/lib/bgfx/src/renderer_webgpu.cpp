@@ -239,6 +239,9 @@ namespace bgfx { namespace wgpu
 		{ WGPUTextureFormat_BC5RGUnorm,          WGPUTextureFormat_Undefined,           WGPUTextureSampleType_Float,             true,  { $_, $_, $_, $_ } }, // BC5
 		{ WGPUTextureFormat_BC6HRGBFloat,        WGPUTextureFormat_Undefined,           WGPUTextureSampleType_Float,             true,  { $_, $_, $_, $_ } }, // BC6H
 		{ WGPUTextureFormat_BC7RGBAUnorm,        WGPUTextureFormat_BC7RGBAUnormSrgb,    WGPUTextureSampleType_Float,             true,  { $_, $_, $_, $_ } }, // BC7
+		{ WGPUTextureFormat_BC4RSnorm,           WGPUTextureFormat_Undefined,           WGPUTextureSampleType_Float,             true,  { $_, $_, $_, $_ } }, // BC4S
+		{ WGPUTextureFormat_BC5RGSnorm,          WGPUTextureFormat_Undefined,           WGPUTextureSampleType_Float,             true,  { $_, $_, $_, $_ } }, // BC5S
+		{ WGPUTextureFormat_BC6HRGBFloat,        WGPUTextureFormat_Undefined,           WGPUTextureSampleType_Float,             true,  { $_, $_, $_, $_ } }, // BC6HS
 		{ WGPUTextureFormat_Undefined,           WGPUTextureFormat_Undefined,           WGPUTextureSampleType_Float,             true,  { $_, $_, $_, $_ } }, // ETC1
 		{ WGPUTextureFormat_ETC2RGB8Unorm,       WGPUTextureFormat_ETC2RGB8UnormSrgb,   WGPUTextureSampleType_Float,             true,  { $_, $_, $_, $_ } }, // ETC2
 		{ WGPUTextureFormat_ETC2RGBA8Unorm,      WGPUTextureFormat_ETC2RGBA8UnormSrgb,  WGPUTextureSampleType_Float,             true,  { $_, $_, $_, $_ } }, // ETC2A

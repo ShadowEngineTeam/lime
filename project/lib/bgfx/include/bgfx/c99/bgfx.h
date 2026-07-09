@@ -184,7 +184,10 @@ typedef enum bgfx_texture_format
     BGFX_TEXTURE_FORMAT_BC5,                  /** ( 4) Block Compression 5. Two 8-bit channels (RG), unsigned normalized. 8 BPP. */
     BGFX_TEXTURE_FORMAT_BC6H,                 /** ( 5) Block Compression 6H. Three 16-bit floating-point channels (RGB), HDR. 8 BPP. */
     BGFX_TEXTURE_FORMAT_BC7,                  /** ( 6) RGB 4-7 bits per color channel, 0-8 bits alpha. Block Compression 7. High-quality RGBA, 4-7 bits per color, 0-8 bits alpha. 8 BPP. */
-    BGFX_TEXTURE_FORMAT_ETC1,                 /** ( 7) Ericsson Texture Compression 1. 8-bit per channel RGB. 4 BPP. */
+    BGFX_TEXTURE_FORMAT_BC4S,                 /** ( 7) Block Compression 4, signed. (lime) */
+    BGFX_TEXTURE_FORMAT_BC5S,                 /** ( 8) Block Compression 5, signed. (lime) */
+    BGFX_TEXTURE_FORMAT_BC6HS,                /** ( 9) Block Compression 6H, signed float. (lime) */
+    BGFX_TEXTURE_FORMAT_ETC1,                 /** (10) Ericsson Texture Compression 1. 8-bit per channel RGB. 4 BPP. */
     BGFX_TEXTURE_FORMAT_ETC2,                 /** ( 8) Ericsson Texture Compression 2. 8-bit per channel RGB. 4 BPP. */
     BGFX_TEXTURE_FORMAT_ETC2A,                /** ( 9) Ericsson Texture Compression 2 with full alpha. 8-bit per channel RGBA. 8 BPP. */
     BGFX_TEXTURE_FORMAT_ETC2A1,               /** (10) Ericsson Texture Compression 2 with 1-bit punch-through alpha. 4 BPP. */

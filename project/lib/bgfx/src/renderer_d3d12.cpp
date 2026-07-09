@@ -213,6 +213,9 @@ namespace bgfx { namespace d3d12
 		{ DXGI_FORMAT_BC5_UNORM,          DXGI_FORMAT_BC5_UNORM,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,              D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING                }, // BC5
 		{ DXGI_FORMAT_BC6H_SF16,          DXGI_FORMAT_BC6H_SF16,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,              D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING                }, // BC6H
 		{ DXGI_FORMAT_BC7_UNORM,          DXGI_FORMAT_BC7_UNORM,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_BC7_UNORM_SRGB,       D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING                }, // BC7
+		{ DXGI_FORMAT_BC4_SNORM,          DXGI_FORMAT_BC4_SNORM,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,              D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING                }, // BC4S
+		{ DXGI_FORMAT_BC5_SNORM,          DXGI_FORMAT_BC5_SNORM,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,              D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING                }, // BC5S
+		{ DXGI_FORMAT_BC6H_SF16,          DXGI_FORMAT_BC6H_SF16,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,              D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING                }, // BC6HS
 		{ DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,               DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,              D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING                }, // ETC1
 		{ DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,               DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,              D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING                }, // ETC2
 		{ DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,               DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,              D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING                }, // ETC2A
@@ -1389,20 +1392,20 @@ namespace bgfx { namespace d3d12
 
 					if (SUCCEEDED(hr) )
 					{
-						m_infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
-						m_infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR,      true);
+						m_infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, false);
+						m_infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR,      false);
 						m_infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING,    false);
 
 						D3D12_INFO_QUEUE_FILTER filter;
 						bx::memSet(&filter, 0, sizeof(filter) );
 
-						D3D12_MESSAGE_CATEGORY catlist[] =
+						D3D12_MESSAGE_SEVERITY sevlist[] =
 						{
-							D3D12_MESSAGE_CATEGORY_STATE_CREATION,
-							D3D12_MESSAGE_CATEGORY_EXECUTION,
+							D3D12_MESSAGE_SEVERITY_INFO,
+							D3D12_MESSAGE_SEVERITY_MESSAGE,
 						};
-						filter.DenyList.NumCategories = BX_COUNTOF(catlist);
-						filter.DenyList.pCategoryList = catlist;
+						filter.DenyList.NumSeverities = BX_COUNTOF(sevlist);
+						filter.DenyList.pSeverityList = sevlist;
 						m_infoQueue->PushStorageFilter(&filter);
 					}
 				}
@@ -3272,6 +3275,36 @@ namespace bgfx { namespace d3d12
 			_desc.BackFace.StencilFunc         = s_cmpFunc[(bstencil&BGFX_STENCIL_TEST_MASK) >> BGFX_STENCIL_TEST_SHIFT];
 		}
 
+		void drainInfoQueue()
+		{
+#if BX_PLATFORM_WINDOWS
+			if (NULL != m_infoQueue)
+			{
+				UINT64 num = m_infoQueue->GetNumStoredMessagesAllowedByRetrievalFilter();
+
+				for (UINT64 ii = 0; ii < num; ++ii)
+				{
+					SIZE_T length = 0;
+
+					if (SUCCEEDED(m_infoQueue->GetMessage(ii, NULL, &length) )
+					&&  0 < length)
+					{
+						D3D12_MESSAGE* msg = (D3D12_MESSAGE*)bx::alloc(g_allocator, length);
+
+						if (SUCCEEDED(m_infoQueue->GetMessage(ii, msg, &length) ) )
+						{
+							BX_TRACE("D3D12 message %d: %s", msg->ID, msg->pDescription);
+						}
+
+						bx::free(g_allocator, msg);
+					}
+				}
+
+				m_infoQueue->ClearStoredMessages();
+			}
+#endif // BX_PLATFORM_WINDOWS
+		}
+
 		uint32_t setInputLayout(D3D12_INPUT_ELEMENT_DESC* _vertexElements, uint8_t _numStreams, const VertexLayout** _layouts, const ProgramD3D12& _program, uint16_t _numInstanceData)
 		{
 			uint16_t attrMask[Attrib::Count];
@@ -3658,10 +3691,192 @@ namespace bgfx { namespace d3d12
 
 			if (NULL == pso)
 			{
-				DX_CHECK(m_device->CreateGraphicsPipelineState(&desc
+				HRESULT hr = m_device->CreateGraphicsPipelineState(&desc
 					, IID_ID3D12PipelineState
 					, (void**)&pso
-					) );
+					);
+
+				if (FAILED(hr) )
+				{
+					BX_TRACE("CreateGraphicsPipelineState failed 0x%08x; input layout (%d elements):"
+						, hr
+						, desc.InputLayout.NumElements
+						);
+
+					for (uint32_t ii = 0; ii < desc.InputLayout.NumElements; ++ii)
+					{
+						const D3D12_INPUT_ELEMENT_DESC& ie = desc.InputLayout.pInputElementDescs[ii];
+						BX_TRACE("\t%2d: %s%d, format %d, slot %d, offset %d, class %d"
+							, ii
+							, ie.SemanticName
+							, ie.SemanticIndex
+							, ie.Format
+							, ie.InputSlot
+							, ie.AlignedByteOffset
+							, ie.InputSlotClass
+							);
+					}
+
+					BX_TRACE("\tnumRTs %d, RTV[0] %d, DSV %d, sample %d/%d, topology %d"
+						, desc.NumRenderTargets
+						, desc.RTVFormats[0]
+						, desc.DSVFormat
+						, desc.SampleDesc.Count
+						, desc.SampleDesc.Quality
+						, desc.PrimitiveTopologyType
+						);
+
+					BX_TRACE("\tstate %016" PRIx64 ", stencil %08x, rgba %08x"
+						, _state
+						, _stencil
+						, _rgba
+						);
+
+					const D3D12_RENDER_TARGET_BLEND_DESC& rt0 = desc.BlendState.RenderTarget[0];
+					BX_TRACE("\tblend: enable %d, src %d, dst %d, op %d, srcA %d, dstA %d, opA %d, write 0x%02x"
+						, rt0.BlendEnable
+						, rt0.SrcBlend
+						, rt0.DestBlend
+						, rt0.BlendOp
+						, rt0.SrcBlendAlpha
+						, rt0.DestBlendAlpha
+						, rt0.BlendOpAlpha
+						, rt0.RenderTargetWriteMask
+						);
+
+					BX_TRACE("\traster: fill %d, cull %d; depth: enable %d, func %d, write %d; stencil: enable %d, frontFunc %d, backFunc %d"
+						, desc.RasterizerState.FillMode
+						, desc.RasterizerState.CullMode
+						, desc.DepthStencilState.DepthEnable
+						, desc.DepthStencilState.DepthFunc
+						, desc.DepthStencilState.DepthWriteMask
+						, desc.DepthStencilState.StencilEnable
+						, desc.DepthStencilState.FrontFace.StencilFunc
+						, desc.DepthStencilState.BackFace.StencilFunc
+						);
+
+					BX_TRACE("\tvs size %d, fs size %d"
+						, program.m_vsh->m_code->size
+						, NULL != program.m_fsh ? program.m_fsh->m_code->size : 0
+						);
+
+					BX_TRACE("\tvs attrMask: %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x"
+						, program.m_vsh->m_attrMask[ 0], program.m_vsh->m_attrMask[ 1], program.m_vsh->m_attrMask[ 2]
+						, program.m_vsh->m_attrMask[ 3], program.m_vsh->m_attrMask[ 4], program.m_vsh->m_attrMask[ 5]
+						, program.m_vsh->m_attrMask[ 6], program.m_vsh->m_attrMask[ 7], program.m_vsh->m_attrMask[ 8]
+						, program.m_vsh->m_attrMask[ 9], program.m_vsh->m_attrMask[10], program.m_vsh->m_attrMask[11]
+						, program.m_vsh->m_attrMask[12], program.m_vsh->m_attrMask[13], program.m_vsh->m_attrMask[14]
+						, program.m_vsh->m_attrMask[15], program.m_vsh->m_attrMask[16], program.m_vsh->m_attrMask[17]
+						);
+
+					// dump DXBC input/output signature chunks so stage linkage
+					// mismatches are visible without the debug layer
+					struct DxbcSig
+					{
+						static void dump(const char* _label, const void* _blob, uint32_t _size, uint32_t _fourcc)
+						{
+							const uint8_t* data = (const uint8_t*)_blob;
+							if (_size < 36
+							||  0 != bx::memCmp(data, "DXBC", 4) )
+							{
+								BX_TRACE("\t%s: not a DXBC container", _label);
+								return;
+							}
+
+							uint32_t numChunks = *(const uint32_t*)(data + 28);
+							const uint32_t* offsets = (const uint32_t*)(data + 32);
+
+							for (uint32_t ii = 0; ii < numChunks; ++ii)
+							{
+								const uint8_t* chunk = data + offsets[ii];
+								if (*(const uint32_t*)chunk != _fourcc)
+								{
+									continue;
+								}
+
+								const uint8_t* sig = chunk + 8;
+								uint32_t count = *(const uint32_t*)sig;
+								BX_TRACE("\t%s: %d elements", _label, count);
+
+								const uint8_t* elem = sig + 8;
+								for (uint32_t jj = 0; jj < count; ++jj, elem += 24)
+								{
+									BX_TRACE("\t\t%s%d, sv %d, ct %d, reg %d, mask %x, rw %x"
+										, (const char*)(sig + *(const uint32_t*)(elem + 0) )
+										, *(const uint32_t*)(elem + 4)
+										, *(const uint32_t*)(elem + 8)
+										, *(const uint32_t*)(elem + 12)
+										, *(const uint32_t*)(elem + 16)
+										, elem[20]
+										, elem[21]
+										);
+								}
+
+								return;
+							}
+
+							BX_TRACE("\t%s: chunk not found", _label);
+						}
+					};
+
+					// list all chunks in the container (finds unexpected ones,
+					// e.g. an embedded root signature)
+					struct DxbcChunks
+					{
+						static void dump(const char* _label, const void* _blob, uint32_t _size)
+						{
+							const uint8_t* data = (const uint8_t*)_blob;
+							if (_size < 36
+							||  0 != bx::memCmp(data, "DXBC", 4) )
+							{
+								BX_TRACE("\t%s: not a DXBC container", _label);
+								return;
+							}
+
+							uint32_t totalSize = *(const uint32_t*)(data + 24);
+							uint32_t numChunks = *(const uint32_t*)(data + 28);
+							const uint32_t* offsets = (const uint32_t*)(data + 32);
+							BX_TRACE("\t%s: container size %d (blob %d), %d chunks, hash %08x%08x%08x%08x, version %d"
+								, _label
+								, totalSize
+								, _size
+								, numChunks
+								, *(const uint32_t*)(data + 4)
+								, *(const uint32_t*)(data + 8)
+								, *(const uint32_t*)(data + 12)
+								, *(const uint32_t*)(data + 16)
+								, *(const uint32_t*)(data + 20)
+								);
+
+							for (uint32_t ii = 0; ii < numChunks; ++ii)
+							{
+								const uint8_t* chunk = data + offsets[ii];
+								BX_TRACE("\t\t%c%c%c%c, size %d, offset %d"
+									, chunk[0], chunk[1], chunk[2], chunk[3]
+									, *(const uint32_t*)(chunk + 4)
+									, offsets[ii]
+									);
+							}
+						}
+					};
+
+					DxbcChunks::dump("VS chunks", program.m_vsh->m_code->data, program.m_vsh->m_code->size);
+					if (NULL != program.m_fsh)
+					{
+						DxbcChunks::dump("PS chunks", program.m_fsh->m_code->data, program.m_fsh->m_code->size);
+					}
+
+					DxbcSig::dump("VS ISGN", program.m_vsh->m_code->data, program.m_vsh->m_code->size, BX_MAKEFOURCC('I','S','G','N') );
+					DxbcSig::dump("VS OSGN", program.m_vsh->m_code->data, program.m_vsh->m_code->size, BX_MAKEFOURCC('O','S','G','N') );
+
+					if (NULL != program.m_fsh)
+					{
+						DxbcSig::dump("PS ISGN", program.m_fsh->m_code->data, program.m_fsh->m_code->size, BX_MAKEFOURCC('I','S','G','N') );
+						DxbcSig::dump("PS OSGN", program.m_fsh->m_code->data, program.m_fsh->m_code->size, BX_MAKEFOURCC('O','S','G','N') );
+					}
+
+					drainInfoQueue();
+				}
 			}
 
 			BGFX_FATAL(NULL != pso, Fatal::InvalidShader, "Failed to create PSO!");

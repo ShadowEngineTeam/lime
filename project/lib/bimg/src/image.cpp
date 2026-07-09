@@ -34,6 +34,9 @@ namespace bimg
 		{   8,  4, 4, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // BC5
 		{   8,  4, 4, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Float) }, // BC6H
 		{   8,  4, 4, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // BC7
+		{   4,  4, 4,  8, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Snorm) }, // BC4S
+		{   8,  4, 4, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Snorm) }, // BC5S
+		{   8,  4, 4, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Float) }, // BC6HS
 		{   4,  4, 4,  8, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ETC1
 		{   4,  4, 4,  8, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ETC2
 		{   8,  4, 4, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ETC2A
@@ -139,6 +142,9 @@ namespace bimg
 		"BC5",        // BC5
 		"BC6H",       // BC6H
 		"BC7",        // BC7
+		"BC4S",       // BC4S
+		"BC5S",       // BC5S
+		"BC6HS",      // BC6HS
 		"ETC1",       // ETC1
 		"ETC2",       // ETC2
 		"ETC2A",      // ETC2A
@@ -1108,6 +1114,9 @@ namespace bimg
 		{ NULL,               NULL                 }, // BC5
 		{ NULL,               NULL                 }, // BC6H
 		{ NULL,               NULL                 }, // BC7
+		{ NULL,               NULL                 }, // BC4S
+		{ NULL,               NULL                 }, // BC5S
+		{ NULL,               NULL                 }, // BC6HS
 		{ NULL,               NULL                 }, // ETC1
 		{ NULL,               NULL                 }, // ETC2
 		{ NULL,               NULL                 }, // ETC2A
@@ -3754,7 +3763,9 @@ namespace bimg
 #define DDS_FORMAT_BC3_UNORM              77
 #define DDS_FORMAT_BC3_UNORM_SRGB         78
 #define DDS_FORMAT_BC4_UNORM              80
+#define DDS_FORMAT_BC4_SNORM              81
 #define DDS_FORMAT_BC5_UNORM              83
+#define DDS_FORMAT_BC5_SNORM              84
 #define DDS_FORMAT_B5G6R5_UNORM           85
 #define DDS_FORMAT_B5G5R5A1_UNORM         86
 #define DDS_FORMAT_B8G8R8A8_UNORM         87
@@ -3917,9 +3928,11 @@ namespace bimg
 		{ DDS_FORMAT_BC3_UNORM,             TextureFormat::BC3,       false },
 		{ DDS_FORMAT_BC3_UNORM_SRGB,        TextureFormat::BC3,       true  },
 		{ DDS_FORMAT_BC4_UNORM,             TextureFormat::BC4,       false },
+		{ DDS_FORMAT_BC4_SNORM,             TextureFormat::BC4S,      false },
 		{ DDS_FORMAT_BC5_UNORM,             TextureFormat::BC5,       false },
+		{ DDS_FORMAT_BC5_SNORM,             TextureFormat::BC5S,      false },
 		{ DDS_FORMAT_BC6H_UF16,             TextureFormat::BC6H,      false },
-		{ DDS_FORMAT_BC6H_SF16,             TextureFormat::BC6H,      false },
+		{ DDS_FORMAT_BC6H_SF16,             TextureFormat::BC6HS,     false },
 		{ DDS_FORMAT_BC7_UNORM,             TextureFormat::BC7,       false },
 		{ DDS_FORMAT_BC7_UNORM_SRGB,        TextureFormat::BC7,       true  },
 		{ DDS_FORMAT_ASTC_4X4_UNORM,        TextureFormat::ASTC4x4,   false },
@@ -4241,6 +4254,8 @@ namespace bimg
 #define KTX_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT       0x8C4F
 #define KTX_COMPRESSED_LUMINANCE_LATC1_EXT            0x8C70
 #define KTX_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT      0x8C72
+#define KTX_COMPRESSED_SIGNED_RED_RGTC1               0x8DBC
+#define KTX_COMPRESSED_SIGNED_RG_RGTC2                0x8DBE
 #define KTX_COMPRESSED_RGBA_BPTC_UNORM_ARB            0x8E8C
 #define KTX_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB      0x8E8D
 #define KTX_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB      0x8E8E
@@ -4379,6 +4394,9 @@ namespace bimg
 		{ KTX_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,     KTX_ZERO,                                      KTX_RG,    KTX_ZERO,                         }, // BC5
 		{ KTX_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,     KTX_ZERO,                                      KTX_RGB,   KTX_ZERO,                         }, // BC6H
 		{ KTX_COMPRESSED_RGBA_BPTC_UNORM_ARB,           KTX_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB,      KTX_RGBA,  KTX_ZERO,                         }, // BC7
+		{ KTX_COMPRESSED_SIGNED_RED_RGTC1,              KTX_ZERO,                                      KTX_RED,   KTX_ZERO,                         }, // BC4S
+		{ KTX_COMPRESSED_SIGNED_RG_RGTC2,               KTX_ZERO,                                      KTX_RG,    KTX_ZERO,                         }, // BC5S
+		{ KTX_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,     KTX_ZERO,                                      KTX_RGB,   KTX_ZERO,                         }, // BC6HS
 		{ KTX_ETC1_RGB8_OES,                            KTX_ZERO,                                      KTX_RGB,   KTX_ZERO,                         }, // ETC1
 		{ KTX_COMPRESSED_RGB8_ETC2,                     KTX_COMPRESSED_SRGB8_ETC2,                     KTX_RGB,   KTX_ZERO,                         }, // ETC2
 		{ KTX_COMPRESSED_RGBA8_ETC2_EAC,                KTX_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC,          KTX_RGBA,  KTX_ZERO,                         }, // ETC2A
@@ -4784,6 +4802,9 @@ namespace bimg
 		{ KTX2_FORMAT_BC5_UNORM_BLOCK,             KTX2_FORMAT_UNDEFINED                  }, // BC5
 		{ KTX2_FORMAT_BC6H_SFLOAT_BLOCK,           KTX2_FORMAT_UNDEFINED                  }, // BC6H
 		{ KTX2_FORMAT_BC7_UNORM_BLOCK,             KTX2_FORMAT_BC7_SRGB_BLOCK             }, // BC7
+		{ KTX2_FORMAT_BC4_SNORM_BLOCK,             KTX2_FORMAT_UNDEFINED                  }, // BC4S
+		{ KTX2_FORMAT_BC5_SNORM_BLOCK,             KTX2_FORMAT_UNDEFINED                  }, // BC5S
+		{ KTX2_FORMAT_BC6H_SFLOAT_BLOCK,           KTX2_FORMAT_UNDEFINED                  }, // BC6HS
 		{ KTX2_FORMAT_ETC2_R8G8B8_UNORM_BLOCK,     KTX2_FORMAT_ETC2_R8G8B8_SRGB_BLOCK     }, // ETC1 (no Vulkan ETC1, use ETC2 RGB)
 		{ KTX2_FORMAT_ETC2_R8G8B8_UNORM_BLOCK,     KTX2_FORMAT_ETC2_R8G8B8_SRGB_BLOCK     }, // ETC2
 		{ KTX2_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK,   KTX2_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK   }, // ETC2A
@@ -6043,6 +6064,7 @@ namespace bimg
 			break;
 
 		case TextureFormat::BC4:
+		case TextureFormat::BC4S: // lime: unsigned decode approximation (software path only)
 			if (BX_ENABLED(BIMG_CONFIG_DECODE_BC4) )
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
@@ -6075,6 +6097,7 @@ namespace bimg
 			break;
 
 		case TextureFormat::BC5:
+		case TextureFormat::BC5S: // lime: unsigned decode approximation (software path only)
 			if (BX_ENABLED(BIMG_CONFIG_DECODE_BC5) )
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
@@ -6108,6 +6131,7 @@ namespace bimg
 			break;
 
 		case TextureFormat::BC6H:
+		case TextureFormat::BC6HS: // lime: same decoder (BC6H decode handles both)
 			if (BX_ENABLED(BIMG_CONFIG_DECODE_BC6) )
 			{
 				ImageContainer* rgba32f = imageAlloc(_allocator
@@ -6682,6 +6706,7 @@ namespace bimg
 			switch (_srcFormat)
 			{
 			case TextureFormat::BC5:
+			case TextureFormat::BC5S: // lime: unsigned decode approximation (software path only)
 				{
 					uint32_t width  = _width/4;
 					uint32_t height = _height/4;
@@ -6717,6 +6742,7 @@ namespace bimg
 				break;
 
 			case TextureFormat::BC6H:
+			case TextureFormat::BC6HS: // lime: same decoder
 				{
 					uint32_t width  = _width/4;
 					uint32_t height = _height/4;

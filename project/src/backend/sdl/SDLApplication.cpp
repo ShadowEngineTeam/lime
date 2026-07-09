@@ -802,8 +802,35 @@ namespace lime {
 		// If the frame was faster than the target frame time, delay to cap FPS
 		if (frameTime.frame < frameTime.target) {
 
-			// Pause for the remaining time to maintain a consistent frame rate
-			SDL_DelayPrecise (frameTime.target - frameTime.frame);
+			// Wait out the remaining time while still pumping the OS message
+			// queue: a blind sleep here leaves synchronous window messages
+			// (WM_WINDOWPOSCHANGING etc.) unanswered for up to a full frame,
+			// which makes window dragging visibly laggy. Finish with a short
+			// precise sleep so frame pacing stays accurate.
+			const Uint64 deadline = frameTime.current + (frameTime.target - frameTime.frame);
+			const Uint64 preciseTailNS = 2000000; // 2ms
+
+			for (;;) {
+
+				Uint64 now = SDL_GetTicksNS ();
+				if (now >= deadline) break;
+
+				Uint64 remaining = deadline - now;
+
+				if (remaining > preciseTailNS) {
+
+					// waits AND processes incoming events/messages; may
+					// return early when events arrive, so loop until due
+					SDL_WaitEventTimeout (NULL, (Sint32)((remaining - preciseTailNS) / 1000000ull));
+
+				} else {
+
+					SDL_DelayPrecise (remaining);
+					break;
+
+				}
+
+			}
 
 			// Measure the actual time spent waiting and add it to frameTime
 			frameTime.current = SDL_GetTicksNS ();
@@ -888,18 +915,60 @@ namespace lime {
 	#if defined(HX_WINDOWS) || defined(HX_MACOS)
 	bool SDLApplication::HandleEventWatcher (void *userdata, SDL_Event *event) {
 
+		// This watcher runs synchronously inside the OS window procedure
+		// (during modal move/resize loops); anything slow here directly adds
+		// latency to window dragging. Never render per MOVED message (content
+		// does not change) and never sleep (FramePacer) inside the pump.
+
 		if (!inBackground) {
 
 			switch (event->type) {
 
-				case SDL_EVENT_WINDOW_EXPOSED:
 				case SDL_EVENT_WINDOW_MOVED:
-				case SDL_EVENT_WINDOW_RESIZED:
 
+					// deliver through the normal event queue; dispatching into
+					// Haxe synchronously here adds latency to every window move
+					return true;
+
+				case SDL_EVENT_WINDOW_RESIZED: {
+
+					// render immediately so the backbuffer matches the new size
+					// as soon as possible (vsync in the present already paces
+					// this); ProcessWindowEvent performs the bgfx reset first
 					currentApplication->ProcessWindowEvent (event);
 					currentApplication->RenderFrame ();
-					currentApplication->FramePacer ();
+
+					FrameTime& frameTime = currentApplication->frameTime;
+					frameTime.current = SDL_GetTicksNS ();
+					frameTime.frame = frameTime.current - frameTime.previous;
+					frameTime.previous = frameTime.current;
+
 					return false;
+
+				}
+
+				case SDL_EVENT_WINDOW_EXPOSED: {
+
+					currentApplication->ProcessWindowEvent (event);
+
+					// re-render at most at the target frame rate, without
+					// delaying the message loop
+					FrameTime& frameTime = currentApplication->frameTime;
+					Uint64 now = SDL_GetTicksNS ();
+
+					if (now - frameTime.previous >= frameTime.target) {
+
+						currentApplication->RenderFrame ();
+
+						frameTime.current = SDL_GetTicksNS ();
+						frameTime.frame = frameTime.current - frameTime.previous;
+						frameTime.previous = frameTime.current;
+
+					}
+
+					return false;
+
+				}
 
 			}
 

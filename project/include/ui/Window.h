@@ -73,6 +73,10 @@ namespace lime {
 			virtual int GetNativeWidth () = 0;
 			virtual int GetNativeHeight () = 0;
 
+			// native handles for bgfx platformData (nwh/ndt)
+			virtual void* GetNativeWindowHandle () { return 0; }
+			virtual void* GetNativeDisplayHandle () { return 0; }
+
 			Application* currentApplication;
 			int flags;
 
@@ -101,7 +105,8 @@ namespace lime {
 		WINDOW_FLAG_MINIMIZED = 0x00002000,
 		WINDOW_FLAG_MAXIMIZED = 0x00004000,
 		WINDOW_FLAG_ALWAYS_ON_TOP = 0x00008000,
-		WINDOW_FLAG_COLOR_DEPTH_32_BIT = 0x00010000
+		WINDOW_FLAG_COLOR_DEPTH_32_BIT = 0x00010000,
+		WINDOW_FLAG_BGFX = 0x00020000
 
 	};
 

@@ -408,6 +408,153 @@ class NativeCFFI
 	@:cffi private static function lime_zlib_compress(data:Dynamic, bytes:Dynamic):Dynamic;
 
 	@:cffi private static function lime_zlib_decompress(data:Dynamic, bytes:Dynamic):Dynamic;
+
+	@:cffi private static function lime_bgfx_init(window:Dynamic, width:Int, height:Int, rendererType:Int, resetFlags:Int):Bool;
+
+	@:cffi private static function lime_bgfx_shutdown():Void;
+
+	@:cffi private static function lime_bgfx_reset(width:Int, height:Int, flags:Int):Void;
+
+	@:cffi private static function lime_bgfx_frame(capture:Bool):Int;
+
+	@:cffi private static function lime_bgfx_touch(viewId:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_debug(flags:Int):Void;
+
+	@:cffi private static function lime_bgfx_dbg_text_clear():Void;
+
+	@:cffi private static function lime_bgfx_dbg_text_print(x:Int, y:Int, attr:Int, text:String):Void;
+
+	@:cffi private static function lime_bgfx_get_renderer_type():Int;
+
+	@:cffi private static function lime_bgfx_get_caps_max_texture_size():Int;
+
+	@:cffi private static function lime_bgfx_get_caps_homogeneous_depth():Bool;
+
+	@:cffi private static function lime_bgfx_get_caps_origin_bottom_left():Bool;
+
+	@:cffi private static function lime_bgfx_set_view_rect(viewId:Int, x:Int, y:Int, width:Int, height:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_view_scissor(viewId:Int, x:Int, y:Int, width:Int, height:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_view_clear(viewId:Int, flags:Int, rgba:Int, depth:Float, stencil:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_view_mode(viewId:Int, mode:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_view_transform(viewId:Int, view:DataPointer, proj:DataPointer):Void;
+
+	@:cffi private static function lime_bgfx_set_view_frame_buffer(viewId:Int, handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_vertex_layout_create():Dynamic;
+
+	@:cffi private static function lime_bgfx_vertex_layout_begin(handle:Dynamic, rendererType:Int):Void;
+
+	@:cffi private static function lime_bgfx_vertex_layout_add(handle:Dynamic, attrib:Int, num:Int, type:Int, normalized:Bool, asInt:Bool):Void;
+
+	@:cffi private static function lime_bgfx_vertex_layout_skip(handle:Dynamic, num:Int):Void;
+
+	@:cffi private static function lime_bgfx_vertex_layout_end(handle:Dynamic):Void;
+
+	@:cffi private static function lime_bgfx_vertex_layout_get_stride(handle:Dynamic):Int;
+
+	@:cffi private static function lime_bgfx_create_vertex_buffer(data:DataPointer, size:Int, layout:Dynamic, flags:Int):Int;
+
+	@:cffi private static function lime_bgfx_destroy_vertex_buffer(handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_create_dynamic_vertex_buffer(num:Int, layout:Dynamic, flags:Int):Int;
+
+	@:cffi private static function lime_bgfx_update_dynamic_vertex_buffer(handle:Int, startVertex:Int, data:DataPointer, size:Int):Void;
+
+	@:cffi private static function lime_bgfx_destroy_dynamic_vertex_buffer(handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_create_index_buffer(data:DataPointer, size:Int, flags:Int):Int;
+
+	@:cffi private static function lime_bgfx_destroy_index_buffer(handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_create_dynamic_index_buffer(num:Int, flags:Int):Int;
+
+	@:cffi private static function lime_bgfx_update_dynamic_index_buffer(handle:Int, startIndex:Int, data:DataPointer, size:Int):Void;
+
+	@:cffi private static function lime_bgfx_destroy_dynamic_index_buffer(handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_transient_vertex_buffer(stream:Int, data:DataPointer, numVertices:Int, layout:Dynamic):Int;
+
+	@:cffi private static function lime_bgfx_set_transient_index_buffer(data:DataPointer, numIndices:Int, index32:Bool):Int;
+
+	@:cffi private static function lime_bgfx_create_shader(data:DataPointer, size:Int):Int;
+
+	@:cffi private static function lime_bgfx_destroy_shader(handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_create_program(vsh:Int, fsh:Int, destroyShaders:Bool):Int;
+
+	@:cffi private static function lime_bgfx_destroy_program(handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_create_uniform(name:String, type:Int, num:Int):Int;
+
+	@:cffi private static function lime_bgfx_destroy_uniform(handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_uniform(handle:Int, data:DataPointer, num:Int):Void;
+
+	@:cffi private static function lime_bgfx_create_texture_2d(width:Int, height:Int, hasMips:Bool, numLayers:Int, format:Int, flagsHi:Int, flagsLo:Int, data:DataPointer, size:Int):Int;
+
+	@:cffi private static function lime_bgfx_update_texture_2d(handle:Int, layer:Int, mip:Int, x:Int, y:Int, width:Int, height:Int, data:DataPointer, size:Int, pitch:Int):Void;
+
+	@:cffi private static function lime_bgfx_destroy_texture(handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_read_texture(handle:Int, data:DataPointer, mip:Int):Int;
+
+	@:cffi private static function lime_bgfx_create_frame_buffer(width:Int, height:Int, format:Int, flagsHi:Int, flagsLo:Int):Int;
+
+	@:cffi private static function lime_bgfx_create_frame_buffer_from_textures(color:Int, depthStencil:Int):Int;
+
+	@:cffi private static function lime_bgfx_get_frame_buffer_texture(handle:Int, attachment:Int):Int;
+
+	@:cffi private static function lime_bgfx_destroy_frame_buffer(handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_state(stateHi:Int, stateLo:Int, rgba:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_stencil(fstencil:Int, bstencil:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_scissor(x:Int, y:Int, width:Int, height:Int):Int;
+
+	@:cffi private static function lime_bgfx_set_transform(data:DataPointer, num:Int):Int;
+
+	@:cffi private static function lime_bgfx_set_vertex_buffer(stream:Int, handle:Int, startVertex:Int, numVertices:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_dynamic_vertex_buffer(stream:Int, handle:Int, startVertex:Int, numVertices:Int):Void;
+
+	@:cffi private static function lime_bgfx_alloc_transient_vertex_buffer_slot(data:DataPointer, numVertices:Int, layout:Dynamic):Int;
+
+	@:cffi private static function lime_bgfx_set_transient_vertex_buffer_slot(stream:Int, slot:Int):Void;
+
+	@:cffi private static function lime_bgfx_create_vertex_layout_handle(layout:Dynamic):Int;
+
+	@:cffi private static function lime_bgfx_destroy_vertex_layout_handle(handle:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_vertex_buffer_layout(stream:Int, handle:Int, startVertex:Int, numVertices:Int, layoutHandle:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_dynamic_vertex_buffer_layout(stream:Int, handle:Int, startVertex:Int, numVertices:Int,
+		layoutHandle:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_index_buffer(handle:Int, firstIndex:Int, numIndices:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_dynamic_index_buffer(handle:Int, firstIndex:Int, numIndices:Int):Void;
+
+	@:cffi private static function lime_bgfx_set_texture(stage:Int, sampler:Int, texture:Int, flags:Int):Void;
+
+	@:cffi private static function lime_bgfx_submit(viewId:Int, program:Int, depth:Int, discardFlags:Int):Void;
+
+	@:cffi private static function lime_bgfx_discard(flags:Int):Void;
+
+	@:cffi private static function lime_bgfx_blit(viewId:Int, dst:Int, dstX:Int, dstY:Int, src:Int, srcX:Int, srcY:Int, width:Int, height:Int):Void;
+
+	@:cffi private static function lime_bgfx_request_screen_shot(frameBuffer:Int, path:String):Void;
+
+	@:cffi private static function lime_bgfx_compile_shader(source:String, type:String, platform:String, profile:String, varying:String, includeDir:String, debug:Bool, bytes:Dynamic):Dynamic;
+
+	@:cffi private static function lime_bgfx_get_shader_compile_messages():Dynamic;
+
+	@:cffi private static function lime_bgfx_shaderc_available():Bool;
 	#else
 	private static var lime_application_create = new cpp.Callable<Void->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_application_create", "o", false));
 	private static var lime_application_event_manager_register = new cpp.Callable<cpp.Object->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime",
@@ -721,6 +868,134 @@ class NativeCFFI
 		false));
 	private static var lime_zlib_decompress = new cpp.Callable<cpp.Object->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_zlib_decompress", "ooo",
 		false));
+	private static var lime_bgfx_init = new cpp.Callable<cpp.Object->Int->Int->Int->Int->Bool>(cpp.Prime._loadPrime("lime", "lime_bgfx_init", "oiiiib", false));
+	private static var lime_bgfx_shutdown = new cpp.Callable<Void->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_shutdown", "v", false));
+	private static var lime_bgfx_reset = new cpp.Callable<Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_reset", "iiiv", false));
+	private static var lime_bgfx_frame = new cpp.Callable<Bool->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_frame", "bi", false));
+	private static var lime_bgfx_touch = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_touch", "iv", false));
+	private static var lime_bgfx_set_debug = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_debug", "iv", false));
+	private static var lime_bgfx_dbg_text_clear = new cpp.Callable<Void->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_dbg_text_clear", "v", false));
+	private static var lime_bgfx_dbg_text_print = new cpp.Callable<Int->Int->Int->String->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_dbg_text_print",
+		"iiisv", false));
+	private static var lime_bgfx_get_renderer_type = new cpp.Callable<Void->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_get_renderer_type", "i", false));
+	private static var lime_bgfx_get_caps_max_texture_size = new cpp.Callable<Void->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_get_caps_max_texture_size",
+		"i", false));
+	private static var lime_bgfx_get_caps_homogeneous_depth = new cpp.Callable<Void->Bool>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_get_caps_homogeneous_depth", "b", false));
+	private static var lime_bgfx_get_caps_origin_bottom_left = new cpp.Callable<Void->Bool>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_get_caps_origin_bottom_left", "b", false));
+	private static var lime_bgfx_set_view_rect = new cpp.Callable<Int->Int->Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_view_rect",
+		"iiiiiv", false));
+	private static var lime_bgfx_set_view_scissor = new cpp.Callable<Int->Int->Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_view_scissor", "iiiiiv", false));
+	private static var lime_bgfx_set_view_clear = new cpp.Callable<Int->Int->Int->Float->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_view_clear", "iiidiv", false));
+	private static var lime_bgfx_set_view_mode = new cpp.Callable<Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_view_mode", "iiv", false));
+	private static var lime_bgfx_set_view_transform = new cpp.Callable<Int->lime.utils.DataPointer->lime.utils.DataPointer->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_view_transform", "iddv", false));
+	private static var lime_bgfx_set_view_frame_buffer = new cpp.Callable<Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_view_frame_buffer", "iiv", false));
+	private static var lime_bgfx_vertex_layout_create = new cpp.Callable<Void->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_bgfx_vertex_layout_create", "o",
+		false));
+	private static var lime_bgfx_vertex_layout_begin = new cpp.Callable<cpp.Object->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_vertex_layout_begin", "oiv", false));
+	private static var lime_bgfx_vertex_layout_add = new cpp.Callable<cpp.Object->Int->Int->Int->Bool->Bool->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_vertex_layout_add", "oiiibbv", false));
+	private static var lime_bgfx_vertex_layout_skip = new cpp.Callable<cpp.Object->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_vertex_layout_skip", "oiv", false));
+	private static var lime_bgfx_vertex_layout_end = new cpp.Callable<cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_vertex_layout_end", "ov",
+		false));
+	private static var lime_bgfx_vertex_layout_get_stride = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_vertex_layout_get_stride", "oi", false));
+	private static var lime_bgfx_create_vertex_buffer = new cpp.Callable<lime.utils.DataPointer->Int->cpp.Object->Int->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_create_vertex_buffer", "dioii", false));
+	private static var lime_bgfx_destroy_vertex_buffer = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_destroy_vertex_buffer", "iv",
+		false));
+	private static var lime_bgfx_create_dynamic_vertex_buffer = new cpp.Callable<Int->cpp.Object->Int->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_create_dynamic_vertex_buffer", "ioii", false));
+	private static var lime_bgfx_update_dynamic_vertex_buffer = new cpp.Callable<Int->Int->lime.utils.DataPointer->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_update_dynamic_vertex_buffer", "iidiv", false));
+	private static var lime_bgfx_destroy_dynamic_vertex_buffer = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_destroy_dynamic_vertex_buffer", "iv", false));
+	private static var lime_bgfx_create_index_buffer = new cpp.Callable<lime.utils.DataPointer->Int->Int->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_create_index_buffer", "diii", false));
+	private static var lime_bgfx_destroy_index_buffer = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_destroy_index_buffer", "iv",
+		false));
+	private static var lime_bgfx_create_dynamic_index_buffer = new cpp.Callable<Int->Int->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_create_dynamic_index_buffer", "iii", false));
+	private static var lime_bgfx_update_dynamic_index_buffer = new cpp.Callable<Int->Int->lime.utils.DataPointer->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_update_dynamic_index_buffer", "iidiv", false));
+	private static var lime_bgfx_destroy_dynamic_index_buffer = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_destroy_dynamic_index_buffer", "iv", false));
+	private static var lime_bgfx_set_transient_vertex_buffer = new cpp.Callable<Int->lime.utils.DataPointer->Int->cpp.Object->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_transient_vertex_buffer", "idioi", false));
+	private static var lime_bgfx_set_transient_index_buffer = new cpp.Callable<lime.utils.DataPointer->Int->Bool->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_transient_index_buffer", "dibi", false));
+	private static var lime_bgfx_create_shader = new cpp.Callable<lime.utils.DataPointer->Int->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_create_shader",
+		"dii", false));
+	private static var lime_bgfx_destroy_shader = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_destroy_shader", "iv", false));
+	private static var lime_bgfx_create_program = new cpp.Callable<Int->Int->Bool->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_create_program", "iibi",
+		false));
+	private static var lime_bgfx_destroy_program = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_destroy_program", "iv", false));
+	private static var lime_bgfx_create_uniform = new cpp.Callable<String->Int->Int->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_create_uniform", "siii",
+		false));
+	private static var lime_bgfx_destroy_uniform = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_destroy_uniform", "iv", false));
+	private static var lime_bgfx_set_uniform = new cpp.Callable<Int->lime.utils.DataPointer->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_uniform", "idiv", false));
+	private static var lime_bgfx_create_texture_2d = new cpp.Callable<Int->Int->Bool->Int->Int->Int->Int->lime.utils.DataPointer->Int->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_create_texture_2d", "iibiiiidii", false));
+	private static var lime_bgfx_update_texture_2d = new cpp.Callable<Int->Int->Int->Int->Int->Int->Int->lime.utils.DataPointer->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_update_texture_2d", "iiiiiiidiiv", false));
+	private static var lime_bgfx_destroy_texture = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_destroy_texture", "iv", false));
+	private static var lime_bgfx_read_texture = new cpp.Callable<Int->lime.utils.DataPointer->Int->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_read_texture",
+		"idii", false));
+	private static var lime_bgfx_create_frame_buffer = new cpp.Callable<Int->Int->Int->Int->Int->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_create_frame_buffer", "iiiiii", false));
+	private static var lime_bgfx_create_frame_buffer_from_textures = new cpp.Callable<Int->Int->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_create_frame_buffer_from_textures", "iii", false));
+	private static var lime_bgfx_get_frame_buffer_texture = new cpp.Callable<Int->Int->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_get_frame_buffer_texture", "iii", false));
+	private static var lime_bgfx_destroy_frame_buffer = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_destroy_frame_buffer", "iv",
+		false));
+	private static var lime_bgfx_set_state = new cpp.Callable<Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_state", "iiiv", false));
+	private static var lime_bgfx_set_stencil = new cpp.Callable<Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_stencil", "iiv", false));
+	private static var lime_bgfx_set_scissor = new cpp.Callable<Int->Int->Int->Int->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_scissor", "iiiii",
+		false));
+	private static var lime_bgfx_set_transform = new cpp.Callable<lime.utils.DataPointer->Int->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_transform",
+		"dii", false));
+	private static var lime_bgfx_set_vertex_buffer = new cpp.Callable<Int->Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_vertex_buffer", "iiiiv", false));
+	private static var lime_bgfx_set_dynamic_vertex_buffer = new cpp.Callable<Int->Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_dynamic_vertex_buffer", "iiiiv", false));
+	private static var lime_bgfx_alloc_transient_vertex_buffer_slot = new cpp.Callable<lime.utils.DataPointer->Int->cpp.Object->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_alloc_transient_vertex_buffer_slot", "dioi", false));
+	private static var lime_bgfx_set_transient_vertex_buffer_slot = new cpp.Callable<Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_transient_vertex_buffer_slot", "iiv", false));
+	private static var lime_bgfx_create_vertex_layout_handle = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_create_vertex_layout_handle", "oi", false));
+	private static var lime_bgfx_destroy_vertex_layout_handle = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_destroy_vertex_layout_handle", "iv", false));
+	private static var lime_bgfx_set_vertex_buffer_layout = new cpp.Callable<Int->Int->Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_vertex_buffer_layout", "iiiiiv", false));
+	private static var lime_bgfx_set_dynamic_vertex_buffer_layout = new cpp.Callable<Int->Int->Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_dynamic_vertex_buffer_layout", "iiiiiv", false));
+	private static var lime_bgfx_set_index_buffer = new cpp.Callable<Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_index_buffer",
+		"iiiv", false));
+	private static var lime_bgfx_set_dynamic_index_buffer = new cpp.Callable<Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_set_dynamic_index_buffer", "iiiv", false));
+	private static var lime_bgfx_set_texture = new cpp.Callable<Int->Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_texture", "iiiiv",
+		false));
+	private static var lime_bgfx_submit = new cpp.Callable<Int->Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_submit", "iiiiv", false));
+	private static var lime_bgfx_discard = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_discard", "iv", false));
+	private static var lime_bgfx_blit = new cpp.Callable<Int->Int->Int->Int->Int->Int->Int->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_blit",
+		"iiiiiiiiiv", false));
+	private static var lime_bgfx_request_screen_shot = new cpp.Callable<Int->String->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_request_screen_shot",
+		"isv", false));
+	private static var lime_bgfx_compile_shader = new cpp.Callable<String->String->String->String->String->String->Bool->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_compile_shader", "ssssssboo", false));
+	private static var lime_bgfx_get_shader_compile_messages = new cpp.Callable<Void->cpp.Object>(cpp.Prime._loadPrime("lime",
+		"lime_bgfx_get_shader_compile_messages", "o", false));
+	private static var lime_bgfx_shaderc_available = new cpp.Callable<Void->Bool>(cpp.Prime._loadPrime("lime", "lime_bgfx_shaderc_available", "b", false));
 	#end
 	#end
 	#if (neko || cppia)
@@ -901,6 +1176,79 @@ class NativeCFFI
 	private static var lime_audio_decoder_total = CFFI.load("lime", "lime_audio_decoder_total", 1);
 	private static var lime_zlib_compress = CFFI.load("lime", "lime_zlib_compress", 2);
 	private static var lime_zlib_decompress = CFFI.load("lime", "lime_zlib_decompress", 2);
+	private static var lime_bgfx_init = CFFI.load("lime", "lime_bgfx_init", 5);
+	private static var lime_bgfx_shutdown = CFFI.load("lime", "lime_bgfx_shutdown", 0);
+	private static var lime_bgfx_reset = CFFI.load("lime", "lime_bgfx_reset", 3);
+	private static var lime_bgfx_frame = CFFI.load("lime", "lime_bgfx_frame", 1);
+	private static var lime_bgfx_touch = CFFI.load("lime", "lime_bgfx_touch", 1);
+	private static var lime_bgfx_set_debug = CFFI.load("lime", "lime_bgfx_set_debug", 1);
+	private static var lime_bgfx_dbg_text_clear = CFFI.load("lime", "lime_bgfx_dbg_text_clear", 0);
+	private static var lime_bgfx_dbg_text_print = CFFI.load("lime", "lime_bgfx_dbg_text_print", 4);
+	private static var lime_bgfx_get_renderer_type = CFFI.load("lime", "lime_bgfx_get_renderer_type", 0);
+	private static var lime_bgfx_get_caps_max_texture_size = CFFI.load("lime", "lime_bgfx_get_caps_max_texture_size", 0);
+	private static var lime_bgfx_get_caps_homogeneous_depth = CFFI.load("lime", "lime_bgfx_get_caps_homogeneous_depth", 0);
+	private static var lime_bgfx_get_caps_origin_bottom_left = CFFI.load("lime", "lime_bgfx_get_caps_origin_bottom_left", 0);
+	private static var lime_bgfx_set_view_rect = CFFI.load("lime", "lime_bgfx_set_view_rect", 5);
+	private static var lime_bgfx_set_view_scissor = CFFI.load("lime", "lime_bgfx_set_view_scissor", 5);
+	private static var lime_bgfx_set_view_clear = CFFI.load("lime", "lime_bgfx_set_view_clear", 5);
+	private static var lime_bgfx_set_view_mode = CFFI.load("lime", "lime_bgfx_set_view_mode", 2);
+	private static var lime_bgfx_set_view_transform = CFFI.load("lime", "lime_bgfx_set_view_transform", 3);
+	private static var lime_bgfx_set_view_frame_buffer = CFFI.load("lime", "lime_bgfx_set_view_frame_buffer", 2);
+	private static var lime_bgfx_vertex_layout_create = CFFI.load("lime", "lime_bgfx_vertex_layout_create", 0);
+	private static var lime_bgfx_vertex_layout_begin = CFFI.load("lime", "lime_bgfx_vertex_layout_begin", 2);
+	private static var lime_bgfx_vertex_layout_add = CFFI.load("lime", "lime_bgfx_vertex_layout_add", -1);
+	private static var lime_bgfx_vertex_layout_skip = CFFI.load("lime", "lime_bgfx_vertex_layout_skip", 2);
+	private static var lime_bgfx_vertex_layout_end = CFFI.load("lime", "lime_bgfx_vertex_layout_end", 1);
+	private static var lime_bgfx_vertex_layout_get_stride = CFFI.load("lime", "lime_bgfx_vertex_layout_get_stride", 1);
+	private static var lime_bgfx_create_vertex_buffer = CFFI.load("lime", "lime_bgfx_create_vertex_buffer", 4);
+	private static var lime_bgfx_destroy_vertex_buffer = CFFI.load("lime", "lime_bgfx_destroy_vertex_buffer", 1);
+	private static var lime_bgfx_create_dynamic_vertex_buffer = CFFI.load("lime", "lime_bgfx_create_dynamic_vertex_buffer", 3);
+	private static var lime_bgfx_update_dynamic_vertex_buffer = CFFI.load("lime", "lime_bgfx_update_dynamic_vertex_buffer", 4);
+	private static var lime_bgfx_destroy_dynamic_vertex_buffer = CFFI.load("lime", "lime_bgfx_destroy_dynamic_vertex_buffer", 1);
+	private static var lime_bgfx_create_index_buffer = CFFI.load("lime", "lime_bgfx_create_index_buffer", 3);
+	private static var lime_bgfx_destroy_index_buffer = CFFI.load("lime", "lime_bgfx_destroy_index_buffer", 1);
+	private static var lime_bgfx_create_dynamic_index_buffer = CFFI.load("lime", "lime_bgfx_create_dynamic_index_buffer", 2);
+	private static var lime_bgfx_update_dynamic_index_buffer = CFFI.load("lime", "lime_bgfx_update_dynamic_index_buffer", 4);
+	private static var lime_bgfx_destroy_dynamic_index_buffer = CFFI.load("lime", "lime_bgfx_destroy_dynamic_index_buffer", 1);
+	private static var lime_bgfx_set_transient_vertex_buffer = CFFI.load("lime", "lime_bgfx_set_transient_vertex_buffer", 4);
+	private static var lime_bgfx_set_transient_index_buffer = CFFI.load("lime", "lime_bgfx_set_transient_index_buffer", 3);
+	private static var lime_bgfx_create_shader = CFFI.load("lime", "lime_bgfx_create_shader", 2);
+	private static var lime_bgfx_destroy_shader = CFFI.load("lime", "lime_bgfx_destroy_shader", 1);
+	private static var lime_bgfx_create_program = CFFI.load("lime", "lime_bgfx_create_program", 3);
+	private static var lime_bgfx_destroy_program = CFFI.load("lime", "lime_bgfx_destroy_program", 1);
+	private static var lime_bgfx_create_uniform = CFFI.load("lime", "lime_bgfx_create_uniform", 3);
+	private static var lime_bgfx_destroy_uniform = CFFI.load("lime", "lime_bgfx_destroy_uniform", 1);
+	private static var lime_bgfx_set_uniform = CFFI.load("lime", "lime_bgfx_set_uniform", 3);
+	private static var lime_bgfx_create_texture_2d = CFFI.load("lime", "lime_bgfx_create_texture_2d", -1);
+	private static var lime_bgfx_update_texture_2d = CFFI.load("lime", "lime_bgfx_update_texture_2d", -1);
+	private static var lime_bgfx_destroy_texture = CFFI.load("lime", "lime_bgfx_destroy_texture", 1);
+	private static var lime_bgfx_read_texture = CFFI.load("lime", "lime_bgfx_read_texture", 3);
+	private static var lime_bgfx_create_frame_buffer = CFFI.load("lime", "lime_bgfx_create_frame_buffer", 5);
+	private static var lime_bgfx_create_frame_buffer_from_textures = CFFI.load("lime", "lime_bgfx_create_frame_buffer_from_textures", 2);
+	private static var lime_bgfx_get_frame_buffer_texture = CFFI.load("lime", "lime_bgfx_get_frame_buffer_texture", 2);
+	private static var lime_bgfx_destroy_frame_buffer = CFFI.load("lime", "lime_bgfx_destroy_frame_buffer", 1);
+	private static var lime_bgfx_set_state = CFFI.load("lime", "lime_bgfx_set_state", 3);
+	private static var lime_bgfx_set_stencil = CFFI.load("lime", "lime_bgfx_set_stencil", 2);
+	private static var lime_bgfx_set_scissor = CFFI.load("lime", "lime_bgfx_set_scissor", 4);
+	private static var lime_bgfx_set_transform = CFFI.load("lime", "lime_bgfx_set_transform", 2);
+	private static var lime_bgfx_set_vertex_buffer = CFFI.load("lime", "lime_bgfx_set_vertex_buffer", 4);
+	private static var lime_bgfx_set_dynamic_vertex_buffer = CFFI.load("lime", "lime_bgfx_set_dynamic_vertex_buffer", 4);
+	private static var lime_bgfx_alloc_transient_vertex_buffer_slot = CFFI.load("lime", "lime_bgfx_alloc_transient_vertex_buffer_slot", 3);
+	private static var lime_bgfx_set_transient_vertex_buffer_slot = CFFI.load("lime", "lime_bgfx_set_transient_vertex_buffer_slot", 2);
+	private static var lime_bgfx_create_vertex_layout_handle = CFFI.load("lime", "lime_bgfx_create_vertex_layout_handle", 1);
+	private static var lime_bgfx_destroy_vertex_layout_handle = CFFI.load("lime", "lime_bgfx_destroy_vertex_layout_handle", 1);
+	private static var lime_bgfx_set_vertex_buffer_layout = CFFI.load("lime", "lime_bgfx_set_vertex_buffer_layout", 5);
+	private static var lime_bgfx_set_dynamic_vertex_buffer_layout = CFFI.load("lime", "lime_bgfx_set_dynamic_vertex_buffer_layout", 5);
+	private static var lime_bgfx_set_index_buffer = CFFI.load("lime", "lime_bgfx_set_index_buffer", 3);
+	private static var lime_bgfx_set_dynamic_index_buffer = CFFI.load("lime", "lime_bgfx_set_dynamic_index_buffer", 3);
+	private static var lime_bgfx_set_texture = CFFI.load("lime", "lime_bgfx_set_texture", 4);
+	private static var lime_bgfx_submit = CFFI.load("lime", "lime_bgfx_submit", 4);
+	private static var lime_bgfx_discard = CFFI.load("lime", "lime_bgfx_discard", 1);
+	private static var lime_bgfx_blit = CFFI.load("lime", "lime_bgfx_blit", -1);
+	private static var lime_bgfx_request_screen_shot = CFFI.load("lime", "lime_bgfx_request_screen_shot", 2);
+	private static var lime_bgfx_compile_shader = CFFI.load("lime", "lime_bgfx_compile_shader", -1);
+	private static var lime_bgfx_get_shader_compile_messages = CFFI.load("lime", "lime_bgfx_get_shader_compile_messages", 0);
+	private static var lime_bgfx_shaderc_available = CFFI.load("lime", "lime_bgfx_shaderc_available", 0);
 	#end
 
 	#if hl
@@ -1632,6 +1980,262 @@ class NativeCFFI
 	@:hlNative("lime", "hl_zlib_decompress") private static function lime_zlib_decompress(data:Bytes, bytes:Bytes):Bytes
 	{
 		return null;
+	}
+
+	@:hlNative("lime", "hl_bgfx_init") private static function lime_bgfx_init(window:CFFIPointer, width:Int, height:Int, rendererType:Int,
+			resetFlags:Int):Bool
+	{
+		return false;
+	}
+
+	@:hlNative("lime", "hl_bgfx_shutdown") private static function lime_bgfx_shutdown():Void {}
+
+	@:hlNative("lime", "hl_bgfx_reset") private static function lime_bgfx_reset(width:Int, height:Int, flags:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_frame") private static function lime_bgfx_frame(capture:Bool):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_touch") private static function lime_bgfx_touch(viewId:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_debug") private static function lime_bgfx_set_debug(flags:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_dbg_text_clear") private static function lime_bgfx_dbg_text_clear():Void {}
+
+	@:hlNative("lime", "hl_bgfx_dbg_text_print") private static function lime_bgfx_dbg_text_print(x:Int, y:Int, attr:Int, text:String):Void {}
+
+	@:hlNative("lime", "hl_bgfx_get_renderer_type") private static function lime_bgfx_get_renderer_type():Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_get_caps_max_texture_size") private static function lime_bgfx_get_caps_max_texture_size():Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_get_caps_homogeneous_depth") private static function lime_bgfx_get_caps_homogeneous_depth():Bool
+	{
+		return false;
+	}
+
+	@:hlNative("lime", "hl_bgfx_get_caps_origin_bottom_left") private static function lime_bgfx_get_caps_origin_bottom_left():Bool
+	{
+		return false;
+	}
+
+	@:hlNative("lime", "hl_bgfx_set_view_rect") private static function lime_bgfx_set_view_rect(viewId:Int, x:Int, y:Int, width:Int, height:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_view_scissor") private static function lime_bgfx_set_view_scissor(viewId:Int, x:Int, y:Int, width:Int, height:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_view_clear") private static function lime_bgfx_set_view_clear(viewId:Int, flags:Int, rgba:Int, depth:Float,
+		stencil:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_view_mode") private static function lime_bgfx_set_view_mode(viewId:Int, mode:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_view_transform") private static function lime_bgfx_set_view_transform(viewId:Int, view:DataPointer,
+		proj:DataPointer):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_view_frame_buffer") private static function lime_bgfx_set_view_frame_buffer(viewId:Int, handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_vertex_layout_create") private static function lime_bgfx_vertex_layout_create():CFFIPointer
+	{
+		return null;
+	}
+
+	@:hlNative("lime", "hl_bgfx_vertex_layout_begin") private static function lime_bgfx_vertex_layout_begin(handle:CFFIPointer, rendererType:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_vertex_layout_add") private static function lime_bgfx_vertex_layout_add(handle:CFFIPointer, attrib:Int, num:Int, type:Int,
+		normalized:Bool, asInt:Bool):Void {}
+
+	@:hlNative("lime", "hl_bgfx_vertex_layout_skip") private static function lime_bgfx_vertex_layout_skip(handle:CFFIPointer, num:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_vertex_layout_end") private static function lime_bgfx_vertex_layout_end(handle:CFFIPointer):Void {}
+
+	@:hlNative("lime", "hl_bgfx_vertex_layout_get_stride") private static function lime_bgfx_vertex_layout_get_stride(handle:CFFIPointer):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_create_vertex_buffer") private static function lime_bgfx_create_vertex_buffer(data:DataPointer, size:Int,
+			layout:CFFIPointer, flags:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_destroy_vertex_buffer") private static function lime_bgfx_destroy_vertex_buffer(handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_create_dynamic_vertex_buffer") private static function lime_bgfx_create_dynamic_vertex_buffer(num:Int, layout:CFFIPointer,
+			flags:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_update_dynamic_vertex_buffer") private static function lime_bgfx_update_dynamic_vertex_buffer(handle:Int, startVertex:Int,
+		data:DataPointer, size:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_destroy_dynamic_vertex_buffer") private static function lime_bgfx_destroy_dynamic_vertex_buffer(handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_create_index_buffer") private static function lime_bgfx_create_index_buffer(data:DataPointer, size:Int, flags:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_destroy_index_buffer") private static function lime_bgfx_destroy_index_buffer(handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_create_dynamic_index_buffer") private static function lime_bgfx_create_dynamic_index_buffer(num:Int, flags:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_update_dynamic_index_buffer") private static function lime_bgfx_update_dynamic_index_buffer(handle:Int, startIndex:Int,
+		data:DataPointer, size:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_destroy_dynamic_index_buffer") private static function lime_bgfx_destroy_dynamic_index_buffer(handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_transient_vertex_buffer") private static function lime_bgfx_set_transient_vertex_buffer(stream:Int, data:DataPointer,
+			numVertices:Int, layout:CFFIPointer):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_set_transient_index_buffer") private static function lime_bgfx_set_transient_index_buffer(data:DataPointer, numIndices:Int,
+			index32:Bool):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_create_shader") private static function lime_bgfx_create_shader(data:DataPointer, size:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_destroy_shader") private static function lime_bgfx_destroy_shader(handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_create_program") private static function lime_bgfx_create_program(vsh:Int, fsh:Int, destroyShaders:Bool):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_destroy_program") private static function lime_bgfx_destroy_program(handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_create_uniform") private static function lime_bgfx_create_uniform(name:String, type:Int, num:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_destroy_uniform") private static function lime_bgfx_destroy_uniform(handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_uniform") private static function lime_bgfx_set_uniform(handle:Int, data:DataPointer, num:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_create_texture_2d") private static function lime_bgfx_create_texture_2d(width:Int, height:Int, hasMips:Bool, numLayers:Int,
+			format:Int, flagsHi:Int, flagsLo:Int, data:DataPointer, size:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_update_texture_2d") private static function lime_bgfx_update_texture_2d(handle:Int, layer:Int, mip:Int, x:Int, y:Int,
+		width:Int, height:Int, data:DataPointer, size:Int, pitch:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_destroy_texture") private static function lime_bgfx_destroy_texture(handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_read_texture") private static function lime_bgfx_read_texture(handle:Int, data:DataPointer, mip:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_create_frame_buffer") private static function lime_bgfx_create_frame_buffer(width:Int, height:Int, format:Int, flagsHi:Int,
+			flagsLo:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_create_frame_buffer_from_textures") private static function lime_bgfx_create_frame_buffer_from_textures(color:Int,
+			depthStencil:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_get_frame_buffer_texture") private static function lime_bgfx_get_frame_buffer_texture(handle:Int, attachment:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_destroy_frame_buffer") private static function lime_bgfx_destroy_frame_buffer(handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_state") private static function lime_bgfx_set_state(stateHi:Int, stateLo:Int, rgba:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_stencil") private static function lime_bgfx_set_stencil(fstencil:Int, bstencil:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_scissor") private static function lime_bgfx_set_scissor(x:Int, y:Int, width:Int, height:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_set_transform") private static function lime_bgfx_set_transform(data:DataPointer, num:Int):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_set_vertex_buffer") private static function lime_bgfx_set_vertex_buffer(stream:Int, handle:Int, startVertex:Int,
+		numVertices:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_dynamic_vertex_buffer") private static function lime_bgfx_set_dynamic_vertex_buffer(stream:Int, handle:Int,
+		startVertex:Int, numVertices:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_alloc_transient_vertex_buffer_slot") private static function lime_bgfx_alloc_transient_vertex_buffer_slot(data:DataPointer,
+			numVertices:Int, layout:CFFIPointer):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_set_transient_vertex_buffer_slot") private static function lime_bgfx_set_transient_vertex_buffer_slot(stream:Int,
+			slot:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_create_vertex_layout_handle") private static function lime_bgfx_create_vertex_layout_handle(layout:CFFIPointer):Int
+	{
+		return 0;
+	}
+
+	@:hlNative("lime", "hl_bgfx_destroy_vertex_layout_handle") private static function lime_bgfx_destroy_vertex_layout_handle(handle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_vertex_buffer_layout") private static function lime_bgfx_set_vertex_buffer_layout(stream:Int, handle:Int,
+		startVertex:Int, numVertices:Int, layoutHandle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_dynamic_vertex_buffer_layout") private static function lime_bgfx_set_dynamic_vertex_buffer_layout(stream:Int,
+		handle:Int, startVertex:Int, numVertices:Int, layoutHandle:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_index_buffer") private static function lime_bgfx_set_index_buffer(handle:Int, firstIndex:Int, numIndices:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_dynamic_index_buffer") private static function lime_bgfx_set_dynamic_index_buffer(handle:Int, firstIndex:Int,
+		numIndices:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_set_texture") private static function lime_bgfx_set_texture(stage:Int, sampler:Int, texture:Int, flags:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_submit") private static function lime_bgfx_submit(viewId:Int, program:Int, depth:Int, discardFlags:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_discard") private static function lime_bgfx_discard(flags:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_blit") private static function lime_bgfx_blit(viewId:Int, dst:Int, dstX:Int, dstY:Int, src:Int, srcX:Int, srcY:Int,
+		width:Int, height:Int):Void {}
+
+	@:hlNative("lime", "hl_bgfx_request_screen_shot") private static function lime_bgfx_request_screen_shot(frameBuffer:Int, path:String):Void {}
+
+	@:hlNative("lime", "hl_bgfx_compile_shader") private static function lime_bgfx_compile_shader(source:String, type:String, platform:String,
+			profile:String, varying:String, includeDir:String, debug:Bool, bytes:Bytes):Bytes
+	{
+		return null;
+	}
+
+	@:hlNative("lime", "hl_bgfx_get_shader_compile_messages") private static function lime_bgfx_get_shader_compile_messages():hl.Bytes
+	{
+		return null;
+	}
+
+	@:hlNative("lime", "hl_bgfx_shaderc_available") private static function lime_bgfx_shaderc_available():Bool
+	{
+		return false;
 	}
 	#end
 	#end

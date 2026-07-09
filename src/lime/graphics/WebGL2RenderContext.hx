@@ -255,7 +255,6 @@ abstract WebGL2RenderContext(HTML5WebGL2RenderContext) from HTML5WebGL2RenderCon
 #elseif (!lime_doc_gen || lime_opengl || lime_opengles || lime_webgl)
 import haxe.Int64;
 import lime.graphics.opengl.*;
-import lime.graphics.OpenGLRenderContext;
 import lime.utils.ArrayBuffer;
 import lime.utils.ArrayBufferView;
 import lime.utils.BytePointer;
@@ -288,14 +287,8 @@ import lime.utils.UInt32Array;
 	```
 **/
 @:access(lime.graphics.RenderContext)
-#if !doc_gen
-@:transitive
-abstract WebGL2RenderContext(OpenGLRenderContext) from OpenGLRenderContext to OpenGLRenderContext
-{
-#else
 abstract WebGL2RenderContext(Dynamic) from Dynamic to Dynamic
 {
-#end
 
 	private static var __tempPointer = new BytePointer();
 	public var DEPTH_BUFFER_BIT(get, never):Int;

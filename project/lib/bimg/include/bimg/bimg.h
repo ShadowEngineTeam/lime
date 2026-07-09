@@ -55,6 +55,9 @@ namespace bimg
 			BC5,          //!< LATC2/ATI2
 			BC6H,         //!< BC6H
 			BC7,          //!< BC7
+			BC4S,         //!< LATC1/ATI1 signed (lime)
+			BC5S,         //!< LATC2/ATI2 signed (lime)
+			BC6HS,        //!< BC6H signed float (lime)
 			ETC1,         //!< ETC1 RGB8
 			ETC2,         //!< ETC2 RGB8
 			ETC2A,        //!< ETC2 RGBA8

@@ -468,10 +468,10 @@
 # define SDL_SENSOR_DUMMY 1              /**< Dummy sensor driver (no native support) */
 # define SDL_VIDEO_DRIVER_COCOA 1        /**< Cocoa video driver */
 # define SDL_VIDEO_METAL 1               /**< Metal support */
-# define SDL_VIDEO_OPENGL 1              /**< OpenGL support */
-# define SDL_VIDEO_OPENGL_EGL 1          /**< EGL (Embedded OpenGL) support */
-# define SDL_VIDEO_OPENGL_ES2 1          /**< OpenGL ES 2.0 support */
-# define SDL_VIDEO_OPENGL_CGL 1          /**< Core Graphics Layer (CGL) OpenGL support */
+# define SDL_VIDEO_OPENGL 0              /**< OpenGL support */
+# define SDL_VIDEO_OPENGL_EGL 0          /**< EGL (Embedded OpenGL) support */
+# define SDL_VIDEO_OPENGL_ES2 0          /**< OpenGL ES 2.0 support */
+# define SDL_VIDEO_OPENGL_CGL 0          /**< Core Graphics Layer (CGL) OpenGL support */
 /** @} */
 
 #elif defined(SDL_PLATFORM_IOS)
@@ -502,8 +502,8 @@
 
 # define SDL_VIDEO_DRIVER_UIKIT 1    /**< UIKit video driver */
 # define SDL_VIDEO_METAL 1           /**< Metal support */
-# define SDL_VIDEO_OPENGL_ES 1       /**< OpenGL ES support */
-# define SDL_VIDEO_OPENGL_ES2 1      /**< OpenGL ES 2.0 support */
+# define SDL_VIDEO_OPENGL_ES 0       /**< OpenGL ES support */
+# define SDL_VIDEO_OPENGL_ES2 0      /**< OpenGL ES 2.0 support */
 /** @} */
 
 #elif defined(SDL_PLATFORM_ANDROID)

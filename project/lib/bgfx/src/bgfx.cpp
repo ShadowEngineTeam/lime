@@ -3232,6 +3232,28 @@ namespace bgfx
 
 				if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
 				{
+					// lime patch: prefer OpenGL (ES) over Direct3D as the
+					// fallback when the requested renderer (Vulkan by
+					// default) is unavailable. GLES here needs an EGL runtime
+					// such as ANGLE's libEGL.dll next to the app; probe for
+					// the dll first, because without a loadable EGL the GLES
+					// backend BGFX_FATALs (aborts) instead of failing over,
+					// so drop it as a candidate entirely.
+					if (RendererType::OpenGLES == renderer)
+					{
+						void* egl = bx::dlopen("libEGL.dll");
+
+						if (NULL == egl)
+						{
+							continue;
+						}
+
+						bx::dlclose(egl);
+						score += 30;
+					}
+
+					score += RendererType::OpenGL == renderer ? 25 : 0;
+
 					if (windowsVersionIs(Condition::GreaterEqual, 0x0602) )
 					{
 						score += RendererType::Direct3D11 == renderer ? 20 : 0;
@@ -5230,6 +5252,27 @@ namespace bgfx
 			, g_caps.limits.maxTextureSize
 			);
 
+		// lime patch: hard texture size limits regardless of what the driver
+		// reports — 16384 for 2D, 4096 for 3D — to prevent black boxes from
+		// oversized allocations
+		{
+			const uint16_t limeMaxSize = is3DTexture ? 4096 : 16384;
+
+			BGFX_ERROR_CHECK(true
+				&& _width  <= limeMaxSize
+				&& _height <= limeMaxSize
+				&& (!is3DTexture || _depth <= limeMaxSize)
+				, _err
+				, BGFX_ERROR_TEXTURE_VALIDATION
+				, "Requested texture size is above the lime hard limit."
+				, "Texture requested %d x %d x %d (Max: %d)."
+				, _width
+				, _height
+				, _depth
+				, limeMaxSize
+				);
+		}
+
 		BGFX_ERROR_CHECK(false
 			|| 0 == (_flags & BGFX_TEXTURE_RT_MASK)
 			|| 0 == (_flags & BGFX_TEXTURE_READ_BACK)
@@ -6430,6 +6473,9 @@ BGFX_TEXTURE_FORMAT_BIMG(BC4);
 BGFX_TEXTURE_FORMAT_BIMG(BC5);
 BGFX_TEXTURE_FORMAT_BIMG(BC6H);
 BGFX_TEXTURE_FORMAT_BIMG(BC7);
+BGFX_TEXTURE_FORMAT_BIMG(BC4S);
+BGFX_TEXTURE_FORMAT_BIMG(BC5S);
+BGFX_TEXTURE_FORMAT_BIMG(BC6HS);
 BGFX_TEXTURE_FORMAT_BIMG(ETC1);
 BGFX_TEXTURE_FORMAT_BIMG(ETC2);
 BGFX_TEXTURE_FORMAT_BIMG(ETC2A);

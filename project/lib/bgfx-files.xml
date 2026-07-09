@@ -1,0 +1,85 @@
+<xml>
+
+	<files id="native-toolkit-bgfx">
+
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/include" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/3rdparty" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bimg/include" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bgfx/include" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bgfx/3rdparty" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bgfx/3rdparty/khronos" />
+
+		<section if="windows">
+
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bgfx/3rdparty/directx-headers/include" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bgfx/3rdparty/directx-headers/include/directx" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bgfx/3rdparty/directx-headers/include/wsl/stubs" unless="isMsvc" />
+
+		</section>
+
+		<section if="isMsvc">
+
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/include/compat/msvc" />
+			<compilerflag value="/Zc:__cplusplus" />
+			<compilerflag value="/Zc:preprocessor" />
+			<compilerflag value="-D_CRT_SECURE_NO_WARNINGS" />
+
+		</section>
+
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/include/compat/mingw" if="mingw" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/include/compat/osx" if="mac" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/include/compat/ios" if="iphone || appletv" />
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bgfx/3rdparty/metal-cpp" if="apple" />
+
+		<compilerflag value="-DBX_CONFIG_DEBUG=1" if="fulldebug" />
+		<compilerflag value="-DBX_CONFIG_DEBUG=0" unless="fulldebug" />
+
+		<!-- transient buffer pools are fixed-size (no growth); draws that do
+		     not fit are skipped whole (all-or-nothing in the lime bindings).
+		     OpenFL chunked quad draws cost ~3.4MB per 16K-quad chunk (vertex
+		     data + per-vertex-replicated constant attributes); 96MB / 16MB
+		     covers ~450K quads per frame -->
+		<compilerflag value="-DBGFX_CONFIG_MAX_TRANSIENT_VERTEX_BUFFER_SIZE=100663296" />
+		<compilerflag value="-DBGFX_CONFIG_MAX_TRANSIENT_INDEX_BUFFER_SIZE=16777216" />
+
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/include" />
+
+		<compilerflag value="-DBGFX_CONFIG_RENDERER_OPENGL=0" unless="windows" />
+		<compilerflag value="-DBGFX_CONFIG_RENDERER_OPENGLES=0" if="windows || apple" />
+		<compilerflag value="-DBGFX_CONFIG_RENDERER_OPENGL=1" if="windows" />
+		<compilerflag value="-DBGFX_CONFIG_RENDERER_OPENGLES=1" unless="windows || apple" />
+		<compilerflag value="-DBGFX_CONFIG_RENDERER_DIRECT3D11=1" if="windows" />
+		<compilerflag value="-DBGFX_CONFIG_RENDERER_DIRECT3D12=1" if="windows" />
+		<compilerflag value="-DBGFX_CONFIG_RENDERER_VULKAN=1" if="windows || linux || android" />
+		<compilerflag value="-DBGFX_CONFIG_RENDERER_METAL=1" if="apple" />
+
+		<file name="${NATIVE_TOOLKIT_PATH}/bx-bgfx/src/amalgamated.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/src/image.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/amalgamated.cpp" />
+
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_averages_and_directions.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_block_sizes.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_color_quantize.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_color_unquantize.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_compress_symbolic.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_compute_variance.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_decompress_symbolic.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_diagnostic_trace.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_entry.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_find_best_partitioning.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_ideal_endpoints_and_weights.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_image.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_integer_sequence.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_mathlib.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_mathlib_softfloat.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_partition_tables.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_percentile_tables.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_pick_best_endpoint_format.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_quantization.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_symbolic_physical.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_weight_align.cpp" />
+		<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_weight_quant_xfer_tables.cpp" />
+
+	</files>
+
+</xml>

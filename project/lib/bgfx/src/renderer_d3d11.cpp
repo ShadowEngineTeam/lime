@@ -211,6 +211,9 @@ namespace bgfx { namespace d3d11
 		{ DXGI_FORMAT_BC5_UNORM,          DXGI_FORMAT_BC5_UNORM,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // BC5
 		{ DXGI_FORMAT_BC6H_SF16,          DXGI_FORMAT_BC6H_SF16,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // BC6H
 		{ DXGI_FORMAT_BC7_UNORM,          DXGI_FORMAT_BC7_UNORM,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_BC7_UNORM_SRGB       }, // BC7
+		{ DXGI_FORMAT_BC4_SNORM,          DXGI_FORMAT_BC4_SNORM,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // BC4S
+		{ DXGI_FORMAT_BC5_SNORM,          DXGI_FORMAT_BC5_SNORM,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // BC5S
+		{ DXGI_FORMAT_BC6H_SF16,          DXGI_FORMAT_BC6H_SF16,             DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // BC6HS
 		{ DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,               DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // ETC1
 		{ DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,               DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // ETC2
 		{ DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,               DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // ETC2A
@@ -1213,13 +1216,14 @@ namespace bgfx { namespace d3d11
 					D3D11_INFO_QUEUE_FILTER filter;
 					bx::memSet(&filter, 0, sizeof(filter) );
 
-					D3D11_MESSAGE_CATEGORY catlist[] =
+					D3D11_MESSAGE_SEVERITY sevlist[] =
 					{
-						D3D11_MESSAGE_CATEGORY_STATE_CREATION,
+						D3D11_MESSAGE_SEVERITY_INFO,
+						D3D11_MESSAGE_SEVERITY_MESSAGE,
 					};
 
-					filter.DenyList.NumCategories = BX_COUNTOF(catlist);
-					filter.DenyList.pCategoryList = catlist;
+					filter.DenyList.NumSeverities = BX_COUNTOF(sevlist);
+					filter.DenyList.pSeverityList = sevlist;
 
 					D3D11_MESSAGE_ID idlist[] =
 					{
@@ -2388,8 +2392,38 @@ namespace bgfx { namespace d3d11
 			return m_lost;
 		}
 
+		void drainInfoQueue()
+		{
+			if (NULL != m_infoQueue)
+			{
+				UINT64 num = m_infoQueue->GetNumStoredMessagesAllowedByRetrievalFilter();
+
+				for (UINT64 ii = 0; ii < num; ++ii)
+				{
+					SIZE_T length = 0;
+
+					if (SUCCEEDED(m_infoQueue->GetMessage(ii, NULL, &length) )
+					&&  0 < length)
+					{
+						D3D11_MESSAGE* msg = (D3D11_MESSAGE*)bx::alloc(g_allocator, length);
+
+						if (SUCCEEDED(m_infoQueue->GetMessage(ii, msg, &length) ) )
+						{
+							BX_TRACE("D3D11 message %d: %s", msg->ID, msg->pDescription);
+						}
+
+						bx::free(g_allocator, msg);
+					}
+				}
+
+				m_infoQueue->ClearStoredMessages();
+			}
+		}
+
 		void flip() override
 		{
+			drainInfoQueue();
+
 			if (!m_lost)
 			{
 				HRESULT hr = S_OK;

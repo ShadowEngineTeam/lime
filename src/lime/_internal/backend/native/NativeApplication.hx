@@ -4,8 +4,6 @@ import haxe.Int64;
 import haxe.Timer;
 import lime._internal.backend.native.NativeCFFI;
 import lime.app.Application;
-import lime.graphics.opengl.GL;
-import lime.graphics.OpenGLRenderContext;
 import lime.graphics.RenderContext;
 import lime.math.Rectangle;
 import lime.media.AudioManager;
@@ -31,11 +29,8 @@ import lime.ui.Window;
 
 @:access(haxe.Timer)
 @:access(lime._internal.backend.native.NativeCFFI)
-@:access(lime._internal.backend.native.NativeOpenGLRenderContext)
 @:access(lime._internal.backend.native.NativeWindow)
 @:access(lime.app.Application)
-@:access(lime.graphics.opengl.GL)
-@:access(lime.graphics.OpenGLRenderContext)
 @:access(lime.graphics.Renderer)
 @:access(lime.system.Clipboard)
 @:access(lime.system.Sensor)
@@ -379,22 +374,8 @@ class NativeApplication
 				case RENDER_CONTEXT_LOST:
 					if (window.context != null)
 					{
-						switch (window.context.type)
-						{
-							case OPENGL, OPENGLES, WEBGL:
-								#if (lime_cffi && (lime_opengl || lime_opengles) && !display)
-								// context.gl is only populated on lime_opengl (desktop) builds; on
-								// lime_opengles (Android) it's null and the GL lives in gles2/webgl.
-								var gl:NativeOpenGLRenderContext = window.context.gl != null ? cast window.context.gl : cast window.context.gles2;
-								if (gl != null)
-								{
-									gl.__contextLost();
-									if (GL.context == gl) GL.context = null;
-								}
-								#end
-
-							default:
-						}
+						// bgfx recovers from device loss internally; consumers are
+						// still notified so they can recreate GPU resources
 
 						window.context = null;
 						window.onRenderContextLost.dispatch();
@@ -630,6 +611,14 @@ class NativeApplication
 				case WINDOW_RESIZE:
 					window.__width = windowEventInfo.width;
 					window.__height = windowEventInfo.height;
+
+					// bgfx owns the backbuffer; without a reset it keeps rendering
+					// at the old size and the image gets stretch-blitted
+					if (window.context != null && window.context.bgfx != null)
+					{
+						window.context.bgfx.resize(windowEventInfo.width, windowEventInfo.height);
+					}
+
 					window.onResize.dispatch(windowEventInfo.width, windowEventInfo.height);
 
 				case WINDOW_RESTORE:

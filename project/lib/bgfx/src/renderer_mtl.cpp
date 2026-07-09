@@ -239,6 +239,9 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunguarded-availability-new");
 		{ MTL::PixelFormatBC5_RGUnorm,           MTL::PixelFormatInvalid,              MTL::ReadWriteTextureTierNone, { $R, $G, $B, $A }, false }, // BC5
 		{ MTL::PixelFormatBC6H_RGBFloat,         MTL::PixelFormatInvalid,              MTL::ReadWriteTextureTierNone, { $R, $G, $B, $A }, false }, // BC6H
 		{ MTL::PixelFormatBC7_RGBAUnorm,         MTL::PixelFormatBC7_RGBAUnorm_sRGB,   MTL::ReadWriteTextureTierNone, { $R, $G, $B, $A }, false }, // BC7
+		{ MTL::PixelFormatBC4_RSnorm,            MTL::PixelFormatInvalid,              MTL::ReadWriteTextureTierNone, { $R, $G, $B, $A }, false }, // BC4S
+		{ MTL::PixelFormatBC5_RGSnorm,           MTL::PixelFormatInvalid,              MTL::ReadWriteTextureTierNone, { $R, $G, $B, $A }, false }, // BC5S
+		{ MTL::PixelFormatBC6H_RGBFloat,         MTL::PixelFormatInvalid,              MTL::ReadWriteTextureTierNone, { $R, $G, $B, $A }, false }, // BC6HS
 		{ MTL::PixelFormatInvalid,               MTL::PixelFormatInvalid,              MTL::ReadWriteTextureTierNone, { $R, $G, $B, $A }, false }, // ETC1
 		{ MTL::PixelFormatETC2_RGB8,             MTL::PixelFormatETC2_RGB8_sRGB,       MTL::ReadWriteTextureTierNone, { $R, $G, $B, $A }, false }, // ETC2
 		{ MTL::PixelFormatEAC_RGBA8,             MTL::PixelFormatEAC_RGBA8_sRGB,       MTL::ReadWriteTextureTierNone, { $R, $G, $B, $A }, false }, // ETC2A
@@ -390,6 +393,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			case TextureFormat::BC5:
 			case TextureFormat::BC6H:
 			case TextureFormat::BC7:
+			case TextureFormat::BC4S:
+			case TextureFormat::BC5S:
+			case TextureFormat::BC6HS:
 				supported = m_bc;
 				break;
 

@@ -175,6 +175,9 @@ namespace bgfx
 			BC5,          //!< Block Compression 5. Two 8-bit channels (RG), unsigned normalized. 8 BPP.
 			BC6H,         //!< Block Compression 6H. Three 16-bit floating-point channels (RGB), HDR. 8 BPP.
 			BC7,          //!< RGB 4-7 bits per color channel, 0-8 bits alpha. Block Compression 7. High-quality RGBA, 4-7 bits per color, 0-8 bits alpha. 8 BPP.
+			BC4S,         //!< Block Compression 4. Single 8-bit red channel, signed normalized. 4 BPP. (lime)
+			BC5S,         //!< Block Compression 5. Two 8-bit channels (RG), signed normalized. 8 BPP. (lime)
+			BC6HS,        //!< Block Compression 6H. Three 16-bit signed floating-point channels (RGB), HDR. 8 BPP. (lime)
 			ETC1,         //!< Ericsson Texture Compression 1. 8-bit per channel RGB. 4 BPP.
 			ETC2,         //!< Ericsson Texture Compression 2. 8-bit per channel RGB. 4 BPP.
 			ETC2A,        //!< Ericsson Texture Compression 2 with full alpha. 8-bit per channel RGBA. 8 BPP.

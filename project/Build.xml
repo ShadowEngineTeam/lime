@@ -28,12 +28,12 @@
 	<set name="LIME_OPUS" value="1" />
 	<set name="LIME_DR_LIBS" value="1" />
 	<set name="LIME_OPENAL" value="1" if="windows || linux || mac || android || iphone || appletv" />
-	<set name="LIME_OPENGL" value="1" />
 	<set name="LIME_PIXMAN" value="1" />
 	<set name="LIME_SDL" value="1" />
 	<set name="LIME_SDL_IMAGE" value="1" if="LIME_SDL" />
-	<set name="LIME_ANGLE" value="1" if="iphone" />
-	<set name="LIME_GLAD" value="1" unless="iphone || appletv" />
+	<set name="LIME_BGFX" value="1" />
+	<!-- runtime shader compiler (GLSL .sc -> native shader binaries); desktop only -->
+	<set name="LIME_BGFX_SHADERC" value="1" if="LIME_BGFX" />
 	<set name="LIME_ZLIB" value="1" />
 
 	<set name="OUTPUT_DIR" value="../ndll" unless="OUTPUT_DIR" />
@@ -190,43 +190,45 @@
 
 		</section>
 
-		<section if="LIME_OPENGL">
-
-			<compilerflag value="-DLIME_OPENGL" />
-			<compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" />
-			<compilerflag value="-I${DEVELOPER_DIR}/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS${TVOS_VER}.sdk/" if="appletv" />
-
-			<file name="src/bindings/opengl/OpenGLBindings.cpp" />
-
-		</section>
-
 		<section if="LIME_SDL">
 
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include" />
 			<compilerflag value="-DLIME_SDL" />
 			<compilerflag value="-DSDL_DISABLE_ALLOCA" />
 			<compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" unless="iphone" />
-            <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" if="iphone LIME_ANGLE" />
-			<compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" unless="LIME_ANGLE" />
 
 			<file name="src/backend/sdl/SDLApplication.cpp" />
 			<file name="src/backend/sdl/SDLWindow.cpp" />
 
 		</section>
 
-		<section if="LIME_GLAD">
+		<section if="LIME_BGFX">
 
-			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/glad/include" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/include" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/include/compat/msvc" if="isMsvc" />
+			<compilerflag value="/Zc:preprocessor" if="isMsvc" />
+			<compilerflag value="/Zc:__cplusplus" if="isMsvc" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/include/compat/mingw" if="mingw" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/include/compat/osx" if="mac" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx-bgfx/include/compat/ios" if="iphone || appletv" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bimg/include" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bgfx/include" />
 
-			<compilerflag value="-DLIME_GLAD" />
+			<compilerflag value="-DLIME_BGFX" />
+			<compilerflag value="-DBX_CONFIG_DEBUG=1" if="fulldebug" />
+			<compilerflag value="-DBX_CONFIG_DEBUG=0" unless="fulldebug" />
+			<compilerflag value="-DLIME_BGFX_TRACE" if="LIME_BGFX_TRACE" />
 
-		</section>
+			<file name="src/bindings/bgfx/BGFXBindings.cpp" />
 
-		<section if="LIME_ANGLE">
+			<section if="LIME_BGFX_SHADERC">
 
-			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/angle/include/" />
+				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bgfx/tools/shaderc" />
+				<compilerflag value="-DLIME_BGFX_SHADERC" />
 
-			<compilerflag value="-DLIME_ANGLE" />
+				<file name="src/bindings/bgfx/BGFXShadercBindings.cpp" />
+
+			</section>
 
 		</section>
 
@@ -314,12 +316,13 @@
 	<!-- TODO: if https://github.com/HaxeFoundation/hxcpp/issues/930 ever gets resolved, use that instead. -->
 	<setup name="androidNdk" if="android" />
 
+	<include name="lib/bgfx-files.xml" if="LIME_BGFX" />
+	<include name="lib/shaderc-files.xml" if="LIME_BGFX_SHADERC" />
 	<include name="lib/cairo-files.xml" />
 	<include name="lib/curl-files.xml" />
 	<include name="lib/efsw-files.xml" />
 	<include name="lib/freetype-files.xml" />
 	<include name="lib/harfbuzz-files.xml" />
-	<include name="lib/glad-files.xml" if="LIME_GLAD" />
 	<include name="lib/lzma-files.xml" />
 	<include name="lib/mbedtls-files.xml" />
 	<include name="lib/vorbis-files.xml" />
@@ -344,6 +347,8 @@
 		<files id="lime" />
 		<files id="android-cpufeatures" if="android" />
 
+		<files id="native-toolkit-bgfx" if="LIME_BGFX" />
+		<files id="native-toolkit-shaderc" if="LIME_BGFX_SHADERC" />
 		<files id="native-toolkit-cairo" if="LIME_CAIRO" />
 		<files id="native-toolkit-curl" if="LIME_CURL" />
 		<files id="native-toolkit-efsw" if="LIME_EFSW" />
@@ -360,7 +365,6 @@
 		<files id="native-toolkit-pixman" if="LIME_PIXMAN" />
 		<files id="native-toolkit-sdl" if="LIME_SDL" />
 		<files id="native-toolkit-sdl_image" if="LIME_SDL_IMAGE" />
-		<files id="native-toolkit-glad" if="LIME_GLAD" />
 		<files id="native-toolkit-webm" if="LIME_WEBM" />
 		<files id="native-toolkit-zlib" if="LIME_ZLIB" />
 
@@ -377,6 +381,7 @@
 					<lib name="advapi32.lib" />
 					<lib name="avrt.lib" if="LIME_OPENAL" />
 					<lib name="bcrypt.lib" if="LIME_CURL" />
+					<lib name="psapi.lib" if="LIME_BGFX" />
 					<lib name="comdlg32.lib" />
 					<lib name="comsuppw.lib" />
 					<lib name="dwrite.lib" if="LIME_HARFBUZZ" />
@@ -403,6 +408,7 @@
 					<lib name="-ladvapi32" />
 					<lib name="-lavrt" if="LIME_OPENAL" />
 					<lib name="-lbcrypt" if="LIME_CURL" />
+					<lib name="-lpsapi" if="LIME_BGFX" />
 					<lib name="-lcomdlg32" />
 					<lib name="-ldwrite" if="LIME_HARFBUZZ" />
 					<lib name="-lgdi32" />
@@ -460,6 +466,10 @@
 				<vflag name="-rpath" value="/opt/homebrew/lib" if="HXCPP_ARM64" />
 
 				<vflag name="-l" value="iconv" />
+				<section if="LIME_BGFX">
+					<vflag name="-framework" value="Metal" />
+					<vflag name="-framework" value="QuartzCore" />
+				</section>
 				<vflag name="-framework" value="AppKit" />
 				<vflag name="-framework" value="AudioToolbox" />
 				<vflag name="-framework" value="AudioUnit" />
@@ -493,10 +503,6 @@
 			<section if="android">
 
 				<lib name="-L../ndll/Android" />
-				<lib name="-L../dependencies/angle/Android/arm" if="HXCPP_ARMV7" />
-				<lib name="-L../dependencies/angle/Android/arm64" if="HXCPP_ARM64" />
-				<lib name="-L../dependencies/angle/Android/x86" if="HXCPP_X86" />
-				<lib name="-L../dependencies/angle/Android/x86_64" if="HXCPP_X86_64" />
 
 				<lib name="-ldl" />
 				<lib name="-llog" />

@@ -1,7 +1,6 @@
 #include "SDLWindow.h"
 #include "SDLApplication.h"
 #include "system/System.h"
-#include "../../bindings/opengl/OpenGLBindings.h"
 #ifdef ANDROID
 #include <android/native_window.h>
 #endif
@@ -22,13 +21,8 @@ namespace lime {
 		sdlTexture = 0;
 		sdlRenderer = 0;
 
-		#if defined(LIME_ANGLE) && defined(IPHONE)
-		eglMetalView = 0;
-		eglDisplay = EGL_NO_DISPLAY;
-		eglContext = EGL_NO_CONTEXT;
-		eglSurface = EGL_NO_SURFACE;
-		#else
-		context = 0;
+		#ifdef LIME_BGFX
+		metalView = 0;
 		#endif
 
 		contextWidth = 0;
@@ -50,308 +44,39 @@ namespace lime {
 		if (flags & WINDOW_FLAG_MAXIMIZED) sdlWindowFlags |= SDL_WINDOW_MAXIMIZED;
 		if (flags & WINDOW_FLAG_ALWAYS_ON_TOP) sdlWindowFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
 
-		#if !defined(IPHONE) && !defined(APPLETV)
-		SDL_SetHint (SDL_HINT_VIDEO_FORCE_EGL, "1");
-		#ifdef HX_WINDOWS
-		SDL_SetHint (SDL_HINT_VIDEO_WIN_D3DCOMPILER, "none");
-		#endif
-		SDL_SetHint (SDL_HINT_OPENGL_ES_DRIVER, "1");
-		#endif
-
-		#if defined(LIME_ANGLE) && defined(IPHONE)
-		egl_display_attribs.push_back (EGL_PLATFORM_ANGLE_TYPE_ANGLE);
-		egl_display_attribs.push_back (EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE);
-		egl_display_attribs.push_back (EGL_POWER_PREFERENCE_ANGLE);
-		egl_display_attribs.push_back (EGL_HIGH_POWER_ANGLE);
-		egl_display_attribs.push_back (EGL_NONE);
-		#endif
-
-		#if defined(LIME_ANGLE) && defined(IPHONE)
+		// bgfx is the only hardware renderer; no SDL_WINDOW_OPENGL, no GL
+		// attributes — bgfx configures its own backbuffer from reset flags
+		#if defined(HX_MACOS) || defined(IPHONE) || defined(APPLETV)
 		sdlWindowFlags |= SDL_WINDOW_METAL;
-		#else
-		sdlWindowFlags |= SDL_WINDOW_OPENGL;
-		#endif
-
-		#if !(defined(LIME_ANGLE) && defined(IPHONE))
-		SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-		SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		SDL_GL_SetAttribute (SDL_GL_CONTEXT_MINOR_VERSION, 0);
-		#endif
-
-		#if defined(LIME_ANGLE) && defined(IPHONE)
-
-		if (flags & WINDOW_FLAG_DEPTH_BUFFER) {
-
-			egl_config_attribs.push_back (EGL_DEPTH_SIZE);
-			egl_config_attribs.push_back (32 - ((flags & WINDOW_FLAG_STENCIL_BUFFER) ? 8 : 0));
-
-		}
-
-		if (flags & WINDOW_FLAG_STENCIL_BUFFER) {
-
-			egl_config_attribs.push_back (EGL_STENCIL_SIZE);
-			egl_config_attribs.push_back (8);
-
-		}
-
-		if (flags & WINDOW_FLAG_HW_AA_HIRES) {
-
-			egl_config_attribs.push_back (EGL_SAMPLE_BUFFERS);
-			egl_config_attribs.push_back (1);
-			egl_config_attribs.push_back (EGL_SAMPLES);
-			egl_config_attribs.push_back (4);
-
-		} else if (flags & WINDOW_FLAG_HW_AA) {
-
-			egl_config_attribs.push_back (EGL_SAMPLE_BUFFERS);
-			egl_config_attribs.push_back (1);
-			egl_config_attribs.push_back (EGL_SAMPLES);
-			egl_config_attribs.push_back (2);
-
-		}
-
-		if (flags & WINDOW_FLAG_COLOR_DEPTH_32_BIT) {
-
-			egl_config_attribs.push_back (EGL_RED_SIZE);
-			egl_config_attribs.push_back (8);
-			egl_config_attribs.push_back (EGL_GREEN_SIZE);
-			egl_config_attribs.push_back (8);
-			egl_config_attribs.push_back (EGL_BLUE_SIZE);
-			egl_config_attribs.push_back (8);
-			egl_config_attribs.push_back (EGL_ALPHA_SIZE);
-			egl_config_attribs.push_back (8);
-
-		} else {
-
-			egl_config_attribs.push_back (EGL_RED_SIZE);
-			egl_config_attribs.push_back (5);
-			egl_config_attribs.push_back (EGL_GREEN_SIZE);
-			egl_config_attribs.push_back (6);
-			egl_config_attribs.push_back (EGL_BLUE_SIZE);
-			egl_config_attribs.push_back (5);
-
-		}
-
-		egl_config_attribs.push_back (EGL_COLOR_BUFFER_TYPE);
-		egl_config_attribs.push_back (EGL_RGB_BUFFER);
-		egl_config_attribs.push_back (EGL_SURFACE_TYPE);
-		egl_config_attribs.push_back (EGL_WINDOW_BIT);
-		egl_config_attribs.push_back (EGL_RENDERABLE_TYPE);
-		egl_config_attribs.push_back (EGL_OPENGL_ES3_BIT);
-		egl_config_attribs.push_back (EGL_NONE);
-
-		#else
-
-		if (flags & WINDOW_FLAG_DEPTH_BUFFER) {
-
-			SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 32 - ((flags & WINDOW_FLAG_STENCIL_BUFFER) ? 8 : 0));
-
-		}
-
-		if (flags & WINDOW_FLAG_STENCIL_BUFFER) {
-
-			SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 8);
-
-		}
-
-		if (flags & WINDOW_FLAG_HW_AA_HIRES) {
-
-			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, true);
-			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, 4);
-
-		} else if (flags & WINDOW_FLAG_HW_AA) {
-
-			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, true);
-			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, 2);
-
-		}
-
-		if (flags & WINDOW_FLAG_COLOR_DEPTH_32_BIT) {
-
-			SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 8);
-			SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 8);
-			SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 8);
-			SDL_GL_SetAttribute (SDL_GL_ALPHA_SIZE, 8);
-
-		} else {
-
-			SDL_GL_SetAttribute (SDL_GL_RED_SIZE, 5);
-			SDL_GL_SetAttribute (SDL_GL_GREEN_SIZE, 6);
-			SDL_GL_SetAttribute (SDL_GL_BLUE_SIZE, 5);
-
-		}
-
-		#endif
-
-		#if defined(LIME_ANGLE) && defined(IPHONE)
-		egl_context_attribs.push_back (EGL_CONTEXT_CLIENT_VERSION);
-		egl_context_attribs.push_back (3);
-		egl_context_attribs.push_back (EGL_NONE);
 		#endif
 
 		sdlWindow = SDL_CreateWindow (title, width, height, sdlWindowFlags);
 
 		if (!sdlWindow) {
 
-			//#if defined(IPHONE) || defined(APPLETV)
-			SDL_Log ("Could not create SDL Window with OpenGL ES 3: %s.\nTrying to create SDL Window using OpenGL ES 2...", SDL_GetError ());
-			/*#else
-			SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL Window", SDL_GetError (), NULL);
-			#endif*/
+			SDL_Log ("Could not create SDL Window: %s.\nReturning null...\n", SDL_GetError ());
 
-			SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-
-			sdlWindow = SDL_CreateWindow (title, width, height, sdlWindowFlags);
-
-			if (!sdlWindow) {
-
-				//#if defined(IPHONE) || defined(APPLETV)
-				SDL_Log ("Could not create SDL Window with OpenGL ES 2: %s.\nReturning null...\n", SDL_GetError ());
-				/*#else
-				SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL Window", SDL_GetError (), NULL);
-				#endif*/
-
-				return;
-
-			}
+			return;
 
 		}
 
-		#if defined(LIME_ANGLE) && defined(IPHONE)
+		#ifdef LIME_BGFX
 
-		eglMetalView = SDL_Metal_CreateView (sdlWindow);
+		// bgfx::init happens later, from lime.graphics.bgfx.BGFX on the
+		// Haxe side, using GetNativeWindowHandle / GetNativeDisplayHandle
 
-		eglDisplay = eglGetPlatformDisplay (EGL_PLATFORM_ANGLE_ANGLE, (void*)EGL_DEFAULT_DISPLAY, egl_display_attribs.data ());
-
-		if (eglDisplay == EGL_NO_DISPLAY) {
-
-			SDL_Log ("Failed to get EGL display (EGL error: 0x%04X)\n", eglGetError ());
-
-		}
-
-		if (eglInitialize (eglDisplay, NULL, NULL) == false) {
-
-			SDL_Log ("Failed to initialize EGL (EGL error: 0x%04X)\n", eglGetError ());
-
-		}
-
-		EGLConfig eglConfig = 0;
-		EGLint eglConfigCount = 0;
-
-		if (!eglChooseConfig (eglDisplay, egl_config_attribs.data (), &eglConfig, 1, &eglConfigCount) || eglConfigCount == 0) {
-
-			SDL_Log ("Failed to choose EGL config (EGL error: 0x%04X), retrying with OpenGL ES 2\n", eglGetError ());
-
-			egl_config_attribs[egl_config_attribs.size () - 2] = EGL_OPENGL_ES2_BIT;
-			egl_config_attribs[egl_config_attribs.size () - 1] = EGL_NONE;
-
-			if (!eglChooseConfig (eglDisplay, egl_config_attribs.data (), &eglConfig, 1, &eglConfigCount) || eglConfigCount == 0) {
-
-				SDL_Log ("Failed to choose EGL config with OpenGL ES 2 (EGL error: 0x%04X)\n", eglGetError ());
-
-			} else {
-
-				egl_context_attribs[1] = 2;
-
-			}
-
-		}
-
-		eglSurface = eglCreateWindowSurface (eglDisplay, eglConfig, SDL_Metal_GetLayer (eglMetalView), NULL);
-
-		if (eglSurface == EGL_NO_SURFACE) {
-
-			SDL_Log ("Failed to create EGL surface (EGL error: 0x%04X)\n", eglGetError ());
-
-		}
-
-		eglContext = eglCreateContext (eglDisplay, eglConfig, EGL_NO_CONTEXT, egl_context_attribs.data ());
-
-		if (eglContext == EGL_NO_CONTEXT) {
-
-			SDL_Log ("Failed to create EGL context (EGL error: 0x%04X)\n", eglGetError ());
-
-		}
-
-		if (!eglMakeCurrent (eglDisplay, eglSurface, eglSurface, eglContext)) {
-
-			SDL_Log ("Failed to make EGL context current (EGL error: 0x%04X)\n", eglGetError ());
-
-		} else {
-
-			SetVSyncMode ((flags & WINDOW_FLAG_VSYNC) ? WINDOW_VSYNC_ON : WINDOW_VSYNC_OFF);
-
-			OpenGLBindings::Init ();
-
-		}
-
-		#else
-
-		context = SDL_GL_CreateContext (sdlWindow);
-
-		if (context && SDL_GL_MakeCurrent (sdlWindow, context)) {
-
-			SetVSyncMode ((flags & WINDOW_FLAG_VSYNC) ? WINDOW_VSYNC_ON : WINDOW_VSYNC_OFF);
-
-			OpenGLBindings::Init ();
-
-			#if defined(IPHONE) || defined(APPLETV)
-			SDL_PropertiesID props = SDL_GetWindowProperties (sdlWindow);
-			#endif
-
-		} else {
-
-			//#if defined(IPHONE) || defined(APPLETV)
-			SDL_Log ("Could not create SDL GL Context: %s\n", SDL_GetError ());
-			/*#else
-			SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL GL Context", SDL_GetError (), sdlWindow);
-			#endif*/
-
-			if (sdlWindow) {
-
-				SDL_DestroyWindow (sdlWindow);
-				sdlWindow = 0;
-
-			}
-
-			if (context) {
-
-				SDL_GL_DestroyContext (context);
-				context = 0;
-
-			}
-
-		}
-
+		#if defined(HX_MACOS) || defined(IPHONE) || defined(APPLETV)
+		metalView = SDL_Metal_CreateView (sdlWindow);
 		#endif
 
-		#if defined(LIME_ANGLE) && defined(IPHONE)
-
-		if (eglContext == EGL_NO_CONTEXT) {
-
-			sdlRenderer = SDL_CreateRenderer (sdlWindow, SDL_SOFTWARE_RENDERER);
-
-		}
-
-		if (eglContext != EGL_NO_CONTEXT || sdlRenderer) {
-
-			((SDLApplication*)currentApplication)->RegisterWindow (this);
-
-		} else {
-
-			SDL_Log ("Could not create SDL renderer: %s.\n", SDL_GetError ());
-
-		}
+		((SDLApplication*)currentApplication)->RegisterWindow (this);
 
 		#else
 
-		if (!context) {
+		// no bgfx in this build: software renderer only
+		sdlRenderer = SDL_CreateRenderer (sdlWindow, SDL_SOFTWARE_RENDERER);
 
-			sdlRenderer = SDL_CreateRenderer (sdlWindow, SDL_SOFTWARE_RENDERER);
-
-		}
-
-		if (context || sdlRenderer) {
+		if (sdlRenderer) {
 
 			((SDLApplication*)currentApplication)->RegisterWindow (this);
 
@@ -379,47 +104,16 @@ namespace lime {
 
 			SDL_DestroyRenderer (sdlRenderer);
 
-		} else {
+		}
 
-			#if defined(LIME_ANGLE) && defined(IPHONE)
+		#ifdef LIME_BGFX
+		if (metalView) {
 
-			if (eglDisplay != EGL_NO_DISPLAY) {
-
-				eglMakeCurrent (eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-
-				if (eglContext != EGL_NO_CONTEXT) {
-
-					eglDestroyContext (eglDisplay, eglContext);
-					eglContext = EGL_NO_CONTEXT;
-
-				}
-
-				if (eglSurface != EGL_NO_SURFACE) {
-
-					eglDestroySurface (eglDisplay, eglSurface);
-					eglSurface = EGL_NO_SURFACE;
-
-				}
-
-				eglTerminate (eglDisplay);
-				eglDisplay = EGL_NO_DISPLAY;
-
-			}
-
-			if (eglMetalView) SDL_Metal_DestroyView (eglMetalView);
-
-			#else
-
-			if (context) {
-
-				SDL_GL_DestroyContext (context);
-				context = 0;
-
-			}
-
-			#endif
+			SDL_Metal_DestroyView (metalView);
+			metalView = 0;
 
 		}
+		#endif
 
 	}
 
@@ -495,15 +189,8 @@ namespace lime {
 
 	bool SDLWindow::SetVSyncMode (int mode) {
 
-		#if defined(LIME_ANGLE) && defined(IPHONE)
-
-		return eglSwapInterval (eglDisplay, mode) == EGL_TRUE;
-
-		#else
-
-		return SDL_GL_SetSwapInterval (mode);
-
-		#endif
+		// vsync is controlled through BGFX_RESET_VSYNC on the Haxe side
+		return false;
 
 	}
 
@@ -541,27 +228,8 @@ namespace lime {
 
 		if (SDLApplication::isInBackground ()) return;
 
-		if (!sdlRenderer) {
-
-			#if defined(LIME_ANGLE) && defined(IPHONE)
-
-			if (eglDisplay != EGL_NO_DISPLAY && eglSurface != EGL_NO_SURFACE) {
-
-				eglSwapBuffers (eglDisplay, eglSurface);
-
-			}
-
-			#else
-
-			if (context) {
-
-				SDL_GL_SwapWindow (sdlWindow);
-
-			}
-
-			#endif
-
-		} else {
+		// bgfx presents inside bgfx::frame; only the software fallback flips here
+		if (sdlRenderer) {
 
 			SDL_RenderPresent (sdlRenderer);
 
@@ -657,27 +325,7 @@ namespace lime {
 
 	void SDLWindow::ContextMakeCurrent () {
 
-		if (sdlWindow) {
-
-			#if defined(LIME_ANGLE) && defined(IPHONE)
-
-			if (eglDisplay != EGL_NO_DISPLAY && eglSurface != EGL_NO_SURFACE && eglContext != EGL_NO_CONTEXT) {
-
-				eglMakeCurrent (eglDisplay, eglSurface, eglSurface, eglContext);
-
-			}
-
-			#else
-
-			if (context) {
-
-				SDL_GL_MakeCurrent (sdlWindow, context);
-
-			}
-
-			#endif
-
-		}
+		// no-op: bgfx owns the device context
 
 	}
 
@@ -706,26 +354,28 @@ namespace lime {
 
 		SDL_PropertiesID props = SDL_GetWindowProperties (sdlWindow);
 
-		#if defined(SDL_VIDEO_DRIVER_WINDOWS)
-			void* hwnd = nullptr;
-			SDL_GetPointerProperty (props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, &hwnd);
-			return hwnd;
-		#elif defined(SDL_VIDEO_DRIVER_X11)
-			unsigned long x11win = 0;
-			SDL_GetNumberProperty (props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, &x11win);
-			return (void*)(uintptr_t)x11win;
-		#elif defined(SDL_VIDEO_DRIVER_WAYLAND)
-			void* wlSurface = nullptr;
-			SDL_GetPointerProperty (props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, &wlSurface);
-			return wlSurface;
-		#elif defined(SDL_VIDEO_DRIVER_ANDROID)
-			void* native = nullptr;
-			SDL_GetPointerProperty (props, SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, &native);
-			return native;
-		#elif defined(SDL_VIDEO_DRIVER_COCOA)
-			void* cocoa = nullptr;
-			SDL_GetPointerProperty (props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, &cocoa);
-			return cocoa;
+		// note: SDL_VIDEO_DRIVER_* are SDL-internal build macros and are never
+		// defined for library consumers; use the public SDL_PLATFORM_* macros.
+		// SDL_GetPointerProperty RETURNS the value (third argument is a default).
+
+		#if defined(SDL_PLATFORM_WIN32)
+			return SDL_GetPointerProperty (props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
+		#elif defined(SDL_PLATFORM_MACOS)
+			return SDL_GetPointerProperty (props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL);
+		#elif defined(SDL_PLATFORM_ANDROID)
+			return SDL_GetPointerProperty (props, SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, NULL);
+		#elif defined(SDL_PLATFORM_IOS) || defined(SDL_PLATFORM_TVOS)
+			return SDL_GetPointerProperty (props, SDL_PROP_WINDOW_UIKIT_WINDOW_POINTER, NULL);
+		#elif defined(SDL_PLATFORM_LINUX)
+			const char* videoDriver = SDL_GetCurrentVideoDriver ();
+
+			if (videoDriver && SDL_strcmp (videoDriver, "wayland") == 0) {
+
+				return SDL_GetPointerProperty (props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL);
+
+			}
+
+			return (void*)(uintptr_t)SDL_GetNumberProperty (props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
 		#else
 			return nullptr;
 		#endif
@@ -735,39 +385,24 @@ namespace lime {
 
 	void* SDLWindow::GetContext () {
 
-		#if defined(LIME_ANGLE) && defined(IPHONE)
-		return eglContext;
-		#else
-		return context;
-		#endif
+		return 0;
 
 	}
 
 
 	const char* SDLWindow::GetContextType () {
 
-		#if defined(LIME_ANGLE) && defined(IPHONE)
-		if (eglDisplay != EGL_NO_DISPLAY && eglSurface != EGL_NO_SURFACE && eglContext != EGL_NO_CONTEXT)
-		#else
-		if (context)
+		#ifdef LIME_BGFX
+		if (sdlWindow) {
+
+			return "bgfx";
+
+		}
 		#endif
-		{
 
-			return "opengl";
+		if (sdlRenderer) {
 
-		} else if (sdlRenderer) {
-
-			const char *name = SDL_GetRendererName (sdlRenderer);
-
-			if (name && strcmp (name, SDL_SOFTWARE_RENDERER)) {
-
-				return "software";
-
-			} else {
-
-				return "opengl";
-
-			}
+			return "software";
 
 		}
 
@@ -1218,6 +853,44 @@ namespace lime {
 		SDL_GetWindowSizeInPixels (sdlWindow, &width, &height);
 
 		return height;
+		#endif
+
+	}
+
+
+	void* SDLWindow::GetNativeWindowHandle () {
+
+		#ifdef LIME_BGFX
+		#if defined(HX_MACOS) || defined(IPHONE) || defined(APPLETV)
+		// bgfx accepts a CAMetalLayer directly as the native window handle
+		if (metalView) {
+
+			return SDL_Metal_GetLayer (metalView);
+
+		}
+		#endif
+		#endif
+
+		return GetHandle ();
+
+	}
+
+
+	void* SDLWindow::GetNativeDisplayHandle () {
+
+		#if defined(SDL_PLATFORM_LINUX)
+			SDL_PropertiesID props = SDL_GetWindowProperties (sdlWindow);
+			const char* videoDriver = SDL_GetCurrentVideoDriver ();
+
+			if (videoDriver && SDL_strcmp (videoDriver, "wayland") == 0) {
+
+				return SDL_GetPointerProperty (props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, NULL);
+
+			}
+
+			return SDL_GetPointerProperty (props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, NULL);
+		#else
+			return NULL;
 		#endif
 
 	}
