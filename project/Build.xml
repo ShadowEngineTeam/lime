@@ -7,13 +7,13 @@
 
 	</compiler>
 
-	<set name="PLATFORM" value="android-24" if="android" />
+	<set name="PLATFORM" value="android-26" if="android" />
 	<set name="HXCPP_CPP20" value="1" />
 
 	<include name="${HXCPP}/build-tool/BuildCommon.xml" />
 
-	<set name="HXCPP_ANDROID_PLATFORM" value="24" if="android" />
-	<set name="PLATFORM_NUMBER" value="24" if="android" />
+	<set name="HXCPP_ANDROID_PLATFORM" value="26" if="android" />
+	<set name="PLATFORM_NUMBER" value="26" if="android" />
 	<setenv name="MACOSX_DEPLOYMENT_TARGET" value="12" if="mac" />
 
 	<set name="LIME_CAIRO" value="1" />
@@ -511,7 +511,7 @@
 				<lib name="-lEGL" />
 				<lib name="-lGLESv2" />
 				<lib name="-lOpenSLES" />
-				<!-- <lib name="-laaudio" /> -->
+				<lib name="-laaudio" />
 
 			</section>
 
