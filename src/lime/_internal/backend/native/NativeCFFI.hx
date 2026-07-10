@@ -379,12 +379,6 @@ class NativeCFFI
 
 	@:cffi private static function lime_window_warp_mouse(handle:Dynamic, x:Int, y:Int):Void;
 
-	@:cffi private static function lime_window_get_draw_scale(handle:Dynamic):Float;
-
-	@:cffi private static function lime_window_get_native_width(handle:Dynamic):Int;
-
-	@:cffi private static function lime_window_get_native_height(handle:Dynamic):Int;
-
 	@:cffi private static function lime_window_event_manager_register(callback:Dynamic, eventObject:Dynamic):Void;
 
 	@:cffi private static function lime_audio_decoder_open_file(path:Dynamic, codec:Int):Dynamic;
@@ -838,12 +832,6 @@ class NativeCFFI
 		false));
 	private static var lime_window_warp_mouse = new cpp.Callable<cpp.Object->Int->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_window_warp_mouse",
 		"oiiv", false));
-	private static var lime_window_get_draw_scale = new cpp.Callable<cpp.Object->Float>(cpp.Prime._loadPrime("lime", "lime_window_get_draw_scale", "od",
-		false));
-	private static var lime_window_get_native_width = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_window_get_native_width", "oi",
-		false));
-	private static var lime_window_get_native_height = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_window_get_native_height", "oi",
-		false));
 	private static var lime_window_event_manager_register = new cpp.Callable<cpp.Object->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime",
 		"lime_window_event_manager_register", "oov", false));
 	private static var lime_audio_decoder_open_file = new cpp.Callable<cpp.Object->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_audio_decoder_open_file",
@@ -1161,9 +1149,6 @@ class NativeCFFI
 	private static var lime_window_set_visible = CFFI.load("lime", "lime_window_set_visible", 2);
 	private static var lime_window_set_always_on_top = CFFI.load("lime", "lime_window_set_always_on_top", 2);
 	private static var lime_window_warp_mouse = CFFI.load("lime", "lime_window_warp_mouse", 3);
-	private static var lime_window_get_draw_scale = CFFI.load("lime", "lime_window_get_draw_scale", 1);
-	private static var lime_window_get_native_width = CFFI.load("lime", "lime_window_get_native_width", 1);
-	private static var lime_window_get_native_height = CFFI.load("lime", "lime_window_get_native_height", 1);
 	private static var lime_window_event_manager_register = CFFI.load("lime", "lime_window_event_manager_register", 2);
 	private static var lime_audio_decoder_open_file = CFFI.load("lime", "lime_audio_decoder_open_file", 2);
 	private static var lime_audio_decoder_open_bytes = CFFI.load("lime", "lime_audio_decoder_open_bytes", 2);
@@ -1903,21 +1888,6 @@ class NativeCFFI
 	}
 
 	@:hlNative("lime", "hl_window_warp_mouse") private static function lime_window_warp_mouse(handle:CFFIPointer, x:Int, y:Int):Void {}
-
-	@:hlNative("lime", "hl_window_get_draw_scale") private static function lime_window_get_draw_scale(handle:CFFIPointer):Float
-	{
-		return 1;
-	}
-
-	@:hlNative("lime", "hl_window_get_native_width") private static function lime_window_get_native_width(handle:CFFIPointer):Int
-	{
-		return 0;
-	}
-
-	@:hlNative("lime", "hl_window_get_native_height") private static function lime_window_get_native_height(handle:CFFIPointer):Int
-	{
-		return 0;
-	}
 
 	@:hlNative("lime", "hl_window_get_opacity") private static function lime_window_get_opacity(handle:CFFIPointer):Float { return 0.0; }
 

@@ -299,9 +299,8 @@ void SDL_PostInitMouse(void)
      * so that mouse grab and focus functionality will work.
      */
     if (!mouse->def_cursor) {
-        SDL_Surface *surface = SDL_CreateSurface(1, 1, SDL_PIXELFORMAT_ARGB8888);
+        SDL_Surface *surface = SDL_CreateSurfaceZeroed(1, 1, SDL_PIXELFORMAT_ARGB8888);
         if (surface) {
-            SDL_memset(surface->pixels, 0, (size_t)surface->h * surface->pitch);
             SDL_SetDefaultCursor(SDL_CreateColorCursor(surface, 0, 0));
             SDL_DestroySurface(surface);
         }
@@ -422,14 +421,38 @@ SDL_MouseID *SDL_GetMice(int *count)
 const char *SDL_GetMouseNameForID(SDL_MouseID instance_id)
 {
     const char *name = NULL;
-    if (!SDL_FindInHashTable(SDL_mouse_names, (const void *)(uintptr_t)instance_id, (const void **)&name)) {
-        SDL_SetError("Mouse %" SDL_PRIu32 " not found", instance_id);
-        return NULL;
-    }
-    if (!name) {
-        // SDL_strdup() failed during insert
-        SDL_OutOfMemory();
-        return NULL;
+
+    switch (instance_id) {
+    case SDL_GLOBAL_MOUSE_ID:
+        name = "Mouse";
+        break;
+    case SDL_TOUCH_MOUSEID:
+        // We can't tell which touch device it was, just use the first one
+        {
+            SDL_TouchID *devices = SDL_GetTouchDevices(NULL);
+            if (devices) {
+                name = SDL_GetTouchDeviceName(devices[0]);
+                SDL_free(devices);
+            }
+        }
+        if (!name) {
+            name = "Touch";
+        }
+        break;
+    case SDL_PEN_MOUSEID:
+        name = "Pen";
+        break;
+    default:
+        if (!SDL_FindInHashTable(SDL_mouse_names, (const void *)(uintptr_t)instance_id, (const void **)&name)) {
+            SDL_SetError("Mouse %" SDL_PRIu32 " not found", instance_id);
+            return NULL;
+        }
+        if (!name) {
+            // SDL_strdup() failed during insert
+            SDL_OutOfMemory();
+            return NULL;
+        }
+        break;
     }
     return name;
 }
@@ -1396,7 +1419,13 @@ bool SDL_UpdateRelativeMouseMode(void)
 {
     SDL_Mouse *mouse = SDL_GetMouse();
     SDL_Window *focus = SDL_GetKeyboardFocus();
-    bool relative_mode = (focus && (focus->flags & SDL_WINDOW_MOUSE_RELATIVE_MODE));
+    bool relative_mode = false;
+
+    if (focus &&
+        (focus->flags & SDL_WINDOW_MOUSE_RELATIVE_MODE) &&
+        (focus->flags & SDL_WINDOW_MOUSE_FOCUS)) {
+        relative_mode = true;
+    }
 
     if (relative_mode == mouse->relative_mode) {
         return true;
@@ -1503,7 +1532,7 @@ SDL_Cursor *SDL_CreateCursor(const Uint8 *data, const Uint8 *mask, int w, int h,
     w = ((w + 7) & ~7);
 
     // Create the surface from a bitmap
-    surface = SDL_CreateSurface(w, h, SDL_PIXELFORMAT_ARGB8888);
+    surface = SDL_CreateSurfaceUninitialized(w, h, SDL_PIXELFORMAT_ARGB8888);
     if (!surface) {
         return NULL;
     }

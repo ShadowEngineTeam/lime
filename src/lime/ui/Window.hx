@@ -43,7 +43,6 @@ class Window
 
 	public var fullscreen(get, set):Bool;
 	public var height(get, set):Int;
-	public var nativeHeight(get, null):Int;
 	public var hidden(get, null):Bool;
 	public var id(default, null):Int;
 	public var maxHeight(get, set):Int;
@@ -144,7 +143,6 @@ class Window
 	public var visible(get, set):Bool;
 	public var alwaysOnTop(get, set):Bool;
 	public var width(get, set):Int;
-	public var nativeWidth(get, null):Int;
 	public var x(get, set):Int;
 	public var y(get, set):Int;
 
@@ -186,7 +184,6 @@ class Window
 				"frameRate": {get: p.get_frameRate, set: p.set_frameRate},
 				"fullscreen": {get: p.get_fullscreen, set: p.set_fullscreen},
 				"height": {get: p.get_height, set: p.set_height},
-				"nativeHeight": {get: p.get_nativeHeight},
 				"maxHeight": {get: p.get_maxHeight, set: p.set_maxHeight},
 				"maximized": {get: p.get_maximized, set: p.set_maximized},
 				"maxWidth": {get: p.get_maxWidth, set: p.set_maxWidth},
@@ -202,7 +199,6 @@ class Window
 				"visible": {get: p.get_visible, set: p.set_visible},
 				"alwaysOnTop": {get: p.get_alwaysOnTop, set: p.set_alwaysOnTop},
 				"width": {get: p.get_width, set: p.set_width},
-				"nativeWidth": {get: p.get_nativeWidth},
 				"x": {get: p.get_x, set: p.set_y},
 				"y": {get: p.get_x, set: p.set_y}
 			});
@@ -404,11 +400,6 @@ class Window
 		return __height;
 	}
 
-	@:noCompletion private inline function get_nativeHeight():Int
-	{
-		return __backend.getNativeHeight();
-	}
-
 	@:noCompletion private function set_height(value:Int):Int
 	{
 		resize(__width, value);
@@ -524,11 +515,6 @@ class Window
 		return __scale;
 	}
 
-	@:noCompletion private inline function get_drawScale():Float
-	{
-		return __backend.getDrawScale();
-	}
-
 	@:noCompletion private inline function get_textInputEnabled():Bool
 	{
 		return __backend.getTextInputEnabled();
@@ -578,11 +564,6 @@ class Window
 	@:noCompletion private inline function get_width():Int
 	{
 		return __width;
-	}
-
-	@:noCompletion private inline function get_nativeWidth():Int
-	{
-		return __backend.getNativeWidth();
 	}
 
 	@:noCompletion private function set_width(value:Int):Int

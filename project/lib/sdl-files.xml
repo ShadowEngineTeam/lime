@@ -231,6 +231,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/events/SDL_keysym_to_keycode.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/events/SDL_keysym_to_scancode.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/events/SDL_mouse.c" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/events/SDL_notificationevents.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/events/SDL_pen.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/events/SDL_quit.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/events/SDL_scancode_tables.c" />
@@ -428,6 +429,12 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/windows/SDL_sysurl.c" if="windows" />
 
         </section>
+
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/notification/SDL_notification.c" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/notification/cocoa/SDL_cocoanotification.m" if="macos" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/notification/dummy/SDL_dummynotification.c" unless="windows || macos || linux" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/notification/unix/SDL_dbusnotification.c" if="linux" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/notification/windows/SDL_windowsnotification.c" if="windows" />
 
         <section>
 
@@ -720,8 +727,10 @@
                         <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-dialog-v1-client-protocol.c" />
                         <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-foreign-unstable-v2-client-protocol.c" />
                         <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-output-unstable-v1-client-protocol.c" />
+                        <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-session-management-v1-client-protocol.c" />
                         <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-shell-client-protocol.c" />
                         <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-toplevel-icon-v1-client-protocol.c" />
+                        <file name="${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols/xdg-toplevel-tag-v1-client-protocol.c" />
 
                     </section>
 
