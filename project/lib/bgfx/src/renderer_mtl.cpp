@@ -1364,11 +1364,12 @@ static_assert(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNames
 		{
 			const TextureMtl& texture = m_textures[_handle.idx];
 
-#if BX_PLATFORM_OSX
 			MTL::BlitCommandEncoder* bce = s_renderMtl->getBlitCommandEncoder();
+#if BX_PLATFORM_OSX
 			bce->synchronizeTexture(texture.m_ptr, _layer, _mip);
-			endEncoding();
 #endif  // BX_PLATFORM_OSX
+			BX_UNUSED(bce);
+			endEncoding();
 
 			m_cmd.kick(false, true);
 			m_commandBuffer = NULL;
@@ -1502,12 +1503,12 @@ static_assert(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNames
 				return;
 			}
 
-#if BX_PLATFORM_OSX
 			m_blitCommandEncoder = getBlitCommandEncoder();
+#if BX_PLATFORM_OSX
 			m_blitCommandEncoder->synchronizeResource(m_screenshotTarget);
+#endif  // BX_PLATFORM_OSX
 			m_blitCommandEncoder->endEncoding();
 			m_blitCommandEncoder = NULL;
-#endif  // BX_PLATFORM_OSX
 
 			m_cmd.kick(false, true);
 			m_commandBuffer = 0;
@@ -2885,6 +2886,7 @@ static_assert(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNames
 					}
 				}
 
+				bool usedFallbackAttrib = false;
 				for (uint32_t ii = 0; Attrib::Count != program.m_used[ii]; ++ii)
 				{
 					const Attrib::Enum attr = Attrib::Enum(program.m_used[ii]);
@@ -2895,7 +2897,18 @@ static_assert(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNames
 						vertexDesc->attributes()->object(loc)->setFormat(MTL::VertexFormatUChar2);
 						vertexDesc->attributes()->object(loc)->setBufferIndex(1);
 						vertexDesc->attributes()->object(loc)->setOffset(0);
+						usedFallbackAttrib = true;
 					}
+				}
+
+				MTL::VertexBufferLayoutDescriptor* vbld = vertexDesc->layouts()->object(1);
+
+				if (usedFallbackAttrib
+				&&  0 == vbld->stride() )
+				{
+					vbld->setStride(4);
+					vbld->setStepFunction(MTL::VertexStepFunctionConstant);
+					vbld->setStepRate(0);
 				}
 
 				if (0 < _numInstanceData)
@@ -4966,7 +4979,7 @@ static_assert(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNames
 		if (m_blitCommandEncoder)
 		{
 			m_blitCommandEncoder->endEncoding();
-			m_blitCommandEncoder = 0;
+			m_blitCommandEncoder = NULL;
 		}
 
 		updateResolution(_render->m_resolution);
@@ -5712,7 +5725,7 @@ static_assert(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNames
 								);
 							const uint32_t offset = draw.m_stream[idx].m_startVertex * stride;
 
-							rce->setVertexBuffer(vb.m_ptr, offset, idx+1);
+							rce->setVertexBuffer(vb.m_ptr, offset, numStreams+1);
 						}
 					}
 
@@ -5893,10 +5906,14 @@ static_assert(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNames
 
 					if (UINT32_MAX == numVertices)
 					{
-						const VertexBufferMtl& vb = m_vertexBuffers[currentState.m_stream[0].m_handle.idx];
-						uint16_t decl = isValid(draw.m_stream[0].m_layoutHandle) ? draw.m_stream[0].m_layoutHandle.idx : vb.m_layoutHandle.idx;
-						const VertexLayout& layout = m_vertexLayouts[decl];
-						numVertices = vb.m_size/layout.m_stride;
+						for (BitMaskToIndexIteratorT it(currentState.m_streamMask); !it.isDone(); it.next() )
+						{
+							const uint8_t idx = it.idx;
+							const VertexBufferMtl& vb = m_vertexBuffers[currentState.m_stream[idx].m_handle.idx];
+							const uint16_t decl = isValid(draw.m_stream[idx].m_layoutHandle) ? draw.m_stream[idx].m_layoutHandle.idx : vb.m_layoutHandle.idx;
+							const VertexLayout& layout = m_vertexLayouts[decl];
+							numVertices = bx::min(numVertices, vb.m_size/layout.m_stride);
+						}
 					}
 
 					uint32_t numIndices        = 0;

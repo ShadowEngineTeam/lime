@@ -134,7 +134,6 @@ class Window
 	public var parameters:Dynamic;
 	public var resizable(get, set):Bool;
 	public var scale(get, null):Float;
-	public var drawScale(get, null):Float;
 	#if (!lime_doc_gen || openfl)
 	public var stage(default, null):Stage;
 	#end
@@ -193,7 +192,6 @@ class Window
 				"mouseLock": {get: p.get_mouseLock, set: p.set_mouseLock},
 				"resizable": {get: p.get_resizable, set: p.set_resizable},
 				"scale": {get: p.get_scale},
-				"drawScale": {get: p.get_drawScale},
 				"textInputEnabled": {get: p.get_textInputEnabled, set: p.set_textInputEnabled},
 				"title": {get: p.get_title, set: p.set_title},
 				"visible": {get: p.get_visible, set: p.set_visible},

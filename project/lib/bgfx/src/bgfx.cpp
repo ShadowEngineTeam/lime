@@ -1257,6 +1257,7 @@ namespace bgfx
 		"u_invModelView",
 		"u_modelViewProj",
 		"u_alphaRef4",
+		"bgfx_indirectArgBase",
 	};
 
 	const char* getPredefinedUniformName(PredefinedUniform::Enum _enum)
@@ -1626,6 +1627,7 @@ namespace bgfx
 
 		m_compute.m_startMatrix = m_draw.m_startMatrix;
 		m_compute.m_numMatrices = m_draw.m_numMatrices;
+		m_compute.m_startIndex  = m_draw.m_startIndex;
 		m_compute.m_numX   = bx::max(_numX, 1u);
 		m_compute.m_numY   = bx::max(_numY, 1u);
 		m_compute.m_numZ   = bx::max(_numZ, 1u);
@@ -4003,8 +4005,8 @@ namespace bgfx
 
 	Init::Limits::Limits()
 		: maxEncoders(BGFX_CONFIG_DEFAULT_MAX_ENCODERS)
-		, numDrawCalls(4096)
-		, numDrawCallPeakFrames(120)
+		, numDrawCalls(BGFX_CONFIG_MAX_DRAW_CALLS)
+		, numDrawCallPeakFrames(0)
 		, minResourceCbSize(BGFX_CONFIG_MIN_RESOURCE_COMMAND_BUFFER_SIZE)
 		, maxTransientVbSize(BGFX_CONFIG_MAX_TRANSIENT_VERTEX_BUFFER_SIZE)
 		, maxTransientIbSize(BGFX_CONFIG_MAX_TRANSIENT_INDEX_BUFFER_SIZE)

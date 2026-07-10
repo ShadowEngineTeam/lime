@@ -1077,10 +1077,10 @@ namespace bgfx { namespace d3d11
 
 					m_scd.bufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 					m_scd.bufferCount = m_swapBufferCount;
-					// lime: always stretch — with DXGI_SCALING_NONE, freshly grown
-					// window area shows black until the next frame presents at the
-					// new size, which makes live resizing look broken
-					m_scd.scaling = DXGI_SCALING_STRETCH;
+					m_scd.scaling = 0 == g_platformData.ndt
+						? DXGI_SCALING_NONE
+						: DXGI_SCALING_STRETCH
+						;
 					m_scd.swapEffect = m_swapEffect;
 
 					m_scd.alphaMode = (_init.resolution.reset & BGFX_RESET_TRANSPARENT_BACKBUFFER)
@@ -1216,14 +1216,13 @@ namespace bgfx { namespace d3d11
 					D3D11_INFO_QUEUE_FILTER filter;
 					bx::memSet(&filter, 0, sizeof(filter) );
 
-					D3D11_MESSAGE_SEVERITY sevlist[] =
+					D3D11_MESSAGE_CATEGORY catlist[] =
 					{
-						D3D11_MESSAGE_SEVERITY_INFO,
-						D3D11_MESSAGE_SEVERITY_MESSAGE,
+						D3D11_MESSAGE_CATEGORY_STATE_CREATION,
 					};
 
-					filter.DenyList.NumSeverities = BX_COUNTOF(sevlist);
-					filter.DenyList.pSeverityList = sevlist;
+					filter.DenyList.NumCategories = BX_COUNTOF(catlist);
+					filter.DenyList.pCategoryList = catlist;
 
 					D3D11_MESSAGE_ID idlist[] =
 					{
@@ -2392,38 +2391,8 @@ namespace bgfx { namespace d3d11
 			return m_lost;
 		}
 
-		void drainInfoQueue()
-		{
-			if (NULL != m_infoQueue)
-			{
-				UINT64 num = m_infoQueue->GetNumStoredMessagesAllowedByRetrievalFilter();
-
-				for (UINT64 ii = 0; ii < num; ++ii)
-				{
-					SIZE_T length = 0;
-
-					if (SUCCEEDED(m_infoQueue->GetMessage(ii, NULL, &length) )
-					&&  0 < length)
-					{
-						D3D11_MESSAGE* msg = (D3D11_MESSAGE*)bx::alloc(g_allocator, length);
-
-						if (SUCCEEDED(m_infoQueue->GetMessage(ii, msg, &length) ) )
-						{
-							BX_TRACE("D3D11 message %d: %s", msg->ID, msg->pDescription);
-						}
-
-						bx::free(g_allocator, msg);
-					}
-				}
-
-				m_infoQueue->ClearStoredMessages();
-			}
-		}
-
 		void flip() override
 		{
-			drainInfoQueue();
-
 			if (!m_lost)
 			{
 				HRESULT hr = S_OK;
