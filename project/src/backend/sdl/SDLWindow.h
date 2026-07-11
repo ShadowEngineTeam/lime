@@ -64,9 +64,6 @@ namespace lime {
 			virtual bool SetVisible (bool visible);
 			virtual bool SetAlwaysOnTop (bool alwaysOnTop);
 			virtual void WarpMouse (int x, int y);
-			virtual double GetDrawScale();
-			virtual int GetNativeWidth();
-			virtual int GetNativeHeight();
 			virtual void* GetNativeWindowHandle ();
 			virtual void* GetNativeDisplayHandle ();
 			SDL_Renderer* sdlRenderer;

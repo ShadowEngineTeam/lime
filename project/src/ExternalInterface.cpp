@@ -4869,8 +4869,6 @@ namespace lime {
 	DEFINE_PRIME2 (lime_window_set_visible);
 	DEFINE_PRIME2 (lime_window_set_always_on_top);
 	DEFINE_PRIME3v (lime_window_warp_mouse);
-	DEFINE_PRIME1 (lime_window_get_native_width);
-	DEFINE_PRIME1 (lime_window_get_native_height);
 	DEFINE_PRIME1 (lime_window_get_opacity);
 	DEFINE_PRIME2v (lime_window_set_opacity);
 	DEFINE_PRIME2 (lime_audio_decoder_open_file);
@@ -5082,8 +5080,6 @@ namespace lime {
 	DEFINE_HL_PRIM (_BOOL, hl_window_set_visible, _TCFFIPOINTER _BOOL);
 	DEFINE_HL_PRIM (_BOOL, hl_window_set_always_on_top, _TCFFIPOINTER _BOOL);
 	DEFINE_HL_PRIM (_VOID, hl_window_warp_mouse, _TCFFIPOINTER _I32 _I32);
-	DEFINE_HL_PRIM (_I32, hl_window_get_native_width, _TCFFIPOINTER);
-	DEFINE_HL_PRIM (_I32, hl_window_get_native_height, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_F64, hl_window_get_opacity, _TCFFIPOINTER);
 	DEFINE_HL_PRIM (_VOID, hl_window_set_opacity, _TCFFIPOINTER _F64);
 	DEFINE_HL_PRIM (_TCFFIPOINTER, hl_audio_decoder_open_file, _STRING _I32);

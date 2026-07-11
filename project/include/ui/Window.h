@@ -69,9 +69,6 @@ namespace lime {
 			virtual bool SetVisible (bool visible) = 0;
 			virtual bool SetAlwaysOnTop (bool alwaysOnTop) = 0;
 			virtual void WarpMouse (int x, int y) = 0;
-			virtual double GetDrawScale () = 0;
-			virtual int GetNativeWidth () = 0;
-			virtual int GetNativeHeight () = 0;
 
 			// native handles for bgfx platformData (nwh/ndt)
 			virtual void* GetNativeWindowHandle () { return 0; }
