@@ -2,12 +2,12 @@ package;
 
 import ::APP_MAIN::;
 
+@:dox(hide)
 @:access(lime.app.Application)
 @:access(lime.system.System)
-
-@:dox(hide) class ApplicationMain
+class ApplicationMain
 {
-	public static function main()
+	public static function main():Void
 	{
 		lime.system.System.__registerEntryPoint("::APP_FILE::", create);
 
