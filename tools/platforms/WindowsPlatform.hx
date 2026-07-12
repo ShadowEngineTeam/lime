@@ -118,6 +118,7 @@ class WindowsPlatform extends PlatformTarget
 		}
 
 		defaults.merge(project);
+
 		project = defaults;
 
 		for (excludeArchitecture in project.excludeArchitectures)
