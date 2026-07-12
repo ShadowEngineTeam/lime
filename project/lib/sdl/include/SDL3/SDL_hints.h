@@ -141,6 +141,27 @@ extern "C" {
 #define SDL_HINT_ANDROID_TRAP_BACK_BUTTON "SDL_ANDROID_TRAP_BACK_BUTTON"
 
 /**
+ * A variable to control whether we allow persistent folder access on Android
+ * when using the SDL select folder dialog.
+ *
+ * If set to `1`, the selected folder will be accessible persistently across
+ * app launches. That allows the user to only have to select the directory
+ * once, and then the app can access it again in the future without needing to
+ * ask the user to select it again.
+ *
+ * The variable can be set to the following values:
+ *
+ * - "0": Persistent folder access is not allowed. (default)
+ * - "1": Persistent folder access is allowed.
+ *
+ * This hint should be set before the SDL folder selection dialog is shown,
+ * and can be changed between dialog invocations.
+ *
+ * \since This hint is available since SDL 3.6.0.
+ */
+#define SDL_HINT_ANDROID_ALLOW_PERSISTENT_FOLDER_ACCESS "SDL_ANDROID_ALLOW_PERSISTENT_FOLDER_ACCESS"
+
+/**
  * A variable setting the app ID string.
  *
  * This string is used by desktop compositors to identify and group windows
@@ -273,9 +294,9 @@ extern "C" {
  *
  * The variable can be set to the following values:
  *
+ * - "playback": Use the AVAudioSessionCategoryPlayback category. (default)
  * - "ambient": Use the AVAudioSessionCategoryAmbient audio category, will be
- *   muted by the phone mute switch (default)
- * - "playback": Use the AVAudioSessionCategoryPlayback category.
+ *   muted by the phone mute switch.
  *
  * For more information, see Apple's documentation:
  * https://developer.apple.com/library/content/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/AudioSessionCategoriesandModes/AudioSessionCategoriesandModes.html
@@ -486,6 +507,23 @@ extern "C" {
 #define SDL_HINT_AUDIO_DRIVER "SDL_AUDIO_DRIVER"
 
 /**
+ * Specify whether this audio stream should duck other audio.
+ *
+ * On Apple platforms, this hint controls whether other audio streams are
+ * ducked (reduced in volume) while your application is in the foreground.
+ *
+ * The variable can be set to the following values:
+ *
+ * - "0": Other audio will not be ducked. (default)
+ * - "1": Other audio will be ducked.
+ *
+ * This hint should be set before an audio device is opened.
+ *
+ * \since This hint is available since SDL 3.6.0.
+ */
+#define SDL_HINT_AUDIO_DUCK_OTHERS "SDL_AUDIO_DUCK_OTHERS"
+
+/**
  * A variable controlling the audio rate when using the dummy audio driver.
  *
  * The dummy audio driver normally simulates real-time for the audio rate that
@@ -654,6 +692,7 @@ extern "C" {
  * - "avx512f"
  * - "arm-simd"
  * - "neon"
+ * - "sve2"
  * - "lsx"
  * - "lasx"
  *
@@ -825,6 +864,25 @@ extern "C" {
  * \since This hint is available since SDL 3.2.0.
  */
 #define SDL_HINT_ENABLE_SCREEN_KEYBOARD "SDL_ENABLE_SCREEN_KEYBOARD"
+
+/**
+ * A variable that controls whether the Steam on-screen keyboard should be
+ * shown when text input is active.
+ *
+ * Steam will set this hint via environment variable for games launched in Big
+ * Picture mode. To override this you should call SDL_SetHintWithPriority()
+ * with priority `SDL_HINT_OVERRIDE`.
+ *
+ * The variable can be set to the following values:
+ *
+ * - "0": Do not show the Steam on-screen keyboard.
+ * - "1": Show the Steam on-screen keyboard.
+ *
+ * This hint should be set before SDL is initialized.
+ *
+ * \since This hint is available since SDL 3.4.12.
+ */
+#define SDL_HINT_ENABLE_STEAM_SCREEN_KEYBOARD "SDL_ENABLE_STEAM_SCREEN_KEYBOARD"
 
 /**
  * A variable containing a list of evdev devices to use if udev is not
@@ -2779,7 +2837,11 @@ extern "C" {
  * There are other strings that have special meaning. If set to "waitevent",
  * SDL_AppIterate will not be called until new event(s) have arrived (and been
  * processed by SDL_AppEvent). This can be useful for apps that are completely
- * idle except in response to input.
+ * idle except in response to input. As of SDL 3.6.0, SDL will allow a single
+ * call to SDL_AppIterate to proceed without an event immediately after this
+ * hint is set to "waitevent", so apps can have a minimum of activity, perhaps
+ * to render an initial image to a window before the user has otherwise
+ * interacted with the app.
  *
  * On some platforms, or if you are using SDL_main instead of SDL_AppIterate,
  * this hint is ignored. When the hint can be used, it is allowed to be
@@ -4265,6 +4327,21 @@ extern "C" {
 #define SDL_HINT_VIDEO_X11_XRANDR "SDL_VIDEO_X11_XRANDR"
 
 /**
+ * A variable controlling whether the HDR headroom slider should be shown in
+ * the visionOS window settings.
+ *
+ * The variable can be set to the following values:
+ *
+ * - "0": The HDR headroom slider is not shown. (default)
+ * - "1": The HDR headroom slider is shown.
+ *
+ * This hint should be set before SDL is initialized.
+ *
+ * \since This hint is available since SDL 3.6.0.
+ */
+#define SDL_HINT_VISIONOS_HDR_HEADROOM_UI "SDL_VISIONOS_HDR_HEADROOM_UI"
+
+/**
  * A variable controlling whether touch should be enabled on the back panel of
  * the PlayStation Vita.
  *
@@ -4673,6 +4750,30 @@ extern "C" {
  * \since This hint is available since SDL 3.4.4.
  */
 #define SDL_HINT_WINDOWS_RAW_KEYBOARD_INPUTSINK "SDL_WINDOWS_RAW_KEYBOARD_INPUTSINK"
+
+/**
+ * A variable controlling whether the RIDEV_NOLEGACY flag is set when enabling
+ * Windows raw mouse events.
+ *
+ * If RIDEV_NOLEGACY is set, then Windows mouse events will not be sent for
+ * mouse motion while relative mode is enabled. This improves performance when
+ * players are using high DPI mice, but should be disabled while showing
+ * custom assert dialogs in your application code.
+ *
+ * Caution: Windows will not see mouse button releases in relative mode with
+ * this active. This means you should not enable relative mode while a mouse
+ * button is currently pressed.
+ *
+ * - "0": Windows mouse events will be generated while relative motion is
+ *   enabled. (default)
+ * - "1": Windows mouse events will not be generated while relative motion is
+ *   enabled.
+ *
+ * This hint can be set anytime.
+ *
+ * \since This hint is available since SDL 3.6.0.
+ */
+#define SDL_HINT_WINDOWS_RAW_MOUSE_NOLEGACY "SDL_WINDOWS_RAW_MOUSE_NOLEGACY"
 
 /**
  * A variable controlling whether SDL uses Kernel Semaphores on Windows.

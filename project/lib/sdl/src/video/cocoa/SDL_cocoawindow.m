@@ -1145,7 +1145,7 @@ static NSCursor *Cocoa_GetDesiredCursor(void)
                                                       repeats:TRUE
                                                         block:^(NSTimer *unusedTimer)
     {
-        SDL_OnWindowLiveResizeUpdate(_data.window);
+        SDL_OnWindowLiveResizeUpdate(self->_data.window);
     }];
 
     [[NSRunLoop currentRunLoop] addTimer:liveResizeTimer forMode:NSRunLoopCommonModes];
@@ -1460,7 +1460,6 @@ static NSCursor *Cocoa_GetDesiredCursor(void)
         }
         SDL_SendWindowEvent(window, SDL_EVENT_WINDOW_ENTER_FULLSCREEN, 0, 0);
 
-        _data.pending_position = NO;
         _data.pending_size = NO;
 
         /* Force the size change event in case it was delivered earlier
@@ -2042,17 +2041,17 @@ static void Cocoa_SendMouseButtonClicks(SDL_Mouse *mouse, NSEvent *theEvent, SDL
 {
     switch ([theEvent phase]) {
     case NSEventPhaseBegan:
-        SDL_SendPinch(SDL_EVENT_PINCH_BEGIN, Cocoa_GetEventTimestamp([theEvent timestamp]), NULL, 0);
+        SDL_SendPinch(SDL_EVENT_PINCH_BEGIN, Cocoa_GetEventTimestamp([theEvent timestamp]), NULL, 0, -1.0f, -1.0f, -1.0f, -1.0f);
         break;
     case NSEventPhaseChanged:
         {
             CGFloat scale = 1.0f + [theEvent magnification];
-            SDL_SendPinch(SDL_EVENT_PINCH_UPDATE, Cocoa_GetEventTimestamp([theEvent timestamp]), NULL, scale);
+            SDL_SendPinch(SDL_EVENT_PINCH_UPDATE, Cocoa_GetEventTimestamp([theEvent timestamp]), NULL, scale, -1.0f, -1.0f, -1.0f, -1.0f);
         }
         break;
     case NSEventPhaseEnded:
     case NSEventPhaseCancelled:
-        SDL_SendPinch(SDL_EVENT_PINCH_END, Cocoa_GetEventTimestamp([theEvent timestamp]), NULL, 0);
+        SDL_SendPinch(SDL_EVENT_PINCH_END, Cocoa_GetEventTimestamp([theEvent timestamp]), NULL, 0, -1.0f, -1.0f, -1.0f, -1.0f);
         break;
     default:
         break;
@@ -2241,7 +2240,7 @@ static void Cocoa_SendMouseButtonClicks(SDL_Mouse *mouse, NSEvent *theEvent, SDL
 }
 @end
 
-static void Cocoa_UpdateMouseFocus()
+static void Cocoa_UpdateMouseFocus(void)
 {
     const NSPoint mouseLocation = [NSEvent mouseLocation];
 
@@ -2604,7 +2603,7 @@ bool Cocoa_SetWindowPosition(SDL_VideoDevice *_this, SDL_Window *window)
         BOOL fullscreen = (window->flags & SDL_WINDOW_FULLSCREEN) ? YES : NO;
         int x, y;
 
-        if ([windata.listener isInFullscreenSpaceTransition]) {
+        if (fullscreen || [windata.listener isInFullscreenSpaceTransition]) {
             windata.pending_position = YES;
             return true;
         }
@@ -3029,8 +3028,13 @@ SDL_FullscreenResult Cocoa_SetWindowFullscreen(SDL_VideoDevice *_this, SDL_Windo
 
             SDL_SendWindowEvent(window, SDL_EVENT_WINDOW_LEAVE_FULLSCREEN, 0, 0);
 
-            rect.origin.x = data.was_zoomed ? window->windowed.x : window->floating.x;
-            rect.origin.y = data.was_zoomed ? window->windowed.y : window->floating.y;
+            if (data.pending_position) {
+                rect.origin.x = window->pending.x;
+                rect.origin.y = window->pending.y;
+            } else {
+                rect.origin.x = data.was_zoomed ? window->windowed.x : window->floating.x;
+                rect.origin.y = data.was_zoomed ? window->windowed.y : window->floating.y;
+            }
             rect.size.width = data.was_zoomed ? window->windowed.w : window->floating.w;
             rect.size.height = data.was_zoomed ? window->windowed.h : window->floating.h;
 

@@ -48,8 +48,8 @@ extern XVisualInfo *X11_GLES_GetVisual(SDL_VideoDevice *_this, Display *display,
 extern SDL_GLContext X11_GLES_CreateContext(SDL_VideoDevice *_this, SDL_Window *window);
 extern bool X11_GLES_SwapWindow(SDL_VideoDevice *_this, SDL_Window *window);
 extern bool X11_GLES_MakeCurrent(SDL_VideoDevice *_this, SDL_Window *window, SDL_GLContext context);
-extern void X11_GLES_SetDefaultProfileConfig(SDL_VideoDevice *_this);
 extern SDL_EGLSurface X11_GLES_GetEGLSurface(SDL_VideoDevice *_this, SDL_Window *window);
+extern void X11_GLES_SetDefaultProfileConfig(SDL_VideoDevice *_this);
 
 #endif // SDL_VIDEO_OPENGL_EGL
 

@@ -18,49 +18,20 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_internal.h"
 
-#ifdef SDL_TIME_PS2
+#ifndef SDL_sve2_blit_N_h_
+#define SDL_sve2_blit_N_h_
 
-#include "../SDL_time_c.h"
+#include "../../SDL_internal.h"
+#include "../SDL_blit.h"
 
-// PS2 epoch is Jan 1 2000 JST (UTC +9)
-#define UNIX_EPOCH_OFFSET_SEC 946717200
+#ifdef SDL_SVE2_INTRINSICS
 
-// TODO: Implement this...
-void SDL_GetSystemTimeLocalePreferences(SDL_DateFormat *df, SDL_TimeFormat *tf)
-{
-}
+void Blit8888to8888PixelSwizzleSVE2(SDL_BlitInfo *info);
+void Blit8888to565PixelSwizzleSVE2(SDL_BlitInfo *info);
+void Blit2to2KeySVE2(SDL_BlitInfo *info);
+void Blit4to4KeySVE2(SDL_BlitInfo *info);
 
-bool SDL_GetCurrentTime(SDL_Time *ticks)
-{
-    CHECK_PARAM(!ticks) {
-        return SDL_InvalidParamError("ticks");
-    }
+#endif /* SDL_SVE2_INTRINSICS */
 
-    *ticks = 0;
-
-    return true;
-}
-
-bool SDL_TimeToDateTime(SDL_Time ticks, SDL_DateTime *dt, bool localTime)
-{
-    CHECK_PARAM(!dt) {
-        return SDL_InvalidParamError("dt");
-    }
-
-    // FIXME: Need implementation
-    dt->year = 1970;
-    dt->month = 1;
-    dt->day = 1;
-    dt->hour = 0;
-    dt->minute = 0;
-    dt->second = 0;
-    dt->nanosecond = 0;
-    dt->day_of_week = 4;
-    dt->utc_offset = 0;
-
-    return true;
-}
-
-#endif // SDL_TIME_PS2
+#endif /* SDL_sve2_blitters_h_ */

@@ -14,7 +14,7 @@
 // is suboptimal for image quality, but by far the fastest method.
 
 // For all methods, width and height should be even, if not, the last row/column of the result image won't be affected.
-// For sse methods, if the width if not divisible by 32, the last (width%32) pixels of each line won't be affected.
+// For sse methods, if the width if not divisable by 32, the last (width%32) pixels of each line won't be affected.
 
 /*#include <stdint.h>*/
 
@@ -93,6 +93,30 @@ void yuv422_abgr_std(
         uint8_t *rgb, uint32_t rgb_stride,
         YCbCrType yuv_type);
 
+void yuv444_rgba_std(
+        uint32_t width, uint32_t height,
+        const uint8_t *y, const uint8_t *u, const uint8_t *v, uint32_t y_stride, uint32_t uv_stride,
+        uint8_t *rgb, uint32_t rgb_stride,
+        YCbCrType yuv_type);
+
+void yuv444_bgra_std(
+        uint32_t width, uint32_t height,
+        const uint8_t *y, const uint8_t *u, const uint8_t *v, uint32_t y_stride, uint32_t uv_stride,
+        uint8_t *rgb, uint32_t rgb_stride,
+        YCbCrType yuv_type);
+
+void yuv444_argb_std(
+        uint32_t width, uint32_t height,
+        const uint8_t *y, const uint8_t *u, const uint8_t *v, uint32_t y_stride, uint32_t uv_stride,
+        uint8_t *rgb, uint32_t rgb_stride,
+        YCbCrType yuv_type);
+
+void yuv444_abgr_std(
+        uint32_t width, uint32_t height,
+        const uint8_t *y, const uint8_t *u, const uint8_t *v, uint32_t y_stride, uint32_t uv_stride,
+        uint8_t *rgb, uint32_t rgb_stride,
+        YCbCrType yuv_type);
+
 void yuvnv12_rgb565_std(
         uint32_t width, uint32_t height,
         const uint8_t *y, const uint8_t *u, const uint8_t *v, uint32_t y_stride, uint32_t uv_stride,
@@ -130,6 +154,12 @@ void yuvnv12_abgr_std(
         YCbCrType yuv_type);
 
 void yuvp010_xbgr2101010_std(
+        uint32_t width, uint32_t height,
+        const uint16_t *y, const uint16_t *u, const uint16_t *v, uint32_t y_stride, uint32_t uv_stride,
+        uint8_t *rgb, uint32_t rgb_stride,
+        YCbCrType yuv_type);
+
+void yuvp416_rgb48_std(
         uint32_t width, uint32_t height,
         const uint16_t *y, const uint16_t *u, const uint16_t *v, uint32_t y_stride, uint32_t uv_stride,
         uint8_t *rgb, uint32_t rgb_stride,

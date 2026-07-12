@@ -33,6 +33,10 @@
 #include "SDL_uikitwindow.h"
 #include "SDL_uikitopengles.h"
 
+#ifdef SDL_PLATFORM_VISIONOS
+#import "SDL3/SDL3-Swift.h"
+#endif
+
 #ifdef SDL_PLATFORM_TVOS
 static void SDLCALL SDL_AppleTVControllerUIHintChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
 {
@@ -72,13 +76,6 @@ static void SDLCALL SDL_HideHomeIndicatorHintChanged(void *userdata, const char 
     int animationInterval;
     void (*animationCallback)(void *);
     void *animationCallbackParam;
-
-    /* iOS 26 scene lifecycle fires two rapid appearance events when the scene
-     * gains keyboard focus (viewWillAppear: called twice before viewDidAppear:).
-     * This flag guards against the resulting "Unbalanced calls to begin/end
-     * appearance transitions" UIKit warning, which leaves the view in a broken
-     * render state and produces a blank screen. */
-    BOOL _appearanceInProgress;
 
 #ifdef SDL_IPHONE_KEYBOARD
     SDLUITextField *textField;
@@ -126,6 +123,15 @@ static void SDLCALL SDL_HideHomeIndicatorHintChanged(void *userdata, const char 
             }
         }
     }
+
+#ifdef SDL_PLATFORM_VISIONOS
+    if (@available(visionOS 26.0, *)) {
+        SDL_UIKitWindowData *data = (__bridge SDL_UIKitWindowData *)self.window->internal;
+        if (data.settings != nil) {
+            [self initializeVisionOSCurvedUI];
+        }
+    }
+#endif
     return self;
 }
 
@@ -147,6 +153,19 @@ static void SDLCALL SDL_HideHomeIndicatorHintChanged(void *userdata, const char 
                         (__bridge void *)self);
 #endif
 }
+
+#ifdef SDL_PLATFORM_VISIONOS
+- (UIContainerBackgroundStyle)preferredContainerBackgroundStyle
+{
+    if (self.window) {
+        SDL_UIKitWindowData *data = (__bridge SDL_UIKitWindowData *)self.window->internal;
+        if (data && data.curvedContentHosting) {
+            return UIContainerBackgroundStyleHidden;
+        }
+    }
+    return UIContainerBackgroundStyleAutomatic;
+}
+#endif
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
 {
@@ -189,7 +208,7 @@ static void SDLCALL SDL_HideHomeIndicatorHintChanged(void *userdata, const char 
 
             } else {
 
-                displayLink.preferredFrameRateRange = CAFrameRateRangeMake(frame_rate / 2, frame_rate, frame_rate);
+                displayLink.preferredFrameRateRange = CAFrameRateRangeMake(frame_rate, frame_rate, frame_rate);
 
             }
 
@@ -221,44 +240,6 @@ static void SDLCALL SDL_HideHomeIndicatorHintChanged(void *userdata, const char 
 
         animationCallback(animationCallbackParam);
     }
-}
-
-/* Guard against duplicate appearance transitions fired by the iOS 26 scene
- * lifecycle. When the scene acquires keyboard/event-deferring focus it emits
- * two consecutive activation signals; each triggers beginAppearanceTransition,
- * but only one endAppearanceTransition follows — causing the "Unbalanced calls"
- * warning and a broken render pipeline (blank screen).
- *
- * The pattern below is identical to how container view controllers (e.g.
- * UINavigationController) protect their children: skip the second will-appear
- * call while one is already in flight, and clear the flag in the matching did-
- * appear / did-disappear so subsequent transitions work normally. */
-- (void)viewWillAppear:(BOOL)animated
-{
-    if (!_appearanceInProgress) {
-        _appearanceInProgress = YES;
-        [super viewWillAppear:animated];
-    }
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    _appearanceInProgress = NO;
-    [super viewDidAppear:animated];
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{
-    if (!_appearanceInProgress) {
-        _appearanceInProgress = YES;
-        [super viewWillDisappear:animated];
-    }
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{
-    _appearanceInProgress = NO;
-    [super viewDidDisappear:animated];
 }
 
 - (void)loadView

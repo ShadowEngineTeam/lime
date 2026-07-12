@@ -2459,7 +2459,9 @@ extern SDL_DECLSPEC int SDLCALL SDL_GetNumGPUDrivers(void);
  * meant to be proper names.
  *
  * \param index the index of a GPU driver.
- * \returns the name of the GPU driver with the given **index**.
+ * \returns the name of the GPU driver with the given **index** or NULL when
+ *          the index is out of bounds; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL 3.2.0.
  *
@@ -3058,6 +3060,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_PopGPUDebugGroup(
  *
  * You must not reference the texture after calling this function.
  *
+ * It is safe to pass NULL for `texture`, in that case this function is a
+ * no-op.
+ *
  * \param device a GPU context.
  * \param texture a texture to be destroyed.
  *
@@ -3071,6 +3076,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUTexture(
  * Frees the given sampler as soon as it is safe to do so.
  *
  * You must not reference the sampler after calling this function.
+ *
+ * It is safe to pass NULL for `sampler`, in that case this function is a
+ * no-op.
  *
  * \param device a GPU context.
  * \param sampler a sampler to be destroyed.
@@ -3086,6 +3094,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUSampler(
  *
  * You must not reference the buffer after calling this function.
  *
+ * It is safe to pass NULL for `buffer`, in that case this function is a
+ * no-op.
+ *
  * \param device a GPU context.
  * \param buffer a buffer to be destroyed.
  *
@@ -3099,6 +3110,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUBuffer(
  * Frees the given transfer buffer as soon as it is safe to do so.
  *
  * You must not reference the transfer buffer after calling this function.
+ *
+ * It is safe to pass NULL for `transfer_buffer`, in that case this function
+ * is a no-op.
  *
  * \param device a GPU context.
  * \param transfer_buffer a transfer buffer to be destroyed.
@@ -3114,6 +3128,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUTransferBuffer(
  *
  * You must not reference the compute pipeline after calling this function.
  *
+ * It is safe to pass NULL for `compute_pipeline`, in that case this function
+ * is a no-op.
+ *
  * \param device a GPU context.
  * \param compute_pipeline a compute pipeline to be destroyed.
  *
@@ -3128,6 +3145,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUComputePipeline(
  *
  * You must not reference the shader after calling this function.
  *
+ * It is safe to pass NULL for `shader`, in that case this function is a
+ * no-op.
+ *
  * \param device a GPU context.
  * \param shader a shader to be destroyed.
  *
@@ -3141,6 +3161,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUShader(
  * Frees the given graphics pipeline as soon as it is safe to do so.
  *
  * You must not reference the graphics pipeline after calling this function.
+ *
+ * It is safe to pass NULL for `graphics_pipeline`, in that case this function
+ * is a no-op.
  *
  * \param device a GPU context.
  * \param graphics_pipeline a graphics pipeline to be destroyed.
@@ -4232,10 +4255,13 @@ extern SDL_DECLSPEC SDL_GPUTextureFormat SDLCALL SDL_GetGPUSwapchainTextureForma
  * submitted. The swapchain texture should only be referenced by the command
  * buffer used to acquire it.
  *
- * This function will fill the swapchain texture handle with NULL if too many
- * frames are in flight. This is not an error. This NULL pointer should not be
- * passed back into SDL. Instead, it should be considered as an indication to
- * wait until the swapchain is available.
+ * If too many frames are in flight, this function will fill the swapchain
+ * texture handle with NULL and return true. This is not an error. This NULL
+ * pointer should not be passed back into SDL. Instead, it should be
+ * considered as an indication to wait.
+ *
+ * In VSYNC present mode (which is the default) this function may block on
+ * vblank.
  *
  * If you use this function, it is possible to create a situation where many
  * command buffers are allocated while the rendering context waits for the GPU
@@ -4280,7 +4306,8 @@ extern SDL_DECLSPEC bool SDLCALL SDL_AcquireGPUSwapchainTexture(
     Uint32 *swapchain_texture_height);
 
 /**
- * Blocks the thread until a swapchain texture is available to be acquired.
+ * Blocks the thread until all presenting command buffers are finished
+ * executing.
  *
  * \param device a GPU context.
  * \param window a window that has been claimed.
@@ -4480,6 +4507,8 @@ extern SDL_DECLSPEC bool SDLCALL SDL_QueryGPUFence(
  * Releases a fence obtained from SDL_SubmitGPUCommandBufferAndAcquireFence.
  *
  * You must not reference the fence after calling this function.
+ *
+ * It is safe to pass NULL for `fence`, in that case this function is a no-op.
  *
  * \param device a GPU context.
  * \param fence a fence.
