@@ -200,7 +200,7 @@
 			</section>
 
 			<compilerflag value="-DLIME_OPENGL_GL" if="windows || mac || linux" />
-			<compilerflag value="-DLIME_OPENGL_GLES2" if="android || rpi || iphone || appletv" />
+			<compilerflag value="-DLIME_OPENGL_GLES" if="android || linux HXCPP_ARMV7 || linux HXCPP_ARM64 || iphone || appletv" />
 			<compilerflag value="-DLIME_OPENGL" />
 			<compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" />
 

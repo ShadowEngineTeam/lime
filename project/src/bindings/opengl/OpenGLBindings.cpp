@@ -5203,7 +5203,7 @@ namespace lime {
 
 			#if defined (LIME_SDL) && defined (LIME_GLAD)
 
-			#ifdef LIME_OPENGL_GLES2
+			#ifdef LIME_OPENGL_GLES
 			gladLoadGLES2 ((GLADloadfunc)SDL_GL_GetProcAddress);
 			#endif
 
