@@ -3306,6 +3306,9 @@ class NativeOpenGLRenderContext
 			__extensionObjectConstructors["APPLE_sync"] = APPLE_sync.new;
 			__extensionObjectConstructors["APPLE_texture_format_BGRA8888"] = APPLE_texture_format_BGRA8888.new;
 			__extensionObjectConstructors["APPLE_texture_max_level"] = APPLE_texture_max_level.new;
+			__extensionObjectConstructors["ARB_texture_compression"] = ARB_texture_compression.new;
+			__extensionObjectConstructors["ARB_texture_compression_bptc"] = ARB_texture_compression_bptc.new;
+			__extensionObjectConstructors["ARB_texture_compression_rgtc"] = ARB_texture_compression_rgtc.new;
 			__extensionObjectConstructors["ARM_mali_program_binary"] = ARM_mali_program_binary.new;
 			__extensionObjectConstructors["ARM_mali_shader_binary"] = ARM_mali_shader_binary.new;
 			__extensionObjectConstructors["ARM_rgba8"] = ARM_rgba8.new;
@@ -3317,6 +3320,7 @@ class NativeOpenGLRenderContext
 			__extensionObjectConstructors["EXT_debug_label"] = EXT_debug_label.new;
 			__extensionObjectConstructors["EXT_debug_marker"] = EXT_debug_marker.new;
 			__extensionObjectConstructors["EXT_discard_framebuffer"] = EXT_discard_framebuffer.new;
+			__extensionObjectConstructors["EXT_framebuffer_object"] = EXT_framebuffer_object.new;
 			__extensionObjectConstructors["EXT_map_buffer_range"] = EXT_map_buffer_range.new;
 			__extensionObjectConstructors["EXT_multi_draw_arrays"] = EXT_multi_draw_arrays.new;
 			__extensionObjectConstructors["EXT_multisampled_render_to_texture"] = EXT_multisampled_render_to_texture.new;
@@ -3325,11 +3329,12 @@ class NativeOpenGLRenderContext
 			__extensionObjectConstructors["EXT_packed_depth_stencil"] = EXT_packed_depth_stencil.new;
 			__extensionObjectConstructors["EXT_read_format_bgra"] = EXT_read_format_bgra.new;
 			__extensionObjectConstructors["EXT_robustness"] = EXT_robustness.new;
-			__extensionObjectConstructors["EXT_sRGB"] = EXT_sRGB.new;
 			__extensionObjectConstructors["EXT_separate_shader_objects"] = EXT_separate_shader_objects.new;
 			__extensionObjectConstructors["EXT_shader_framebuffer_fetch"] = EXT_shader_framebuffer_fetch.new;
 			__extensionObjectConstructors["EXT_shader_texture_lod"] = EXT_shader_texture_lod.new;
 			__extensionObjectConstructors["EXT_shadow_samplers"] = EXT_shadow_samplers.new;
+			__extensionObjectConstructors["EXT_sRGB"] = EXT_sRGB.new;
+			__extensionObjectConstructors["EXT_texture_compression_astc_decode_mode"] = EXT_texture_compression_astc_decode_mode.new;
 			__extensionObjectConstructors["EXT_texture_compression_bptc"] = EXT_texture_compression_bptc.new;
 			__extensionObjectConstructors["EXT_texture_compression_dxt1"] = EXT_texture_compression_dxt1.new;
 			__extensionObjectConstructors["EXT_texture_compression_rgtc"] = EXT_texture_compression_rgtc.new;
@@ -3348,10 +3353,12 @@ class NativeOpenGLRenderContext
 			__extensionObjectConstructors["IMG_shader_binary"] = IMG_shader_binary.new;
 			__extensionObjectConstructors["IMG_texture_compression_pvrtc"] = IMG_texture_compression_pvrtc.new;
 			__extensionObjectConstructors["IMG_texture_compression_pvrtc2"] = IMG_texture_compression_pvrtc2.new;
+			__extensionObjectConstructors["KHR_blend_equation_advanced"] = KHR_blend_equation_advanced.new;
+			__extensionObjectConstructors["KHR_blend_equation_advanced_coherent"] = KHR_blend_equation_advanced_coherent.new;
 			__extensionObjectConstructors["KHR_debug"] = KHR_debug.new;
-			__extensionObjectConstructors["EXT_texture_compression_astc_decode_mode"] = EXT_texture_compression_astc_decode_mode.new;
-			__extensionObjectConstructors["KHR_texture_compression_astc_ldr"] = KHR_texture_compression_astc_ldr.new;
 			__extensionObjectConstructors["KHR_texture_compression_astc_hdr"] = KHR_texture_compression_astc_hdr.new;
+			__extensionObjectConstructors["KHR_texture_compression_astc_ldr"] = KHR_texture_compression_astc_ldr.new;
+			__extensionObjectConstructors["KHR_texture_compression_astc_sliced_3d"] = KHR_texture_compression_astc_sliced_3d.new;
 			__extensionObjectConstructors["NV_coverage_sample"] = NV_coverage_sample.new;
 			__extensionObjectConstructors["NV_depth_nonlinear"] = NV_depth_nonlinear.new;
 			__extensionObjectConstructors["NV_draw_buffers"] = NV_draw_buffers.new;
@@ -3365,13 +3372,13 @@ class NativeOpenGLRenderContext
 			__extensionObjectConstructors["NV_texture_compression_s3tc_update"] = NV_texture_compression_s3tc_update.new;
 			__extensionObjectConstructors["NV_texture_npot_2D_mipmap"] = NV_texture_npot_2D_mipmap.new;
 			__extensionObjectConstructors["NVX_gpu_memory_info"] = NVX_gpu_memory_info.new;
-			__extensionObjectConstructors["OES_EGL_image"] = OES_EGL_image.new;
-			__extensionObjectConstructors["OES_EGL_image_external"] = OES_EGL_image_external.new;
 			__extensionObjectConstructors["OES_compressed_ETC1_RGB8_texture"] = OES_compressed_ETC1_RGB8_texture.new;
 			__extensionObjectConstructors["OES_compressed_paletted_texture"] = OES_compressed_paletted_texture.new;
+			__extensionObjectConstructors["OES_depth_texture"] = OES_depth_texture.new;
 			__extensionObjectConstructors["OES_depth24"] = OES_depth24.new;
 			__extensionObjectConstructors["OES_depth32"] = OES_depth32.new;
-			__extensionObjectConstructors["OES_depth_texture"] = OES_depth_texture.new;
+			__extensionObjectConstructors["OES_EGL_image"] = OES_EGL_image.new;
+			__extensionObjectConstructors["OES_EGL_image_external"] = OES_EGL_image_external.new;
 			__extensionObjectConstructors["OES_element_index_uint"] = OES_element_index_uint.new;
 			__extensionObjectConstructors["OES_get_program_binary"] = OES_get_program_binary.new;
 			__extensionObjectConstructors["OES_mapbuffer"] = OES_mapbuffer.new;
@@ -3399,6 +3406,7 @@ class NativeOpenGLRenderContext
 			__extensionObjectConstructors["QCOM_perfmon_global_mode"] = QCOM_perfmon_global_mode.new;
 			__extensionObjectConstructors["QCOM_tiled_rendering"] = QCOM_tiled_rendering.new;
 			__extensionObjectConstructors["QCOM_writeonly_rendering"] = QCOM_writeonly_rendering.new;
+			__extensionObjectConstructors["S3_s3tc"] = S3_s3tc.new;
 			__extensionObjectConstructors["VIV_shader_binary"] = VIV_shader_binary.new;
 		}
 
