@@ -25,9 +25,10 @@
 #include "../SDL_sysvideo.h"
 
 #import "SDL_uikitappdelegate.h"
-#import "SDL_uikitaudiosession.h"
 #import "SDL_uikitmodes.h"
 #import "SDL_uikitwindow.h"
+
+#import "ios_audio_session.h"
 
 #include "../../events/SDL_events_c.h"
 #include "../../main/SDL_main_callbacks.h"
@@ -440,28 +441,28 @@ API_AVAILABLE(ios(13.0))
 
 - (void)sceneDidBecomeActive:(UIScene *)scene
 {
-    SDL_AudioSession_SetActive(true);
+    OpenAL_IOSAudioSessionSetActive(true);
 
     SDL_OnApplicationDidEnterForeground();
 }
 
 - (void)sceneWillResignActive:(UIScene *)scene
 {
-    SDL_AudioSession_SetActive(false);
+    OpenAL_IOSAudioSessionSetActive(false);
 
     SDL_OnApplicationWillEnterBackground();
 }
 
 - (void)sceneWillEnterForeground:(UIScene *)scene
 {
-    SDL_AudioSession_SetActive(true);
+    OpenAL_IOSAudioSessionSetActive(true);
 
     SDL_OnApplicationWillEnterForeground();
 }
 
 - (void)sceneDidEnterBackground:(UIScene *)scene
 {
-    SDL_AudioSession_SetActive(false);
+    OpenAL_IOSAudioSessionSetActive(false);
 
     SDL_OnApplicationDidEnterBackground();
 }
@@ -600,8 +601,6 @@ API_AVAILABLE(ios(13.0))
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    SDL_AudioSession_Initialize();
-
     NSBundle *bundle = [NSBundle mainBundle];
 
 #ifdef SDL_IPHONE_LAUNCHSCREEN

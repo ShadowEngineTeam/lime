@@ -24,6 +24,8 @@
 
         <section if="apple">
 
+          <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/openal/alc/backends" if="iphone" />
+
           <compilerflag value="-fobjc-arc" />
 
         </section>
