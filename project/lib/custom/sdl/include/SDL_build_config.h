@@ -188,8 +188,10 @@
 # define HAVE_SETENV 1       /**< Set environment variable */
 # define HAVE_SETJMP 1       /**< Non-local jump support */
 # define HAVE_SIGACTION 1    /**< Signal handling (POSIX) */
+#if !defined(SDL_PLATFORM_LINUX)
 # define HAVE_STRLCAT 1      /**< Safe string concatenation (BSD) */
 # define HAVE_STRLCPY 1      /**< Safe string copy (BSD) */
+#endif
 # define HAVE_STRTOK_R 1     /**< Tokenize string (reentrant) */
 # define HAVE_SYSCONF 1      /**< Get system configuration */
 # define HAVE_UNSETENV 1     /**< Remove environment variable */
@@ -238,7 +240,7 @@
  * @name Android API Level-Dependent Features
  * @{
  */
-# if __ANDROID_API__ >= 24
+# if __ANDROID_API__ >= 28
 #  define HAVE_ICONV 1      /**< Character set conversion (API 24+) */
 #  define HAVE_ICONV_H 1    /**< iconv.h header (API 24+) */
 # endif
@@ -306,8 +308,8 @@
  * @{
  */
 # define HAVE_WCSCMP 1    /**< Compare wide strings */
-# define HAVE_WCSLCAT 1   /**< Safe wide string concatenation */
-# define HAVE_WCSLCPY 1   /**< Safe wide string copy */
+//# define HAVE_WCSLCAT 1   /**< Safe wide string concatenation */
+//# define HAVE_WCSLCPY 1   /**< Safe wide string copy */
 # define HAVE_WCSLEN 1    /**< Get wide string length */
 # define HAVE_WCSNCMP 1   /**< Compare wide strings (n chars) */
 # define HAVE_WCSNLEN 1   /**< Get wide string length (bounded) */
