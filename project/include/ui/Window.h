@@ -29,9 +29,7 @@ namespace lime {
 			virtual bool SetVSyncMode (int mode) = 0;
 			virtual void Close () = 0;
 			virtual void ContextFlip () = 0;
-			virtual void* ContextLock (bool useCFFIValue) = 0;
 			virtual void ContextMakeCurrent () = 0;
-			virtual void ContextUnlock () = 0;
 			virtual void Focus () = 0;
 			virtual void* GetHandle () = 0;
 			virtual void* GetContext () = 0;
