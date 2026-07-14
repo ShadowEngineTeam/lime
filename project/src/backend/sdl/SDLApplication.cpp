@@ -53,7 +53,10 @@ namespace lime {
 		SDL_SetHint (SDL_HINT_MAC_SCROLL_MOMENTUM, "1");
 		#endif
 
-		Uint32 initFlags = SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK | SDL_INIT_SENSOR;
+		Uint32 initFlags = SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK | SDL_INIT_SENSOR;
+		#ifndef IPHONE
+		initFlags |= SDL_INIT_AUDIO;
+		#endif
 
 		if (!SDL_Init (initFlags)) {
 
