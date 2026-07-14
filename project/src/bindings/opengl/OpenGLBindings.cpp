@@ -16,6 +16,9 @@ namespace lime {
 
 	bool OpenGLBindings::initialized = false;
 
+	int OpenGLBindings::defaultFramebuffer = 0;
+	int OpenGLBindings::defaultRenderbuffer = 0;
+
 	std::map<GLObjectType, std::map <GLuint, void*> > glObjects;
 	std::map<void*, GLuint> glObjectIDs;
 	std::map<void*, void*> glObjectPtrs;
@@ -128,7 +131,23 @@ namespace lime {
 
 					case TYPE_FRAMEBUFFER:
 
+						#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+						if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+							if (GLAD_GL_EXT_framebuffer_object) {
+
+								if (glIsFramebufferEXT (id)) glDeleteFramebuffersEXT (1, &id);
+
+							}
+
+						} else {
+
+							if (glIsFramebuffer (id)) glDeleteFramebuffers (1, &id);
+
+						}
+						#else
 						if (glIsFramebuffer (id)) glDeleteFramebuffers (1, &id);
+						#endif
 						break;
 
 					case TYPE_PROGRAM:
@@ -143,7 +162,23 @@ namespace lime {
 
 					case TYPE_RENDERBUFFER:
 
+						#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+						if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+							if (GLAD_GL_EXT_framebuffer_object) {
+
+								if (glIsRenderbufferEXT (id)) glDeleteRenderbuffersEXT (1, &id);
+
+							}
+
+						} else {
+
+							if (glIsRenderbuffer (id)) glDeleteRenderbuffers (1, &id);
+
+						}
+						#else
 						if (glIsRenderbuffer (id)) glDeleteRenderbuffers (1, &id);
+						#endif
 						break;
 
 					case TYPE_SAMPLER:
@@ -309,28 +344,117 @@ namespace lime {
 
 	void lime_gl_bind_framebuffer (int target, int framebuffer) {
 
+		if (!framebuffer) {
+
+			framebuffer = OpenGLBindings::defaultFramebuffer;
+
+		}
+
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glBindFramebufferEXT (target, framebuffer);
+
+			}
+
+		} else {
+
+			glBindFramebuffer (target, framebuffer);
+
+		}
+		#else
 		glBindFramebuffer (target, framebuffer);
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_bind_framebuffer) (int target, int framebuffer) {
 
+		if (!framebuffer) {
+
+			framebuffer = OpenGLBindings::defaultFramebuffer;
+
+		}
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glBindFramebufferEXT (target, framebuffer);
+
+			}
+
+		} else {
+
+			glBindFramebuffer (target, framebuffer);
+
+		}
+		#else
 		glBindFramebuffer (target, framebuffer);
+		#endif
 
 	}
 
 
 	void lime_gl_bind_renderbuffer (int target, int renderbuffer) {
 
+		if (!renderbuffer) {
+
+			renderbuffer = OpenGLBindings::defaultRenderbuffer;
+
+		}
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glBindRenderbufferEXT (target, renderbuffer);
+
+			}
+
+		} else {
+
+			glBindRenderbuffer (target, renderbuffer);
+
+		}
+		#else
 		glBindRenderbuffer (target, renderbuffer);
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_bind_renderbuffer) (int target, int renderbuffer) {
 
+		if (!renderbuffer) {
+
+			renderbuffer = OpenGLBindings::defaultRenderbuffer;
+
+		}
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glBindRenderbufferEXT (target, renderbuffer);
+
+			}
+
+		} else {
+
+			glBindRenderbuffer (target, renderbuffer);
+
+		}
+		#else
 		glBindRenderbuffer (target, renderbuffer);
+		#endif
 
 	}
 
@@ -463,8 +587,12 @@ namespace lime {
 
 	void lime_gl_blend_barrier () {
 
-		#if defined(LIME_GLAD) || defined(LIME_ANGLE)
-		glBlendBarrierKHR ();
+		#ifdef LIME_GLAD
+		if (GLAD_GL_KHR_blend_equation_advanced) {
+
+			glBlendBarrierKHR ();
+
+		}
 		#endif
 
 	}
@@ -472,9 +600,14 @@ namespace lime {
 
 	HL_PRIM void HL_NAME(hl_gl_blend_barrier) () {
 
-		#if defined(LIME_GLAD) || defined(LIME_ANGLE)
-		glBlendBarrierKHR ();
+		#ifdef LIME_GLAD
+		if (GLAD_GL_KHR_blend_equation_advanced) {
+
+			glBlendBarrierKHR ();
+
+		}
 		#endif
+
 
 	}
 
@@ -523,14 +656,22 @@ namespace lime {
 
 	int lime_gl_check_framebuffer_status (int target) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		return (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) ? (GLAD_GL_EXT_framebuffer_object ? glCheckFramebufferStatusEXT (target) : 0) : glCheckFramebufferStatus (target);
+		#else
 		return glCheckFramebufferStatus (target);
+		#endif
 
 	}
 
 
 	HL_PRIM int HL_NAME(hl_gl_check_framebuffer_status) (int target) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		return (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) ? (GLAD_GL_EXT_framebuffer_object ? glCheckFramebufferStatusEXT (target) : 0) : glCheckFramebufferStatus (target);
+		#else
 		return glCheckFramebufferStatus (target);
+		#endif
 
 	}
 
@@ -826,7 +967,25 @@ namespace lime {
 	int lime_gl_create_framebuffer () {
 
 		GLuint id = 0;
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGenFramebuffersEXT (1, &id);
+
+			}
+
+		} else {
+
+			glGenFramebuffers (1, &id);
+
+		}
+		#else
 		glGenFramebuffers (1, &id);
+		#endif
+
 		return id;
 
 	}
@@ -835,7 +994,25 @@ namespace lime {
 	HL_PRIM int HL_NAME(hl_gl_create_framebuffer) () {
 
 		GLuint id = 0;
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGenFramebuffersEXT (1, &id);
+
+			}
+
+		} else {
+
+			glGenFramebuffers (1, &id);
+
+		}
+		#else
 		glGenFramebuffers (1, &id);
+		#endif
+
 		return id;
 
 	}
@@ -876,7 +1053,25 @@ namespace lime {
 	int lime_gl_create_renderbuffer () {
 
 		GLuint id = 0;
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGenRenderbuffersEXT (1, &id);
+
+			}
+
+		} else {
+
+			glGenRenderbuffers (1, &id);
+
+		}
+		#else
 		glGenRenderbuffers (1, &id);
+		#endif
+
 		return id;
 
 	}
@@ -885,7 +1080,25 @@ namespace lime {
 	HL_PRIM int HL_NAME(hl_gl_create_renderbuffer) () {
 
 		GLuint id = 0;
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGenRenderbuffersEXT (1, &id);
+
+			}
+
+		} else {
+
+			glGenRenderbuffers (1, &id);
+
+		}
+		#else
 		glGenRenderbuffers (1, &id);
+		#endif
+
 		return id;
 
 	}
@@ -1007,14 +1220,46 @@ namespace lime {
 
 	void lime_gl_delete_framebuffer (int framebuffer) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glDeleteFramebuffersEXT (1, (GLuint*)&framebuffer);
+
+			}
+
+		} else {
+
+			glDeleteFramebuffers (1, (GLuint*)&framebuffer);
+
+		}
+		#else
 		glDeleteFramebuffers (1, (GLuint*)&framebuffer);
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_delete_framebuffer) (int framebuffer) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glDeleteFramebuffersEXT (1, (GLuint*)&framebuffer);
+
+			}
+
+		} else {
+
+			glDeleteFramebuffers (1, (GLuint*)&framebuffer);
+
+		}
+		#else
 		glDeleteFramebuffers (1, (GLuint*)&framebuffer);
+		#endif
 
 	}
 
@@ -1049,14 +1294,46 @@ namespace lime {
 
 	void lime_gl_delete_renderbuffer (int renderbuffer) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glDeleteRenderbuffersEXT (1, (GLuint*)&renderbuffer);
+
+			}
+
+		} else {
+
+			glDeleteRenderbuffers (1, (GLuint*)&renderbuffer);
+
+		}
+		#else
 		glDeleteRenderbuffers (1, (GLuint*)&renderbuffer);
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_delete_renderbuffer) (int renderbuffer) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glDeleteRenderbuffersEXT (1, (GLuint*)&renderbuffer);
+
+			}
+
+		} else {
+
+			glDeleteRenderbuffers (1, (GLuint*)&renderbuffer);
+
+		}
+		#else
 		glDeleteRenderbuffers (1, (GLuint*)&renderbuffer);
+		#endif
 
 	}
 
@@ -1431,28 +1708,92 @@ namespace lime {
 
 	void lime_gl_framebuffer_renderbuffer (int target, int attachment, int renderbuffertarget, int renderbuffer) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glFramebufferRenderbufferEXT (target, attachment, renderbuffertarget, renderbuffer);
+
+			}
+
+		} else {
+
+			glFramebufferRenderbuffer (target, attachment, renderbuffertarget, renderbuffer);
+
+		}
+		#else
 		glFramebufferRenderbuffer (target, attachment, renderbuffertarget, renderbuffer);
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_framebuffer_renderbuffer) (int target, int attachment, int renderbuffertarget, int renderbuffer) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glFramebufferRenderbufferEXT (target, attachment, renderbuffertarget, renderbuffer);
+
+			}
+
+		} else {
+
+			glFramebufferRenderbuffer (target, attachment, renderbuffertarget, renderbuffer);
+
+		}
+		#else
 		glFramebufferRenderbuffer (target, attachment, renderbuffertarget, renderbuffer);
+		#endif
 
 	}
 
 
 	void lime_gl_framebuffer_texture2D (int target, int attachment, int textarget, int texture, int level) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glFramebufferTexture2DEXT (target, attachment, textarget, texture, level);
+
+			}
+
+		} else {
+
+			glFramebufferTexture2D (target, attachment, textarget, texture, level);
+
+		}
+		#else
 		glFramebufferTexture2D (target, attachment, textarget, texture, level);
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_framebuffer_texture2D) (int target, int attachment, int textarget, int texture, int level) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glFramebufferTexture2DEXT (target, attachment, textarget, texture, level);
+
+			}
+
+		} else {
+
+			glFramebufferTexture2D (target, attachment, textarget, texture, level);
+
+		}
+		#else
 		glFramebufferTexture2D (target, attachment, textarget, texture, level);
+		#endif
 
 	}
 
@@ -1487,14 +1828,46 @@ namespace lime {
 
 	void lime_gl_generate_mipmap (int target) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGenerateMipmapEXT (target);
+
+			}
+
+		} else {
+
+			glGenerateMipmap (target);
+
+		}
+		#else
 		glGenerateMipmap (target);
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_generate_mipmap) (int target) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGenerateMipmapEXT (target);
+
+			}
+
+		} else {
+
+			glGenerateMipmap (target);
+
+		}
+		#else
 		glGenerateMipmap (target);
+		#endif
 
 	}
 
@@ -1835,6 +2208,24 @@ namespace lime {
 	}
 
 
+	void lime_gl_get_buffer_sub_data (int target, double offset, int size, double data) {
+
+		#ifdef LIME_OPENGL_GL
+		glGetBufferSubData (target, (GLintptr)(uintptr_t)offset, size, (void*)(uintptr_t)data);
+		#endif
+
+	}
+
+
+	HL_PRIM void HL_NAME(hl_gl_get_buffer_sub_data) (int target, double offset, int size, double data) {
+
+		#ifdef LIME_OPENGL_GL
+		glGetBufferSubData (target, (GLintptr)(uintptr_t)offset, size, (void*)(uintptr_t)data);
+		#endif
+
+	}
+
+
 	value lime_gl_get_context_attributes () {
 
 		value result = alloc_empty_object ();
@@ -1940,7 +2331,25 @@ namespace lime {
 	int lime_gl_get_framebuffer_attachment_parameteri (int target, int attachment, int pname) {
 
 		GLint params = 0;
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGetFramebufferAttachmentParameterivEXT (target, attachment, pname, &params);
+
+			}
+
+		} else {
+
+			glGetFramebufferAttachmentParameteriv (target, attachment, pname, &params);
+
+		}
+		#else
 		glGetFramebufferAttachmentParameteriv (target, attachment, pname, &params);
+		#endif
+
 		return params;
 
 	}
@@ -1949,7 +2358,25 @@ namespace lime {
 	HL_PRIM int HL_NAME(hl_gl_get_framebuffer_attachment_parameteri) (int target, int attachment, int pname) {
 
 		GLint params = 0;
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGetFramebufferAttachmentParameterivEXT (target, attachment, pname, &params);
+
+			}
+
+		} else {
+
+			glGetFramebufferAttachmentParameteriv (target, attachment, pname, &params);
+
+		}
+		#else
 		glGetFramebufferAttachmentParameteriv (target, attachment, pname, &params);
+		#endif
+
 		return params;
 
 	}
@@ -1957,14 +2384,46 @@ namespace lime {
 
 	void lime_gl_get_framebuffer_attachment_parameteriv (int target, int attachment, int pname, double params) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGetFramebufferAttachmentParameterivEXT (target, attachment, pname, (GLint*)(uintptr_t)params);
+
+			}
+
+		} else {
+
+			glGetFramebufferAttachmentParameteriv (target, attachment, pname, (GLint*)(uintptr_t)params);
+
+		}
+		#else
 		glGetFramebufferAttachmentParameteriv (target, attachment, pname, (GLint*)(uintptr_t)params);
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_get_framebuffer_attachment_parameteriv) (int target, int attachment, int pname, double params) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGetFramebufferAttachmentParameterivEXT (target, attachment, pname, (GLint*)(uintptr_t)params);
+
+			}
+
+		} else {
+
+			glGetFramebufferAttachmentParameteriv (target, attachment, pname, (GLint*)(uintptr_t)params);
+
+		}
+		#else
 		glGetFramebufferAttachmentParameteriv (target, attachment, pname, (GLint*)(uintptr_t)params);
+		#endif
 
 	}
 
@@ -2234,7 +2693,25 @@ namespace lime {
 	int lime_gl_get_renderbuffer_parameteri (int target, int pname) {
 
 		GLint param = 0;
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGetRenderbufferParameterivEXT (target, pname, &param);
+
+			}
+
+		} else {
+
+			glGetRenderbufferParameteriv (target, pname, &param);
+
+		}
+		#else
 		glGetRenderbufferParameteriv (target, pname, &param);
+		#endif
+
 		return param;
 
 	}
@@ -2243,7 +2720,25 @@ namespace lime {
 	HL_PRIM int HL_NAME(hl_gl_get_renderbuffer_parameteri) (int target, int pname) {
 
 		GLint param = 0;
+
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGetRenderbufferParameterivEXT (target, pname, &param);
+
+			}
+
+		} else {
+
+			glGetRenderbufferParameteriv (target, pname, &param);
+
+		}
+		#else
 		glGetRenderbufferParameteriv (target, pname, &param);
+		#endif
+
 		return param;
 
 	}
@@ -2251,14 +2746,46 @@ namespace lime {
 
 	void lime_gl_get_renderbuffer_parameteriv (int target, int pname, double params) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGetRenderbufferParameterivEXT (target, pname, (GLint*)(uintptr_t)params);
+
+			}
+
+		} else {
+
+			glGetRenderbufferParameteriv (target, pname, (GLint*)(uintptr_t)params);
+
+		}
+		#else
 		glGetRenderbufferParameteriv (target, pname, (GLint*)(uintptr_t)params);
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_get_renderbuffer_parameteriv) (int target, int pname, double params) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glGetRenderbufferParameterivEXT (target, pname, (GLint*)(uintptr_t)params);
+
+			}
+
+		} else {
+
+			glGetRenderbufferParameteriv (target, pname, (GLint*)(uintptr_t)params);
+
+		}
+		#else
 		glGetRenderbufferParameteriv (target, pname, (GLint*)(uintptr_t)params);
+		#endif
 
 	}
 
@@ -3072,14 +3599,22 @@ namespace lime {
 
 	bool lime_gl_is_framebuffer (int handle) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		return (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) ? (GLAD_GL_EXT_framebuffer_object ? glIsFramebufferEXT (handle) : false) : glIsFramebuffer (handle);
+		#else
 		return glIsFramebuffer (handle);
+		#endif
 
 	}
 
 
 	HL_PRIM bool HL_NAME(hl_gl_is_framebuffer) (int handle) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		return (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) ? (GLAD_GL_EXT_framebuffer_object ? glIsFramebufferEXT (handle) : false) : glIsFramebuffer (handle);
+		#else
 		return glIsFramebuffer (handle);
+		#endif
 
 	}
 
@@ -3114,14 +3649,22 @@ namespace lime {
 
 	bool lime_gl_is_renderbuffer (int handle) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		return (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) ? (GLAD_GL_EXT_framebuffer_object ? glIsRenderbufferEXT (handle) : false) : glIsRenderbuffer (handle);
+		#else
 		return glIsRenderbuffer (handle);
+		#endif
 
 	}
 
 
 	HL_PRIM bool HL_NAME(hl_gl_is_renderbuffer) (int handle) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		return (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) ? (GLAD_GL_EXT_framebuffer_object ? glIsRenderbufferEXT (handle) : false) : glIsRenderbuffer (handle);
+		#else
 		return glIsRenderbuffer (handle);
+		#endif
 
 	}
 
@@ -3507,14 +4050,46 @@ namespace lime {
 
 	void lime_gl_renderbuffer_storage (int target, int internalformat, int width, int height) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glRenderbufferStorageEXT (target, internalformat, width, height);
+
+			}
+
+		} else {
+
+			glRenderbufferStorage (target, internalformat, width, height);
+
+		}
+		#else
 		glRenderbufferStorage (target, internalformat, width, height);
+		#endif
 
 	}
 
 
 	HL_PRIM void HL_NAME(hl_gl_renderbuffer_storage) (int target, int internalformat, int width, int height) {
 
+		#if defined (LIME_GLAD) && defined (LIME_OPENGL_GL)
+		if (GLAD_GL_VERSION_2_1 && !GLAD_GL_VERSION_3_0) {
+
+			if (GLAD_GL_EXT_framebuffer_object) {
+
+				glRenderbufferStorageEXT (target, internalformat, width, height);
+
+			}
+
+		} else {
+
+			glRenderbufferStorage (target, internalformat, width, height);
+
+		}
+		#else
 		glRenderbufferStorage (target, internalformat, width, height);
+		#endif
 
 	}
 
@@ -4626,9 +5201,16 @@ namespace lime {
 
 		if (!initialized) {
 
-			#if defined(LIME_GLAD) && defined(LIME_SDL)
-			gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress);
-			//gladLoadGLSC2((GLADloadfunc)SDL_GL_GetProcAddress);
+			#if defined (LIME_SDL) && defined (LIME_GLAD)
+
+			#ifdef LIME_OPENGL_GLES2
+			gladLoadGLES2 ((GLADloadfunc)SDL_GL_GetProcAddress);
+			#endif
+
+			#ifdef LIME_OPENGL_GL
+			gladLoadGL ((GLADloadfunc)SDL_GL_GetProcAddress);
+			#endif
+
 			#endif
 
 			initialized = true;
@@ -4743,6 +5325,7 @@ namespace lime {
 	DEFINE_PRIME3v (lime_gl_get_buffer_parameteriv);
 	DEFINE_PRIME3v (lime_gl_get_buffer_parameteri64v);
 	DEFINE_PRIME2 (lime_gl_get_buffer_pointerv);
+	DEFINE_PRIME4v (lime_gl_get_buffer_sub_data);
 	DEFINE_PRIME0 (lime_gl_get_context_attributes);
 	DEFINE_PRIME0 (lime_gl_get_error);
 	DEFINE_PRIME1 (lime_gl_get_extension);
@@ -5020,6 +5603,7 @@ namespace lime {
 	DEFINE_HL_PRIM (_VOID, hl_gl_get_buffer_parameteriv, _I32 _I32 _F64);
 	DEFINE_HL_PRIM (_VOID, hl_gl_get_buffer_parameteri64v, _I32 _I32 _F64);
 	DEFINE_HL_PRIM (_F64, hl_gl_get_buffer_pointerv, _I32 _I32);
+	DEFINE_HL_PRIM (_VOID, hl_gl_get_buffer_sub_data, _I32 _F64 _I32 _F64);
 	DEFINE_HL_PRIM (_DYN, hl_gl_get_context_attributes, _NO_ARG);
 	DEFINE_HL_PRIM (_I32, hl_gl_get_error, _NO_ARG);
 	DEFINE_HL_PRIM (_DYN, hl_gl_get_extension, _STRING);

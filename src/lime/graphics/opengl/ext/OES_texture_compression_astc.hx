@@ -1,8 +1,7 @@
 package lime.graphics.opengl.ext;
 
 @:keep
-@:noCompletion
-class OES_texture_compression_astc
+@:noCompletion class OES_texture_compression_astc
 {
 	public var COMPRESSED_RGBA_ASTC_3x3x3_OES = 0x93C0;
 	public var COMPRESSED_RGBA_ASTC_4x3x3_OES = 0x93C1;

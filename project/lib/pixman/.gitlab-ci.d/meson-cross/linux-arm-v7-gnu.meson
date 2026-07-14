@@ -1,5 +1,1 @@
-[binaries]
-c = 'gcc'
-ar = 'ar'
-strip = 'strip'
-pkg-config = 'pkg-config'
+native-gnu.meson

@@ -65,7 +65,9 @@
                 <compilerflag value="/utf-8" />
 
                 <compilerflag value="/wd4267" />
-				<compilerflag value="/wd4875" />
+                <compilerflag value="/wd4875" />
+
+                <compilerflag value="/EHs" />
 
             </section>
 
@@ -86,8 +88,8 @@
                     <compilerflag value="-mmmx" />
                     <compilerflag value="-msse" />
                     <compilerflag value="-msse2" />
-		            <compilerflag value="-msse3" />
-		            <compilerflag value="-mssse3" />
+                    <compilerflag value="-msse3" />
+                    <compilerflag value="-mssse3" />
                 </section>
 
             </section>

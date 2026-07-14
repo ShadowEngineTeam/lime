@@ -18,7 +18,6 @@
 
             </section>
 
-            <compilerflag value="-I/usr/include/libdrm" />
             <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/wayland-protocols" />
 
         </section>
@@ -38,19 +37,12 @@
 
         <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/src" />
 
-        <section if="LIME_ANGLE">
-
-			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/angle/include/" />
-			<compilerflag value="-DLIME_ANGLE" />
-
-		</section>
 
         <section>
 
             <compilerflag value="-DSDL_DISABLE_ALLOCA" />
-            <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" unless="iphone" />
-            <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" if="iphone LIME_ANGLE" />
-            <compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" unless="LIME_ANGLE" />
+            <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" />
+            <compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" />
 
             <section>
 
@@ -60,12 +52,12 @@
 
         </section>
 
-		<section if="linux" unless="HXCPP_ARM64 || HXCPP_ARMV7">
+        <section if="linux" unless="HXCPP_ARM64 || HXCPP_ARMV7">
             <compilerflag value="-mmmx" />
             <compilerflag value="-msse" />
             <compilerflag value="-msse2" />
-		    <compilerflag value="-msse3" />
-		    <compilerflag value="-mssse3" />
+            <compilerflag value="-msse3" />
+            <compilerflag value="-mssse3" />
         </section>
 
         <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/SDL.c" />
@@ -462,15 +454,6 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/SDL_render.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/SDL_yuv_sw.c" />
 
-			<section>
-				<file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/software/SDL_blendfillrect.c" />
-				<file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/software/SDL_blendline.c" />
-				<file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/software/SDL_blendpoint.c" />
-				<file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/software/SDL_drawline.c" />
-				<file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/software/SDL_drawpoint.c" />
-				<file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/software/SDL_render_sw.c" />
-				<file name="${NATIVE_TOOLKIT_PATH}/sdl/src/render/software/SDL_triangle.c" />
-			</section>
         </section>
 
         <section>
@@ -636,13 +619,6 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/dummy/SDL_nullevents.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/dummy/SDL_nullframebuffer.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/dummy/SDL_nullvideo.c" />
-
-            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/kmsdrm/SDL_kmsdrmdyn.c" />
-            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/kmsdrm/SDL_kmsdrmevents.c" />
-            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/kmsdrm/SDL_kmsdrmmouse.c" />
-            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/kmsdrm/SDL_kmsdrmopengles.c" />
-            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/kmsdrm/SDL_kmsdrmvideo.c" />
-            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/kmsdrm/SDL_kmsdrmvulkan.c" />
 
             <section if="iphone">
 

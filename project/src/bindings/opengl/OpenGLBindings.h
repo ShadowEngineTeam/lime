@@ -1,16 +1,23 @@
 #pragma once
 
-#if defined(LIME_GLAD)
-	#include <glad/gles2.h>
-	//#include <glad/glsc2.h>
-#elif defined(LIME_ANGLE) && defined(IPHONE)
-	#define GL_GLEXT_PROTOTYPES 1
-	#include <GLES3/gl3.h>
-	#include <GLES2/gl2ext.h>
-#elif defined (IPHONE) || defined(APPLETV)
-	#include <OpenGLES/ES3/gl.h>
-	#include <OpenGLES/ES3/glext.h>
+
+#ifdef LIME_GLAD
+
+#if defined (LIME_OPENGL_GL)
+#include <glad/gl.h>
+#elif defined (LIME_OPENGL_GLES2)
+#include <glad/gles2.h>
 #endif
+
+#else
+
+#if defined (IPHONE) || defined(APPLETV)
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
+#endif
+
+#endif
+
 
 namespace lime {
 
@@ -21,6 +28,9 @@ namespace lime {
 
 			static bool initialized;
 			static bool Init ();
+
+			static int defaultFramebuffer;
+			static int defaultRenderbuffer;
 
 	};
 

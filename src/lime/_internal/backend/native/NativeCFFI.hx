@@ -28,7 +28,7 @@ import lime.utils.ArrayBufferView;
 import lime.system.CFFI;
 import lime.system.CFFIPointer;
 #end
-#if (cpp && !cppia)
+#if cpp
 import cpp.Float32;
 #else
 typedef Float32 = Float;
@@ -49,7 +49,7 @@ typedef CFFIPointer = Dynamic;
 class NativeCFFI
 {
 	#if (lime_cffi && !macro)
-	#if (cpp && !cppia)
+	#if cpp
 	#if disable_cffi
 	@:cffi private static function lime_application_create():Dynamic;
 
@@ -723,7 +723,7 @@ class NativeCFFI
 		false));
 	#end
 	#end
-	#if (neko || cppia)
+	#if neko
 	private static var lime_application_create = CFFI.load("lime", "lime_application_create", 0);
 	private static var lime_application_event_manager_register = CFFI.load("lime", "lime_application_event_manager_register", 2);
 	private static var lime_application_exec = CFFI.load("lime", "lime_application_exec", 1);
@@ -1636,7 +1636,7 @@ class NativeCFFI
 	#end
 	#end
 	#if (lime_cffi && !macro && android)
-	#if (cpp && !cppia)
+	#if cpp
 	#if disable_cffi
 	@:cffi private static function lime_jni_call_member(jniMethod:Dynamic, jniObject:Dynamic, args:Dynamic):Dynamic;
 
@@ -1701,7 +1701,7 @@ class NativeCFFI
 	#end
 	#end
 	#if (lime_cffi && !macro && lime_openal)
-	#if (cpp && !cppia)
+	#if cpp
 	#if disable_cffi
 	@:cffi private static function lime_al_buffer_data(buffer:CFFIPointer, format:Int, data:Dynamic, size:Int, freq:Int):Void;
 
@@ -2131,7 +2131,7 @@ class NativeCFFI
 	private static var lime_al_remove_send = new cpp.Callable<cpp.Object->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_al_remove_send", "oiv", false));
 	#end
 	#end
-	#if (neko || cppia)
+	#if neko
 	private static var lime_al_buffer_data = CFFI.load("lime", "lime_al_buffer_data", 5);
 	private static var lime_al_buffer3f = CFFI.load("lime", "lime_al_buffer3f", 5);
 	private static var lime_al_buffer3i = CFFI.load("lime", "lime_al_buffer3i", 5);
@@ -2698,7 +2698,7 @@ class NativeCFFI
 	#end
 	#end
 	#if (lime_cffi && !macro && lime_cairo)
-	#if (cpp && !cppia)
+	#if cpp
 	#if disable_cffi
 	@:cffi private static function lime_cairo_arc(handle:CFFIPointer, xc:Float, yc:Float, radius:Float, angle1:Float, angle2:Float):Void;
 
@@ -3137,7 +3137,7 @@ class NativeCFFI
 		false));
 	#end
 	#end
-	#if (neko || cppia)
+	#if neko
 	private static var lime_cairo_arc = CFFI.load("lime", "lime_cairo_arc", -1);
 	private static var lime_cairo_arc_negative = CFFI.load("lime", "lime_cairo_arc_negative", -1);
 	private static var lime_cairo_clip = CFFI.load("lime", "lime_cairo_clip", 1);
@@ -3660,7 +3660,7 @@ class NativeCFFI
 	#end
 	#end
 	#if (lime_cffi && !macro && lime_curl)
-	#if (cpp && !cppia)
+	#if cpp
 	#if disable_cffi
 	@:cffi private static function lime_curl_getdate(date:String, now:Float):Float;
 
@@ -3757,7 +3757,7 @@ class NativeCFFI
 	private static var lime_curl_multi_wait = new cpp.Callable<cpp.Object->Int->Int>(cpp.Prime._loadPrime("lime", "lime_curl_multi_wait", "oii", false));
 	#end
 	#end
-	#if (neko || cppia)
+	#if neko
 	private static var lime_curl_getdate = CFFI.load("lime", "lime_curl_getdate", 2);
 	private static var lime_curl_global_cleanup = CFFI.load("lime", "lime_curl_global_cleanup", 0);
 	private static var lime_curl_global_init = CFFI.load("lime", "lime_curl_global_init", 1);
@@ -3917,7 +3917,7 @@ class NativeCFFI
 	#end
 	#end
 	#if (lime_cffi && !macro && (lime_opengl || lime_opengles))
-	#if (cpp && !cppia)
+	#if cpp
 	#if disable_cffi
 	@:cffi private static function lime_gl_active_texture(texture:Int):Void;
 
@@ -4131,6 +4131,8 @@ class NativeCFFI
 	@:cffi private static function lime_gl_get_buffer_parameteriv(target:Int, pname:Int, params:DataPointer):Void;
 
 	@:cffi private static function lime_gl_get_buffer_pointerv(target:Int, pname:Int):DataPointer;
+
+	@:cffi private static function lime_gl_get_buffer_sub_data(target:Int, offset:DataPointer, size:Int, data:DataPointer):Void;
 
 	@:cffi private static function lime_gl_get_context_attributes():Dynamic;
 
@@ -4625,6 +4627,8 @@ class NativeCFFI
 		"lime_gl_get_buffer_parameteriv", "iidv", false));
 	private static var lime_gl_get_buffer_pointerv = new cpp.Callable<Int->Int->lime.utils.DataPointer>(cpp.Prime._loadPrime("lime",
 		"lime_gl_get_buffer_pointerv", "iid", false));
+	private static var lime_gl_get_buffer_sub_data = new cpp.Callable<Int->lime.utils.DataPointer->Int->lime.utils.DataPointer->
+		cpp.Void>(cpp.Prime._loadPrime("lime", "lime_gl_get_buffer_sub_data", "ididv", false));
 	private static var lime_gl_get_context_attributes = new cpp.Callable<Void->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_gl_get_context_attributes", "o",
 		false));
 	private static var lime_gl_get_error = new cpp.Callable<Void->Int>(cpp.Prime._loadPrime("lime", "lime_gl_get_error", "i", false));
@@ -4909,7 +4913,7 @@ class NativeCFFI
 		false));
 	#end
 	#end
-	#if (neko || cppia)
+	#if neko
 	private static var lime_gl_active_texture = CFFI.load("lime", "lime_gl_active_texture", 1);
 	private static var lime_gl_attach_shader = CFFI.load("lime", "lime_gl_attach_shader", 2);
 	private static var lime_gl_begin_query = CFFI.load("lime", "lime_gl_begin_query", 2);
@@ -5013,6 +5017,7 @@ class NativeCFFI
 	private static var lime_gl_get_buffer_parameteri64v = CFFI.load("lime", "lime_gl_get_buffer_parameteri64v", 3);
 	private static var lime_gl_get_buffer_parameteriv = CFFI.load("lime", "lime_gl_get_buffer_parameteriv", 3);
 	private static var lime_gl_get_buffer_pointerv = CFFI.load("lime", "lime_gl_get_buffer_pointerv", 2);
+	private static var lime_gl_get_buffer_sub_data = CFFI.load("lime", "lime_gl_get_buffer_sub_data", 4);
 	private static var lime_gl_get_context_attributes = CFFI.load("lime", "lime_gl_get_context_attributes", 0);
 	private static var lime_gl_get_error = CFFI.load("lime", "lime_gl_get_error", 0);
 	private static var lime_gl_get_extension = CFFI.load("lime", "lime_gl_get_extension", 1);
@@ -5478,6 +5483,9 @@ class NativeCFFI
 	{
 		return 0;
 	}
+
+	@:hlNative("lime", "hl_gl_get_buffer_sub_data") private static function lime_gl_get_buffer_sub_data(target:Int, offset:DataPointer, size:Int,
+		data:DataPointer):Void {}
 
 	@:hlNative("lime", "hl_gl_get_context_attributes") private static function lime_gl_get_context_attributes():Dynamic
 	{
@@ -5998,7 +6006,7 @@ class NativeCFFI
 	#end
 	#end
 	#if (lime_cffi && !macro && lime_harfbuzz)
-	#if (cpp && !cppia)
+	#if cpp
 	#if disable_cffi
 	@:cffi private static function lime_hb_blob_create(data:DataPointer, length:Int, memoryMode:Int):CFFIPointer;
 
@@ -6411,7 +6419,7 @@ class NativeCFFI
 		false));
 	#end
 	#end
-	#if (neko || cppia)
+	#if neko
 	private static var lime_hb_blob_create:lime.utils.DataPointer->Int->Int->Dynamic = CFFI.load("lime", "lime_hb_blob_create", 3);
 	private static var lime_hb_blob_create_sub_blob:Dynamic->Int->Int->Dynamic = CFFI.load("lime", "lime_hb_blob_create_sub_blob", 3);
 	private static var lime_hb_blob_get_data:Dynamic->Float = CFFI.load("lime", "lime_hb_blob_get_data", 1);
