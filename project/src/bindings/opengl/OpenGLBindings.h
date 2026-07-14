@@ -5,7 +5,7 @@
 
 #if defined (LIME_OPENGL_GL)
 #include <glad/gl.h>
-#elif defined (LIME_OPENGL_GLES2)
+#elif defined (LIME_OPENGL_GLES)
 #include <glad/gles2.h>
 #endif
 

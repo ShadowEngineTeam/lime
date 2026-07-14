@@ -19,7 +19,7 @@
 	<define name="lime-native" if="native" />
 	<define name="lime-openal" if="windows || linux || mac || android || ios || tvos" />
 	<define name="lime-opengl" if="desktop" unless="html5" />
-	<define name="lime-opengles" if="mobile" />
+	<define name="lime-opengles" if="mobile || linux armv7 || linux arm64" />
 	<define name="lime-webgl" if="html5" />
 
 	<haxedef name="no-compilation" />
