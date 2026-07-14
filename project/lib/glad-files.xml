@@ -4,9 +4,8 @@
 
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/glad/include" />
 
-		<file name="${NATIVE_TOOLKIT_PATH}/glad/src/gl.c" if="windows || mac || linux" />
-
-		<file name="${NATIVE_TOOLKIT_PATH}/glad/src/gles2.c" if="android || rpi" />
+		<file name="${NATIVE_TOOLKIT_PATH}/glad/src/gl.c" if="windows || mac || linux" unless="linux HXCPP_ARMV7 || linux HXCPP_ARM64" />
+		<file name="${NATIVE_TOOLKIT_PATH}/glad/src/gles2.c" if="android || linux HXCPP_ARMV7 || linux HXCPP_ARM64" />
 
 	</files>
 
