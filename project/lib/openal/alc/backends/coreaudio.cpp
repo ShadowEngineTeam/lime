@@ -53,6 +53,10 @@
 #define CAN_ENUMERATE 1
 #endif
 
+#if TARGET_OS_IOS
+#include "ios_audio_session.h"
+#endif
+
 #if HAVE_CXXMODULES
 import logging;
 #else
@@ -364,6 +368,13 @@ static std::optional<DeviceHelper> sDeviceHelper;
 static constexpr char ca_device[] = "CoreAudio Default";
 #endif
 
+#if TARGET_OS_IOS
+struct CoreAudioPlayback;
+namespace {
+CoreAudioPlayback *gActiveIOSPlayback{nullptr};
+bool gIOSSessionInitialized{false};
+} // namespace
+#endif
 
 struct CoreAudioPlayback final : public BackendBase {
     explicit CoreAudioPlayback(gsl::not_null<DeviceBase*> device) noexcept : BackendBase{device}
@@ -387,6 +398,10 @@ struct CoreAudioPlayback final : public BackendBase {
 
 CoreAudioPlayback::~CoreAudioPlayback()
 {
+#if TARGET_OS_IOS
+    if(gActiveIOSPlayback == this)
+        gActiveIOSPlayback = nullptr;
+#endif
     AudioUnitUninitialize(mAudioUnit);
     AudioComponentInstanceDispose(mAudioUnit);
 }
@@ -407,6 +422,15 @@ OSStatus CoreAudioPlayback::MixerProc(AudioUnitRenderActionFlags*, const AudioTi
 
 void CoreAudioPlayback::open(std::string_view name)
 {
+#if TARGET_OS_IOS
+    if(!gIOSSessionInitialized)
+    {
+        OpenAL_IOSAudioSessionInitialize();
+        gIOSSessionInitialized = true;
+    }
+    gActiveIOSPlayback = this;
+#endif
+
 #if CAN_ENUMERATE
     AudioDeviceID audioDevice{kAudioDeviceUnknown};
     if(name.empty())
@@ -681,6 +705,33 @@ void CoreAudioPlayback::stop()
     if(err != noErr)
         ERR("AudioOutputUnitStop failed: '{}' ({})", FourCCPrinter{err}.c_str(), err);
 }
+
+#if TARGET_OS_IOS
+} // namespace
+
+extern "C" void OpenAL_SetIOSAudioUnitActive(bool active)
+{
+    if(!gActiveIOSPlayback || !gActiveIOSPlayback->mAudioUnit)
+        return;
+
+    if(active)
+    {
+        const OSStatus err{AudioOutputUnitStart(gActiveIOSPlayback->mAudioUnit)};
+        if(err != noErr)
+            ERR("OpenAL_SetIOSAudioUnitActive: AudioOutputUnitStart failed: '{}' ({})",
+                FourCCPrinter{err}.c_str(), err);
+    }
+    else
+    {
+        const OSStatus err{AudioOutputUnitStop(gActiveIOSPlayback->mAudioUnit)};
+        if(err != noErr)
+            ERR("OpenAL_SetIOSAudioUnitActive: AudioOutputUnitStop failed: '{}' ({})",
+                FourCCPrinter{err}.c_str(), err);
+    }
+}
+
+namespace {
+#endif
 
 
 struct CoreAudioCapture final : public BackendBase {
