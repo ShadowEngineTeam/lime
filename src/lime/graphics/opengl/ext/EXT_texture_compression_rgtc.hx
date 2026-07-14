@@ -1,8 +1,7 @@
 package lime.graphics.opengl.ext;
 
 @:keep
-@:noCompletion
-class EXT_texture_compression_rgtc
+@:noCompletion class EXT_texture_compression_rgtc
 {
 	public var COMPRESSED_RED_RGTC1_EXT = 0x8DBB;
 	public var COMPRESSED_SIGNED_RED_RGTC1_EXT = 0x8DBC;

@@ -22,17 +22,8 @@
 #if defined(SDL_VIDEO_OPENGL_ES) || defined(SDL_VIDEO_OPENGL_ES2)
 
 #import <UIKit/UIKit.h>
-#if defined(LIME_ANGLE)
-#import <EGL/egl.h>
-#import <EGL/eglext.h>
-#import <GLES2/gl2.h>
-#import <GLES2/gl2ext.h>
-#import <GLES3/gl3.h>
-#import <Metal/Metal.h>
-#else
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/ES3/gl.h>
-#endif
 
 #import "SDL_uikitview.h"
 #include "SDL_uikitvideo.h"
@@ -50,19 +41,9 @@
                   stencilBits:(int)stencilBits
                          sRGB:(int)sRGB
                  multisamples:(int)multisamples
-#if defined(LIME_ANGLE)
-                      context:(EGLContext *)glcontext;
-#else
                       context:(EAGLContext *)glcontext;
-#endif
 
-#if defined(LIME_ANGLE)
-@property(nonatomic, readonly) EGLDisplay eglDisplay;
-@property(nonatomic, readonly) EGLSurface eglSurface;
-@property(nonatomic, readonly) EGLContext eglContext;
-#else
 @property(nonatomic, readonly, weak) EAGLContext *context;
-#endif
 
 // The width and height of the drawable in pixels (as opposed to points.)
 @property(nonatomic, readonly) int backingWidth;

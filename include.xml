@@ -18,7 +18,8 @@
 	<define name="lime-html5" if="html5" />
 	<define name="lime-native" if="native" />
 	<define name="lime-openal" if="windows || linux || mac || android || ios || tvos" />
-	<define name="lime-opengles" if="native" />
+	<define name="lime-opengl" if="desktop" unless="html5" />
+	<define name="lime-opengles" if="mobile" />
 	<define name="lime-webgl" if="html5" />
 
 	<haxedef name="no-compilation" />
@@ -97,6 +98,7 @@
 			<dependency name="GameController.framework" />
 			<dependency name="MediaPlayer.framework" />
 			<dependency name="Metal.framework" />
+			<dependency name="OpenGLES.framework" />
 			<dependency name="QuartzCore.framework" />
 			<dependency name="Security.framework" />
 			<dependency name="UIKit.framework" />
@@ -117,41 +119,7 @@
 			<dependency name="UIKit.framework" />
 		</section>
 
-		<section if="windows">
-			<dependency path="dependencies/angle" name="d3dcompiler_47" />
-			<dependency path="dependencies/angle" name="vk_swiftshader" />
-			<dependency path="dependencies/angle" name="vk_swiftshader_icd.json" type="json" />
-		</section>
-		<section if="linux">
-			<dependency path="dependencies/angle" name="libvk_swiftshader" />
-			<dependency path="dependencies/angle" name="vk_swiftshader_icd.json" type="json" />
-		</section>
-		<dependency path="dependencies/angle" name="libVkICD_mock_icd" if="mac" />
-		<dependency path="dependencies/angle" name="libEGL" unless="android || ios" />
-		<dependency path="dependencies/angle" name="libGLESv2" unless="android || ios" />
-
-		<ndll name="EGL" dir="dependencies/angle" if="android" />
-		<ndll name="GLESv2" dir="dependencies/angle" if="android" />
-		<ndll name="c++_shared" dir="dependencies/angle" if="android" />
-
-		<section if="ios">
-			<section unless="simulator">
-				<dependency path="dependencies/angle/iPhone/device/arm64/libEGL.framework" embed="true" if="ios" />
-				<dependency path="dependencies/angle/iPhone/device/arm64/libGLESv2.framework" embed="true" if="ios" />
-			</section>
-
-			<section if="simulator">
-				<section if="arm64">
-					<dependency path="dependencies/angle/iPhone/simulator/arm64/libGLESv2.framework" embed="true" />
-					<dependency path="dependencies/angle/iPhone/simulator/arm64/libEGL.framework" embed="true" />
-				</section>
-
-				<section if="x86_64">
-					<dependency path="dependencies/angle/iPhone/simulator/x64/libGLESv2.framework" />
-					<dependency path="dependencies/angle/iPhone/simulator/x64/libEGL.framework" />
-				</section>
-			</section>
-		</section>
+		<ndll name="c++_shared" dir="dependencies" if="android" />
 
 		<section if="mac">
 			<define name="MACOSX_DEPLOYMENT_TARGET" value="12.0" unless="MACOSX_DEPLOYMENT_TARGET" />

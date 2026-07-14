@@ -1251,6 +1251,20 @@ class GL
 	}
 	#end
 
+	#if (lime_opengl || lime_opengles)
+	public static inline function getBufferSubData(target:Int, offset:DataPointer, size:Int, data:DataPointer):Void
+	{
+		context.getBufferSubData(target, offset, size, data);
+	}
+	#end
+
+	#if lime_webgl
+	public static inline function getBufferSubDataWEBGL(target:Int, srcByteOffset:DataPointer, dstData:Dynamic, ?srcOffset:Dynamic, ?length:Int):Void
+	{
+		context.getBufferSubData(target, srcByteOffset, dstData, srcOffset, length);
+	}
+	#end
+
 	public static inline function getContextAttributes():GLContextAttributes
 	{
 		return context.getContextAttributes();
@@ -2626,7 +2640,7 @@ class GL
 	}
 }
 
-@:dox(hide) @:noCompletion #if (haxe_ver >= 4.0) enum #else @:enum #end abstract GLObjectType(Int) to Int
+@:dox(hide) @:noCompletion enum abstract GLObjectType(Int) to Int
 {
 	var UNKNOWN = 0;
 	var PROGRAM = 1;

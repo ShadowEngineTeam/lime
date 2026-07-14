@@ -30,10 +30,12 @@ class DefineMacro
 				if (Context.defined("ios") || Context.defined("android"))
 				{
 					Compiler.define("mobile");
+					if (cffi) Compiler.define("lime-opengles");
 				}
 				else
 				{
 					Compiler.define("desktop");
+					if (cffi) Compiler.define("lime-opengl");
 				}
 
 				if (cffi)
@@ -44,7 +46,6 @@ class DefineMacro
 					Compiler.define("lime-cairo");
 					Compiler.define("lime-curl");
 					Compiler.define("lime-harfbuzz");
-					Compiler.define("lime-opengles");
 				}
 				else
 				{

@@ -188,10 +188,8 @@
 # define HAVE_SETENV 1       /**< Set environment variable */
 # define HAVE_SETJMP 1       /**< Non-local jump support */
 # define HAVE_SIGACTION 1    /**< Signal handling (POSIX) */
-#if !defined(SDL_PLATFORM_LINUX)
 # define HAVE_STRLCAT 1      /**< Safe string concatenation (BSD) */
 # define HAVE_STRLCPY 1      /**< Safe string copy (BSD) */
-#endif
 # define HAVE_STRTOK_R 1     /**< Tokenize string (reentrant) */
 # define HAVE_SYSCONF 1      /**< Get system configuration */
 # define HAVE_UNSETENV 1     /**< Remove environment variable */
@@ -240,7 +238,7 @@
  * @name Android API Level-Dependent Features
  * @{
  */
-# if __ANDROID_API__ >= 28
+# if __ANDROID_API__ >= 24
 #  define HAVE_ICONV 1      /**< Character set conversion (API 24+) */
 #  define HAVE_ICONV_H 1    /**< iconv.h header (API 24+) */
 # endif
@@ -308,8 +306,8 @@
  * @{
  */
 # define HAVE_WCSCMP 1    /**< Compare wide strings */
-//# define HAVE_WCSLCAT 1   /**< Safe wide string concatenation */
-//# define HAVE_WCSLCPY 1   /**< Safe wide string copy */
+# define HAVE_WCSLCAT 1   /**< Safe wide string concatenation */
+# define HAVE_WCSLCPY 1   /**< Safe wide string copy */
 # define HAVE_WCSLEN 1    /**< Get wide string length */
 # define HAVE_WCSNCMP 1   /**< Compare wide strings (n chars) */
 # define HAVE_WCSNLEN 1   /**< Get wide string length (bounded) */
@@ -482,8 +480,6 @@
 # define SDL_VIDEO_DRIVER_COCOA 1        /**< Cocoa video driver */
 # define SDL_VIDEO_METAL 1               /**< Metal support */
 # define SDL_VIDEO_OPENGL 1              /**< OpenGL support */
-# define SDL_VIDEO_OPENGL_EGL 1          /**< EGL (Embedded OpenGL) support */
-# define SDL_VIDEO_OPENGL_ES2 1          /**< OpenGL ES 2.0 support */
 # define SDL_VIDEO_OPENGL_CGL 1          /**< Core Graphics Layer (CGL) OpenGL support */
 /** @} */
 
@@ -515,7 +511,6 @@
 
 # define SDL_VIDEO_DRIVER_UIKIT 1    /**< UIKit video driver */
 # define SDL_VIDEO_METAL 1           /**< Metal support */
-# define SDL_VIDEO_OPENGL_ES 1       /**< OpenGL ES support */
 # define SDL_VIDEO_OPENGL_ES2 1      /**< OpenGL ES 2.0 support */
 /** @} */
 
@@ -562,16 +557,6 @@
 #define SDL_POWER_LINUX 1                                        /**< Linux power management */
 #define SDL_SENSOR_DUMMY 1                                       /**< Dummy sensor driver (no native support) */
 #define SDL_STORAGE_STEAM 1                                      /**< Steam cloud storage support */
-
-/**
- * @name KMS/DRM Video Driver
- * @brief Kernel Mode Setting / Direct Rendering Manager video driver.
- * @{
- */
-# define SDL_VIDEO_DRIVER_KMSDRM 1                        /**< KMS/DRM video driver */
-# define SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC "libdrm.so.2"   /**< Dynamic libdrm loading */
-# define SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC_GBM "libgbm.so.1" /**< Dynamic libgbm loading */
-/** @} */
 
 /**
  * @name Wayland Video Driver
@@ -621,7 +606,7 @@
 # define SDL_VIDEO_OPENGL 1         /**< OpenGL support */
 # define SDL_VIDEO_OPENGL_EGL 1     /**< EGL support */
 # define SDL_VIDEO_OPENGL_ES2 1     /**< OpenGL ES 2.0 support */
-# define SDL_VIDEO_OPENGL_GLX 0     /**< GLX (OpenGL Extension to X) support */
+# define SDL_VIDEO_OPENGL_GLX 1     /**< GLX (OpenGL Extension to X) support */
 /** @} */
 
 #endif

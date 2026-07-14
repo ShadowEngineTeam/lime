@@ -64,7 +64,6 @@
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-radial-gradient.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-region16.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-region32.c" />
-		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-riscv.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-solid-fill.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-sse2.c" if="windows || mac || linux" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-ssse3.c" if="windows || mac || linux" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
@@ -72,6 +71,7 @@
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-trap.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-utils.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-x86.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman-riscv.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/pixman/pixman/pixman.c" />
 
 	</files>

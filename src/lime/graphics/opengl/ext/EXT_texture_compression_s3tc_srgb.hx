@@ -1,8 +1,7 @@
 package lime.graphics.opengl.ext;
 
 @:keep
-@:noCompletion
-class EXT_texture_compression_s3tc_srgb
+@:noCompletion class EXT_texture_compression_s3tc_srgb
 {
 	public var COMPRESSED_SRGB_S3TC_DXT1_EXT = 0x8C4C;
 	public var COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT = 0x8C4D;

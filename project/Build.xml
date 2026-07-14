@@ -14,6 +14,7 @@
 
 	<set name="HXCPP_ANDROID_PLATFORM" value="26" if="android" />
 	<set name="PLATFORM_NUMBER" value="26" if="android" />
+	<set name="HXCPP_IOS_MIN_VERSION" value="11.0" if="iphone" />
 	<setenv name="MACOSX_DEPLOYMENT_TARGET" value="12" if="mac" />
 
 	<set name="LIME_CAIRO" value="1" />
@@ -29,11 +30,10 @@
 	<set name="LIME_DR_LIBS" value="1" />
 	<set name="LIME_OPENAL" value="1" if="windows || linux || mac || android || iphone || appletv" />
 	<set name="LIME_OPENGL" value="1" />
+	<set name="LIME_GLAD" value="1" if="LIME_OPENGL" unless="iphone || appletv" />
 	<set name="LIME_PIXMAN" value="1" />
 	<set name="LIME_SDL" value="1" />
 	<set name="LIME_SDL_IMAGE" value="1" if="LIME_SDL" />
-	<set name="LIME_ANGLE" value="1" if="iphone" />
-	<set name="LIME_GLAD" value="1" unless="iphone || appletv" />
 	<set name="LIME_ZLIB" value="1" />
 
 	<set name="OUTPUT_DIR" value="../ndll" unless="OUTPUT_DIR" />
@@ -61,7 +61,7 @@
 		<section if="LIME_CAIRO">
 
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/cairo/src" />
-			
+
 			<section>
 				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/cairo/configs/default" unless="windows || mac || linux" />
 				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/cairo/configs/linux" if="linux" />
@@ -192,9 +192,17 @@
 
 		<section if="LIME_OPENGL">
 
+			<section if="LIME_GLAD">
+
+				<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/glad/include" />
+				<compilerflag value="-DLIME_GLAD" />
+
+			</section>
+
+			<compilerflag value="-DLIME_OPENGL_GL" if="windows || mac || linux" />
+			<compilerflag value="-DLIME_OPENGL_GLES2" if="android || rpi || iphone || appletv" />
 			<compilerflag value="-DLIME_OPENGL" />
 			<compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" />
-			<compilerflag value="-I${DEVELOPER_DIR}/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS${TVOS_VER}.sdk/" if="appletv" />
 
 			<file name="src/bindings/opengl/OpenGLBindings.cpp" />
 
@@ -205,28 +213,11 @@
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include" />
 			<compilerflag value="-DLIME_SDL" />
 			<compilerflag value="-DSDL_DISABLE_ALLOCA" />
-			<compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" unless="iphone" />
-            <compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" if="iphone LIME_ANGLE" />
-			<compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" unless="LIME_ANGLE" />
+			<compilerflag value="-DSDL_USE_BUILTIN_OPENGL_DEFINITIONS" />
+			<compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" />
 
 			<file name="src/backend/sdl/SDLApplication.cpp" />
 			<file name="src/backend/sdl/SDLWindow.cpp" />
-
-		</section>
-
-		<section if="LIME_GLAD">
-
-			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/glad/include" />
-
-			<compilerflag value="-DLIME_GLAD" />
-
-		</section>
-
-		<section if="LIME_ANGLE">
-
-			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/angle/include/" />
-
-			<compilerflag value="-DLIME_ANGLE" />
 
 		</section>
 
@@ -319,7 +310,7 @@
 	<include name="lib/efsw-files.xml" />
 	<include name="lib/freetype-files.xml" />
 	<include name="lib/harfbuzz-files.xml" />
-	<include name="lib/glad-files.xml" if="LIME_GLAD" />
+	<include name="lib/glad-files.xml" />
 	<include name="lib/lzma-files.xml" />
 	<include name="lib/mbedtls-files.xml" />
 	<include name="lib/vorbis-files.xml" />
@@ -385,6 +376,7 @@
 					<lib name="kernel32.lib" />
 					<lib name="ole32.lib" />
 					<lib name="oleaut32.lib" />
+					<lib name="opengl32.lib" />
 					<lib name="rpcrt4.lib" if="LIME_HARFBUZZ" />
 					<lib name="setupapi.lib" />
 					<lib name="shell32.lib" />
@@ -411,6 +403,7 @@
 					<lib name="-lkernel32" />
 					<lib name="-lole32" />
 					<lib name="-loleaut32" />
+					<lib name="-lopengl32" />
 					<lib name="-lrpcrt4" if="LIME_HARFBUZZ" />
 					<lib name="-lsetupapi" />
 					<lib name="-lshell32" />
@@ -437,8 +430,6 @@
 			</section>
 
 			<section if="linux">
-
-				<flag value="-Wl,-rpath,$ORIGIN"/>
 
 				<lib name="-lpthread" />
 				<lib name="-lrt" />
@@ -476,6 +467,7 @@
 				<vflag name="-framework" value="Foundation" />
 				<vflag name="-framework" value="GameController" />
 				<vflag name="-framework" value="IOKit" />
+				<vflag name="-framework" value="OpenGL" />
 				<vflag name="-framework" value="Security" />
 				<vflag name="-framework" value="SystemConfiguration" />
 				<vflag name="-framework" value="UniformTypeIdentifiers" />
@@ -496,10 +488,6 @@
 			<section if="android">
 
 				<lib name="-L../ndll/Android" />
-				<lib name="-L../dependencies/angle/Android/arm" if="HXCPP_ARMV7" />
-				<lib name="-L../dependencies/angle/Android/arm64" if="HXCPP_ARM64" />
-				<lib name="-L../dependencies/angle/Android/x86" if="HXCPP_X86" />
-				<lib name="-L../dependencies/angle/Android/x86_64" if="HXCPP_X86_64" />
 
 				<lib name="-ldl" />
 				<lib name="-llog" />
