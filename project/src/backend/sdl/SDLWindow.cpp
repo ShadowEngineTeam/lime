@@ -85,7 +85,7 @@ namespace lime {
 
 		if (!sdlWindow) {
 
-			//#if defined(IPHONE) || defined(APPLETV)
+			//#if defined(IPHONE)
 			SDL_Log ("Could not create SDL Window with OpenGL ES 3: %s.\nTrying to create SDL Window using OpenGL ES 2...", SDL_GetError ());
 			/*#else
 			SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL Window", SDL_GetError (), NULL);
@@ -97,7 +97,7 @@ namespace lime {
 
 			if (!sdlWindow) {
 
-				//#if defined(IPHONE) || defined(APPLETV)
+				//#if defined(IPHONE)
 				SDL_Log ("Could not create SDL Window with OpenGL ES 2: %s.\nReturning null...\n", SDL_GetError ());
 				/*#else
 				SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL Window", SDL_GetError (), NULL);
@@ -117,7 +117,7 @@ namespace lime {
 
 			OpenGLBindings::Init ();
 
-			#if defined(IPHONE) || defined(APPLETV)
+			#if defined(IPHONE)
 			SDL_PropertiesID props = SDL_GetWindowProperties(sdlWindow);
 			OpenGLBindings::defaultFramebuffer = (int)SDL_GetNumberProperty(props, SDL_PROP_WINDOW_UIKIT_OPENGL_FRAMEBUFFER_NUMBER, 0);
 			OpenGLBindings::defaultRenderbuffer = (int)SDL_GetNumberProperty(props, SDL_PROP_WINDOW_UIKIT_OPENGL_RENDERBUFFER_NUMBER, 0);
@@ -127,7 +127,7 @@ namespace lime {
 
 		} else {
 
-			//#if defined(IPHONE) || defined(APPLETV)
+			//#if defined(IPHONE)
 			SDL_Log ("Could not create SDL GL Context: %s\n", SDL_GetError ());
 			/*#else
 			SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL GL Context", SDL_GetError (), sdlWindow);
