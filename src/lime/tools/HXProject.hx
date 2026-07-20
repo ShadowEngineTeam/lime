@@ -754,7 +754,7 @@ class HXProject extends Script
 		{
 			switch (target)
 			{
-				case IOS, TVOS:
+				case IOS:
 					if (targetFlags.exists("simulator"))
 					{
 						architectures = [new Architecture(Std.string(System.hostArchitecture))];
