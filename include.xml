@@ -102,6 +102,8 @@
 			<dependency name="QuartzCore.framework" />
 			<dependency name="Security.framework" />
 			<dependency name="UIKit.framework" />
+
+			<config:ios class="Main.mm" />
 		</section>
 
 		<section if="tvos">
