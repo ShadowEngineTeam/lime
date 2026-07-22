@@ -9,6 +9,7 @@
 
 	<set name="PLATFORM" value="android-26" if="android" />
 	<set name="HXCPP_CPP20" value="1" />
+	<set name="HXCPP_OBJCXX_STANDARD" value="20" if="apple" />
 
 	<include name="${HXCPP}/build-tool/BuildCommon.xml" />
 
