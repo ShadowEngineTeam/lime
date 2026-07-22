@@ -395,11 +395,7 @@ void LoadSEALDefaultConfig()
     SetConfigValue("drivers", "pipewire,pulse,alsa,jack,oss,null");
     #elif defined(__APPLE__)
     // SetConfigValue("drivers", "sdl3,coreaudio,null");
-    #if !TARGET_OS_IPHONE
     SetConfigValue("drivers", "sdl3,null");
-    #else
-    SetConfigValue("drivers", "coreaudio,null");
-    #endif
     #elif defined(__ANDROID__)
     //SetConfigValue("drivers", "sdl3,oboe,opensl,null");
     char sdk[PROP_VALUE_MAX] = { 0 };
