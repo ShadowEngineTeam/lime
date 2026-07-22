@@ -54,9 +54,9 @@ namespace lime {
 		#endif
 
 		Uint32 initFlags = SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK | SDL_INIT_SENSOR;
-		#ifndef IPHONE
+		//#ifndef IPHONE
 		initFlags |= SDL_INIT_AUDIO;
-		#endif
+		//#endif
 
 		if (!SDL_Init (initFlags)) {
 
