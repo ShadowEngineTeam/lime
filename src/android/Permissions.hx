@@ -15,9 +15,20 @@ class Permissions
 	 *
 	 * @return An array of granted permissions.
 	 */
-	public static inline function getGrantedPermissions():Array<String>
+	public static function getGrantedPermissions():Array<String>
 	{
-		return JNICache.createStaticMethod('org/haxe/extension/Tools', 'getGrantedPermissions', '()[Ljava/lang/String;')();
+		final getGrantedPermissionsJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'getGrantedPermissions',
+			'()[Ljava/lang/String;');
+
+		if (getGrantedPermissionsJNI != null)
+		{
+			final permissions:Null<Array<String>> = getGrantedPermissionsJNI();
+
+			if (permissions != null)
+				return permissions;
+		}
+
+		return [];
 	}
 
 	/**
@@ -26,14 +37,19 @@ class Permissions
 	 * @param permissions The permissions to request. This should be in the format ['android.permission.PERMISSION_NAME'].
 	 * @param requestCode The request code to associate with this permission request.
 	 */
-	public static inline function requestPermissions(permissions:Array<String>, requestCode:Int = 1):Void
+	public static function requestPermissions(permissions:Array<String>, requestCode:Int = 1):Void
 	{
-		for (i in 0...permissions.length)
-			if (!permissions[i].startsWith('android.permission.'))
-				permissions[i] = 'android.permission.${permissions[i]}';
+		final requestPermissionsJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'requestPermissions', '([Ljava/lang/String;I)V');
 
-		JNICache.createStaticMethod('org/haxe/extension/Tools', 'requestPermissions',
-			'([Ljava/lang/String;I)V')(permissions, requestCode);
+		if (requestPermissionsJNI != null)
+		{
+			final nativePermissions:Array<String> = [];
+
+			for (permission in permissions)
+				nativePermissions.push(permission.startsWith('android.permission.') ? permission : 'android.permission.$permission');
+
+			requestPermissionsJNI(nativePermissions, requestCode);
+		}
 	}
 }
 #end

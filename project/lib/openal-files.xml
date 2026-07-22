@@ -179,7 +179,7 @@
                 </section>
 
                 <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/coreaudio.cpp" if="apple" />
-                <fike name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/ios_audio_session.mm" if="iphone" />
+                <file name="${NATIVE_TOOLKIT_PATH}/openal/alc/backends/ios_audio_session.mm" if="iphone" />
 
                 <section if="windows">
 
