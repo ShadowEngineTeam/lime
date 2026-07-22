@@ -36,6 +36,26 @@ public class GameActivity extends SDLActivity {
 
 
 	private static AudioManager audioManager;
+
+	// Audio focus is matched by listener identity, so the same instance has to be
+	// used for every request/abandon pair. Focus changes are forwarded to the
+	// extensions, which is how Haxe code gets notified.
+	private static final AudioManager.OnAudioFocusChangeListener audioFocusListener = new AudioManager.OnAudioFocusChangeListener () {
+
+		@Override public void onAudioFocusChange (int focusChange) {
+
+			if (extensions == null) return;
+
+			for (Extension extension : extensions) {
+
+				extension.onAudioFocusChange (focusChange);
+
+			}
+
+		}
+
+	};
+
 	private static AssetManager assetManager;
 	private static List<Extension> extensions;
 	private static DisplayMetrics metrics;
@@ -225,7 +245,7 @@ public class GameActivity extends SDLActivity {
 
 		if (audioManager != null) {
 
-			audioManager.abandonAudioFocus(null);
+			audioManager.abandonAudioFocus(audioFocusListener);
 
 		}
 
@@ -425,7 +445,7 @@ public class GameActivity extends SDLActivity {
 
 		if (audioManager != null) {
 
-			audioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+			audioManager.requestAudioFocus(audioFocusListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 		}
 
 	}

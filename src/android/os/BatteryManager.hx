@@ -35,14 +35,18 @@ class BatteryManager
 	public static final BATTERY_PROPERTY_ENERGY_COUNTER:Int = 5;
 
 	@:noCompletion
-	private var constructor:Dynamic;
+	private var handle:Null<Dynamic>;
 
 	/**
 	 * Constructs a new instance of BatteryManager.
 	 */
 	public function new():Void
 	{
-		constructor = JNICache.createStaticMethod('org/haxe/extension/Tools', 'getBatteryManager', '()Landroid/os/BatteryManager;')();
+		final getBatteryManagerJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'getBatteryManager',
+			'()Landroid/os/BatteryManager;');
+
+		if (getBatteryManagerJNI != null)
+			handle = getBatteryManagerJNI();
 	}
 
 	/**
@@ -52,18 +56,36 @@ class BatteryManager
 	 */
 	public function isCharging():Bool
 	{
-		return JNI.callMember(JNICache.createMemberMethod('android/os/BatteryManager', 'isCharging', '()Z'), constructor, []);
+		if (handle == null)
+			return false;
+
+		final isChargingJNI:Null<Dynamic> = JNICache.createMemberMethod('android/os/BatteryManager', 'isCharging', '()Z');
+
+		return isChargingJNI != null && JNI.callMember(isChargingJNI, handle, []);
 	}
 
 	/**
 	 * Retrieves the specified battery property value.
 	 *
 	 * @param id The ID of the battery property to retrieve.
-	 * @return The value of the specified battery property.
+	 * @return The value of the specified battery property, or 0 if it couldn't be read.
 	 */
 	public function getProperty(id:Int):Int
 	{
-		return JNI.callMember(JNICache.createMemberMethod('android/os/BatteryManager', 'getIntProperty', '(I)I'), constructor, [id]);
+		if (handle == null)
+			return 0;
+
+		final getIntPropertyJNI:Null<Dynamic> = JNICache.createMemberMethod('android/os/BatteryManager', 'getIntProperty', '(I)I');
+
+		if (getIntPropertyJNI != null)
+		{
+			final value:Null<Int> = JNI.callMember(getIntPropertyJNI, handle, [id]);
+
+			if (value != null)
+				return value;
+		}
+
+		return 0;
 	}
 }
 #end

@@ -25,7 +25,8 @@ class Tools
 	@:noCompletion
 	static function get_DATA_FOLDER_CLOSED():Int
 	{
-		final field:Null<Dynamic> = JNICache.createStaticField('org/haxe/extension/Tools', 'DATA_FOLDER_CLOSED', 'I');
+		final field:Null<JNIStaticField> = JNICache.createStaticField('org/haxe/extension/Tools', 'DATA_FOLDER_CLOSED', 'I');
+
 		return field != null ? field.get() : 0;
 	}
 
@@ -35,7 +36,9 @@ class Tools
 	public static function openDataFolder():Void
 	{
 		final openDataFolderJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'openDataFolder', '(I)V');
-		if (openDataFolderJNI != null) openDataFolderJNI(DATA_FOLDER_CLOSED);
+
+		if (openDataFolderJNI != null)
+			openDataFolderJNI(DATA_FOLDER_CLOSED);
 	}
 
 	/**
@@ -45,27 +48,36 @@ class Tools
 	 */
 	public static function installPackage(path:String):Void
 	{
-		if (!JNICache.createStaticMethod('org/haxe/extension/Tools', 'installPackage',
-			'(Ljava/lang/String;)Z')(path))
+		final installPackageJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'installPackage', '(Ljava/lang/String;)Z');
+
+		if (installPackageJNI != null && !installPackageJNI(path))
+		{
 			Log.warn('"REQUEST_INSTALL_PACKAGES" permission and "Install apps from external sources" setting must be granted to this app in order to install a '
 				+ Path.extension(path).toUpperCase()
 				+ ' file.');
+		}
 	}
 
 	/**
 	 * Adds the security flag to the application's window.
 	 */
-	public static inline function enableAppSecure():Void
+	public static function enableAppSecure():Void
 	{
-		JNICache.createStaticMethod('org/haxe/extension/Tools', 'enableAppSecure', '()V')();
+		final enableAppSecureJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'enableAppSecure', '()V');
+
+		if (enableAppSecureJNI != null)
+			enableAppSecureJNI();
 	}
 
 	/**
 	 * Clears the security flag from the application's window.
 	 */
-	public static inline function disableAppSecure():Void
+	public static function disableAppSecure():Void
 	{
-		JNICache.createStaticMethod('org/haxe/extension/Tools', 'disableAppSecure', '()V')();
+		final disableAppSecureJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'disableAppSecure', '()V');
+
+		if (disableAppSecureJNI != null)
+			disableAppSecureJNI();
 	}
 
 	/**
@@ -74,9 +86,12 @@ class Tools
 	 * @param packageName The package name of the application to launch.
 	 * @param requestCode The request code to pass along with the launch request.
 	 */
-	public static inline function launchPackage(packageName:String, requestCode:Int = 1):Void
+	public static function launchPackage(packageName:String, requestCode:Int = 1):Void
 	{
-		JNICache.createStaticMethod('org/haxe/extension/Tools', 'launchPackage', '(Ljava/lang/String;I)V')(packageName, requestCode);
+		final launchPackageJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'launchPackage', '(Ljava/lang/String;I)V');
+
+		if (launchPackageJNI != null)
+			launchPackageJNI(packageName, requestCode);
 	}
 
 	/**
@@ -89,13 +104,20 @@ class Tools
 	 */
 	public static function showAlertDialog(title:String, message:String, ?positiveButton:ButtonData, ?negativeButton:ButtonData):Void
 	{
-		if (positiveButton == null) positiveButton = {name: null, func: null};
+		if (positiveButton == null)
+			positiveButton = {name: null, func: null};
 
-		if (negativeButton == null) negativeButton = {name: null, func: null};
+		if (negativeButton == null)
+			negativeButton = {name: null, func: null};
 
-		JNICache.createStaticMethod('org/haxe/extension/Tools', 'showAlertDialog',
-			'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/haxe/lime/HaxeObject;Ljava/lang/String;Lorg/haxe/lime/HaxeObject;)V')(title, message,
-				positiveButton.name, new ButtonListener(positiveButton.func), negativeButton.name, new ButtonListener(negativeButton.func));
+		final showAlertDialogJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'showAlertDialog',
+			'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/haxe/lime/HaxeObject;Ljava/lang/String;Lorg/haxe/lime/HaxeObject;)V');
+
+		if (showAlertDialogJNI != null)
+		{
+			showAlertDialogJNI(title, message, positiveButton.name, new ButtonListener(positiveButton.func), negativeButton.name,
+				new ButtonListener(negativeButton.func));
+		}
 	}
 
 	/**
@@ -121,9 +143,11 @@ class Tools
 	 *
 	 * @return `true` if the device has Dolby Atmos support; `false` otherwise.
 	 */
-	public static inline function isDolbyAtmos():Bool
+	public static function isDolbyAtmos():Bool
 	{
-		return JNICache.createStaticMethod('org/haxe/extension/Tools', 'isDolbyAtmos', '()Z')();
+		final isDolbyAtmosJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'isDolbyAtmos', '()Z');
+
+		return isDolbyAtmosJNI != null && isDolbyAtmosJNI();
 	}
 
 	/**
@@ -135,21 +159,24 @@ class Tools
 	 * @param channelName Optional name of the notification channel.
 	 * @param ID Optional unique ID for the notification.
 	 */
-	public static inline function showNotification(title:String, message:String, ?channelID:String = 'unknown_channel',
-			?channelName:String = 'Unknown Channel', ?ID:Int = 1):Void
+	public static function showNotification(title:String, message:String, ?channelID:String = 'unknown_channel', ?channelName:String = 'Unknown Channel',
+			?ID:Int = 1):Void
 	{
-		JNICache.createStaticMethod('org/haxe/extension/Tools', 'showNotification',
-			'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V')(title, message, channelID, channelName, ID);
+		final showNotificationJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'showNotification',
+			'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
+
+		if (showNotificationJNI != null)
+			showNotificationJNI(title, message, channelID, channelName, ID);
 	}
 
 	/**
 	 * Retrieves the dimensions of display cutouts (notches) as an array of rectangles.
 	 *
-	 * On devices with Android 9.0 (Pie) or higher, this function returns the areas of the screen 
-	 * occupied by display cutouts, such as notches or camera holes. Each cutout is represented 
+	 * On devices with Android 9.0 (Pie) or higher, this function returns the areas of the screen
+	 * occupied by display cutouts, such as notches or camera holes. Each cutout is represented
 	 * by a `lime.math.Rectangle` object indicating its position and size.
 	 *
-	 * @return An array of `lime.math.Rectangle` objects representing the cutout areas. If there 
+	 * @return An array of `lime.math.Rectangle` objects representing the cutout areas. If there
 	 *         are no cutouts or if the device does not support cutouts, an empty array is returned.
 	 */
 	public static function getCutoutDimensions():Array<Rectangle>
@@ -157,40 +184,38 @@ class Tools
 		final getCutoutDimensionsJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'getCutoutDimensions',
 			'()[Landroid/graphics/Rect;');
 
-		if (getCutoutDimensionsJNI != null)
+		if (getCutoutDimensionsJNI == null)
+			return [];
+
+		final topJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'top', 'I');
+		final leftJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'left', 'I');
+		final rightJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'right', 'I');
+		final bottomJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'bottom', 'I');
+
+		if (topJNI == null || leftJNI == null || rightJNI == null || bottomJNI == null)
+			return [];
+
+		final handles:Null<Array<Dynamic>> = getCutoutDimensionsJNI();
+
+		if (handles == null)
+			return [];
+
+		final rectangles:Array<Rectangle> = [];
+
+		for (handle in handles)
 		{
-			final rectangles:Array<Rectangle> = [];
+			if (handle == null)
+				continue;
 
-			for (rectangle in cast(getCutoutDimensionsJNI(), Array<Dynamic>))
-			{
-				if (rectangle == null) continue;
+			final top:Int = topJNI.get(handle);
+			final left:Int = leftJNI.get(handle);
+			final right:Int = rightJNI.get(handle);
+			final bottom:Int = bottomJNI.get(handle);
 
-				final topJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'top', 'I');
-				final leftJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'left', 'I');
-				final rightJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'right', 'I');
-				final bottomJNI:Null<JNIMemberField> = JNICache.createMemberField('android/graphics/Rect', 'bottom', 'I');
-
-				if (topJNI != null && leftJNI != null && rightJNI != null && bottomJNI != null)
-				{
-					final rectangle:Rectangle = new Rectangle();
-					rectangle.top = topJNI.get(rectangle);
-					rectangle.left = leftJNI.get(rectangle);
-					rectangle.right = rightJNI.get(rectangle);
-					rectangle.bottom = bottomJNI.get(rectangle);
-					rectangles.push(rectangle);
-
-					final top:Int = topJNI.get(rectangle);
-					final left:Int = leftJNI.get(rectangle);
-					final right:Int = rightJNI.get(rectangle);
-					final bottom:Int = bottomJNI.get(rectangle);
-					rectangles.push(new Rectangle(left, top, right - left, bottom - top));
-				}
-			}
-
-			return rectangles;
+			rectangles.push(new Rectangle(left, top, right - left, bottom - top));
 		}
 
-		return [];
+		return rectangles;
 	}
 
 	/**
@@ -199,17 +224,22 @@ class Tools
 	 * @param title The title to set for the activity.
 	 * @return `true` if the title was successfully set; `false` otherwise.
 	 */
-	public static inline function setActivityTitle(title:String):Bool
+	public static function setActivityTitle(title:String):Bool
 	{
-		return JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'setActivityTitle', '(Ljava/lang/String;)Z')(title);
+		final setActivityTitleJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'setActivityTitle', '(Ljava/lang/String;)Z');
+
+		return setActivityTitleJNI != null && setActivityTitleJNI(title);
 	}
 
 	/**
 	 * Minimizes the application's window.
 	 */
-	public static inline function minimizeWindow():Void
+	public static function minimizeWindow():Void
 	{
-		JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'minimizeWindow', '()V')();
+		final minimizeWindowJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'minimizeWindow', '()V');
+
+		if (minimizeWindowJNI != null)
+			minimizeWindowJNI();
 	}
 
 	/**
@@ -217,9 +247,11 @@ class Tools
 	 *
 	 * @return `true` if the device is running Android TV; `false` otherwise.
 	 */
-	public static inline function isAndroidTV():Bool
+	public static function isAndroidTV():Bool
 	{
-		return JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isAndroidTV', '()Z')();
+		final isAndroidTVJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isAndroidTV', '()Z');
+
+		return isAndroidTVJNI != null && isAndroidTVJNI();
 	}
 
 	/**
@@ -227,9 +259,11 @@ class Tools
 	 *
 	 * @return `true` if the device is a tablet; `false` otherwise.
 	 */
-	public static inline function isTablet():Bool
+	public static function isTablet():Bool
 	{
-		return JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isTablet', '()Z')();
+		final isTabletJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isTablet', '()Z');
+
+		return isTabletJNI != null && isTabletJNI();
 	}
 
 	/**
@@ -237,9 +271,11 @@ class Tools
 	 *
 	 * @return `true` if the device is a Chromebook; `false` otherwise.
 	 */
-	public static inline function isChromebook():Bool
+	public static function isChromebook():Bool
 	{
-		return JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isChromebook', '()Z')();
+		final isChromebookJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isChromebook', '()Z');
+
+		return isChromebookJNI != null && isChromebookJNI();
 	}
 
 	/**
@@ -247,9 +283,11 @@ class Tools
 	 *
 	 * @return `true` if the device is running in DeX Mode; `false` otherwise.
 	 */
-	public static inline function isDeXMode():Bool
+	public static function isDeXMode():Bool
 	{
-		return JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isDeXMode', '()Z')();
+		final isDeXModeJNI:Null<Dynamic> = JNICache.createStaticMethod('org/libsdl/app/SDLActivity', 'isDeXMode', '()Z');
+
+		return isDeXModeJNI != null && isDeXModeJNI();
 	}
 }
 
@@ -268,6 +306,7 @@ private typedef ButtonData =
 /**
  * Listener class for handling button click events in an alert dialog.
  */
+@:keep
 @:noCompletion
 private class ButtonListener #if !macro implements JNISafety #end
 {
@@ -280,10 +319,13 @@ private class ButtonListener #if !macro implements JNISafety #end
 	 */
 	public function new(clickCallback:Void->Void):Void
 	{
-		if (clickCallback != null) onClickEvent.add(clickCallback);
+		if (clickCallback != null)
+			onClickEvent.add(clickCallback);
 	}
 
+	#if !macro
 	@:runOnMainThread
+	#end
 	public function onClick():Void
 	{
 		onClickEvent.dispatch();

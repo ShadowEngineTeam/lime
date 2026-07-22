@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
+import android.media.AudioManager;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.net.Uri;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 import androidx.core.content.FileProvider;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.haxe.extension.Extension;
@@ -69,6 +71,16 @@ public class Tools extends Extension
 
 	public static HaxeObject cbObject;
 
+	public static HaxeObject audioFocusObject;
+
+	/**
+	 * Audio focus change listeners, keyed by the HaxeObject they report to.
+	 *
+	 * AudioManager matches a request to its abandon call by listener identity,
+	 * so the instance handed to requestAudioFocus has to be kept around.
+	 */
+	private static final Map<HaxeObject, AudioManager.OnAudioFocusChangeListener> audioFocusChangeListeners = new HashMap<>();
+
 	/**
 	 * Constant representing the event when the data folder is closed.
 	 */
@@ -82,6 +94,26 @@ public class Tools extends Extension
 	public static void initCallBack(final HaxeObject cbObject)
 	{
 		Tools.cbObject = cbObject;
+	}
+
+	/**
+	 * Initializes the callback object notified when the activity's audio focus changes.
+	 *
+	 * The activity itself owns audio focus, so this reports the focus changes it
+	 * receives rather than requesting focus separately.
+	 *
+	 * @param audioFocusObject The HaxeObject instance to handle audio focus callbacks.
+	 */
+	public static void initAudioFocusCallBack(final HaxeObject audioFocusObject)
+	{
+		Tools.audioFocusObject = audioFocusObject;
+	}
+
+	@Override
+	public void onAudioFocusChange(int focusChange)
+	{
+		if (audioFocusObject != null)
+			audioFocusObject.call1("onAudioFocusChange", focusChange);
 	}
 
 	/**
@@ -367,7 +399,7 @@ public class Tools extends Extension
 			{
 				if (Extension.mainActivity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
 					ungrantedPermissions.add(permission);
-        		}
+			}
 
 			if (!ungrantedPermissions.isEmpty())
 				Extension.mainActivity.requestPermissions(ungrantedPermissions.toArray(new String[0]), requestCode);
@@ -435,6 +467,7 @@ public class Tools extends Extension
 	 * @param channelName The name of the notification channel.
 	 * @param ID The ID of the notification.
 	 */
+	@SuppressWarnings("deprecation")
 	public static void showNotification(final String title, final String message, final String channelID, final String channelName, final int ID)
 	{
 		mainActivity.runOnUiThread(new Runnable()
@@ -628,6 +661,133 @@ public class Tools extends Extension
 	public static BatteryManager getBatteryManager()
 	{
 		return (BatteryManager) mainContext.getSystemService(Context.BATTERY_SERVICE);
+	}
+
+	/**
+	 * Adjusts the volume of a specified audio stream.
+	 *
+	 * @param streamType The type of audio stream to adjust (e.g., AudioManager.STREAM_MUSIC).
+	 * @param direction The direction to adjust the volume (e.g., AudioManager.ADJUST_RAISE, AudioManager.ADJUST_LOWER).
+	 * @param flags Additional operation flags (e.g., AudioManager.FLAG_SHOW_UI).
+	 */
+	public static void adjustStreamVolume(final int streamType, final int direction, final int flags)
+	{
+		try
+		{
+			final AudioManager audioManager = (AudioManager) mainContext.getSystemService(Context.AUDIO_SERVICE);
+
+			audioManager.adjustStreamVolume(streamType, direction, flags);
+		}
+		catch (Exception e)
+		{
+			Log.e(LOG_TAG, e.toString());
+		}
+	}
+
+	/**
+	 * Retrieves the current volume index for a specified audio stream.
+	 *
+	 * @param streamType The type of audio stream (e.g., AudioManager.STREAM_MUSIC).
+	 * @return The current volume index for the specified stream, or 0 if an error occurs.
+	 */
+	public static int getStreamVolume(final int streamType)
+	{
+		try
+		{
+			final AudioManager audioManager = (AudioManager) mainContext.getSystemService(Context.AUDIO_SERVICE);
+
+			return audioManager.getStreamVolume(streamType);
+		}
+		catch (Exception e)
+		{
+			Log.e(LOG_TAG, e.toString());
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Requests audio focus for a given stream and duration, and sets up a callback for focus changes.
+	 *
+	 * @param haxeCallbackObject The HaxeObject to receive audio focus change callbacks.
+	 * @param streamType The type of audio stream for which focus is requested.
+	 * @param durationHint The duration of the audio focus request (e.g., AudioManager.AUDIOFOCUS_GAIN).
+	 * @return The result of the audio focus request (e.g., AudioManager.AUDIOFOCUS_REQUEST_GRANTED or AUDIOFOCUS_REQUEST_FAILED).
+	 */
+	@SuppressWarnings("deprecation")
+	public static int requestAudioFocus(final HaxeObject haxeCallbackObject, final int streamType, final int durationHint)
+	{
+		try
+		{
+			final AudioManager audioManager = (AudioManager) mainContext.getSystemService(Context.AUDIO_SERVICE);
+
+			return audioManager.requestAudioFocus(getAudioFocusChangeListener(haxeCallbackObject), streamType, durationHint);
+		}
+		catch (Exception e)
+		{
+			Log.e(LOG_TAG, e.toString());
+		}
+
+		return AudioManager.AUDIOFOCUS_REQUEST_FAILED;
+	}
+
+	/**
+	 * Abandons audio focus for the given HaxeObject callback.
+	 *
+	 * @param haxeCallbackObject The HaxeObject that was used to request audio focus.
+	 * @return The result of the abandon audio focus request (e.g., AudioManager.AUDIOFOCUS_REQUEST_GRANTED or AUDIOFOCUS_REQUEST_FAILED).
+	 */
+	@SuppressWarnings("deprecation")
+	public static int abandonAudioFocus(final HaxeObject haxeCallbackObject)
+	{
+		try
+		{
+			final AudioManager audioManager = (AudioManager) mainContext.getSystemService(Context.AUDIO_SERVICE);
+
+			final AudioManager.OnAudioFocusChangeListener focusChangeListener = audioFocusChangeListeners.remove(haxeCallbackObject);
+
+			if (focusChangeListener == null)
+				return AudioManager.AUDIOFOCUS_REQUEST_FAILED;
+
+			return audioManager.abandonAudioFocus(focusChangeListener);
+		}
+		catch (Exception e)
+		{
+			Log.e(LOG_TAG, e.toString());
+		}
+
+		return AudioManager.AUDIOFOCUS_REQUEST_FAILED;
+	}
+
+	/**
+	 * Returns the listener registered for the given HaxeObject, creating it on first use.
+	 *
+	 * AudioManager matches focus requests to abandon calls by listener identity, so the
+	 * same instance has to be handed back for every call made with the same HaxeObject.
+	 *
+	 * @param haxeCallbackObject The HaxeObject to receive audio focus change callbacks.
+	 * @return The listener associated with the given HaxeObject.
+	 */
+	private static AudioManager.OnAudioFocusChangeListener getAudioFocusChangeListener(final HaxeObject haxeCallbackObject)
+	{
+		AudioManager.OnAudioFocusChangeListener focusChangeListener = audioFocusChangeListeners.get(haxeCallbackObject);
+
+		if (focusChangeListener == null)
+		{
+			focusChangeListener = new AudioManager.OnAudioFocusChangeListener()
+			{
+				@Override
+				public void onAudioFocusChange(int focusChange)
+				{
+					if (haxeCallbackObject != null)
+						haxeCallbackObject.call1("onAudioFocusChange", focusChange);
+				}
+			};
+
+			audioFocusChangeListeners.put(haxeCallbackObject, focusChangeListener);
+		}
+
+		return focusChangeListener;
 	}
 
 	@Override

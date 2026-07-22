@@ -37,6 +37,15 @@ public class Extension {
 		return true;
 
 	}
+
+
+	/**
+	 * Called when the audio focus of the activity changes, for example when a
+	 * phone call or another media app takes over playback.
+	 */
+	public void onAudioFocusChange (int focusChange) {
+
+	}
 	
 	
 	public boolean onBackPressed () {

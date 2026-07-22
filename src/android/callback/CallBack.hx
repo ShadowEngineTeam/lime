@@ -19,13 +19,13 @@ class CallBack
 	 * Event triggered when an activity result is received.
 	 * Handlers should expect a dynamic argument.
 	 */
-	public static var onActivityResult:Event<Dynamic->Void>;
+	public static var onActivityResult(default, null):Event<Dynamic->Void> = new Event<Dynamic->Void>();
 
 	/**
 	 * Event triggered when a permissions result is received.
 	 * Handlers should expect a dynamic argument.
 	 */
-	public static var onRequestPermissionsResult:Event<Dynamic->Void>;
+	public static var onRequestPermissionsResult(default, null):Event<Dynamic->Void> = new Event<Dynamic->Void>();
 
 	@:noCompletion
 	private static var initialized:Bool = false;
@@ -39,10 +39,12 @@ class CallBack
 		if (initialized)
 			return;
 
-		onActivityResult = new Event<Dynamic->Void>();
-		onRequestPermissionsResult = new Event<Dynamic->Void>();
+		final initCallBackJNI:Null<Dynamic> = JNICache.createStaticMethod('org/haxe/extension/Tools', 'initCallBack', '(Lorg/haxe/lime/HaxeObject;)V');
 
-		JNICache.createStaticMethod('org/haxe/extension/Tools', 'initCallBack', '(Lorg/haxe/lime/HaxeObject;)V')(new CallBackHandler());
+		if (initCallBackJNI == null)
+			return;
+
+		initCallBackJNI(new CallBackHandler());
 
 		initialized = true;
 	}
@@ -67,10 +69,8 @@ private class CallBackHandler #if !macro implements JNISafety #end
 	#end
 	public function onActivityResult(content:String):Void
 	{
-		if (CallBack.onActivityResult != null)
-		{
+		if (CallBack.onActivityResult != null && content != null)
 			CallBack.onActivityResult.dispatch(Json.parse(content.trim()));
-		}
 	}
 
 	/**
@@ -83,10 +83,8 @@ private class CallBackHandler #if !macro implements JNISafety #end
 	#end
 	public function onRequestPermissionsResult(content:String):Void
 	{
-		if (CallBack.onRequestPermissionsResult != null)
-		{
+		if (CallBack.onRequestPermissionsResult != null && content != null)
 			CallBack.onRequestPermissionsResult.dispatch(Json.parse(content.trim()));
-		}
 	}
 }
 #end

@@ -52,6 +52,8 @@
 			<dependency name="extension-api" path="dependencies/extension-api" if="android" />
 			<dependency name="androidtools" path="dependencies/androidtools" if="android" />
 
+			<config:android extension="org.haxe.extension.Tools" />
+
 			<config:android>
 				<manifest>
 					<uses-permission android:name="android.permission.WAKE_LOCK" />
