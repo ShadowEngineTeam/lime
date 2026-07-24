@@ -15,7 +15,7 @@
 
 	<set name="HXCPP_ANDROID_PLATFORM" value="26" if="android" />
 	<set name="PLATFORM_NUMBER" value="26" if="android" />
-	<set name="HXCPP_IOS_MIN_VERSION" value="11.0" if="iphone" />
+	<set name="HXCPP_IOS_MIN_VERSION" value="15.0" if="iphone" />
 	<setenv name="MACOSX_DEPLOYMENT_TARGET" value="12" if="mac" />
 
 	<set name="LIME_CAIRO" value="1" />

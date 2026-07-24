@@ -105,12 +105,13 @@
 			<dependency name="UIKit.framework" />
 
 			<config:ios class="Main.mm" />
+			<define name="HXCPP_IOS_MIN_VERSION" value="15.0" />
 		</section>
 
 		<ndll name="c++_shared" dir="dependencies" if="android" />
 
 		<section if="mac">
-			<define name="MACOSX_DEPLOYMENT_TARGET" value="12.0" unless="MACOSX_DEPLOYMENT_TARGET" />
+			<define name="MACOSX_DEPLOYMENT_TARGET" value="12" />
 			<setenv name="MACOSX_DEPLOYMENT_TARGET" value="${MACOSX_DEPLOYMENT_TARGET}" />
 		</section>
 
