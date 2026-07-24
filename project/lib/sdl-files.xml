@@ -48,7 +48,7 @@
 
             <section>
 
-                <compilerflag value="-Wno-deprecated-declarations" if="macos || android" />
+                <compilerflag value="-Wno-deprecated-declarations" if="macos || iphone || android" />
 
             </section>
 
