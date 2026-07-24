@@ -203,7 +203,6 @@
 			<compilerflag value="-DLIME_OPENGL_GL" if="windows || mac || linux" unless="linux HXCPP_ARMV7 || linux HXCPP_ARM64" />
 			<compilerflag value="-DLIME_OPENGL_GLES" if="android || linux HXCPP_ARMV7 || linux HXCPP_ARM64 || iphone" />
 			<compilerflag value="-DLIME_OPENGL" />
-			<compilerflag value="-DGLES_SILENCE_DEPRECATION" if="iphone" />
 
 			<file name="src/bindings/opengl/OpenGLBindings.cpp" />
 
