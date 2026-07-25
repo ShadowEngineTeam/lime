@@ -1837,7 +1837,7 @@ class ProjectXMLParser extends HXProject
 					{
 						var deployment = Std.parseFloat(substitute(element.att.deployment));
 
-						// If it is specified, assume the dev knows what he is doing!
+						// If it is specified, assume the dev knows what they are doing!
 						config.set("ios.deployment", deployment);
 					}
 
