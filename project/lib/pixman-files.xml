@@ -1,7 +1,7 @@
 <xml>
 	<!-- <set name="PIXMAN_ARM_SIMD" value="1" if="android || rpi" unless="HXCPP_ARMV7 || HXCPP_ARM64 || HXCPP_X86" /> -->
-	<set name="PIXMAN_ARM_NEON" value="1" if="HXCPP_ARMV7" unless="android || linux || mac || iphoneos || HXCPP_ARM64" />
-	<set name="PIXMAN_ARMA64_NEON" value="1" if="HXCPP_ARM64" unless="windows || android || mac || iphoneos || emscripten || HXCPP_ARMV7" />
+	<set name="PIXMAN_ARM_NEON" value="1" if="HXCPP_ARMV7" unless="HXCPP_ARM64" />
+	<set name="PIXMAN_ARMA64_NEON" value="1" if="HXCPP_ARM64" unless="HXCPP_ARMV7" />
 
 	<files id="native-toolkit-pixman">
 
