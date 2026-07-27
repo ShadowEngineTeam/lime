@@ -5,7 +5,7 @@
 
 	<files id="native-toolkit-pixman">
 
-		<compilerflag value="-fno-integrated-as" if="HXCPP_CLANG || NDKV20+" unless="apple || NDKV22+" />
+		<compilerflag value="-fno-integrated-as" if="linux || HXCPP_CLANG || NDKV20+" unless="apple || NDKV22+" />
 
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/pixman" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/pixman/pixman" />
