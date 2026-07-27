@@ -23,9 +23,11 @@
 		<compilerflag value="-msse2" if="linux || mac || mingw" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
 		<compilerflag value="-msse3" if="linux || mac || mingw" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
 		<compilerflag value="-mssse3" if="linux || mac || mingw" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+		<!--
 		<compilerflag value="-march=armv7-a" if="linux HXCPP_ARMV7 PIXMAN_ARM_NEON" />
 		<compilerflag value="-mfpu=neon" if="linux HXCPP_ARMV7 PIXMAN_ARM_NEON" />
 		<compilerflag value="-mfloat-abi=hard" if="linux HXCPP_ARMV7 PIXMAN_ARM_NEON" />
+		-->
 		<compilerflag value="-Wno-attributes" if="android" />
 		<compilerflag value="-Wno-tautological-constant-out-of-range-compare" if="apple" />
 
