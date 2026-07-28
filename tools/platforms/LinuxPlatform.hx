@@ -1,6 +1,5 @@
 package;
 
-import lime.tools.HashlinkHelper;
 import hxp.Haxelib;
 import hxp.HXML;
 import hxp.Path;
@@ -27,8 +26,6 @@ class LinuxPlatform extends PlatformTarget
 	private var executablePath:String;
 	private var is64:Bool;
 	private var isArm:Bool;
-	private var targetType:String;
-
 	public function new(command:String, _project:HXProject, targetFlags:Map<String, String>)
 	{
 		super(command, _project, targetFlags);
@@ -134,36 +131,7 @@ class LinuxPlatform extends PlatformTarget
 			}
 		}
 
-		if (project.targetFlags.exists("hl") || targetFlags.exists("hlc"))
-		{
-			targetType = "hl";
-			is64 = true;
-			var hlVer = project.haxedefs.get("hl-ver");
-			if (hlVer == null)
-			{
-				var hlPath = project.defines.get("HL_PATH");
-				if (hlPath == null)
-				{
-					// Haxe's default target version for HashLink may be
-					// different (newer even) than the build of HashLink that
-					// is bundled with Lime. if using Lime's bundled HashLink,
-					// set hl-ver to the correct version
-					project.haxedefs.set("hl-ver", HashlinkHelper.BUNDLED_HL_VER);
-				}
-			}
-		}
-		else
-		{
-			targetType = "cpp";
-		}
-
-		var defaultTargetDirectory = switch (targetType)
-		{
-			case "cpp": "linux";
-			case "hl": project.targetFlags.exists("hlc") ? "hlc" : targetType;
-			default: targetType;
-		}
-		targetDirectory = Path.combine(project.app.path, project.config.getString("linux.output-directory", defaultTargetDirectory));
+		targetDirectory = Path.combine(project.app.path, project.config.getString("linux.output-directory", "linux"));
 		targetDirectory = StringTools.replace(targetDirectory, "arch64", is64 ? "64" : "");
 		applicationDirectory = targetDirectory + "/bin/";
 		executablePath = Path.combine(applicationDirectory, project.app.file);
@@ -193,98 +161,52 @@ class LinuxPlatform extends PlatformTarget
 
 		for (ndll in project.ndlls)
 		{
-			if (targetType == "hl")
+			ProjectHelper.copyLibrary(project, ndll,
+				"Linux" + ((System.hostArchitecture == ARMV7 || System.hostArchitecture == ARM64) ? "Arm" : "") + (is64 ? "64" : ""), "", ".ndll",
+				applicationDirectory, project.debug);
+		}
+
+		var haxeArgs:Array<String> = [hxml];
+		var flags:Array<String> = [];
+
+		if (is64)
+		{
+			if (isArm)
 			{
-				ProjectHelper.copyLibrary(project, ndll, "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".hdll", applicationDirectory, project.debug, ".hdll");
+				haxeArgs.push("-D");
+				haxeArgs.push("HXCPP_ARM64");
+				flags.push("-DHXCPP_ARM64");
 			}
 			else
 			{
-				ProjectHelper.copyLibrary(project, ndll, "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".ndll", applicationDirectory, project.debug);
-			}
-		}
-
-		if (targetType == "hl")
-		{
-			System.runCommand("", "haxe", [hxml]);
-
-			if (noOutput) return;
-
-			HashlinkHelper.copyHashlink(project, targetDirectory, applicationDirectory, executablePath, is64, isArm);
-
-			if (project.targetFlags.exists("hlc"))
-			{
-				var compiler = project.targetFlags.exists("clang") ? "clang" : "gcc";
-				var command = [
-					compiler,
-					"-O3",
-					"-o",
-					executablePath,
-					"-std=c11",
-					"-Wl,-rpath,$ORIGIN",
-					"-I",
-					Path.combine(targetDirectory, "obj"),
-					Path.combine(targetDirectory, "obj/ApplicationMain.c"),
-					"-L",
-					applicationDirectory
-				];
-				for (file in System.readDirectory(applicationDirectory))
-				{
-					switch Path.extension(file)
-					{
-						case "so", "hdll":
-							// ensure the executable knows about every library
-							command.push("-l:" + Path.withoutDirectory(file));
-						default:
-					}
-				}
-				command.push("-lm");
-				System.runCommand("", command.shift(), command);
+				haxeArgs.push("-D");
+				haxeArgs.push("HXCPP_M64");
+				flags.push("-DHXCPP_M64");
 			}
 		}
 		else
 		{
-			var haxeArgs:Array<String> = [hxml];
-			var flags:Array<String> = [];
-
-			if (is64)
+			if (isArm)
 			{
-				if (isArm)
-				{
-					haxeArgs.push("-D");
-					haxeArgs.push("HXCPP_ARM64");
-					flags.push("-DHXCPP_ARM64");
-				}
-				else
-				{
-					haxeArgs.push("-D");
-					haxeArgs.push("HXCPP_M64");
-					flags.push("-DHXCPP_M64");
-				}
+				haxeArgs.push("-D");
+				haxeArgs.push("HXCPP_ARMV7");
+				flags.push("-DHXCPP_ARMV7");
 			}
 			else
 			{
-				if (isArm)
-				{
-					haxeArgs.push("-D");
-					haxeArgs.push("HXCPP_ARMV7");
-					flags.push("-DHXCPP_ARMV7");
-				}
-				else
-				{
-					haxeArgs.push("-D");
-					haxeArgs.push("HXCPP_M32");
-					flags.push("-DHXCPP_M32");
-				}
+				haxeArgs.push("-D");
+				haxeArgs.push("HXCPP_M32");
+				flags.push("-DHXCPP_M32");
 			}
-
-			System.runCommand("", "haxe", haxeArgs);
-
-			if (noOutput) return;
-
-			CPPHelper.compile(project, targetDirectory + "/obj", flags);
-
-			System.copyFile(targetDirectory + "/obj/ApplicationMain" + (project.debug ? "-debug" : ""), executablePath);
 		}
+
+		System.runCommand("", "haxe", haxeArgs);
+
+		if (noOutput) return;
+
+		CPPHelper.compile(project, targetDirectory + "/obj", flags);
+
+		System.copyFile(targetDirectory + "/obj/ApplicationMain" + (project.debug ? "-debug" : ""), executablePath);
 
 		if (System.hostPlatform != WINDOWS)
 		{
@@ -318,12 +240,8 @@ class LinuxPlatform extends PlatformTarget
 
 		var context = project.templateContext;
 
-		context.NEKO_FILE = targetDirectory + "/obj/ApplicationMain.n";
-		context.NODE_FILE = targetDirectory + "/bin/ApplicationMain.js";
-		context.HL_FILE = targetDirectory + "/obj/ApplicationMain" + (project.defines.exists("hlc") ? ".c" : ".hl");
 		context.CPP_DIR = targetDirectory + "/obj/";
 		context.BUILD_DIR = project.app.path + "/linux" + (isArm ? "arm" : "") + (is64 ? "64" : "");
-		context.WIN_ALLOW_SHADERS = false;
 
 		return context;
 	}
@@ -347,13 +265,7 @@ class LinuxPlatform extends PlatformTarget
 			var context = project.templateContext;
 			var hxml = HXML.fromString(context.HAXE_FLAGS);
 			hxml.addClassName(context.APP_MAIN);
-			switch (targetType)
-			{
-				case "hl":
-					hxml.hl = "_.hl";
-				default:
-					hxml.cpp = "_";
-			}
+			hxml.cpp = "_";
 			hxml.noOutput = true;
 			return hxml;
 		}
@@ -363,37 +275,24 @@ class LinuxPlatform extends PlatformTarget
 	{
 		var commands:Array<Array<String>> = [];
 
-		if (targetFlags.exists("hl") && System.hostArchitecture == X64)
+		if ((!targetFlags.exists("armv7") && project.architectures.indexOf(Architecture.ARM64) != -1) || targetFlags.exists("arm64"))
 		{
-			// TODO: Support single binary
-			commands.push(["-Dlinux", "-DHXCPP_M64", "-Dhashlink"]);
-		}
-		else
-		{
-			if ((!targetFlags.exists("armv7") && project.architectures.indexOf(Architecture.ARM64) != -1) || targetFlags.exists("arm64"))
-			{
-				commands.push(["-Dlinux", "-DHXCPP_ARM64"]);
-			}
-
-			if ((!targetFlags.exists("arm64") && project.architectures.indexOf(Architecture.ARMV7) != -1) || targetFlags.exists("armv7"))
-			{
-				commands.push(["-Dlinux", "-DHXCPP_ARMV7"]);
-			}
-
-			if (!targetFlags.exists("32") && project.architectures.indexOf(Architecture.X64) != -1)
-			{
-				commands.push(["-Dlinux", "-DHXCPP_M64"]);
-			}
-
-			if (!targetFlags.exists("64") && (command == "rebuild" || project.architectures.indexOf(Architecture.X86) != -1))
-			{
-				commands.push(["-Dlinux", "-DHXCPP_M32"]);
-			}
+			commands.push(["-Dlinux", "-DHXCPP_ARM64"]);
 		}
 
-		if (targetFlags.exists("hl"))
+		if ((!targetFlags.exists("arm64") && project.architectures.indexOf(Architecture.ARMV7) != -1) || targetFlags.exists("armv7"))
 		{
-			CPPHelper.rebuild(project, commands, null, "BuildHashlink.xml");
+			commands.push(["-Dlinux", "-DHXCPP_ARMV7"]);
+		}
+
+		if (!targetFlags.exists("32") && project.architectures.indexOf(Architecture.X64) != -1)
+		{
+			commands.push(["-Dlinux", "-DHXCPP_M64"]);
+		}
+
+		if (!targetFlags.exists("64") && (command == "rebuild" || project.architectures.indexOf(Architecture.X86) != -1))
+		{
+			commands.push(["-Dlinux", "-DHXCPP_M32"]);
 		}
 
 		CPPHelper.rebuild(project, commands);
@@ -438,7 +337,7 @@ class LinuxPlatform extends PlatformTarget
 		System.mkdir(applicationDirectory);
 
 		ProjectHelper.recursiveSmartCopyTemplate(project, "haxe", targetDirectory + "/haxe", context);
-		ProjectHelper.recursiveSmartCopyTemplate(project, targetType + "/hxml", targetDirectory + "/haxe", context);
+		ProjectHelper.recursiveSmartCopyTemplate(project, "cpp/hxml", targetDirectory + "/haxe", context);
 
 		copyProjectAssets(applicationDirectory);
 	}
