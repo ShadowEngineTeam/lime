@@ -283,11 +283,13 @@ class AndroidPlatform extends PlatformTarget
 			{
 				if (targetFlags.exists("bundle"))
 				{
-					outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory), Path.combine(project.config.getString("android.gradle-project-directory", "bin"), "app/build/outputs/bundle"));
+					outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory),
+						Path.combine(project.config.getString("android.gradle-project-directory", "bin"), "app/build/outputs/bundle"));
 				}
 				else
 				{
-					outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory), Path.combine(project.config.getString("android.gradle-project-directory", "bin"), "app/build/outputs/apk"));
+					outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory),
+						Path.combine(project.config.getString("android.gradle-project-directory", "bin"), "app/build/outputs/apk"));
 				}
 			}
 
@@ -307,7 +309,8 @@ class AndroidPlatform extends PlatformTarget
 		// modified more recently than the .hxml, then the .hxml cannot be
 		// considered valid anymore. it may cause errors in editors like vscode.
 		if (FileSystem.exists(path)
-			&& (project.projectFilePath == null || !FileSystem.exists(project.projectFilePath)
+			&& (project.projectFilePath == null
+				|| !FileSystem.exists(project.projectFilePath)
 				|| (FileSystem.stat(path).mtime.getTime() > FileSystem.stat(project.projectFilePath).mtime.getTime())))
 		{
 			return File.getContent(path);
@@ -362,11 +365,13 @@ class AndroidPlatform extends PlatformTarget
 		{
 			if (targetFlags.exists("bundle"))
 			{
-				outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory), Path.combine(project.config.getString("android.gradle-project-directory", "bin"), "app/build/outputs/bundle/" + build));
+				outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory),
+					Path.combine(project.config.getString("android.gradle-project-directory", "bin"), "app/build/outputs/bundle/" + build));
 			}
 			else
 			{
-				outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory), Path.combine(project.config.getString("android.gradle-project-directory", "bin"), "app/build/outputs/apk/" + build));
+				outputDirectory = Path.combine(FileSystem.fullPath(targetDirectory),
+					Path.combine(project.config.getString("android.gradle-project-directory", "bin"), "app/build/outputs/apk/" + build));
 			}
 		}
 
@@ -471,7 +476,13 @@ class AndroidPlatform extends PlatformTarget
 
 					var padContext:Dynamic = {};
 					padContext.ANDROID_PLAY_ASSETS_DELIVERY_PACK = asset.deliveryPackName;
-					System.copyFileTemplate(project.templatePaths, "android/asset-pack/build.gradle", targetDirectory + "/" + gradleProject + "/" + asset.deliveryPackName + "/build.gradle", padContext);
+					System.copyFileTemplate(project.templatePaths, "android/asset-pack/build.gradle",
+						targetDirectory
+						+ "/"
+						+ gradleProject
+						+ "/"
+						+ asset.deliveryPackName
+						+ "/build.gradle", padContext);
 
 					context.ANDROID_PLAY_ASSETS_DELIVERY_PACKS.push(asset.deliveryPackName);
 				}
@@ -609,9 +620,7 @@ class AndroidPlatform extends PlatformTarget
 					}
 				}
 			}
-			catch (e:Dynamic)
-			{
-			}
+			catch (e:Dynamic) {}
 		}
 
 		if (Reflect.hasField(context, "KEY_STORE")) context.KEY_STORE = StringTools.replace(context.KEY_STORE, "\\", "\\\\");
@@ -663,10 +672,10 @@ class AndroidPlatform extends PlatformTarget
 			{
 				ProjectHelper.recursiveSmartCopyDirectory(project, project.adaptiveIcon.path, destination + "/app/src/main/res/", context);
 				context.HAS_ICON = true;
-				context.ANDROID_APPLICATION.push({ key: "android:icon", value: "@mipmap/ic_launcher" });
+				context.ANDROID_APPLICATION.push({key: "android:icon", value: "@mipmap/ic_launcher"});
 				if (project.adaptiveIcon.hasRoundIcon)
 				{
-					context.ANDROID_APPLICATION.push({ key: "android:roundIcon", value: "@mipmap/ic_launcher_round" });
+					context.ANDROID_APPLICATION.push({key: "android:roundIcon", value: "@mipmap/ic_launcher_round"});
 				}
 			}
 			else
@@ -682,7 +691,7 @@ class AndroidPlatform extends PlatformTarget
 						&& !context.HAS_ICON)
 					{
 						context.HAS_ICON = true;
-						context.ANDROID_APPLICATION.push({ key: "android:icon", value: "@drawable/icon" });
+						context.ANDROID_APPLICATION.push({key: "android:icon", value: "@drawable/icon"});
 					}
 				}
 				IconHelper.createIcon(icons, 732, 412, sourceSet + "/res/drawable-xhdpi/ouya_icon.png");
@@ -774,7 +783,9 @@ class AndroidPlatform extends PlatformTarget
 				}
 				else
 				{
-					var path = Path.combine(asset.deliveryPackName != '' ? (outputDirectory + "/" + asset.deliveryPackName + "/src/main/assets/") : assetDirectory, asset.targetPath);
+					var path = Path.combine(asset.deliveryPackName != '' ? (outputDirectory + "/" + asset.deliveryPackName +
+						"/src/main/assets/") : assetDirectory,
+						asset.targetPath);
 					System.mkdir(Path.directory(path));
 					AssetHelper.copyAssetIfNewer(asset, path);
 				}
