@@ -26,10 +26,12 @@ class HashlinkHelper
 				Sys.exit(1);
 				"";
 		};
-		if(isArm) {
+		if (isArm)
+		{
 			bindir += "Arm";
 		}
-		if(is64) {
+		if (is64)
+		{
 			bindir += "64";
 		}
 

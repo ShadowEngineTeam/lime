@@ -685,8 +685,8 @@ class NativeCFFI
 		false));
 	private static var lime_window_set_visible = new cpp.Callable<cpp.Object->Bool->Bool>(cpp.Prime._loadPrime("lime", "lime_window_set_visible", "obb",
 		false));
-	private static var lime_window_set_always_on_top = new cpp.Callable<cpp.Object->Bool->Bool>(cpp.Prime._loadPrime("lime", "lime_window_set_always_on_top", "obb",
-		false));
+	private static var lime_window_set_always_on_top = new cpp.Callable<cpp.Object->Bool->Bool>(cpp.Prime._loadPrime("lime", "lime_window_set_always_on_top",
+		"obb", false));
 	private static var lime_window_warp_mouse = new cpp.Callable<cpp.Object->Int->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_window_warp_mouse",
 		"oiiv", false));
 	private static var lime_window_get_draw_scale = new cpp.Callable<cpp.Object->Float>(cpp.Prime._loadPrime("lime", "lime_window_get_draw_scale", "od",
@@ -697,24 +697,21 @@ class NativeCFFI
 		false));
 	private static var lime_window_event_manager_register = new cpp.Callable<cpp.Object->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime",
 		"lime_window_event_manager_register", "oov", false));
-	private static var lime_audio_decoder_open_file = new cpp.Callable<cpp.Object->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_audio_decoder_open_file",
-		"oio", false));
-	private static var lime_audio_decoder_open_bytes = new cpp.Callable<cpp.Object->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_audio_decoder_open_bytes",
-		"oio", false));
-	private static var lime_audio_decoder_info = new cpp.Callable<cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime",
-		"lime_audio_decoder_info", "oo", false));
-	private static var lime_audio_decoder_decode = new cpp.Callable<cpp.Object->cpp.Object->Int->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_audio_decoder_decode",
-		"ooiio", false));
-	private static var lime_audio_decoder_rewind = new cpp.Callable<cpp.Object->Bool>(cpp.Prime._loadPrime("lime",
-		"lime_audio_decoder_rewind", "ob", false));
-	private static var lime_audio_decoder_seek = new cpp.Callable<cpp.Object->Int->Int->Bool>(cpp.Prime._loadPrime("lime",
-		"lime_audio_decoder_seek", "oiib", false));
-	private static var lime_audio_decoder_can_seek = new cpp.Callable<cpp.Object->Bool>(cpp.Prime._loadPrime("lime",
-		"lime_audio_decoder_can_seek", "ob", false));
-	private static var lime_audio_decoder_tell = new cpp.Callable<cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime",
-		"lime_audio_decoder_tell", "oo", false));
-	private static var lime_audio_decoder_total = new cpp.Callable<cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime",
-		"lime_audio_decoder_total", "oo", false));
+	private static var lime_audio_decoder_open_file = new cpp.Callable<cpp.Object->Int->cpp.Object>(cpp.Prime._loadPrime("lime",
+		"lime_audio_decoder_open_file", "oio", false));
+	private static var lime_audio_decoder_open_bytes = new cpp.Callable<cpp.Object->Int->cpp.Object>(cpp.Prime._loadPrime("lime",
+		"lime_audio_decoder_open_bytes", "oio", false));
+	private static var lime_audio_decoder_info = new cpp.Callable<cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_audio_decoder_info", "oo", false));
+	private static var lime_audio_decoder_decode = new cpp.Callable<cpp.Object->cpp.Object->Int->Int->cpp.Object>(cpp.Prime._loadPrime("lime",
+		"lime_audio_decoder_decode", "ooiio", false));
+	private static var lime_audio_decoder_rewind = new cpp.Callable<cpp.Object->Bool>(cpp.Prime._loadPrime("lime", "lime_audio_decoder_rewind", "ob", false));
+	private static var lime_audio_decoder_seek = new cpp.Callable<cpp.Object->Int->Int->Bool>(cpp.Prime._loadPrime("lime", "lime_audio_decoder_seek", "oiib",
+		false));
+	private static var lime_audio_decoder_can_seek = new cpp.Callable<cpp.Object->Bool>(cpp.Prime._loadPrime("lime", "lime_audio_decoder_can_seek", "ob",
+		false));
+	private static var lime_audio_decoder_tell = new cpp.Callable<cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_audio_decoder_tell", "oo", false));
+	private static var lime_audio_decoder_total = new cpp.Callable<cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_audio_decoder_total", "oo",
+		false));
 	private static var lime_zlib_compress = new cpp.Callable<cpp.Object->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_zlib_compress", "ooo",
 		false));
 	private static var lime_zlib_decompress = new cpp.Callable<cpp.Object->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_zlib_decompress", "ooo",
@@ -1576,7 +1573,10 @@ class NativeCFFI
 		return 0;
 	}
 
-	@:hlNative("lime", "hl_window_get_opacity") private static function lime_window_get_opacity(handle:CFFIPointer):Float { return 0.0; }
+	@:hlNative("lime", "hl_window_get_opacity") private static function lime_window_get_opacity(handle:CFFIPointer):Float
+	{
+		return 0.0;
+	}
 
 	@:hlNative("lime", "hl_window_set_opacity") private static function lime_window_set_opacity(handle:CFFIPointer, value:Float):Void {}
 
