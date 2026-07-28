@@ -26,6 +26,7 @@ class LinuxPlatform extends PlatformTarget
 	private var executablePath:String;
 	private var is64:Bool;
 	private var isArm:Bool;
+
 	public function new(command:String, _project:HXProject, targetFlags:Map<String, String>)
 	{
 		super(command, _project, targetFlags);
@@ -115,7 +116,9 @@ class LinuxPlatform extends PlatformTarget
 
 		for (architecture in project.architectures)
 		{
-			if (!targetFlags.exists("32") && !targetFlags.exists("x86_32") && architecture == Architecture.X64)
+			if (!targetFlags.exists("32")
+				&& !targetFlags.exists("x86_32")
+				&& architecture == Architecture.X64)
 			{
 				is64 = true;
 			}

@@ -40,7 +40,11 @@ namespace lime {
 		if (flags & WINDOW_FLAG_MAXIMIZED) sdlWindowFlags |= SDL_WINDOW_MAXIMIZED;
 		if (flags & WINDOW_FLAG_ALWAYS_ON_TOP) sdlWindowFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
 
+		#ifdef LIME_OPENGL_GL
+		SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+		#else
 		SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		#endif
 
 		if (flags & WINDOW_FLAG_DEPTH_BUFFER) {
 
@@ -306,27 +310,27 @@ namespace lime {
 
 	void* SDLWindow::GetHandle () {
 
-		SDL_PropertiesID props = SDL_GetWindowProperties (sdlWindow);
+		SDL_PropertiesID props = SDL_GetWindowProperties(sdlWindow);
 
 		#if defined(SDL_VIDEO_DRIVER_WINDOWS)
 			void* hwnd = nullptr;
-			SDL_GetPointerProperty (props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, &hwnd);
+			SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, &hwnd);
 			return hwnd;
 		#elif defined(SDL_VIDEO_DRIVER_X11)
 			unsigned long x11win = 0;
-			SDL_GetNumberProperty (props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, &x11win);
+			SDL_GetNumberProperty(props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, &x11win);
 			return (void*)(uintptr_t)x11win;
 		#elif defined(SDL_VIDEO_DRIVER_WAYLAND)
 			void* wlSurface = nullptr;
-			SDL_GetPointerProperty (props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, &wlSurface);
+			SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, &wlSurface);
 			return wlSurface;
 		#elif defined(SDL_VIDEO_DRIVER_ANDROID)
 			void* native = nullptr;
-			SDL_GetPointerProperty (props, SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, &native);
+			SDL_GetPointerProperty(props, SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, &native);
 			return native;
 		#elif defined(SDL_VIDEO_DRIVER_COCOA)
 			void* cocoa = nullptr;
-			SDL_GetPointerProperty (props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, &cocoa);
+			SDL_GetPointerProperty(props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, &cocoa);
 			return cocoa;
 		#else
 			return nullptr;
@@ -602,7 +606,7 @@ namespace lime {
 
 		SDL_PixelFormat format = SDL_GetPixelFormatForMasks (imageBuffer->bitsPerPixel, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
-		SDL_Surface *surface = SDL_CreateSurfaceFrom (imageBuffer->width, imageBuffer->height, format, imageBuffer->data->buffer->b, imageBuffer->Stride ());
+		SDL_Surface *surface = SDL_CreateSurfaceFrom(imageBuffer->width, imageBuffer->height, format, imageBuffer->data->buffer->b, imageBuffer->Stride ());
 
 		if (surface) {
 
@@ -715,8 +719,7 @@ namespace lime {
 
 		}
 
-		SDL_SetTextInputArea (sdlWindow, &bounds, 0);
-
+		SDL_SetTextInputArea(sdlWindow, &bounds, 0);
 	}
 
 
