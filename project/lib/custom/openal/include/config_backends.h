@@ -1,6 +1,6 @@
 /* Define to 1 if the given backend is enabled, else 0 */
 
-if (defined(__linux__) && !defined(__ANDROID__))
+#if (defined(__linux__) && !defined(__ANDROID__))
 # define HAVE_ALSA 1
 # define HAVE_OSS 1
 # define HAVE_PIPEWIRE 1
