@@ -274,6 +274,19 @@ namespace lime {
 			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
 
 				ProcessWindowEvent(event);
+
+				SDL_Event event;
+
+				if (SDL_PollEvent(&event)) {
+
+					if (event.type != SDL_EVENT_QUIT) {
+
+						HandleEvent(&event);
+
+					}
+
+				}
+
 				break;
 
 			case SDL_EVENT_QUIT:
