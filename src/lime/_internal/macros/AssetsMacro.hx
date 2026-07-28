@@ -43,18 +43,17 @@ class AssetsMacro
 			}
 		}
 
-		var superCall = Context.defined("html5") ? macro super(bytes.b.buffer)
-			: Context.defined("hl") ? macro super(bytes.b, bytes.length)
-			: macro super(bytes.length, bytes.b);
+		var superCall = Context.defined("html5") ? macro super(bytes.b.buffer) : Context.defined("hl") ? macro super(bytes.b,
+			bytes.length) : macro super(bytes.length, bytes.b);
 
 		var definition = macro class Temp
-		{
-			public function new(?length:Int, ?bytesData:haxe.io.BytesData)
 			{
-				var bytes = haxe.Resource.getBytes(resourceName);
-				$superCall;
-			}
-		};
+				public function new(?length:Int, ?bytesData:haxe.io.BytesData)
+				{
+					var bytes = haxe.Resource.getBytes(resourceName);
+					$superCall;
+				}
+			};
 
 		fields.push(definition.fields[0]);
 
@@ -67,15 +66,15 @@ class AssetsMacro
 		if (fields == null) return null;
 
 		var definition = macro class Temp
-		{
-			public function new(?length:Int = 0)
 			{
-				super();
+				public function new(?length:Int = 0)
+				{
+					super();
 
-				var bytes = haxe.Resource.getBytes(resourceName);
-				__fromBytes(bytes);
-			}
-		};
+					var bytes = haxe.Resource.getBytes(resourceName);
+					__fromBytes(bytes);
+				}
+			};
 
 		fields.push(definition.fields[0]);
 
@@ -114,11 +113,7 @@ class AssetsMacro
 					}
 
 					var bytes = File.getBytes(path);
-					var resourceName = "__ASSET__"
-						+ metaName
-						+ "_"
-						+ (classType.pack.length > 0 ? classType.pack.join("_") + "_" : "")
-						+ classType.name;
+					var resourceName = "__ASSET__" + metaName + "_" + (classType.pack.length > 0 ? classType.pack.join("_") + "_" : "") + classType.name;
 
 					if (Context.getResources().exists(resourceName))
 					{
@@ -139,9 +134,9 @@ class AssetsMacro
 						}
 
 						var definition = macro class Temp
-						{
-							private static inline var resourceType:String = $v{ resourceType };
-						};
+							{
+								private static inline var resourceType:String = $v{resourceType};
+							};
 
 						fields.push(definition.fields[0]);
 
@@ -154,9 +149,9 @@ class AssetsMacro
 					}
 
 					var definition = macro class Temp
-					{
-						private static inline var resourceName:String = $v{ resourceName };
-					};
+						{
+							private static inline var resourceName:String = $v{resourceName};
+						};
 
 					fields.push(definition.fields[0]);
 
@@ -228,16 +223,16 @@ class AssetsMacro
 			}
 
 			var definition = macro class Temp
-			{
-				private static var resourceName:String = $v{ resourceName };
-
-				public function new()
 				{
-					super();
+					private static var resourceName:String = $v{resourceName};
 
-					__fromBytes(haxe.Resource.getBytes(resourceName));
-				}
-			};
+					public function new()
+					{
+						super();
+
+						__fromBytes(haxe.Resource.getBytes(resourceName));
+					}
+				};
 
 			fields.push(definition.fields[0]);
 			fields.push(definition.fields[1]);
@@ -257,56 +252,53 @@ class AssetsMacro
 		if (Context.defined("html5"))
 		{
 			definition = macro class Temp
-			{
-				public static var preload:js.html.Image;
-
-				public function new(?buffer:lime.graphics.ImageBuffer,
-					?offsetX:Int, ?offsetY:Int, ?width:Int, ?height:Int,
-					?color:Null<Int>, ?type:lime.graphics.ImageType,
-					?onload:Dynamic = true)
 				{
-					super();
+					public static var preload:js.html.Image;
 
-					if (preload != null)
+					public function new(?buffer:lime.graphics.ImageBuffer, ?offsetX:Int, ?offsetY:Int, ?width:Int, ?height:Int, ?color:Null<Int>,
+							?type:lime.graphics.ImageType, ?onload:Dynamic = true)
 					{
-						var buffer = new lime.graphics.ImageBuffer();
-						buffer.__srcImage = preload;
-						buffer.width = preload.width;
-						buffer.width = preload.height;
+						super();
 
-						__fromImageBuffer(buffer);
-					}
-					else
-					{
-						__fromBase64(haxe.Resource.getString(resourceName), resourceType, function(image)
+						if (preload != null)
 						{
-							if (preload == null)
-							{
-								preload = image.buffer.__srcImage;
-							}
+							var buffer = new lime.graphics.ImageBuffer();
+							buffer.__srcImage = preload;
+							buffer.width = preload.width;
+							buffer.width = preload.height;
 
-							if (onload != null)
+							__fromImageBuffer(buffer);
+						}
+						else
+						{
+							__fromBase64(haxe.Resource.getString(resourceName), resourceType, function(image)
 							{
-								onload(image);
-							}
-						});
+								if (preload == null)
+								{
+									preload = image.buffer.__srcImage;
+								}
+
+								if (onload != null)
+								{
+									onload(image);
+								}
+							});
+						}
 					}
-				}
-			};
+				};
 		}
 		else
 		{
 			definition = macro class Temp
-			{
-				public function new(?buffer:lime.graphics.ImageBuffer,
-					?offsetX:Int, ?offsetY:Int, ?width:Int, ?height:Int,
-					?color:Null<Int>, ?type:lime.graphics.ImageType)
 				{
-					super();
+					public function new(?buffer:lime.graphics.ImageBuffer, ?offsetX:Int, ?offsetY:Int, ?width:Int, ?height:Int, ?color:Null<Int>,
+							?type:lime.graphics.ImageType)
+					{
+						super();
 
-					__fromBytes(haxe.Resource.getBytes(resourceName), null);
-				}
-			};
+						__fromBytes(haxe.Resource.getBytes(resourceName), null);
+					}
+				};
 		}
 
 		for (field in definition.fields)
@@ -321,21 +313,18 @@ class AssetsMacro
 	{
 		var fields = embedData(":sound");
 		// CFFILoader.h(248) : NOT Implemented:api_buffer_data
-		if (fields == null || Context.defined("html5") || !Context.defined("openfl"))
-			return null;
+		if (fields == null || Context.defined("html5") || !Context.defined("openfl")) return null;
 
 		var definition = macro class Temp
-		{
-			public function new(?stream:openfl.net.URLRequest,
-				?context:openfl.media.SoundLoaderContext,
-				?forcePlayAsMusic:Bool = false)
 			{
-				super();
+				public function new(?stream:openfl.net.URLRequest, ?context:openfl.media.SoundLoaderContext, ?forcePlayAsMusic:Bool = false)
+				{
+					super();
 
-				var byteArray = openfl.utils.ByteArray.fromBytes(haxe.Resource.getBytes(resourceName));
-				loadCompressedDataFromByteArray(byteArray, byteArray.length, forcePlayAsMusic);
-			}
-		};
+					var byteArray = openfl.utils.ByteArray.fromBytes(haxe.Resource.getBytes(resourceName));
+					loadCompressedDataFromByteArray(byteArray, byteArray.length, forcePlayAsMusic);
+				}
+			};
 
 		fields.push(definition.fields[0]);
 

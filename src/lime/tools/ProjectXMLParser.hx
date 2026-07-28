@@ -574,7 +574,8 @@ class ProjectXMLParser extends HXProject
 				{
 					if (filter(file, ["*"], exclude.split("|")))
 					{
-						parseAssetsElementDirectory(path + "/" + file, targetPath + file, include, exclude, type, embed, library, glyphs, true, deliveryPackName);
+						parseAssetsElementDirectory(path + "/" + file, targetPath + file, include, exclude, type, embed, library, glyphs, true,
+							deliveryPackName);
 					}
 				}
 			}
@@ -1460,7 +1461,6 @@ class ProjectXMLParser extends HXProject
 					sources.push(path);
 
 				case "extension":
-
 					// deprecated
 
 				case "haxedef":
@@ -1562,7 +1562,6 @@ class ProjectXMLParser extends HXProject
 					parseModuleElement(element, extensionPath);
 
 				case "ssl":
-
 					// if (wantSslCertificate())
 					// parseSsl (element);
 
