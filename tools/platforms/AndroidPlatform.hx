@@ -163,8 +163,20 @@ class AndroidPlatform extends PlatformTarget
 		for (architecture in architectures)
 		{
 			var minSDKVer = project.config.getInt("android.minimum-sdk-version", 26);
-			var haxeParams = [hxml, "-D", "android", "-D", 'HXCPP_ANDROID_PLATFORM=$minSDKVer', "-D", 'PLATFORM=android-$minSDKVer'];
-			var cppParams = ["-Dandroid", '-DHXCPP_ANDROID_PLATFORM=$minSDKVer', '-DPLATFORM=android-$minSDKVer'];
+			var haxeParams = [
+				hxml,
+				"-D",
+				"android",
+				"-D",
+				'HXCPP_ANDROID_PLATFORM=$minSDKVer',
+				"-D",
+				'PLATFORM=android-$minSDKVer'
+			];
+			var cppParams = [
+				"-Dandroid",
+				'-DHXCPP_ANDROID_PLATFORM=$minSDKVer',
+				'-DPLATFORM=android-$minSDKVer'
+			];
 			var path = sourceSet + "/jniLibs/";
 			var suffix = ".so";
 
@@ -500,40 +512,56 @@ class AndroidPlatform extends PlatformTarget
 		context.ANDROID_GRADLE_PROPERTIES = project.config.getKeyValueArray("android.gradle-properties");
 		context.ANDROID_DISPLAY_CUTOUT = project.config.getString("android.layoutInDisplayCutoutMode", "shortEdges");
 
-		context.ANDROID_MANIFEST = project.config.getKeyValueArray("android.manifest", {
-			"android:versionCode": project.meta.buildNumber,
-			"android:versionName": project.meta.version,
-			"android:installLocation": project.config.getString("android.install-location", "auto")
-		});
+		context.ANDROID_MANIFEST = project.config.getKeyValueArray("android.manifest",
+			{
+				"android:versionCode": project.meta.buildNumber,
+				"android:versionName": project.meta.version,
+				"android:installLocation": project.config.getString("android.install-location", "auto")
+			});
 		context.ANDROID_MANIFEST_CHILDREN = project.config.get("android.manifest").xmlChildren;
-		context.ANDROID_APPLICATION = project.config.getKeyValueArray("android.application", {
-			"android:label": project.meta.title,
-			"android:allowBackup": "true",
-			"android:allowAudioPlaybackCapture": "true",
-			"android:theme": "@style/LimeAppMainTheme" + (project.window.fullscreen ? "Fullscreen" : ""),
-			"android:enableOnBackInvokedCallback": "false",
-			"android:hardwareAccelerated": "true",
-			"android:allowNativeHeapPointerTagging": context.ANDROID_TARGET_SDK_VERSION >= 30 ? "false" : null,
-			"android:requestLegacyExternalStorage": context.ANDROID_TARGET_SDK_VERSION >= 29 ? "true" : null,
-			"android:preserveLegacyExternalStorage": context.ANDROID_TARGET_SDK_VERSION >= 30 ? "true" : null,
-			"android:largeHeap": "true",
-			"android:isGame": "true",
-			"android:appCategory": "game"
-		});
+		context.ANDROID_APPLICATION = project.config.getKeyValueArray("android.application",
+			{
+				"android:label": project.meta.title,
+				"android:allowBackup": "true",
+				"android:allowAudioPlaybackCapture": "true",
+				"android:theme": "@style/LimeAppMainTheme" + (project.window.fullscreen ? "Fullscreen" : ""),
+				"android:enableOnBackInvokedCallback": "false",
+				"android:hardwareAccelerated": "true",
+				"android:allowNativeHeapPointerTagging": context.ANDROID_TARGET_SDK_VERSION >= 30 ? "false" : null,
+				"android:requestLegacyExternalStorage": context.ANDROID_TARGET_SDK_VERSION >= 29 ? "true" : null,
+				"android:preserveLegacyExternalStorage": context.ANDROID_TARGET_SDK_VERSION >= 30 ? "true" : null,
+				"android:largeHeap": "true",
+				"android:isGame": "true",
+				"android:appCategory": "game"
+			});
 		context.ANDROID_APPLICATION_CHILDREN = project.config.get("android.application").xmlChildren;
-		context.ANDROID_ACTIVITY = project.config.getKeyValueArray("android.activity", {
-			"android:name": "MainActivity",
-			"android:exported": "true",
-			"android:alwaysRetainTaskState": "true",
-			"android:launchMode": "singleTop",
-			"android:preferMinimalPostProcessing": "true",
-			"android:label": project.meta.title,
-			"android:resizeableActivity": project.window.resizable,
-			"android:configChanges": project.config.getArrayString("android.configChanges",
-				["layoutDirection", "locale", "grammaticalGender", "fontScale", "fontWeightAdjustment", "orientation", "uiMode", "screenLayout", "screenSize", "smallestScreenSize", "keyboard", "keyboardHidden", "navigation"])
-				.join("|"),
-			"android:screenOrientation": project.window.orientation == PORTRAIT ? "sensorPortrait" : (project.window.orientation == LANDSCAPE ? "sensorLandscape" : null)
-		});
+		context.ANDROID_ACTIVITY = project.config.getKeyValueArray("android.activity",
+			{
+				"android:name": "MainActivity",
+				"android:exported": "true",
+				"android:alwaysRetainTaskState": "true",
+				"android:launchMode": "singleTop",
+				"android:preferMinimalPostProcessing": "true",
+				"android:label": project.meta.title,
+				"android:resizeableActivity": project.window.resizable,
+				"android:configChanges": project.config.getArrayString("android.configChanges",
+					[
+						"layoutDirection",
+						"locale",
+						"grammaticalGender",
+						"fontScale",
+						"fontWeightAdjustment",
+						"orientation",
+						"uiMode",
+						"screenLayout",
+						"screenSize",
+						"smallestScreenSize",
+						"keyboard",
+						"keyboardHidden",
+						"navigation"
+					]).join("|"),
+				"android:screenOrientation": project.window.orientation == PORTRAIT ? "sensorPortrait" : (project.window.orientation == LANDSCAPE ? "sensorLandscape" : null)
+			});
 		context.ANDROID_ACTIVITY_CHILDREN = project.config.get("android.activity").xmlChildren;
 		context.ANDROID_ACCEPT_FILE_INTENT = project.config.getArrayString("android.accept-file-intent", []);
 

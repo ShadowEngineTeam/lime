@@ -208,7 +208,11 @@ class WindowsPlatform extends PlatformTarget
 			}
 			else
 			{
-				copyIfNewer(Path.combine(dependency.path, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name + ".dll"), applicationDirectory + "/" + dependency.name + ".dll");
+				copyIfNewer(Path.combine(dependency.path, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name + ".dll"),
+					applicationDirectory
+					+ "/"
+					+ dependency.name
+					+ ".dll");
 			}
 		}
 
@@ -216,10 +220,8 @@ class WindowsPlatform extends PlatformTarget
 		{
 			if (targetType == "hl")
 			{
-				ProjectHelper.copyLibrary(project, ndll, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".hdll", applicationDirectory, project.debug,
-					".hdll");
-				ProjectHelper.copyLibrary(project, ndll, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".lib", applicationDirectory, project.debug,
-					".lib");
+				ProjectHelper.copyLibrary(project, ndll, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".hdll", applicationDirectory, project.debug, ".hdll");
+				ProjectHelper.copyLibrary(project, ndll, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".lib", applicationDirectory, project.debug, ".lib");
 			}
 			else
 			{
