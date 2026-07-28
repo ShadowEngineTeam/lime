@@ -10,20 +10,6 @@
 
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/mbedtls/include" />
 
-		<section if="HASHLINK_PATH">
-
-			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/hl-ssl" />
-
-			<section>
-
-				<compilerflag value="-DMBEDTLS_THREADING_C"  />
-				<compilerflag value="-DMBEDTLS_THREADING_PTHREAD" unless="windows" />
-				<compilerflag value="-DMBEDTLS_THREADING_ALT" if="windows" />
-
-			</section>
-
-		</section>
-
 		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/aes.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/aesni.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/arc4.c" />
@@ -64,7 +50,7 @@
 		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/memory_buffer_alloc.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/mps_reader.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/mps_trace.c" />
-		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/net_sockets.c" unless="HASHLINK_PATH" />
+		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/net_sockets.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/nist_kw.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/oid.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/mbedtls/library/padlock.c" />
