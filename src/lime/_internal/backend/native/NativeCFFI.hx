@@ -2048,6 +2048,7 @@ class NativeCFFI
 	private static var lime_cairo_pattern_set_matrix = CFFI.load("lime", "lime_cairo_pattern_set_matrix", 2);
 	private static var lime_cairo_surface_flush = CFFI.load("lime", "lime_cairo_surface_flush", 1);
 	#end
+	#end
 	#if (lime_cffi && !macro && (lime_opengl || lime_opengles))
 	#if cpp
 	#if disable_cffi
