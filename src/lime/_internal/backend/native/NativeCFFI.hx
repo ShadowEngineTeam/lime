@@ -882,8 +882,6 @@ class NativeCFFI
 	private static var lime_zlib_compress = CFFI.load("lime", "lime_zlib_compress", 2);
 	private static var lime_zlib_decompress = CFFI.load("lime", "lime_zlib_decompress", 2);
 	#end
-
-	#end
 	#end
 	#if (lime_cffi && !macro && android)
 	#if cpp

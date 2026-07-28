@@ -1947,14 +1947,6 @@ namespace lime {
 	}
 
 
-	HL_PRIM vbyte* HL_NAME(hl_window_get_context_type) (HL_CFFIPointer* window) {
-
-		Window* targetWindow = (Window*)window->ptr;
-		return (vbyte*)targetWindow->GetContextType ();
-
-	}
-
-
 	int lime_window_get_display (value window) {
 
 		Window* targetWindow = (Window*)val_data (window);
@@ -2258,14 +2250,6 @@ namespace lime {
 	}
 
 
-	HL_PRIM double HL_NAME(hl_window_get_draw_scale) (HL_CFFIPointer* window) {
-
-		Window* targetWindow = (Window*)window->ptr;
-		return targetWindow->GetDrawScale ();
-
-	}
-
-
 	int lime_window_get_native_width (value window) {
 
 		Window* targetWindow = (Window*)val_data (window);
@@ -2274,24 +2258,9 @@ namespace lime {
 	}
 
 
-	HL_PRIM int HL_NAME(hl_window_get_native_width) (HL_CFFIPointer* window) {
-
-		Window* targetWindow = (Window*)window->ptr;
-		return targetWindow->GetNativeWidth ();
-
-	}
-
-
 	int lime_window_get_native_height (value window) {
 
 		Window* targetWindow = (Window*)val_data (window);
-		return targetWindow->GetNativeHeight ();
-
-	}
-
-	HL_PRIM int HL_NAME(hl_window_get_native_height) (HL_CFFIPointer* window) {
-
-		Window* targetWindow = (Window*)window->ptr;
 		return targetWindow->GetNativeHeight ();
 
 	}
