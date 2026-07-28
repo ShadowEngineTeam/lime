@@ -12,9 +12,6 @@ class CURLMulti
 	public var runningHandles(get, never):Int;
 
 	@:noCompletion private var handle:CFFIPointer;
-	#if hl
-	@:noCompletion private var infoObject:CURLMultiMessage;
-	#end
 
 	public function new(handle:CFFIPointer = null)
 	{
@@ -29,10 +26,7 @@ class CURLMulti
 			#end
 		}
 
-		#if hl
-		infoObject = new CURLMultiMessage(null, 0);
-		#end
-	}
+		}
 
 	public function addHandle(curl:CURL):CURLMultiCode
 	{
@@ -46,7 +40,7 @@ class CURLMulti
 	public function infoRead():CURLMultiMessage
 	{
 		#if (lime_cffi && lime_curl && !macro)
-		var msg:Dynamic = NativeCFFI.lime_curl_multi_info_read(handle #if hl, infoObject #end);
+		var msg:Dynamic = NativeCFFI.lime_curl_multi_info_read(handle);
 
 		if (msg != null)
 		{

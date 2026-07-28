@@ -187,13 +187,6 @@ class CURL
 				}
 
 			case CURLOption.HTTPHEADER:
-				#if hl
-				var headers:Array<String> = cast parameter;
-				var _headers = new hl.NativeArray<String>(headers.length);
-				for (i in 0...headers.length)
-					_headers[i] = headers[i];
-				parameter = _headers;
-				#end
 
 			default:
 		}

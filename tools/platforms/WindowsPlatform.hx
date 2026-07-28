@@ -1,6 +1,5 @@
 package;
 
-import lime.tools.HashlinkHelper;
 import hxp.Haxelib;
 import hxp.HXML;
 import hxp.Log;
@@ -33,7 +32,6 @@ class WindowsPlatform extends PlatformTarget
 	private var executablePath:String;
 	private var is64:Bool;
 	private var isArm:Bool;
-	private var targetType:String;
 	private var outputFile:String;
 
 	public function new(command:String, _project:HXProject, targetFlags:Map<String, String>)
@@ -126,37 +124,11 @@ class WindowsPlatform extends PlatformTarget
 			project.architectures.remove(excludeArchitecture);
 		}
 
-		if (project.targetFlags.exists("hl") || targetFlags.exists("hlc"))
-		{
-			targetType = "hl";
-			is64 = !project.flags.exists("32") && !project.flags.exists("x86_32");
-			var hlVer = project.haxedefs.get("hl-ver");
-			if (hlVer == null)
-			{
-				var hlPath = project.defines.get("HL_PATH");
-				if (hlPath == null)
-				{
-					// Haxe's default target version for HashLink may be
-					// different (newer even) than the build of HashLink that
-					// is bundled with Lime. if using Lime's bundled HashLink,
-					// set hl-ver to the correct version
-					project.haxedefs.set("hl-ver", HashlinkHelper.BUNDLED_HL_VER);
-				}
-			}
-		}
-		else
-		{
-			targetType = "cpp";
-		}
-
 		for (architecture in project.architectures)
 		{
 			if (architecture == Architecture.X64 || architecture == Architecture.ARM64)
 			{
-				if (targetType == "cpp")
-				{
-					is64 = true;
-				}
+				is64 = true;
 			}
 			if ((project.flags.exists("armv7") || architecture == Architecture.ARMV7)
 				|| (project.flags.exists("arm64") || architecture == Architecture.ARM64))
@@ -165,18 +137,12 @@ class WindowsPlatform extends PlatformTarget
 			}
 		}
 
-		if (targetType == "cpp" && (project.flags.exists("32") || project.flags.exists("x86_32")))
+		if (project.flags.exists("32") || project.flags.exists("x86_32"))
 		{
 			is64 = false;
 		}
 
-		var defaultTargetDirectory = switch (targetType)
-		{
-			case "cpp": "windows";
-			case "hl": project.targetFlags.exists("hlc") ? "hlc" : targetType;
-			default: targetType;
-		}
-		targetDirectory = Path.combine(project.app.path, project.config.getString("windows.output-directory", defaultTargetDirectory));
+		targetDirectory = Path.combine(project.app.path, project.config.getString("windows.output-directory", "windows"));
 		targetDirectory = StringTools.replace(targetDirectory, "arch64", is64 ? "64" : "");
 
 		applicationDirectory = targetDirectory + "/bin/";
@@ -218,169 +184,59 @@ class WindowsPlatform extends PlatformTarget
 
 		for (ndll in project.ndlls)
 		{
-			if (targetType == "hl")
+			ProjectHelper.copyLibrary(project, ndll, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".ndll", applicationDirectory, project.debug);
+		}
+
+		var haxeArgs = [hxml, "-D", "resourceFile=ApplicationMain.rc"];
+		var flags = ["-DresourceFile=ApplicationMain.rc"];
+
+		if (is64)
+		{
+			if (isArm)
 			{
-				ProjectHelper.copyLibrary(project, ndll, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".hdll", applicationDirectory, project.debug, ".hdll");
-				ProjectHelper.copyLibrary(project, ndll, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".lib", applicationDirectory, project.debug, ".lib");
+				haxeArgs.push("-D");
+				haxeArgs.push("HXCPP_ARM64");
+				flags.push("-DHXCPP_ARM64");
 			}
 			else
 			{
-				ProjectHelper.copyLibrary(project, ndll, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".ndll", applicationDirectory, project.debug);
-			}
-		}
-
-		if (targetType == "hl")
-		{
-			System.runCommand("", "haxe", [hxml]);
-
-			if (noOutput) return;
-
-			HashlinkHelper.copyHashlink(project, targetDirectory, applicationDirectory, executablePath, is64, isArm);
-
-			if (project.targetFlags.exists("hlc"))
-			{
-				var command:Array<String> = null;
-				if (project.targetFlags.exists("gcc"))
-				{
-					command = [
-						"gcc",
-						"-O3",
-						"-o",
-						executablePath,
-						"-std=c11",
-						"-Wl,-subsystem,windows",
-						"-I",
-						Path.combine(targetDirectory, "obj"),
-						Path.combine(targetDirectory, "obj/ApplicationMain.c"),
-						"C:/Windows/System32/dbghelp.dll"
-					];
-					for (file in System.readDirectory(applicationDirectory))
-					{
-						switch Path.extension(file)
-						{
-							case "dll", "hdll":
-								// ensure the executable knows about every library
-								command.push(file);
-							default:
-						}
-					}
-				}
-				else
-				{
-					// start by finding visual studio
-					var programFilesX86 = Sys.getEnv("ProgramFiles(x86)");
-					var vswhereCommand = programFilesX86 + "\\Microsoft Visual Studio\\Installer\\vswhere.exe";
-					var vswhereOutput = System.runProcess("", vswhereCommand, [
-						"-latest",
-						"-products",
-						"*",
-						"-requires",
-						"Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
-						"-property",
-						"installationPath"
-					]);
-					var visualStudioPath = StringTools.trim(vswhereOutput);
-					var vcvarsallPath = visualStudioPath + "\\VC\\Auxiliary\\Build\\vcvarsall.bat";
-					// this command sets up the environment variables and things that visual studio requires
-					var vcvarsallCommand = [vcvarsallPath, "x64"].map(function(arg:String):String
-					{
-						return ~/([&|\(\)<>\^ ])/g.replace(arg, "^$1");
-					});
-					// this command runs the cl.exe c compiler from visual studio
-					var clCommand = [
-						"cl.exe",
-						"/Ox",
-						"/Fe:" + executablePath,
-						"-I",
-						Path.combine(targetDirectory, "obj"),
-						Path.combine(targetDirectory, "obj/ApplicationMain.c")
-					];
-					for (file in System.readDirectory(applicationDirectory))
-					{
-						switch Path.extension(file)
-						{
-							case "lib":
-								// ensure the executable knows about every library
-								clCommand.push(file);
-							default:
-						}
-					}
-					clCommand.push("/link");
-					clCommand.push("/subsystem:windows");
-					clCommand = clCommand.map(function(arg:String):String
-					{
-						return ~/([&|\(\)<>\^ ])/g.replace(arg, "^$1");
-					});
-					// combine both commands into one
-					command = ["cmd.exe", "/s", "/c", vcvarsallCommand.join(" ") + " && " + clCommand.join(" ")];
-				}
-				System.runCommand("", command.shift(), command);
-			}
-
-			for (file in System.readDirectory(applicationDirectory))
-			{
-				switch Path.extension(file)
-				{
-					case "lib":
-						// lib files required only for hlc compilation
-						System.deleteFile(file);
-					default:
-				}
+				haxeArgs.push("-D");
+				haxeArgs.push("HXCPP_M64");
+				flags.push("-DHXCPP_M64");
 			}
 		}
 		else
 		{
-			var haxeArgs = [hxml, "-D", "resourceFile=ApplicationMain.rc"];
-			var flags = ["-DresourceFile=ApplicationMain.rc"];
-
-			if (is64)
+			if (isArm)
 			{
-				if (isArm)
-				{
-					haxeArgs.push("-D");
-					haxeArgs.push("HXCPP_ARM64");
-					flags.push("-DHXCPP_ARM64");
-				}
-				else
-				{
-					haxeArgs.push("-D");
-					haxeArgs.push("HXCPP_M64");
-					flags.push("-DHXCPP_M64");
-				}
+				haxeArgs.push("-D");
+				haxeArgs.push("HXCPP_ARMV7");
+				flags.push("-DHXCPP_ARMV7");
 			}
 			else
 			{
-				if (isArm)
-				{
-					haxeArgs.push("-D");
-					haxeArgs.push("HXCPP_ARMV7");
-					flags.push("-DHXCPP_ARMV7");
-				}
-				else
-				{
-					haxeArgs.push("-D");
-					haxeArgs.push("HXCPP_M32");
-					flags.push("-DHXCPP_M32");
-				}
-			}
-
-			if (!project.environment.exists("SHOW_CONSOLE"))
-			{
 				haxeArgs.push("-D");
-				haxeArgs.push("no_console");
-				flags.push("-Dno_console");
+				haxeArgs.push("HXCPP_M32");
+				flags.push("-DHXCPP_M32");
 			}
-
-			System.runCommand("", "haxe", haxeArgs);
-
-			if (noOutput) return;
-
-			IconHelper.createWindowsIcon(icons, Path.combine(targetDirectory + "/obj", "ApplicationMain.ico"));
-
-			CPPHelper.compile(project, targetDirectory + "/obj", flags);
-
-			System.copyFile(targetDirectory + "/obj/ApplicationMain" + (project.debug ? "-debug" : "") + ".exe", executablePath);
 		}
+
+		if (!project.environment.exists("SHOW_CONSOLE"))
+		{
+			haxeArgs.push("-D");
+			haxeArgs.push("no_console");
+			flags.push("-Dno_console");
+		}
+
+		System.runCommand("", "haxe", haxeArgs);
+
+		if (noOutput) return;
+
+		IconHelper.createWindowsIcon(icons, Path.combine(targetDirectory + "/obj", "ApplicationMain.ico"));
+
+		CPPHelper.compile(project, targetDirectory + "/obj", flags);
+
+		System.copyFile(targetDirectory + "/obj/ApplicationMain" + (project.debug ? "-debug" : "") + ".exe", executablePath);
 	}
 
 	public override function deploy():Void
@@ -404,32 +260,25 @@ class WindowsPlatform extends PlatformTarget
 	{
 		var context = project.templateContext;
 
-		if (targetType == "cpp")
+		if (context.APP_DESCRIPTION == null || context.APP_DESCRIPTION == "")
 		{
-			if (context.APP_DESCRIPTION == null || context.APP_DESCRIPTION == "")
-			{
-				context.APP_DESCRIPTION = project.meta.title;
-			}
-
-			if (context.APP_COPYRIGHT_YEARS == null || context.APP_COPYRIGHT_YEARS == "")
-			{
-				context.APP_COPYRIGHT_YEARS = Std.string(Date.now().getFullYear());
-			}
-
-			var versionParts = project.meta.version.split(".");
-
-			if (versionParts.length == 3)
-			{
-				versionParts.push("0");
-			}
-
-			context.FILE_VERSION = versionParts.join(".");
-			context.VERSION_NUMBER = versionParts.join(",");
+			context.APP_DESCRIPTION = project.meta.title;
 		}
 
-		context.NEKO_FILE = targetDirectory + "/obj/ApplicationMain.n";
-		context.NODE_FILE = targetDirectory + "/bin/ApplicationMain.js";
-		context.HL_FILE = targetDirectory + "/obj/ApplicationMain" + (project.defines.exists("hlc") ? ".c" : ".hl");
+		if (context.APP_COPYRIGHT_YEARS == null || context.APP_COPYRIGHT_YEARS == "")
+		{
+			context.APP_COPYRIGHT_YEARS = Std.string(Date.now().getFullYear());
+		}
+
+		var versionParts = project.meta.version.split(".");
+
+		if (versionParts.length == 3)
+		{
+			versionParts.push("0");
+		}
+
+		context.FILE_VERSION = versionParts.join(".");
+		context.VERSION_NUMBER = versionParts.join(",");
 		context.CPP_DIR = targetDirectory + "/obj";
 		context.BUILD_DIR = project.app.path + "/windows" + (isArm ? "arm" : "") + (is64 ? "64" : "");
 
@@ -455,13 +304,7 @@ class WindowsPlatform extends PlatformTarget
 			var context = project.templateContext;
 			var hxml = HXML.fromString(context.HAXE_FLAGS);
 			hxml.addClassName(context.APP_MAIN);
-			switch (targetType)
-			{
-				case "hl":
-					hxml.hl = "_.hl";
-				default:
-					hxml.cpp = "_";
-			}
+			hxml.cpp = "_";
 			hxml.noOutput = true;
 			return hxml;
 		}
@@ -495,11 +338,6 @@ class WindowsPlatform extends PlatformTarget
 				args.push("-Dno_shared_libs");
 			}
 
-			if (targetType == "hl")
-			{
-				args.push("-Dhashlink");
-			}
-
 			commands.push(args);
 		}
 
@@ -516,17 +354,7 @@ class WindowsPlatform extends PlatformTarget
 				args.push("-Dno_shared_libs");
 			}
 
-			if (targetType == "hl")
-			{
-				args.push("-Dhashlink");
-			}
-
 			commands.push(args);
-		}
-
-		if (targetFlags.exists("hl"))
-		{
-			CPPHelper.rebuild(project, commands, null, "BuildHashlink.xml");
 		}
 
 		CPPHelper.rebuild(project, commands);
@@ -591,12 +419,8 @@ class WindowsPlatform extends PlatformTarget
 		System.mkdir(applicationDirectory);
 
 		ProjectHelper.recursiveSmartCopyTemplate(project, "haxe", targetDirectory + "/haxe", context);
-		ProjectHelper.recursiveSmartCopyTemplate(project, targetType + "/hxml", targetDirectory + "/haxe", context);
-
-		if (targetType == "cpp")
-		{
-			ProjectHelper.recursiveSmartCopyTemplate(project, "windows/resource", targetDirectory + "/obj", context);
-		}
+		ProjectHelper.recursiveSmartCopyTemplate(project, "cpp/hxml", targetDirectory + "/haxe", context);
+		ProjectHelper.recursiveSmartCopyTemplate(project, "windows/resource", targetDirectory + "/obj", context);
 
 		copyProjectAssets(applicationDirectory);
 	}
