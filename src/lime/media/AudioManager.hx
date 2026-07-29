@@ -9,9 +9,6 @@ import lime.media.openal.ALC;
 import lime.media.openal.ALContext;
 import lime.media.openal.ALDevice;
 import lime.app.Application;
-#if (js && html5)
-import js.Browser;
-#end
 
 @:access(lime._internal.backend.native.NativeCFFI)
 @:access(lime.media.openal.ALDevice)

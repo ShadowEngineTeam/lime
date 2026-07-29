@@ -12,26 +12,19 @@ import lime.graphics.opengl.*;
 	code that should run on the majority of desktop and mobile platforms (when using
 	hardware acceleration).
 
-	Platforms supporting an OpenGL ES context are compatible with the Lime
-	`WebGLRenderContext` if you would prefer to write WebGL-style code, or support web
-	browsers with the same code.
-
 	You can convert from `lime.graphics.RenderContext`, `lime.graphics.OpenGLRenderContext`,
-	`lime.graphics.OpenGLES3RenderContext`, `lime.graphics.opengl.GL`, and can convert to
-	`lime.graphics.WebGLRenderContext` directly if desired:
+	`lime.graphics.OpenGLES3RenderContext`, `lime.graphics.opengl.GL` directly if desired:
 
 	```haxe
 	var gles2:OpenGLES2RenderContext = window.context;
 	var gles2:OpenGLES2RenderContext = gl;
 	var gles2:OpenGLES2RenderContext = gles3;
 	var gles2:OpenGLES2RenderContext = GL;
-
-	var webgl:WebGLRenderContext = gles2;
 	```
 **/
 @:forward(ACTIVE_ATTRIBUTES, ACTIVE_TEXTURE, ACTIVE_UNIFORMS, ALIASED_LINE_WIDTH_RANGE, ALIASED_POINT_SIZE_RANGE, ALPHA, ALPHA_BITS, ALWAYS, ARRAY_BUFFER,
 	ARRAY_BUFFER_BINDING, ATTACHED_SHADERS, BACK, BLEND, BLEND_COLOR, BLEND_DST_ALPHA, BLEND_DST_RGB, BLEND_EQUATION, BLEND_EQUATION_ALPHA,
-	BLEND_EQUATION_RGB, BLEND_SRC_ALPHA, BLEND_SRC_RGB, BLUE_BITS, BOOL, BOOL_VEC2, BOOL_VEC3, BOOL_VEC4, BROWSER_DEFAULT_WEBGL, BUFFER_SIZE, BUFFER_USAGE,
+	BLEND_EQUATION_RGB, BLEND_SRC_ALPHA, BLEND_SRC_RGB, BLUE_BITS, BOOL, BOOL_VEC2, BOOL_VEC3, BOOL_VEC4, BUFFER_SIZE, BUFFER_USAGE,
 	BYTE, CCW, CLAMP_TO_EDGE, COLOR_ATTACHMENT0, COLOR_BUFFER_BIT, COLOR_CLEAR_VALUE, COLOR_WRITEMASK, COMPILE_STATUS, COMPRESSED_TEXTURE_FORMATS,
 	CONSTANT_ALPHA, CONSTANT_COLOR, CULL_FACE, CULL_FACE_MODE, CURRENT_PROGRAM, CURRENT_VERTEX_ATTRIB, CW, DECR, DECR_WRAP, DELETE_STATUS, DEPTH_ATTACHMENT,
 	DEPTH_BITS, DEPTH_BUFFER_BIT, DEPTH_CLEAR_VALUE, DEPTH_COMPONENT, DEPTH_COMPONENT16, DEPTH_FUNC, DEPTH_RANGE, DEPTH_STENCIL, DEPTH_STENCIL_ATTACHMENT,
@@ -121,10 +114,7 @@ abstract OpenGLES2RenderContext(Dynamic) from Dynamic to Dynamic
 		return null;
 	}
 
-	@:from private static function fromWebGLRenderContext(gl:WebGLRenderContext):OpenGLES2RenderContext
-	{
-		return null;
-	}
+
 }
 #end
 #end

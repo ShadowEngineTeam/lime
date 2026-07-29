@@ -13,12 +13,6 @@ import lime.system.System;
 import lime.utils.Assets;
 import lime.utils.Log;
 import lime.utils.UInt8Array;
-#if (js && html5)
-import js.html.CanvasElement;
-import js.html.CanvasRenderingContext2D;
-import js.html.SpanElement;
-import js.Browser;
-#end
 #if (lime_cffi && !macro)
 import haxe.io.Path;
 #end
@@ -123,30 +117,12 @@ class Font
 
 		if (!__init)
 		{
-			#if js if (ascender == untyped js.Syntax.code("undefined")) #end ascender = 0;
-			#if js
-			if (descender == untyped js.Syntax.code("undefined"))
-			#end
+			ascender = 0;
 			descender = 0;
-			#if js
-			if (height == untyped js.Syntax.code("undefined"))
-			#end
 			height = 0;
-			#if js
-			if (numGlyphs == untyped js.Syntax.code("undefined"))
-			#end
 			numGlyphs = 0;
-			#if js
-			if (underlinePosition == untyped js.Syntax.code("undefined"))
-			#end
 			underlinePosition = 0;
-			#if js
-			if (underlineThickness == untyped js.Syntax.code("undefined"))
-			#end
 			underlineThickness = 0;
-			#if js
-			if (unitsPerEM == untyped js.Syntax.code("undefined"))
-			#end
 			unitsPerEM = 0;
 
 			if (__fontID != null)
@@ -264,12 +240,7 @@ class Font
 	 */
 	public static function loadFromName(path:String):Future<Font>
 	{
-		#if (js && html5)
-		var font = new Font();
-		return font.__loadFromName(path);
-		#else
 		return cast Future.withError("");
-		#end
 	}
 
 	/**
@@ -551,11 +522,7 @@ class Font
 				}
 			}
 
-			#if js
-			buffer.data = data.byteView;
-			#else
 			buffer.data = new UInt8Array(data);
-			#end
 
 			return map;
 		}
@@ -643,98 +610,9 @@ class Font
 	@:noCompletion private function __loadFromName(name:String):Future<Font>
 	{
 		var promise = new Promise<Font>();
-
-		#if (js && html5)
-		this.name = name;
-
-		var userAgent = Browser.navigator.userAgent.toLowerCase();
-		var isSafari = (userAgent.indexOf(" safari/") >= 0 && userAgent.indexOf(" chrome/") < 0);
-		var isUIWebView = ~/(iPhone|iPod|iPad).*AppleWebKit(?!.*Version)/i.match(userAgent);
-
-		if (!isSafari && !isUIWebView && untyped (Browser.document).fonts && untyped (Browser.document).fonts.load)
-		{
-			untyped (Browser.document).fonts.load("1em '" + name + "'").then(function(_)
-			{
-				promise.complete(this);
-			}, function(_)
-			{
-				Log.warn("Could not load web font \"" + name + "\"");
-				promise.complete(this);
-			});
-		}
-		else
-		{
-			var node1 = __measureFontNode("'" + name + "', sans-serif");
-			var node2 = __measureFontNode("'" + name + "', serif");
-
-			var width1 = node1.offsetWidth;
-			var width2 = node2.offsetWidth;
-
-			var interval = -1;
-			var timeout = 3000;
-			var intervalLength = 50;
-			var intervalCount = 0;
-			var loaded:Bool;
-			var timeExpired:Bool;
-
-			var checkFont = function()
-			{
-				intervalCount++;
-
-				loaded = (node1.offsetWidth != width1 || node2.offsetWidth != width2);
-				timeExpired = (intervalCount * intervalLength >= timeout);
-
-				if (loaded || timeExpired)
-				{
-					Browser.window.clearInterval(interval);
-					node1.parentNode.removeChild(node1);
-					node2.parentNode.removeChild(node2);
-					node1 = null;
-					node2 = null;
-
-					if (timeExpired)
-					{
-						Log.warn("Could not load web font \"" + name + "\"");
-					}
-
-					promise.complete(this);
-				}
-			}
-
-			interval = Browser.window.setInterval(checkFont, intervalLength);
-		}
-		#else
 		promise.error("");
-		#end
-
 		return promise.future;
 	}
-
-	#if (js && html5)
-	private static function __measureFontNode(fontFamily:String):SpanElement
-	{
-		var node:SpanElement = cast Browser.document.createElement("span");
-		node.setAttribute("aria-hidden", "true");
-		var text = Browser.document.createTextNode("BESbswy");
-		node.appendChild(text);
-		var style = node.style;
-		style.display = "block";
-		style.position = "absolute";
-		style.top = "-9999px";
-		style.left = "-9999px";
-		style.fontSize = "300px";
-		style.width = "auto";
-		style.height = "auto";
-		style.lineHeight = "normal";
-		style.margin = "0";
-		style.padding = "0";
-		style.fontVariant = "normal";
-		style.whiteSpace = "nowrap";
-		style.fontFamily = fontFamily;
-		Browser.document.body.appendChild(node);
-		return node;
-	}
-	#end
 
 	@:noCompletion private function __setSize(size:Int, dpi:Int = 72):Void
 	{

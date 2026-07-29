@@ -452,19 +452,11 @@ class AssetLibrary
 		{
 			var font:Font = Type.createInstance(classTypes.get(id), []);
 
-			#if (js && html5)
-			return font.__loadFromName(font.name);
-			#else
 			return Future.withValue(font);
-			#end
 		}
 		else
 		{
-			#if (js && html5)
-			return Font.loadFromName(getPath(id));
-			#else
 			return Font.loadFromFile(getPath(id));
-			#end
 		}
 	}
 
@@ -801,20 +793,7 @@ class AssetLibrary
 
 	@:noCompletion private function loadAudioBuffer_onError(id:String, message:Dynamic):Void
 	{
-		#if (js && html5)
-		if (message != null && message != "")
-		{
-			Log.warn("Could not load \"" + id + "\": " + Std.string(message));
-		}
-		else
-		{
-			Log.warn("Could not load \"" + id + "\"");
-		}
-
-		loadAudioBuffer_onComplete(id, new AudioBuffer());
-		#else
 		load_onError(id, message);
-		#end
 	}
 
 	@:noCompletion private function loadBytes_onComplete(id:String, bytes:Bytes):Void

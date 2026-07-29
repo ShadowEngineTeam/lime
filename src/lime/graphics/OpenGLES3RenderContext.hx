@@ -19,15 +19,9 @@ import lime.utils.Int32Array;
 	hardware acceleration), though support for OpenGL ES 3.0 features are more limited than
 	GLES2.
 
-	Platforms supporting an OpenGL ES 3.0 context are compatible with the Lime
-	`WebGLRenderContext` as well as the `WebGL2RenderContext` if you would prefer to write
-	WebGL-style code, or support web browsers with the same code. Be aware that not all
-	browsers support WebGL 2, so only plain WebGL might be available.
-
 	You can convert from `lime.graphics.RenderContext`, `lime.graphics.OpenGLRenderContext`,
-	`lime.graphics.opengl.GL`, and can convert to `lime.graphics.OpenGLES2RenderContext`,
-	`lime.graphics.WebGL2RenderContext` or `lime.graphics.WebGLRenderContext` directly
-	if desired:
+	`lime.graphics.opengl.GL`, and can convert to `lime.graphics.OpenGLES2RenderContext`
+	directly if desired:
 
 	```haxe
 	var gles3:OpenGLES3RenderContext = window.context;
@@ -35,8 +29,6 @@ import lime.utils.Int32Array;
 	var gles3:OpenGLES3RenderContext = GL;
 
 	var gles2:OpenGLES2RenderContext = gles3;
-	var webgl2:WebGL2RenderContext = gles3;
-	var webgl:WebGLRenderContext = gles3;
 	```
 **/
 @:forward
@@ -343,12 +335,7 @@ public var FRAMEBUFFER_BINDING(get, never):Int;
 public var RENDERBUFFER_BINDING(get, never):Int;
 public var MAX_RENDERBUFFER_SIZE(get, never):Int;
 public var INVALID_FRAMEBUFFER_OPERATION(get, never):Int;
-public var UNPACK_FLIP_Y_WEBGL(get, never):Int;
-public var UNPACK_PREMULTIPLY_ALPHA_WEBGL(get, never):Int;
-public var CONTEXT_LOST_WEBGL(get, never):Int;
-public var UNPACK_COLORSPACE_CONVERSION_WEBGL(get, never):Int;
-public var BROWSER_DEFAULT_WEBGL(get, never):Int;
-public var READ_BUFFER(get, never):Int;
+	public var READ_BUFFER(get, never):Int;
 public var UNPACK_ROW_LENGTH(get, never):Int;
 public var UNPACK_SKIP_ROWS(get, never):Int;
 public var UNPACK_SKIP_PIXELS(get, never):Int;
@@ -610,8 +597,7 @@ public var DEPTH_COMPONENT32F(get, never):Int;
 public var DEPTH32F_STENCIL8(get, never):Int;
 public var INVALID_INDEX(get, never):Int;
 public var TIMEOUT_IGNORED(get, never):Int;
-public var MAX_CLIENT_WAIT_TIMEOUT_WEBGL(get, never):Int;
-public var type(get, never):RenderContextType;
+	public var type(get, never):RenderContextType;
 public var version(get, never):Float;
 
 @:noCompletion private inline function get_EXTENSIONS():Int
@@ -1855,7 +1841,7 @@ public var version(get, never):Float;
 }
 
 @:noCompletion private inline function get_VERTEX_PROGRAM_POINT_SIZE():Int
-{#if (js && html5) return 0; #else return this.VERTEX_PROGRAM_POINT_SIZE; #end
+{return this.VERTEX_PROGRAM_POINT_SIZE;
 } // TODO
 
 @:noCompletion private inline function get_COMPILE_STATUS():Int
@@ -2071,31 +2057,6 @@ public var version(get, never):Float;
 @:noCompletion private inline function get_INVALID_FRAMEBUFFER_OPERATION():Int
 {
 	return this.INVALID_FRAMEBUFFER_OPERATION;
-}
-
-@:noCompletion private inline function get_UNPACK_FLIP_Y_WEBGL():Int
-{
-	return this.UNPACK_FLIP_Y_WEBGL;
-}
-
-@:noCompletion private inline function get_UNPACK_PREMULTIPLY_ALPHA_WEBGL():Int
-{
-	return this.UNPACK_PREMULTIPLY_ALPHA_WEBGL;
-}
-
-@:noCompletion private inline function get_CONTEXT_LOST_WEBGL():Int
-{
-	return this.CONTEXT_LOST_WEBGL;
-}
-
-@:noCompletion private inline function get_UNPACK_COLORSPACE_CONVERSION_WEBGL():Int
-{
-	return this.UNPACK_COLORSPACE_CONVERSION_WEBGL;
-}
-
-@:noCompletion private inline function get_BROWSER_DEFAULT_WEBGL():Int
-{
-	return this.BROWSER_DEFAULT_WEBGL;
 }
 
 @:noCompletion private inline function get_type():RenderContextType
@@ -3416,11 +3377,6 @@ public var version(get, never):Float;
 @:noCompletion private inline function get_TIMEOUT_IGNORED():Int
 {
 	return this.TIMEOUT_IGNORED;
-}
-
-@:noCompletion private inline function get_MAX_CLIENT_WAIT_TIMEOUT_WEBGL():Int
-{
-	return this.MAX_CLIENT_WAIT_TIMEOUT_WEBGL;
 }
 
 public inline function activeTexture(texture:Int):Void
@@ -4884,15 +4840,7 @@ abstract OpenGLES3RenderContext(Dynamic) from Dynamic to Dynamic
 		return null;
 	}
 
-	@:from private static function fromWebGLRenderContext(context:WebGLRenderContext):OpenGLES3RenderContext
-	{
-		return null;
-	}
 
-	@:from private static function fromWebGL2RenderContext(context:WebGL2RenderContext):OpenGLES3RenderContext
-	{
-		return null;
-	}
 }
 #end
 #end

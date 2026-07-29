@@ -37,8 +37,6 @@ class Base64
 
 		#if cpp
 		cpp.NativeArray.setSize(result, Math.ceil(numBytes / 3) * 2);
-		#elseif js
-		untyped (result).length = Math.ceil(numBytes / 3) * 2;
 		#end
 
 		var numBytesRead = 0;

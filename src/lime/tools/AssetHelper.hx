@@ -265,51 +265,13 @@ class AssetHelper
 				type: Std.string(asset.type)
 			};
 
-		if (project.target == HTML5)
+		if (asset.embed == true || asset.type == FONT)
 		{
-			if (asset.type == FONT)
-			{
-				assetData.className = "__ASSET__" + asset.flatName;
-				assetData.preload = true;
-			}
-			else
-			{
-				assetData.path = asset.resourceName;
-
-				if (asset.embed != false || (asset.library != null && libraries.exists(asset.library) && libraries[asset.library].preload))
-				{
-					assetData.preload = true;
-				}
-
-				if (asset.type == MUSIC || asset.type == SOUND)
-				{
-					var soundName = Path.withoutExtension(assetData.path);
-
-					if (!pathGroups.exists(soundName))
-					{
-						pathGroups.set(soundName, [assetData.path]);
-					}
-					else
-					{
-						pathGroups[soundName].push(assetData.path);
-						Reflect.deleteField(assetData, "preload");
-					}
-
-					Reflect.deleteField(assetData, "path");
-					assetData.pathGroup = pathGroups[soundName];
-				}
-			}
+			assetData.className = "__ASSET__" + asset.flatName;
 		}
 		else
 		{
-			if (asset.embed == true || asset.type == FONT)
-			{
-				assetData.className = "__ASSET__" + asset.flatName;
-			}
-			else
-			{
-				assetData.path = asset.resourceName;
-			}
+			assetData.path = asset.resourceName;
 		}
 
 		return assetData;
@@ -318,11 +280,6 @@ class AssetHelper
 	private static function getPackedAssetData(project:HXProject, output:FileOutput, pathGroups:Map<String, Array<String>>, libraries:Map<String, Library>,
 			library:Library, asset:Asset):Dynamic
 	{
-		if (project.target == HTML5 && (asset.type == MUSIC || asset.type == SOUND || asset.type == FONT))
-		{
-			return getAssetData(project, pathGroups, libraries, library.name, asset);
-		}
-
 		if (asset.type == TEMPLATE) return null;
 		if (asset.library == library.name || (asset.library == null && library.name == DEFAULT_LIBRARY_NAME))
 		{
@@ -341,14 +298,7 @@ class AssetHelper
 					position: output.tell()
 				};
 
-			if (project.target == HTML5 && asset.type == FONT)
-			{
-				assetData.className = "__ASSET__" + asset.flatName;
-				assetData.preload = true;
-			}
-			else
-			{
-				switch (library.type)
+			switch (library.type)
 				{
 					case "deflate", "zip":
 						if (asset.data != null)
@@ -390,12 +340,6 @@ class AssetHelper
 							input.close();
 						}
 				}
-			}
-
-			if (project.target == HTML5 && asset.type == IMAGE)
-			{
-				assetData.preload = true;
-			}
 
 			var position = output.tell();
 			assetData.length = position - assetData.position;
@@ -404,10 +348,7 @@ class AssetHelper
 
 			// asset.sourcePath = "";
 
-			if (project.target != HTML5 || asset.type != FONT)
-			{
-				asset.targetPath = null;
-			}
+			asset.targetPath = null;
 
 			asset.data = null;
 
@@ -593,7 +534,7 @@ class AssetHelper
 					manifest = createManifest(project, library.name != DEFAULT_LIBRARY_NAME ? library.name : null);
 					embed = false;
 
-					if (manifest.assets.length == 0 || (project.target == HTML5 && library.name == DEFAULT_LIBRARY_NAME))
+					if (manifest.assets.length == 0)
 					{
 						embed = true;
 					}

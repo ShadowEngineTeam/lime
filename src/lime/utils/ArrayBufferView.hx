@@ -1,8 +1,5 @@
 package lime.utils;
 
-#if (js && !doc_gen)
-typedef ArrayBufferView = #if haxe4 js.lib.ArrayBufferView #else js.html.ArrayBufferView #end;
-#else
 import lime.system.System;
 import lime.system.Endian;
 
@@ -401,7 +398,6 @@ class ArrayBufferView
 	}
 } // ArrayBufferView
 
-#end // !js
 @:noCompletion @:dox(hide) enum TAError
 {
 	RangeError;
@@ -421,7 +417,6 @@ class ArrayBufferView
 	var Float64 = 9;
 }
 
-#if (!js || doc_gen)
 @:noCompletion @:dox(hide) class ArrayBufferIO
 {
 	// 8
@@ -759,5 +754,4 @@ class ArrayBufferView
 		return _out < 0 ? 0 : _out;
 	} // _clamp
 }
-#else // #error "ArrayBufferIO is not used on js target, use DataView instead"
-#end // !js
+

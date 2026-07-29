@@ -4,7 +4,7 @@ import haxe.macro.Compiler;
 import haxe.Constraints.IMap;
 import lime.media.AudioBuffer;
 import lime.graphics.Image;
-#if !(macro || commonjs)
+#if !macro
 import lime._internal.macros.AssetsMacro;
 #end
 
@@ -22,7 +22,7 @@ class AssetCache
 		font = new Map<String, Dynamic /*Font*/>();
 		image = new Map<String, Image>();
 
-		#if (macro || commonjs || lime_disable_assets_version)
+		#if (macro || lime_disable_assets_version)
 		version = 0;
 		#elseif lime_assets_version
 		version = Std.parseInt(Compiler.getDefine("lime-assets-version"));

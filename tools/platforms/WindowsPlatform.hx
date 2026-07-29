@@ -13,7 +13,6 @@ import lime.tools.AssetType;
 import lime.tools.CPPHelper;
 import lime.tools.DeploymentHelper;
 import lime.tools.GUID;
-import lime.tools.HTML5Helper;
 import lime.tools.HXProject;
 import lime.tools.Icon;
 import lime.tools.IconHelper;

@@ -71,7 +71,7 @@ import lime.utils.Log;
 	{
 		if (work != null)
 		{
-			#if (lime_threads && !html5)
+			#if lime_threads
 			if (useThreads)
 			{
 				var promise = new Promise<T>();
@@ -197,7 +197,7 @@ import lime.utils.Log;
 	**/
 	public function ready(waitTime:Int = -1):Future<T>
 	{
-		#if (lime_threads && !html5)
+		#if lime_threads
 		if (isComplete || isError)
 		{
 			return this;
@@ -451,7 +451,7 @@ import lime.utils.Log;
 		threadPool.cancelJob(id);
 	}
 
-	#if (lime_threads && !html5)
+	#if lime_threads
 	@:allow(lime.app.Future)
 	private static function runSimpleJob<T>(work:Void->T, promise:Promise<T>):Void
 	{

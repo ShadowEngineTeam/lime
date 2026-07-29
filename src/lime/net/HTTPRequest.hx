@@ -176,9 +176,5 @@ public function load(uri:String = null):Future<T>
 	public function cancel():Void;
 }
 
-#if (js && html5)
-private typedef HTTPRequestBackend = lime._internal.backend.html5.HTML5HTTPRequest;
-#else
 private typedef HTTPRequestBackend = lime._internal.backend.native.NativeHTTPRequest;
-#end
 #end

@@ -11,45 +11,34 @@ class DefineMacro
 		if (!Context.defined("tools"))
 		{
 			Compiler.define("lime-shadow");
+			Compiler.define("native");
 
-			if (Context.defined("js"))
+			var cffi = (!Context.defined("nocffi") && !Context.defined("eval"));
+
+			if (Context.defined("ios") || Context.defined("android"))
 			{
-				Compiler.define("html5");
-				Compiler.define("web");
-				Compiler.define("lime-canvas");
-				Compiler.define("lime-dom");
-				Compiler.define("lime-howlerjs");
-				Compiler.define("lime-webgl");
+				Compiler.define("mobile");
+				if (cffi)
+					Compiler.define("lime-opengles");
 			}
 			else
 			{
-				Compiler.define("native");
-
-				var cffi = (!Context.defined("nocffi") && !Context.defined("eval"));
-
-				if (Context.defined("ios") || Context.defined("android"))
-				{
-					Compiler.define("mobile");
-					if (cffi) Compiler.define("lime-opengles");
-				}
-				else
-				{
-					Compiler.define("desktop");
-					if (cffi) Compiler.define("lime-opengl");
-				}
-
+				Compiler.define("desktop");
 				if (cffi)
-				{
-					Compiler.define("lime-cffi");
+					Compiler.define("lime-opengl");
+			}
 
-					Compiler.define("lime-openal");
-					Compiler.define("lime-cairo");
-					Compiler.define("lime-harfbuzz");
-				}
-				else
-				{
-					Compiler.define("disable-cffi");
-				}
+			if (cffi)
+			{
+				Compiler.define("lime-cffi");
+
+				Compiler.define("lime-openal");
+				Compiler.define("lime-cairo");
+				Compiler.define("lime-harfbuzz");
+			}
+			else
+			{
+				Compiler.define("disable-cffi");
 			}
 		}
 

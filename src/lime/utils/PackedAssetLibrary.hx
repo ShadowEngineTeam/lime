@@ -46,9 +46,6 @@ import lime.utils.Bytes;
 
 	public override function getAudioBuffer(id:String):AudioBuffer
 	{
-		#if (js && html5)
-		return super.getAudioBuffer(id);
-		#else
 		if (cachedAudioBuffers.exists(id))
 		{
 			return cachedAudioBuffers.get(id);
@@ -62,7 +59,6 @@ import lime.utils.Bytes;
 			else if (type == "zip" || type == "deflate") bytes = bytes.decompress(DEFLATE);
 			return AudioBuffer.fromBytes(bytes);
 		}
-		#end
 	}
 
 	public override function getBytes(id:String):Bytes
@@ -89,9 +85,6 @@ import lime.utils.Bytes;
 
 	public override function getFont(id:String):Font
 	{
-		#if (js && html5)
-		return super.getFont(id);
-		#else
 		if (cachedFonts.exists(id))
 		{
 			return cachedFonts.get(id);
@@ -105,7 +98,6 @@ import lime.utils.Bytes;
 			else if (type == "zip" || type == "deflate") bytes = bytes.decompress(DEFLATE);
 			return Font.fromBytes(bytes);
 		}
-		#end
 	}
 
 	public override function getImage(id:String):Image
@@ -265,9 +257,6 @@ import lime.utils.Bytes;
 
 	public override function loadAudioBuffer(id:String):Future<AudioBuffer>
 	{
-		#if (js && html5)
-		return super.loadAudioBuffer(id);
-		#else
 		if (cachedAudioBuffers.exists(id))
 		{
 			return Future.withValue(cachedAudioBuffers.get(id));
@@ -281,7 +270,6 @@ import lime.utils.Bytes;
 			else if (type == "zip" || type == "deflate") bytes = bytes.decompress(DEFLATE);
 			return Future.withValue(AudioBuffer.fromBytes(bytes));
 		}
-		#end
 	}
 
 	public override function loadBytes(id:String):Future<Bytes>
@@ -303,9 +291,6 @@ import lime.utils.Bytes;
 
 	public override function loadFont(id:String):Future<Font>
 	{
-		#if (js && html5)
-		return super.loadFont(id);
-		#else
 		if (cachedFonts.exists(id))
 		{
 			return Future.withValue(cachedFonts.get(id));
@@ -319,7 +304,6 @@ import lime.utils.Bytes;
 			else if (type == "zip" || type == "deflate") bytes = bytes.decompress(DEFLATE);
 			return Font.loadFromBytes(bytes);
 		}
-		#end
 	}
 
 	public static function loadFromBytes(bytes:Bytes, rootPath:String = null):Future<PackedAssetLibrary>

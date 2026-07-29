@@ -117,14 +117,12 @@ class NativeWindow
 		#end
 
 		context.gles2 = gl;
-		context.webgl = gl;
 		context.type = gl.type;
 		context.version = Std.string(gl.version);
 
 		if (gl.type == OPENGLES && gl.version >= 3)
 		{
 			context.gles3 = gl;
-			context.webgl2 = gl;
 		}
 
 		if (GL.context == null)
@@ -323,8 +321,8 @@ class NativeWindow
 
 		switch (parent.context.type)
 		{
-			case OPENGL, OPENGLES, WEBGL:
-				var gl = parent.context.webgl;
+		case OPENGL, OPENGLES:
+				var gl = parent.context.gl;
 				var windowWidth = Std.int(parent.__width * parent.__scale);
 				var windowHeight = Std.int(parent.__height * parent.__scale);
 
@@ -352,8 +350,6 @@ class NativeWindow
 
 				gl.readPixels(x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data);
 
-				#if !js // TODO
-
 				var rowLength = width * 4;
 				var srcPosition = (height - 1) * rowLength;
 				var destPosition = 0;
@@ -371,7 +367,6 @@ class NativeWindow
 					destPosition += rowLength;
 					srcPosition -= rowLength;
 				}
-				#end
 
 				imageBuffer = new ImageBuffer(data, width, height, 32, RGBA32);
 

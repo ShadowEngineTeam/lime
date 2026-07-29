@@ -18,7 +18,7 @@ import sys.thread.Thread;
 	  and progress notifications.
 
 	@see `ThreadPool` for more advanced threading capabilities, including thread
-	safety, HTML5 threads, and more robust handling of tasks.
+	safety and more robust handling of tasks.
 **/
 class BackgroundWorker
 {

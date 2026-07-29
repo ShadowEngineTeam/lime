@@ -10,20 +10,13 @@ import sys.thread.Thread;
 #elseif cpp
 import cpp.vm.Deque;
 import cpp.vm.Thread;
-#elseif html5
-import lime._internal.backend.html5.HTML5Thread as Thread;
-import lime._internal.backend.html5.HTML5Thread.Transferable;
-#if lime_threads_deque
-#error "lime_threads_deque is not yet supported in HTML5"
-#end
 #end
 import haxe.Exception;
 
 /**
 	A thread pool executes one or more functions asynchronously.
 
-	In multi-threaded mode, jobs run on background threads. In HTML5, this means
-	using web workers, which impose additional restrictions (see below). In
+	In multi-threaded mode, jobs run on background threads. In
 	single-threaded mode, jobs run between frames on the main thread. To avoid
 	blocking, these jobs should only do a small amount of work at a time.
 
@@ -46,12 +39,12 @@ import haxe.Exception;
 
 	Guidelines to make your code work on all targets and configurations:
 
-	- For thread safety and web worker compatibility, your work function should
+	- For thread safety, your work function should
 	  only return data through the `WorkOutput` object it receives.
-	- For web worker compatibility, you should only send data to your work
+	- You should only send data to your work
 	  function via the `State` object. But since this can be any object, you can
 	  put an arbitrary amount of data there.
-	- For web worker compatibility, your work function must be static, and you
+	- Your work function must be static, and you
 	  can't `bind()` any extra arguments.
 	- For single-threaded performance, your function should only do a small
 	  amount of work at a time. Store progress in the `State` object so you can
@@ -61,10 +54,7 @@ import haxe.Exception;
 **/
 class ThreadPool extends WorkOutput
 {
-	#if (haxe4 && lime_threads && !html5)
-	/**
-		A reference to the app's main thread, for use in `isMainThread()`.
-	**/
+	#if (haxe4 && lime_threads)
 	private static var __mainThread:Thread = Thread.current();
 	#end
 
@@ -93,9 +83,7 @@ class ThreadPool extends WorkOutput
 	**/
 	public static inline function isMainThread():Bool
 	{
-		#if (html5 && lime_threads)
-		return !Thread.current().isWorker();
-		#elseif (haxe4 && lime_threads)
+		#if (haxe4 && lime_threads)
 		return Thread.current() == __mainThread;
 		#else
 		return true;
@@ -229,8 +217,7 @@ class ThreadPool extends WorkOutput
 		times, even if there's no work to do. The threads won't spin up
 		immediately; only after enough calls to `run()`.
 		@param maxThreads The maximum number of threads that will run at once.
-		@param mode The mode jobs will run in by default. Defaults to
-		`SINGLE_THREADED` in HTML5 for backwards compatibility.
+		@param mode The mode jobs will run in by default.
 	**/
 	public function new(minThreads:Int = 0, maxThreads:Int = 1, mode:ThreadMode = null)
 	{
@@ -397,7 +384,7 @@ class ThreadPool extends WorkOutput
 
 		if (doWork == null)
 		{
-			if (__doWork == null #if html5 || mode == MULTI_THREADED #end)
+			if (__doWork == null)
 			{
 				throw "run() requires doWork argument.";
 			}
@@ -616,7 +603,7 @@ class ThreadPool extends WorkOutput
 		// @formatter:off
 		JSAsync.async({
 			var args:ThreadArguments = Thread.readMessage(true);
-			var output:WorkOutput = #if html5 new WorkOutput(MULTI_THREADED) #else args.output #end;
+			var output:WorkOutput = args.output;
 			#if lime_threads_deque
 			var jobQueue:JobQueue = args.queue;
 			#end
@@ -667,9 +654,6 @@ class ThreadPool extends WorkOutput
 				{
 					// Quit working.
 					output.sendThreadEvent({event: EXIT, threadID: args.threadID});
-					#if html5
-					Thread.current().destroy();
-					#end
 					return;
 				}
 
@@ -858,14 +842,8 @@ class ThreadPool extends WorkOutput
 
 		if (idleThreads > minThreads)
 		{
-			#if html5
-			threadData.thread.destroy();
-			__threads[threadID] = null;
-			__idleThreads--;
-			#else
 			threadData.thread.sendMessage({event: EXIT});
 			__queuedExitEvents++;
-			#end
 		}
 		#end
 	}
@@ -876,10 +854,6 @@ class ThreadPool extends WorkOutput
 		{
 			throw "Job " + job.id + " was already started!";
 		}
-
-		#if html5
-		job.doWork.makePortable();
-		#end
 
 		var threadEvent:ThreadEvent =
 			{
@@ -978,9 +952,7 @@ class ThreadPool extends WorkOutput
 
 		thread.sendMessage(
 			{
-				#if !html5
 				output: this,
-				#end
 				#if lime_threads_deque
 				queue: __multiThreadedQueue,
 				#end
@@ -1064,11 +1036,7 @@ private abstract PseudoEvent(ThreadPool) from ThreadPool
 			callback(state);
 		}
 
-		#if (lime_threads && html5)
-		this.__doWork = {func: callCallback};
-		#else
 		this.__doWork = callCallback;
-		#end
 	}
 
 	public inline function cancel():Void {}
@@ -1242,9 +1210,7 @@ private abstract JobQueue(Deque<ThreadEvent>) from Deque<ThreadEvent>
 
 private typedef ThreadArguments =
 {
-	#if !html5
 	var output:WorkOutput;
-	#end
 
 	#if lime_threads_deque
 	var queue:JobQueue;

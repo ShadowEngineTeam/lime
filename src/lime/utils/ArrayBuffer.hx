@@ -1,8 +1,5 @@
 package lime.utils;
 
-#if (js && !doc_gen)
-typedef ArrayBuffer = js.lib.ArrayBuffer;
-#else
 import haxe.io.Bytes;
 
 @:forward
@@ -46,4 +43,4 @@ abstract ArrayBuffer(Bytes) from Bytes to Bytes
 		}
 	}
 }
-#end // !js
+

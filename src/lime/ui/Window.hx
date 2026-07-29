@@ -8,9 +8,7 @@ import lime.graphics.RenderContextAttributes;
 import lime.math.Rectangle;
 import lime.system.Display;
 import lime.system.DisplayMode;
-#if (js && html5)
-import js.html.Element;
-#end
+
 #if openfl
 import openfl.display.Stage;
 #else
@@ -25,9 +23,7 @@ class Window
 	public var cursor(get, set):MouseCursor;
 	public var display(get, null):Display;
 	public var displayMode(get, set):DisplayMode;
-	#if (!lime_doc_gen || (js && html5))
-	public var element(default, null):#if (js && html5) Element #else Dynamic #end;
-	#end
+	public var element(default, null):Dynamic;
 	public var nativeHandle(get, null):Dynamic;
 
 	/**
@@ -151,7 +147,7 @@ class Window
 
 	@:allow(openfl.display.Stage)
 	@:allow(lime.app.Application)
-	@:allow(lime._internal.backend.html5.HTML5Window)
+	@:allow(lime._internal.backend.native.NativeWindow)
 	private var clickCount:Int = 0;
 
 	@:noCompletion private var __attributes:WindowAttributes;
@@ -174,41 +170,6 @@ class Window
 	@:noCompletion private var __maxWidth:Int = 0x7FFFFFFF;
 	@:noCompletion private var __maxHeight:Int = 0x7FFFFFFF;
 
-	#if commonjs
-	private static function __init__()
-	{
-		var p = untyped Window.prototype;
-		untyped Object.defineProperties(p,
-			{
-				"borderless": {get: p.get_borderless, set: p.set_borderless},
-				"cursor": {get: p.get_cursor, set: p.set_cursor},
-				"display": {get: p.get_display},
-				"displayMode": {get: p.get_displayMode, set: p.set_displayMode},
-				"frameRate": {get: p.get_frameRate, set: p.set_frameRate},
-				"fullscreen": {get: p.get_fullscreen, set: p.set_fullscreen},
-				"height": {get: p.get_height, set: p.set_height},
-				"nativeHeight": {get: p.get_nativeHeight},
-				"maxHeight": {get: p.get_maxHeight, set: p.set_maxHeight},
-				"maximized": {get: p.get_maximized, set: p.set_maximized},
-				"maxWidth": {get: p.get_maxWidth, set: p.set_maxWidth},
-				"minHeight": {get: p.get_minHeight, set: p.set_minHeight},
-				"minimized": {get: p.get_minimized, set: p.set_minimized},
-				"minWidth": {get: p.get_minWidth, set: p.set_minWidth},
-				"mouseLock": {get: p.get_mouseLock, set: p.set_mouseLock},
-				"resizable": {get: p.get_resizable, set: p.set_resizable},
-				"scale": {get: p.get_scale},
-				"drawScale": {get: p.get_drawScale},
-				"textInputEnabled": {get: p.get_textInputEnabled, set: p.set_textInputEnabled},
-				"title": {get: p.get_title, set: p.set_title},
-				"visible": {get: p.get_visible, set: p.set_visible},
-				"alwaysOnTop": {get: p.get_alwaysOnTop, set: p.set_alwaysOnTop},
-				"width": {get: p.get_width, set: p.set_width},
-				"nativeWidth": {get: p.get_nativeWidth},
-				"x": {get: p.get_x, set: p.set_y},
-				"y": {get: p.get_x, set: p.set_y}
-			});
-	}
-	#end
 
 	@:noCompletion private function new(application:Application, attributes:WindowAttributes)
 	{
@@ -617,8 +578,4 @@ class Window
 	}
 }
 
-#if (js && html5)
-@:noCompletion private typedef WindowBackend = lime._internal.backend.html5.HTML5Window;
-#else
 @:noCompletion private typedef WindowBackend = lime._internal.backend.native.NativeWindow;
-#end

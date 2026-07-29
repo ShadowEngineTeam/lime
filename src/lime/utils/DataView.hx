@@ -1,100 +1,6 @@
 package lime.utils;
 
 import lime.utils.ArrayBufferView;
-#if (js && !doc_gen)
-import js.lib.DataView as JSDataView;
-@:forward
-abstract DataView(JSDataView) from JSDataView to JSDataView to ArrayBufferView
-{
-	public inline function new(buffer:ArrayBuffer, byteOffset:Null<Int> = null, byteLength:Null<Int> = null)
-	{
-		if (byteOffset != null && byteLength == null) this = new JSDataView(buffer, byteOffset);
-		else if (byteOffset != null && byteLength != null) this = new JSDataView(buffer, byteOffset, byteLength);
-		else
-			this = new JSDataView(buffer);
-	}
-
-	public inline function getInt8(byteOffset:Int):Int
-	{
-		return this.getInt8(byteOffset);
-	}
-
-	public inline function getInt16(byteOffset:Int, ?littleEndian:Bool = true):Int
-	{
-		return this.getInt16(byteOffset, littleEndian);
-	}
-
-	public inline function getInt32(byteOffset:Int, ?littleEndian:Bool = true):Int
-	{
-		return this.getInt32(byteOffset, littleEndian);
-	}
-
-	public inline function getUint8(byteOffset:Int):UInt
-	{
-		return this.getUint8(byteOffset);
-	}
-
-	public inline function getUint16(byteOffset:Int, ?littleEndian:Bool = true):UInt
-	{
-		return this.getUint16(byteOffset, littleEndian);
-	}
-
-	public inline function getUint32(byteOffset:Int, ?littleEndian:Bool = true):UInt
-	{
-		return this.getUint32(byteOffset, littleEndian);
-	}
-
-	public inline function getFloat32(byteOffset:Int, ?littleEndian:Bool = true):Float
-	{
-		return this.getFloat32(byteOffset, littleEndian);
-	}
-
-	public inline function getFloat64(byteOffset:Int, ?littleEndian:Bool = true):Float
-	{
-		return this.getFloat64(byteOffset, littleEndian);
-	}
-
-	public inline function setInt8(byteOffset:Int, value:Int)
-	{
-		this.setInt8(byteOffset, value);
-	}
-
-	public inline function setInt16(byteOffset:Int, value:Int, ?littleEndian:Bool = true)
-	{
-		this.setInt16(byteOffset, value, littleEndian);
-	}
-
-	public inline function setInt32(byteOffset:Int, value:Int, ?littleEndian:Bool = true)
-	{
-		this.setInt32(byteOffset, value, littleEndian);
-	}
-
-	public inline function setUint8(byteOffset:Int, value:UInt)
-	{
-		this.setUint8(byteOffset, value);
-	}
-
-	public inline function setUint16(byteOffset:Int, value:UInt, ?littleEndian:Bool = true)
-	{
-		this.setUint16(byteOffset, value, littleEndian);
-	}
-
-	public inline function setUint32(byteOffset:Int, value:UInt, ?littleEndian:Bool = true)
-	{
-		this.setUint32(byteOffset, value, littleEndian);
-	}
-
-	public inline function setFloat32(byteOffset:Int, value:Float, ?littleEndian:Bool = true)
-	{
-		this.setFloat32(byteOffset, value, littleEndian);
-	}
-
-	public inline function setFloat64(byteOffset:Int, value:Float, ?littleEndian:Bool = true)
-	{
-		this.setFloat64(byteOffset, value, littleEndian);
-	}
-}
-#else
 import lime.utils.ArrayBuffer;
 
 class DataView
@@ -212,4 +118,4 @@ class DataView
 		littleEndian ? ArrayBufferIO.setFloat64(buffer, byteOffset, value) : ArrayBufferIO.setFloat64_BE(buffer, byteOffset, value);
 	}
 }
-#end // !js
+

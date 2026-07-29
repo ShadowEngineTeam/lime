@@ -1,83 +1,5 @@
 package lime.utils;
 
-#if (js && !doc_gen)
-import js.lib.Uint8Array as JSUInt8Array;
-@:forward
-@:transitive
-abstract UInt8Array(JSUInt8Array) from JSUInt8Array to JSUInt8Array
-{
-	@:to inline function toArrayBufferView():ArrayBufferView
-		return this;
-
-	public inline static var BYTES_PER_ELEMENT:Int = 1;
-
-	@:generic
-	public inline function new<T>(?elements:Int, ?array:Array<T>, #if openfl ?vector:openfl.Vector<Int>, #end ?view:ArrayBufferView, ?buffer:ArrayBuffer,
-			?byteoffset:Int = 0, ?len:Null<Int>)
-	{
-		if (elements != null)
-		{
-			this = new JSUInt8Array(elements);
-		}
-		else if (array != null)
-		{
-			this = new JSUInt8Array(untyped array);
-		#if (openfl && commonjs)
-		}
-		else if (vector != null)
-		{
-			this = new JSUInt8Array(untyped (vector));
-		#elseif openfl
-		}
-		else if (vector != null)
-		{
-			this = new JSUInt8Array(untyped untyped (vector).__array);
-		#end
-		}
-		else if (view != null)
-		{
-			this = new JSUInt8Array(untyped view);
-		}
-		else if (buffer != null)
-		{
-			if (len == null)
-			{
-				this = new JSUInt8Array(buffer, byteoffset);
-			}
-			else
-			{
-				this = new JSUInt8Array(buffer, byteoffset, len);
-			}
-		}
-		else
-		{
-			this = null;
-		}
-	}
-
-	@:arrayAccess extern inline function __set(idx:Int, val:UInt):UInt
-		return this[idx] = val;
-
-	@:arrayAccess extern inline function __get(idx:Int):UInt
-		return this[idx];
-
-	// non spec haxe conversions
-	inline public static function fromBytes(bytes:haxe.io.Bytes, ?byteOffset:Int, ?len:Int):UInt8Array
-	{
-		if (byteOffset == null) return new JSUInt8Array(cast bytes.getData());
-		if (len == null) return new JSUInt8Array(cast bytes.getData(), byteOffset);
-		return new JSUInt8Array(cast bytes.getData(), byteOffset, len);
-	}
-
-	inline public function toBytes():haxe.io.Bytes
-	{
-		return @:privateAccess new haxe.io.Bytes(cast new JSUInt8Array(this.buffer));
-	}
-
-	inline function toString()
-		return this != null ? 'UInt8Array [byteLength:${this.byteLength}, length:${this.length}]' : null;
-}
-#else
 import lime.utils.ArrayBufferView;
 
 @:transitive
@@ -156,4 +78,3 @@ abstract UInt8Array(ArrayBufferView) from ArrayBufferView to ArrayBufferView
 		return val;
 	}
 }
-#end // !js

@@ -361,9 +361,6 @@ class PlatformSetup
 				case "android":
 					setupAndroid();
 
-				case "html5":
-					Log.println("\x1b[0;3mNo additional configuration is required.\x1b[0m");
-
 				case "ios", "iphoneos", "iphonesim":
 					if (System.hostPlatform == MAC)
 					{
@@ -381,9 +378,6 @@ class PlatformSetup
 					{
 						setupMac();
 					}
-
-				case "electron":
-					setupElectron();
 
 				case "windows":
 					if (targetFlags.exists("mingw"))
@@ -565,21 +559,6 @@ class PlatformSetup
 		{
 			ConfigHelper.writeConfigValue("ANDROID_SETUP", "true");
 		}
-
-		Log.println("");
-		Log.println("Setup complete.");
-	}
-
-	public static function setupElectron():Void
-	{
-		Log.println("\x1b[1mIn order to run Electron applications, you must download");
-		Log.println("and extract the Electron runtime on your system.");
-		Log.println("");
-
-		getDefineValue("ELECTRON_PATH", "Absolute path to Electron runtime");
-
-		Log.println("");
-		Haxelib.runCommand("", ["install", "electron"], true, true);
 
 		Log.println("");
 		Log.println("Setup complete.");

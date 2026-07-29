@@ -11,16 +11,6 @@ class LZMA
 	{
 		#if (lime_cffi && !macro)
 		return NativeCFFI.lime_lzma_compress(bytes, Bytes.alloc(0));
-		#elseif js
-		var data = untyped js.Syntax.code("LZMA.compress")(new UInt8Array(bytes.getData()), 5);
-		if ((data is String))
-		{
-			return Bytes.ofString(data);
-		}
-		else
-		{
-			return Bytes.ofData(cast data);
-		}
 		#else
 		return null;
 		#end
@@ -30,16 +20,6 @@ class LZMA
 	{
 		#if (lime_cffi && !macro)
 		return NativeCFFI.lime_lzma_decompress(bytes, Bytes.alloc(0));
-		#elseif js
-		var data = untyped js.Syntax.code("LZMA.decompress")(new UInt8Array(bytes.getData()));
-		if ((data is String))
-		{
-			return Bytes.ofString(data);
-		}
-		else
-		{
-			return Bytes.ofData(cast data);
-		}
 		#else
 		return null;
 		#end
