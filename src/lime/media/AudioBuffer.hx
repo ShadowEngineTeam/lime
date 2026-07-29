@@ -59,7 +59,6 @@ class AudioBuffer
 	@:noCompletion private var __srcBuffer:#if lime_cffi ALBuffer #else Dynamic #end;
 	@:noCompletion private var __srcCustom:Dynamic;
 
-
 	public function new() {}
 
 	public function dispose():Void {}
