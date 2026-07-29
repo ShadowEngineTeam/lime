@@ -290,14 +290,10 @@ class IOSPlatform extends PlatformTarget
 			context.OBJC_ARC = true;
 		}
 
-		// context.ENABLE_BITCODE = (project.config.getFloat ("ios.deployment", 13) >= 6);
-		context.ENABLE_BITCODE = project.config.getBool("ios.enable-bitcode", false);
 		context.IOS_COMPILER = project.config.getString("ios.compiler", "clang");
 		context.CPP_BUILD_LIBRARY = project.config.getString("cpp.buildLibrary", "hxcpp");
-
 		context.CPP_CACHE_WORKAROUND = "unset HXCPP_COMPILE_CACHE;";
-
-		context.IOS_LINKER_FLAGS = ["-stdlib=libc++"].concat(project.config.getArrayString("ios.linker-flags"));
+		context.IOS_LINKER_FLAGS = project.config.getArrayString("ios.linker-flags");
 		context.IOS_NON_EXEMPT_ENCRYPTION = project.config.getBool("ios.non-exempt-encryption", false);
 
 		switch (project.window.orientation)
@@ -328,12 +324,15 @@ class IOSPlatform extends PlatformTarget
 
 		context.frameworkSearchPaths = [];
 
+		var processedDependencies:Map<String, Bool> = [];
+
 		for (dependency in project.dependencies)
 		{
 			var name:String = null;
 			var path:String = null;
 			var fileType:String = null;
 			var embed:Bool = false;
+			var system:Bool = false;
 
 			if (Path.extension(dependency.name) == "tbd")
 			{
@@ -341,6 +340,7 @@ class IOSPlatform extends PlatformTarget
 				path = "/usr/lib/" + dependency.name;
 				fileType = "sourcecode.text-based-dylib-definition";
 				embed = false;
+				system = true;
 			}
 			else if (Path.extension(dependency.name) == "framework")
 			{
@@ -348,6 +348,7 @@ class IOSPlatform extends PlatformTarget
 				path = "/System/Library/Frameworks/" + dependency.name;
 				fileType = "wrapper.framework";
 				embed = false;
+				system = true;
 			}
 			else if (Path.extension(dependency.path) == "framework")
 			{
@@ -371,45 +372,52 @@ class IOSPlatform extends PlatformTarget
 				embed = false;
 			}
 
-			if (name != null)
+			if (name == null || path == null || processedDependencies.exists(path))
 			{
-				var buildFileID = "11C0000000000018" + StringTools.getUniqueID();
-				var fileID = "11C0000000000018" + StringTools.getUniqueID();
-				var embedFileID = "11C0000000000018" + StringTools.getUniqueID();
-
-				switch (fileType)
-				{
-					case "wrapper.plug-in":
-						context.ADDL_PBX_BUILD_FILE += "        " + buildFileID + " /* " + name + " in Resources */ = {isa = PBXBuildFile; fileRef = "
-							+ fileID + " /* " + name + " */; };\n";
-						context.ADDL_PBX_RESOURCES_BUILD_PHASE += "                " + buildFileID + " /* " + name + " in Resources */,\n";
-						context.ADDL_PBX_RESOURCE_GROUP += "                " + fileID + " /* " + name + " */,\n";
-					case "wrapper.framework", "wrapper.xcframework", "sourcecode.text-based-dylib-definition":
-						context.ADDL_PBX_BUILD_FILE += "        " + buildFileID + " /* " + name + " in Frameworks */ = {isa = PBXBuildFile; fileRef = "
-							+ fileID + " /* " + name + " */; };\n";
-						context.ADDL_PBX_FRAMEWORKS_BUILD_PHASE += "                " + buildFileID + " /* " + name + " in Frameworks */,\n";
-						context.ADDL_PBX_FRAMEWORK_GROUP += "                " + fileID + " /* " + name + " */,\n";
-
-						if (embed)
-						{
-							context.ADDL_PBX_BUILD_FILE += "        "
-								+ embedFileID
-								+ " /* "
-								+ name
-								+ " in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = "
-								+ fileID
-								+ " /* "
-								+ name
-								+ " */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy); }; };\n";
-							context.ADDL_PBX_EMBED_FRAMEWORKS_BUILD_PHASE += "                " + embedFileID + " /* " + name + " in Embed Frameworks */,\n";
-						}
-
-						ArrayTools.addUnique(context.frameworkSearchPaths, Path.directory(path));
-				}
-
-				context.ADDL_PBX_FILE_REFERENCE += "        " + fileID + " /* " + name + " */ = {isa = PBXFileReference; lastKnownFileType = \"" + fileType
-					+ "\"; name = \"" + name + "\"; path = \"" + path + "\"; sourceTree = SDKROOT; };\n";
+				continue;
 			}
+
+			var buildFileID = "11C0000000000018" + StringTools.getUniqueID();
+			var fileID = "11C0000000000018" + StringTools.getUniqueID();
+			var embedFileID = "11C0000000000018" + StringTools.getUniqueID();
+
+			switch (fileType)
+			{
+				case "wrapper.plug-in":
+					context.ADDL_PBX_BUILD_FILE += "        " + buildFileID + " /* " + name + " in Resources */ = {isa = PBXBuildFile; fileRef = " + fileID
+						+ " /* " + name + " */; };\n";
+					context.ADDL_PBX_RESOURCES_BUILD_PHASE += "                " + buildFileID + " /* " + name + " in Resources */,\n";
+					context.ADDL_PBX_RESOURCE_GROUP += "                " + fileID + " /* " + name + " */,\n";
+				case "wrapper.framework", "wrapper.xcframework", "sourcecode.text-based-dylib-definition":
+					context.ADDL_PBX_BUILD_FILE += "        " + buildFileID + " /* " + name + " in Frameworks */ = {isa = PBXBuildFile; fileRef = " + fileID
+						+ " /* " + name + " */; };\n";
+					context.ADDL_PBX_FRAMEWORKS_BUILD_PHASE += "                " + buildFileID + " /* " + name + " in Frameworks */,\n";
+					context.ADDL_PBX_FRAMEWORK_GROUP += "                " + fileID + " /* " + name + " */,\n";
+
+					if (embed)
+					{
+						context.ADDL_PBX_BUILD_FILE += "        "
+							+ embedFileID
+							+ " /* "
+							+ name
+							+ " in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = "
+							+ fileID
+							+ " /* "
+							+ name
+							+ " */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy); }; };\n";
+						context.ADDL_PBX_EMBED_FRAMEWORKS_BUILD_PHASE += "                " + embedFileID + " /* " + name + " in Embed Frameworks */,\n";
+					}
+
+					if (!system)
+					{
+						ArrayTools.addUnique(context.frameworkSearchPaths, Path.directory(path));
+					}
+			}
+
+			context.ADDL_PBX_FILE_REFERENCE += "        " + fileID + " /* " + name + " */ = {isa = PBXFileReference; lastKnownFileType = \"" + fileType
+				+ "\"; name = \"" + name + "\"; path = \"" + path + "\"; sourceTree = SDKROOT; };\n";
+
+			processedDependencies.set(path, true);
 		}
 
 		context.IOS_CLASS_FILES = [];
