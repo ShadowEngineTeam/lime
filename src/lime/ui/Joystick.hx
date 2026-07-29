@@ -61,33 +61,16 @@ class Joystick
 		if (joystick != null) joystick.onDisconnect.dispatch();
 	}
 
-	#if (js && html5)
-	@:noCompletion private static function __getDeviceData():Array<js.html.Gamepad>
+	@:noCompletion private static function __getDeviceData():Dynamic
 	{
-		var res:Array<js.html.Gamepad> = null;
-
-		try
-		{
-			res = (untyped navigator.getGamepads) ? untyped navigator.getGamepads() : (untyped navigator.webkitGetGamepads) ? untyped navigator.webkitGetGamepads() : null;
-		}
-		catch (err:Dynamic)
-		{
-			// if something went wrong, treat it the same as when navigator.getGamepads doesn't exist
-			// we probably don't have permission to use this feature
-		}
-
-		return res;
+		return null;
 	}
-	#end
 
 	// Get & Set Methods
 	@:noCompletion private inline function get_guid():String
 	{
 		#if (lime_cffi && !macro)
 		return NativeCFFI.lime_joystick_get_device_guid(this.id);
-		#elseif (js && html5)
-		var devices = __getDeviceData();
-		return devices[this.id].id;
 		#else
 		return null;
 		#end
@@ -97,9 +80,6 @@ class Joystick
 	{
 		#if (lime_cffi && !macro)
 		return NativeCFFI.lime_joystick_get_device_name(this.id);
-		#elseif (js && html5)
-		var devices = __getDeviceData();
-		return devices[this.id].id;
 		#else
 		return null;
 		#end
@@ -109,9 +89,6 @@ class Joystick
 	{
 		#if (lime_cffi && !macro)
 		return NativeCFFI.lime_joystick_get_num_axes(this.id);
-		#elseif (js && html5)
-		var devices = __getDeviceData();
-		return devices[this.id].axes.length;
 		#else
 		return 0;
 		#end
@@ -121,9 +98,6 @@ class Joystick
 	{
 		#if (lime_cffi && !macro)
 		return NativeCFFI.lime_joystick_get_num_buttons(this.id);
-		#elseif (js && html5)
-		var devices = __getDeviceData();
-		return devices[this.id].buttons.length;
 		#else
 		return 0;
 		#end

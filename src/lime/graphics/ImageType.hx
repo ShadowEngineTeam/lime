@@ -7,11 +7,6 @@ package lime.graphics;
 enum ImageType
 {
 	/**
-		The source image data is stored in a `js.html.Image` or `js.html.CanvasElement`
-	**/
-	CANVAS;
-
-	/**
 		The source image data is stored in a `UInt8Array`
 	**/
 	DATA;

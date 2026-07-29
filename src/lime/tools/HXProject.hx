@@ -135,9 +135,6 @@ class HXProject extends Script
 
 		platformType = switch (target)
 		{
-			case HTML5:
-				PlatformType.WEB;
-
 			case ANDROID, IOS:
 				PlatformType.MOBILE;
 
@@ -177,7 +174,7 @@ class HXProject extends Script
 		else
 		{
 			environment = Sys.environment();
-			for (conflict in ["android", "cpp", "html5", "ios", "linux", "mac", "windows"])
+			for (conflict in ["android", "cpp", "ios", "linux", "mac", "windows"])
 			{
 				environment.remove(conflict);
 			}
@@ -710,7 +707,7 @@ class HXProject extends Script
 				defines.set("mingw", "1");
 			}
 		}
-		else if (targetFlags.exists("cpp") || ((platformType != PlatformType.WEB) && !targetFlags.exists("html5")))
+		else if (targetFlags.exists("cpp") || (platformType != PlatformType.WEB))
 		{
 			defines.set("targetType", "cpp");
 			defines.set("native", "1");

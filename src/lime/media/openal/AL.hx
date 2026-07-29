@@ -778,7 +778,6 @@ class AL
 
 	@:dox(hide) @:noCompletion public static function getParameter(param:Int):Dynamic
 	{
-		// TODO, return any type value (similar to WebGL getParameter)
 		return null;
 	}
 

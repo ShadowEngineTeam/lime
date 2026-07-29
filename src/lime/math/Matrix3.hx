@@ -467,7 +467,7 @@ abstract Matrix3(Float32Array) to Float32Array
 		@param	tx	The new matrix tx value
 		@param	ty	The new matrix ty value
 	**/
-	public #if !js inline #end function setTo(a:Float, b:Float, c:Float, d:Float, tx:Float, ty:Float):Void
+	public inline function setTo(a:Float, b:Float, c:Float, d:Float, tx:Float, ty:Float):Void
 	{
 		set_a(a);
 		set_b(b);

@@ -1,6 +1,6 @@
 package lime.graphics.opengl;
 
-#if (!lime_doc_gen || lime_opengl || lime_opengles || lime_webgl)
+#if (!lime_doc_gen || lime_opengl || lime_opengles)
 #if ((lime_opengl || lime_opengles) && !doc_gen)
 import lime.graphics.opengl.GL;
 
@@ -12,9 +12,6 @@ abstract GLVertexArrayObject(GLObject) from GLObject to GLObject
 		return GLObject.fromInt(VERTEX_ARRAY_OBJECT, id);
 	}
 }
-#elseif (lime_webgl && !doc_gen)
-@:native("WebGLVertexArrayObject")
-extern class GLVertexArrayObject {}
 #else
 typedef GLVertexArrayObject = Dynamic;
 #end

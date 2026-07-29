@@ -5,11 +5,6 @@ import lime._internal.backend.native.NativeCFFI;
 import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.utils.UInt8Array;
-#if (js && html5)
-import lime._internal.graphics.ImageCanvasUtil;
-import js.Browser;
-#end
-
 @:access(lime._internal.backend.native.NativeCFFI)
 @:access(lime.graphics.ImageBuffer)
 class PNG
@@ -55,22 +50,6 @@ class PNG
 
 		#if (lime_cffi && !macro)
 		return NativeCFFI.lime_image_encode(image.buffer, 0, 0, Bytes.alloc(0));
-		#elseif (js && html5)
-		ImageCanvasUtil.convertToCanvas(image, false);
-
-		if (image.buffer.__srcCanvas != null)
-		{
-			var data = image.buffer.__srcCanvas.toDataURL("image/png");
-			var buffer = Browser.window.atob(data.split(";base64,")[1]);
-			var bytes = Bytes.alloc(buffer.length);
-
-			for (i in 0...buffer.length)
-			{
-				bytes.set(i, buffer.charCodeAt(i));
-			}
-
-			return bytes;
-		}
 		#end
 
 		return null;

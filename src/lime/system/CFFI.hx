@@ -63,7 +63,7 @@ class CFFI
 		var result:Dynamic = null;
 
 		#if (!disable_cffi && !macro)
-		#if (sys && !html5)
+		#if sys
 		if (__moduleNames == null) __moduleNames = new Map<String, String>();
 
 		if (lazy)
@@ -185,7 +185,7 @@ class CFFI
 
 	private static function __findNDLLFolder():String
 	{
-		#if (sys && !macro && !html5)
+		#if (sys && !macro)
 		var process = new Process("haxelib", ["path", "lime"]);
 
 		try
@@ -211,7 +211,7 @@ class CFFI
 
 	private static function __loaderTrace(message:String)
 	{
-		#if (sys && !html5)
+		#if sys
 		var debug = (Sys.getEnv("OPENFL_LOAD_DEBUG") != null);
 
 		if (debug)
@@ -267,7 +267,7 @@ class CFFI
 
 	private static function __sysName():String
 	{
-		#if (sys && !html5)
+		#if sys
 		#if cpp
 		var sys_string = cpp.Lib.load("std", "sys_string", 0);
 		return sys_string();

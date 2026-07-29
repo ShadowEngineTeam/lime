@@ -9,10 +9,6 @@ import cpp.vm.Deque;
 import cpp.vm.Thread;
 import cpp.vm.Tls;
 #end
-#if html5
-import lime._internal.backend.html5.HTML5Thread as Thread;
-import lime._internal.backend.html5.HTML5Thread.Transferable;
-#end
 #if macro
 import haxe.macro.Expr;
 
@@ -29,7 +25,7 @@ using haxe.macro.Context;
 
 	`doWork` should exclusively use `WorkOutput` to communicate with the main
 	thread. On many targets it's also possible to access static or instance
-	variables, but this isn't thread safe and won't work in HTML5.
+	variables, but this isn't thread safe.
 **/
 class WorkOutput
 {
@@ -76,7 +72,7 @@ class WorkOutput
 		__jobComplete.value = false;
 
 		#if lime_threads
-		this.mode = mode != null ? mode : #if html5 SINGLE_THREADED #else MULTI_THREADED #end;
+		this.mode = mode != null ? mode : MULTI_THREADED;
 		#end
 	}
 
@@ -141,13 +137,6 @@ class WorkOutput
 
 	private inline function sendThreadEvent(event:ThreadEvent, transferList:Array<Transferable> = null):Void
 	{
-		#if (lime_threads && html5)
-		if (Thread.current().isWorker())
-		{
-			Thread.returnMessage(event, transferList);
-		}
-		else
-		#end
 		__jobOutput.add(event);
 	}
 
@@ -161,13 +150,6 @@ class WorkOutput
 	private function createThread(executeThread:WorkFunction<Void->Void>):Thread
 	{
 		var thread:Thread = Thread.create(executeThread);
-
-		#if html5
-		thread.onMessage.add(function(event:ThreadEvent)
-		{
-			__jobOutput.add(event);
-		});
-		#end
 
 		return thread;
 	}
@@ -208,10 +190,8 @@ enum abstract ThreadMode(Bool)
 		Even so, `doWork` should return periodically, to allow canceling the
 		thread. If not canceled, `doWork` will be called again immediately.
 
-		In HTML5, web workers will be used to achieve this. This means `doWork`
-		must be a static function, and you can't use `bind()`. Web workers also
-		impose a longer delay each time `doWork` returns, so it shouldn't return
-		as often in multi-threaded mode as in single-threaded mode.
+	This means `doWork`
+	must be a static function, and you can't use `bind()`.
 	**/
 	var MULTI_THREADED = true;
 }
@@ -227,18 +207,11 @@ enum abstract ThreadMode(Bool)
 	function with a persistent `State` argument for tracking progress, which can
 	be any object of your choice.
 
-	Caution: if using multi-threaded mode in HTML5, this must be a static
-	function and binding arguments is forbidden. Compile with
-	`-Dlime-warn-portability` to highlight functions that won't work.
+	Caution: if using multi-threaded mode, this must be a static
+	function and binding arguments is forbidden.
 **/
-#if (lime_threads && html5)
-typedef WorkFunction<T:haxe.Constraints.Function> = lime._internal.backend.html5.HTML5Thread.WorkFunction<T>;
-#else
 abstract WorkFunction<T:haxe.Constraints.Function>(T) from T to T
 {
-	/**
-		Executes this function with the given arguments.
-	**/
 	public macro function dispatch(self:Expr, args:Array<Expr>):Expr
 	{
 		switch (self.typeof().follow().toComplexType())
@@ -250,7 +223,6 @@ abstract WorkFunction<T:haxe.Constraints.Function>(T) from T to T
 		}
 	}
 }
-#end
 
 /**
 	An argument of any type to pass to the `doWork` function. Though `doWork`
@@ -283,8 +255,7 @@ class JobData
 	private static var nextID:Int = 0;
 
 	/**
-		`JobData` instances will regularly be copied in HTML5, so checking
-		equality won't work. Instead, compare identifiers.
+		`JobData` instances should be compared by identifier.
 	**/
 	public var id(default, null):Int;
 
@@ -371,14 +342,7 @@ class JSAsync
 	**/
 	public static macro function async(code:Expr):Expr
 	{
-		if (Context.defined("js"))
-		{
-			return macro js.Syntax.code("(async {0})()", function() $code);
-		}
-		else
-		{
-			return code;
-		}
+		return code;
 	}
 }
 
@@ -408,6 +372,4 @@ class Tls<T>
 }
 #end
 
-#if !html5
 typedef Transferable = Dynamic;
-#end

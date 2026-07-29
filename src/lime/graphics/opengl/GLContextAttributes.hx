@@ -1,7 +1,6 @@
 package lime.graphics.opengl;
 
-#if (!lime_doc_gen || lime_opengl || lime_opengles || lime_webgl)
-#if (!lime_webgl || doc_gen)
+#if (!lime_doc_gen || lime_opengl || lime_opengles)
 typedef GLContextAttributes =
 {
 	alpha:Bool,
@@ -11,7 +10,4 @@ typedef GLContextAttributes =
 	premultipliedAlpha:Bool,
 	preserveDrawingBuffer:Bool
 }
-#else
-typedef GLContextAttributes = js.html.webgl.ContextAttributes;
-#end
 #end

@@ -25,9 +25,7 @@ abstract WindowData({
 	@:optional var depthBuffer:Bool;
 	@:optional var stencilBuffer:Bool;
 	@:optional var title:String;
-	#if (js && html5)
-	@:optional var element:js.html.Element;
-	#end
+	@:optional var element:Dynamic;
 	@:optional var colorDepth:Int;
 	@:optional var minimized:Bool;
 	@:optional var maximized:Bool;
@@ -60,9 +58,7 @@ abstract WindowData({
 			depthBuffer: false,
 			stencilBuffer: false,
 			title: "",
-			#if (js && html5)
 			element: null,
-			#end
 			colorDepth: 0,
 			minimized: false,
 			maximized: false,

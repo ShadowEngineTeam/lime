@@ -9,17 +9,12 @@
 
 	<define name="lime-shadow" />
 	<define name="lime-cairo" if="native" />
-	<define name="lime-canvas" if="html5" />
 	<define name="lime-cffi" if="native" />
-	<define name="lime-dom" if="html5" />
 	<define name="lime-harfbuzz" if="native" />
-	<define name="lime-howlerjs" if="html5" />
-	<define name="lime-html5" if="html5" />
 	<define name="lime-native" if="native" />
 	<define name="lime-openal" if="windows || linux || mac || android || ios" />
-	<define name="lime-opengl" if="desktop" unless="html5" />
+	<define name="lime-opengl" if="desktop" />
 	<define name="lime-opengles" if="mobile || linux armv7 || linux arm64" />
-	<define name="lime-webgl" if="html5" />
 
 	<haxedef name="no-compilation" />
 
@@ -30,7 +25,6 @@
 	<section if="hxp" unless="lime-tools">
 
 		<target name="android" path="tools/platforms/AndroidPlatform.hx" />
-		<target name="html5" path="tools/platforms/HTML5Platform.hx" />
 		<target name="ios" path="tools/platforms/IOSPlatform.hx" />
 		<target name="linux" path="tools/platforms/LinuxPlatform.hx" />
 		<target name="mac" path="tools/platforms/MacPlatform.hx" />
@@ -41,7 +35,7 @@
 	<section unless="display">
 
 		<section unless="force-synchronous || force_synchronous">
-			<haxedef name="lime-threads" if="native || html5" />
+			<haxedef name="lime-threads" if="native" />
 			<haxedef name="lime-threads-deque" if="native" />
 		</section>
 
@@ -72,15 +66,6 @@
 					<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 				</manifest>
 			</config:android>
-		</section>
-
-		<section if="html5">
-			<dependency path="dependencies/howler.js" embed="true" />
-			<dependency path="dependencies/pako.min.js" embed="true" allow-web-workers="true" />
-			<dependency path="dependencies/lzma_worker-min.js" embed="true" />
-			<dependency path="dependencies/FileSaver.min.js" embed="true" />
-			<dependency path="dependencies/webgl-debug.js" if="webgl-debug" embed="true" />
-			<dependency path="dependencies/stats.min.js" if="stats" embed="true" />
 		</section>
 
 		<section if="ios">

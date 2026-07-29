@@ -12,12 +12,7 @@ import lime.utils.AssetLibrary;
 import lime.utils.Assets;
 import lime.utils.AssetType;
 import lime.utils.Log;
-#if (js && html5)
-import js.html.Image;
-import js.html.SpanElement;
-import js.Browser;
 import lime.net.HTTPRequest;
-#end
 
 @:access(lime.utils.AssetLibrary)
 class Preloader

@@ -390,12 +390,7 @@ class ImageDataUtil
 							sourcePosition = sourceView.row(y);
 							destPosition = destView.row(y);
 
-							#if js
-							// TODO: Is this faster on HTML5 than the normal copy method?
-							destData.set(sourceData.subarray(sourcePosition, sourcePosition + destView.width * destBytesPerPixel), destPosition);
-							#else
 							destData.buffer.blit(destPosition, sourceData.buffer, sourcePosition, destView.width * destBytesPerPixel);
-							#end
 						}
 					}
 					else
@@ -1040,13 +1035,6 @@ class ImageDataUtil
 		buffer.width = newWidth;
 		buffer.height = newHeight;
 
-		#if (js && html5)
-		buffer.__srcImage = null;
-		buffer.__srcImageData = null;
-		buffer.__srcCanvas = null;
-		buffer.__srcContext = null;
-		#end
-
 		image.dirty = true;
 		image.version++;
 	}
@@ -1075,13 +1063,6 @@ class ImageDataUtil
 		buffer.data = newData;
 		buffer.width = newWidth;
 		buffer.height = newHeight;
-
-		#if (js && html5)
-		buffer.__srcImage = null;
-		buffer.__srcImageData = null;
-		buffer.__srcCanvas = null;
-		buffer.__srcContext = null;
-		#end
 
 		image.dirty = true;
 		image.version++;

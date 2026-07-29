@@ -47,9 +47,7 @@ abstract Locale(String) from String to String
 		{
 			var locale = null;
 
-			#if (js && html5)
-			locale = untyped navigator.language;
-			#elseif (android)
+			#if (android)
 			var getDefault:Void->Dynamic = JNI.createStaticMethod("java/util/Locale", "getDefault", "()Ljava/util/Locale;");
 			var toString:Dynamic->String = JNI.createMemberMethod("java/util/Locale", "toString", "()Ljava/lang/String;");
 

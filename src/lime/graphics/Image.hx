@@ -9,7 +9,6 @@ import lime._internal.format.Base64;
 import lime._internal.format.BMP;
 import lime._internal.format.JPEG;
 import lime._internal.format.PNG;
-import lime._internal.graphics.ImageCanvasUtil;
 import lime._internal.graphics.ImageDataUtil;
 import lime.app.Application;
 import lime.app.Future;
@@ -28,16 +27,6 @@ import lime.utils.ArrayBuffer;
 import lime.utils.BytePointer;
 import lime.utils.Log;
 import lime.utils.UInt8Array;
-#if (js && html5)
-#if !display
-import lime._internal.backend.html5.HTML5HTTPRequest;
-#end
-import js.Browser;
-import js.html.CanvasElement;
-import js.html.Image as JSImage;
-import js.html.ImageElement;
-import lime._internal.backend.html5.HTML5Thread;
-#end
 #if format
 import format.png.Data;
 import format.png.Reader;
@@ -57,15 +46,12 @@ import sys.io.File;
 **/
 @:autoBuild(lime._internal.macros.AssetsMacro.embedImage())
 @:access(lime._internal.backend.native.NativeCFFI)
-@:allow(lime._internal.graphics.ImageCanvasUtil)
 @:allow(lime._internal.graphics.ImageDataUtil)
 @:access(lime.app.Application)
 @:access(lime.math.ColorMatrix)
 @:access(lime.math.Rectangle)
 @:access(lime.math.Vector2)
-#if (js && html5 && !display)
-@:access(lime._internal.backend.html5.HTML5HTTPRequest)
-#end
+
 class Image
 {
 	/**
@@ -130,7 +116,7 @@ class Image
 	public var rect(get, null):Rectangle;
 
 	/**
-		A higher-level representation of the source `ImageBuffer`. This might be an HTML5 Image, CanvasElement.
+		A higher-level representation of the source `ImageBuffer`.
 	**/
 	public var src(get, set):Dynamic;
 
@@ -168,22 +154,6 @@ class Image
 	**/
 	public var y:Float;
 
-	#if commonjs
-	private static function __init__()
-	{
-		var p = untyped Image.prototype;
-		untyped Object.defineProperties(p,
-			{
-				"data": {get: p.get_data, set: p.set_data},
-				"format": {get: p.get_format, set: p.set_format},
-				"powerOfTwo": {get: p.get_powerOfTwo, set: p.set_powerOfTwo},
-				"premultiplied": {get: p.get_premultiplied, set: p.set_premultiplied},
-				"rect": {get: p.get_rect},
-				"src": {get: p.get_src, set: p.set_src},
-				"transparent": {get: p.get_transparent, set: p.set_transparent}
-			});
-	}
-	#end
 
 	/**
 		Creates a new `Image` instance.
@@ -209,18 +179,7 @@ class Image
 
 		if (type == null)
 		{
-			#if (js && html5)
-			type = CANVAS;
-
-			#if lime_threads
-			if (HTML5Thread.current().isWorker())
-			{
-				type = DATA;
-			}
-			#end
-			#else
 			type = DATA;
-			#end
 		}
 
 		this.type = type;
@@ -231,15 +190,6 @@ class Image
 			{
 				switch (this.type)
 				{
-					case CANVAS:
-						this.buffer = new ImageBuffer(null, width, height);
-						ImageCanvasUtil.createCanvas(this, width, height);
-
-						if (color != null && color != 0)
-						{
-							fillRect(new Rectangle(0, 0, width, height), color);
-						}
-
 					case DATA:
 						this.buffer = new ImageBuffer(new UInt8Array(width * height * 4), width, height);
 
@@ -266,17 +216,6 @@ class Image
 	{
 		if (buffer != null)
 		{
-			#if (js && html5)
-			if (type == CANVAS)
-			{
-				ImageCanvasUtil.convertToCanvas(this);
-			}
-			else
-			{
-				ImageCanvasUtil.convertToData(this);
-			}
-			#end
-
 			var image = new Image(buffer.clone(), offsetX, offsetY, width, height, null, type);
 			image.version = version;
 			return image;
@@ -299,14 +238,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				ImageCanvasUtil.colorTransform(this, rect, colorMatrix);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				#end
-
 				ImageDataUtil.colorTransform(this, rect, colorMatrix);
 
 			default:
@@ -332,15 +264,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				ImageCanvasUtil.copyChannel(this, sourceImage, sourceRect, destPoint, sourceChannel, destChannel);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				ImageCanvasUtil.convertToData(sourceImage);
-				#end
-
 				ImageDataUtil.copyChannel(this, sourceImage, sourceRect, destPoint, sourceChannel, destChannel);
 
 			default:
@@ -409,29 +333,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				if (alphaImage != null)
-				{
-					ImageCanvasUtil.convertToData(this);
-					ImageCanvasUtil.convertToData(sourceImage);
-					if (alphaImage != null) ImageCanvasUtil.convertToData(alphaImage);
-
-					ImageDataUtil.copyPixels(this, sourceImage, sourceRect, destPoint, alphaImage, alphaPoint, mergeAlpha);
-				}
-				else
-				{
-					ImageCanvasUtil.convertToCanvas(this);
-					ImageCanvasUtil.convertToCanvas(sourceImage);
-					ImageCanvasUtil.copyPixels(this, sourceImage, sourceRect, destPoint, alphaImage, alphaPoint, mergeAlpha);
-				}
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				ImageCanvasUtil.convertToData(sourceImage);
-				if (alphaImage != null) ImageCanvasUtil.convertToData(alphaImage);
-				#end
-
 				ImageDataUtil.copyPixels(this, sourceImage, sourceRect, destPoint, alphaImage, alphaPoint, mergeAlpha);
 
 			default:
@@ -481,14 +383,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				ImageCanvasUtil.fillRect(this, rect, color, format);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				#end
-
 				if (buffer.data.length == 0) return;
 
 				ImageDataUtil.fillRect(this, rect, color, format);
@@ -513,14 +408,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				ImageCanvasUtil.floodFill(this, x, y, color, format);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				#end
-
 				ImageDataUtil.floodFill(this, x, y, color, format);
 
 			default:
@@ -544,7 +432,7 @@ class Image
 	/**
 		Converts a `Bytes` object to an `Image` instance
 
-		Some platforms (such as HTML5) cannot convert `Bytes` to an
+		Some platforms cannot convert `Bytes` to an
 		`Image` synchronously, and may not work properly.
 
 		`Image.loadFromBytes` works asynchronously, and should work
@@ -566,29 +454,10 @@ class Image
 		}
 	}
 
-	#if (!lime_doc_gen || lime_canvas)
-	/**
-		Converts an `js.html.CanvasElement` instance to an `Image`
-		@param	canvas	A `CanvasElement`
-		@return	A new `Image` instance
-	**/
-	public static function fromCanvas(canvas:#if (js && html5) CanvasElement #else Dynamic #end):Image
-	{
-		if (canvas == null) return null;
-		var buffer = new ImageBuffer(null, canvas.width, canvas.height);
-		buffer.src = canvas;
-		var image = new Image(buffer);
-
-		image.type = CANVAS;
-		return image;
-	}
-	#end
-
 	/**
 		Loads an `Image` from a path synchronously.
 
-		Some platforms, such as HTML5, cannot load
-		images synchronously.
+		Some platforms cannot load images synchronously.
 
 		`Image.loadFromFile` works asynchronously, and should
 		behave consistently on all platforms.
@@ -609,24 +478,6 @@ class Image
 		}
 	}
 
-	#if (!lime_doc_gen || (js && html5))
-	/**
-		Converts a `js.html.Image` instance to an `Image`
-		@param	image	An `ImageElement` instance
-		@return	A new `Image` instance
-	**/
-	public static function fromImageElement(image:#if (js && html5) ImageElement #else Dynamic #end):Image
-	{
-		if (image == null) return null;
-		var buffer = new ImageBuffer(null, image.width, image.height);
-		buffer.src = image;
-		var _image = new Image(buffer);
-
-		_image.type = CANVAS;
-		return _image;
-	}
-	#end
-
 	/**
 		Finds a region in the `Image` that includes pixels all of a certain color (when `findColor` is `true`) or
 		excludes a certain color (`findColor` is `false`)
@@ -642,13 +493,6 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				#end
-
-				return ImageDataUtil.getColorBoundsRect(this, mask, color, findColor, format);
-
 			case DATA:
 				return ImageDataUtil.getColorBoundsRect(this, mask, color, findColor, format);
 
@@ -670,14 +514,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				return ImageCanvasUtil.getPixel(this, x, y, format);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				#end
-
 				return ImageDataUtil.getPixel(this, x, y, format);
 
 			default:
@@ -698,14 +535,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				return ImageCanvasUtil.getPixel32(this, x, y, format);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				#end
-
 				return ImageDataUtil.getPixel32(this, x, y, format);
 
 			default:
@@ -725,14 +555,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				return ImageCanvasUtil.getPixels(this, rect, format);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				#end
-
 				return ImageDataUtil.getPixels(this, rect, format);
 
 			default:
@@ -750,9 +573,6 @@ class Image
 	{
 		if (base64 == null || type == null) return Future.withValue(null);
 
-		#if (js && html5 && !display)
-		return HTML5HTTPRequest.loadImage("data:" + type + ";base64," + base64);
-		#else
 		if (base64 != null)
 		{
 			return loadFromBytes(Base64.decode(base64));
@@ -761,7 +581,6 @@ class Image
 		{
 			return cast Future.withError("");
 		}
-		#end
 	}
 
 	/**
@@ -773,38 +592,7 @@ class Image
 	{
 		if (bytes == null) return Future.withValue(null);
 
-		#if (js && html5)
-		var type = "";
-
-		if (__isPNG(bytes))
-		{
-			type = "image/png";
-		}
-		else if (__isJPG(bytes))
-		{
-			type = "image/jpeg";
-		}
-		else if (__isGIF(bytes))
-		{
-			type = "image/gif";
-		}
-		else if (__isWebP(bytes))
-		{
-			type = "image/webp";
-		}
-		else
-		{
-			// throw "Image tried to read PNG/JPG Bytes, but found an invalid header.";
-			return Future.withValue(null);
-		}
-		#if !display
-		return HTML5HTTPRequest.loadImageFromBytes(bytes, type);
-		#else
-		return loadFromBase64(Base64.encode(bytes), type);
-		#end
-		#else
 		return new Future(fromBytes.bind(bytes), true);
-		#end
 	}
 
 	/**
@@ -816,9 +604,6 @@ class Image
 	{
 		if (path == null) return Future.withValue(null);
 
-		#if (js && html5 && !display)
-		return HTML5HTTPRequest.loadImage(path);
-		#else
 		var request = new HTTPRequest<Image>();
 		return request.load(path).then(function(image)
 		{
@@ -831,7 +616,6 @@ class Image
 				return cast Future.withError("");
 			}
 		});
-		#end
 	}
 
 	/**
@@ -851,16 +635,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				ImageCanvasUtil.convertToCanvas(this);
-				ImageCanvasUtil.merge(this, sourceImage, sourceRect, destPoint, redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				ImageCanvasUtil.convertToData(sourceImage);
-				#end
-
 				ImageDataUtil.merge(this, sourceImage, sourceRect, destPoint, redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier);
 
 			default:
@@ -878,9 +653,6 @@ class Image
 	{
 		switch (type)
 		{
-			case CANVAS:
-				ImageCanvasUtil.resize(this, newWidth, newHeight);
-
 			case DATA:
 				ImageDataUtil.resize(this, newWidth, newHeight);
 
@@ -911,9 +683,6 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				ImageCanvasUtil.scroll(this, x, y);
-
 			case DATA:
 				copyPixels(this, rect, new Vector2(x, y));
 
@@ -934,14 +703,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				ImageCanvasUtil.setPixel(this, x, y, color, format);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				#end
-
 				ImageDataUtil.setPixel(this, x, y, color, format);
 
 			default:
@@ -961,14 +723,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				ImageCanvasUtil.setPixel32(this, x, y, color, format);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				#end
-
 				ImageDataUtil.setPixel32(this, x, y, color, format);
 
 			default:
@@ -990,14 +745,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS:
-				ImageCanvasUtil.setPixels(this, rect, bytePointer, format, endian);
-
 			case DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				#end
-
 				ImageDataUtil.setPixels(this, rect, bytePointer, format, endian);
 
 			default:
@@ -1043,12 +791,7 @@ class Image
 
 		switch (type)
 		{
-			case CANVAS, DATA:
-				#if (js && html5)
-				ImageCanvasUtil.convertToData(this);
-				ImageCanvasUtil.convertToData(sourceImage);
-				#end
-
+			case DATA:
 				return ImageDataUtil.threshold(this, sourceImage, sourceRect, destPoint, operation, threshold, color, mask, copySource, format);
 
 			default:
@@ -1096,61 +839,15 @@ class Image
 
 	@:noCompletion private function __fromBase64(base64:String, type:String, onload:Image->Void = null):Void
 	{
-		#if (js && html5)
-		var image:JSImage = untyped js.Syntax.code('new window.Image ()');
-
-		var image_onLoaded = function(event)
-		{
-			buffer = new ImageBuffer(null, image.width, image.height);
-			buffer.__srcImage = cast image;
-
-			offsetX = 0;
-			offsetY = 0;
-			width = buffer.width;
-			height = buffer.height;
-
-			if (onload != null)
-			{
-				onload(this);
-			}
-		}
-
-		image.addEventListener("load", image_onLoaded, false);
-		image.src = "data:" + type + ";base64," + base64;
-		#else
 		if (base64 != null)
 		{
 			__fromBytes(Base64.decode(base64));
 		}
-		#end
 	}
 
 	@:noCompletion private function __fromBytes(bytes:Bytes, onload:Image->Void = null):Bool
 	{
-		#if (js && html5)
-		var type = "";
-
-		if (__isPNG(bytes))
-		{
-			type = "image/png";
-		}
-		else if (__isJPG(bytes))
-		{
-			type = "image/jpeg";
-		}
-		else if (__isGIF(bytes))
-		{
-			type = "image/gif";
-		}
-		else
-		{
-			// throw "Image tried to read PNG/JPG Bytes, but found an invalid header.";
-			return false;
-		}
-
-		__fromBase64(Base64.encode(bytes), type, onload);
-		return true;
-		#elseif (lime_cffi && !macro)
+		#if (lime_cffi && !macro)
 		if (bytes == null || bytes.length == 0)
 		{
 			return false;
@@ -1178,46 +875,7 @@ class Image
 
 	@:noCompletion private function __fromFile(path:String, onload:Image->Void = null, onerror:Void->Void = null):Bool
 	{
-		#if (js && html5)
-		var image:JSImage = untyped js.Syntax.code('new window.Image ()');
-
-		#if !display
-		if (!HTML5HTTPRequest.__isSameOrigin(path))
-		{
-			image.crossOrigin = "Anonymous";
-		}
-		#end
-
-		image.onload = function(_)
-		{
-			buffer = new ImageBuffer(null, image.width, image.height);
-			buffer.__srcImage = cast image;
-
-			width = image.width;
-			height = image.height;
-
-			if (onload != null)
-			{
-				onload(this);
-			}
-		}
-
-		image.onerror = function(_)
-		{
-			if (onerror != null)
-			{
-				onerror();
-			}
-		}
-
-		image.src = path;
-
-		// Another IE9 bug: loading 20+ images fails unless this line is added.
-		// (issue #1019768)
-		if (image.complete) {}
-
-		return true;
-		#elseif lime_cffi
+		#if lime_cffi
 		var buffer:ImageBuffer = null;
 
 		#if (!sys || disable_cffi || macro)
@@ -1334,13 +992,6 @@ class Image
 	// Get & Set Methods
 	@:noCompletion private function get_data():UInt8Array
 	{
-		if (buffer.data == null && buffer.width > 0 && buffer.height > 0)
-		{
-			#if (js && html5)
-			ImageCanvasUtil.convertToData(this);
-			#end
-		}
-
 		return buffer.data;
 	}
 
@@ -1401,12 +1052,6 @@ class Image
 
 			switch (type)
 			{
-				case CANVAS:
-					#if (js && html5)
-					ImageCanvasUtil.convertToData(this);
-					#end
-					ImageDataUtil.resizeBuffer(this, newWidth, newHeight);
-
 				case DATA:
 					ImageDataUtil.resizeBuffer(this, newWidth, newHeight);
 
@@ -1428,11 +1073,7 @@ class Image
 		{
 			switch (type)
 			{
-				case CANVAS, DATA:
-					#if (js && html5)
-					ImageCanvasUtil.convertToData(this);
-					#end
-
+				case DATA:
 					ImageDataUtil.multiplyAlpha(this);
 
 				default:
@@ -1444,10 +1085,6 @@ class Image
 			switch (type)
 			{
 				case DATA:
-					#if (js && html5)
-					ImageCanvasUtil.convertToData(this);
-					#end
-
 					ImageDataUtil.unmultiplyAlpha(this);
 
 				default:
@@ -1465,13 +1102,6 @@ class Image
 
 	@:noCompletion private function get_src():Dynamic
 	{
-		#if (js && html5)
-		if (buffer.__srcCanvas == null && (buffer.data != null || type == DATA))
-		{
-			ImageCanvasUtil.convertToCanvas(this);
-		}
-		#end
-
 		return buffer.src;
 	}
 

@@ -18,13 +18,7 @@ abstract Bytes(HaxeBytes) from HaxeBytes to HaxeBytes
 {
 	public function new(length:Int, bytesData:BytesData)
 	{
-		#if js
-		this = new HaxeBytes(bytesData);
-		// bytesData may have extra bytes. See https://github.com/HaxeFoundation/haxe/issues/8974
-		this.length = length;
-		#else
 		this = new HaxeBytes(length, bytesData);
-		#end
 	}
 
 	public static function alloc(length:Int):Bytes

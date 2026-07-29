@@ -5,7 +5,7 @@ import haxe.ds.ObjectMap;
 /**
 	A generic object pool for reusing objects.
 **/
-#if !js @:generic #end class ObjectPool<T>
+@:generic class ObjectPool<T>
 {
 	/**
 		The number of active objects in the pool.

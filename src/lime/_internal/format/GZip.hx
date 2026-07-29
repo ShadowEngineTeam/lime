@@ -10,13 +10,6 @@ class GZip
 	{
 		#if (lime_cffi && !macro)
 		return NativeCFFI.lime_gzip_compress(bytes, Bytes.alloc(0));
-		#elseif js
-		#if commonjs
-		var data = untyped js.Syntax.code("require (\"pako\").gzip")(bytes.getData());
-		#else
-		var data = untyped js.Syntax.code("pako.gzip")(bytes.getData());
-		#end
-		return Bytes.ofData(data);
 		#else
 		return null;
 		#end
@@ -26,13 +19,6 @@ class GZip
 	{
 		#if (lime_cffi && !macro)
 		return NativeCFFI.lime_gzip_decompress(bytes, Bytes.alloc(0));
-		#elseif js
-		#if commonjs
-		var data = untyped js.Syntax.code("require (\"pako\").ungzip")(bytes.getData());
-		#else
-		var data = untyped js.Syntax.code("pako.ungzip")(bytes.getData());
-		#end
-		return Bytes.ofData(data);
 		#else
 		return null;
 		#end

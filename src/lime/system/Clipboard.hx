@@ -4,9 +4,6 @@ import lime._internal.backend.native.NativeCFFI;
 import lime.app.Application;
 import lime.app.Event;
 import lime.system.CFFI;
-#if (js && html5)
-import lime._internal.backend.html5.HTML5Window;
-#end
 
 /**
 	Reads and writes text on the system clipboard.
@@ -35,8 +32,7 @@ class Clipboard
 
 		#if (lime_cffi && !macro)
 		_text = NativeCFFI.lime_clipboard_get_text();
-		#elseif (js || html5)
-		_text = cacheText;
+
 		#end
 		__updated = true;
 
@@ -52,7 +48,7 @@ class Clipboard
 		// On some native platforms, __update() is called automatically when the
 		// native clipboard changes. On others, __update() needs to be called
 		// manually.
-		#if (js || html5 || ios || android)
+		#if (ios || android)
 		__update();
 		#elseif linux
 		// Xorg won't call __update until we call set_text at least once.
@@ -86,12 +82,7 @@ class Clipboard
 
 		#if (lime_cffi && !macro)
 		NativeCFFI.lime_clipboard_set_text(value);
-		#elseif (js && html5)
-		var window = Application.current.window;
-		if (window != null)
-		{
-			window.__backend.setClipboard(value);
-		}
+
 		#end
 
 		if (_text != cacheText)

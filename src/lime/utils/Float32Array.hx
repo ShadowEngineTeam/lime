@@ -1,85 +1,5 @@
 package lime.utils;
 
-#if (js && !doc_gen)
-import js.lib.Float32Array as JSFloat32Array;
-import js.lib.Uint8Array as JSUInt8Array;
-@:forward
-@:arrayAccess
-@:transitive
-abstract Float32Array(JSFloat32Array) from JSFloat32Array to JSFloat32Array
-{
-	@:to function toArrayBufferView():ArrayBufferView
-		return this;
-
-	public inline static var BYTES_PER_ELEMENT:Int = 4;
-
-	@:generic
-	public inline function new<T>(?elements:Int, ?array:Array<T>, #if openfl ?vector:openfl.Vector<Float>, #end ?view:ArrayBufferView, ?buffer:ArrayBuffer,
-			?byteoffset:Int = 0, ?len:Null<Int>)
-	{
-		if (elements != null)
-		{
-			this = new JSFloat32Array(elements);
-		}
-		else if (array != null)
-		{
-			this = new JSFloat32Array(untyped array);
-		#if (openfl && commonjs)
-		}
-		else if (vector != null)
-		{
-			this = new JSFloat32Array(untyped (vector));
-		#elseif openfl
-		}
-		else if (vector != null)
-		{
-			this = new JSFloat32Array(untyped untyped (vector).__array);
-		#end
-		}
-		else if (view != null)
-		{
-			this = new JSFloat32Array(untyped view);
-		}
-		else if (buffer != null)
-		{
-			if (len == null)
-			{
-				this = new JSFloat32Array(buffer, byteoffset);
-			}
-			else
-			{
-				this = new JSFloat32Array(buffer, byteoffset, len);
-			}
-		}
-		else
-		{
-			this = null;
-		}
-	}
-
-	@:arrayAccess extern inline function __set(idx:Int, val:Float):Float
-		return this[idx] = val;
-
-	@:arrayAccess extern inline function __get(idx:Int):Float
-		return this[idx];
-
-	// non spec haxe conversions
-	inline public static function fromBytes(bytes:haxe.io.Bytes, ?byteOffset:Int = 0, ?len:Int):Float32Array
-	{
-		if (byteOffset == null) return new JSFloat32Array(cast bytes.getData());
-		if (len == null) return new JSFloat32Array(cast bytes.getData(), byteOffset);
-		return new JSFloat32Array(cast bytes.getData(), byteOffset, len);
-	}
-
-	inline public function toBytes():haxe.io.Bytes
-	{
-		return @:privateAccess new haxe.io.Bytes(cast new JSUInt8Array(this.buffer));
-	}
-
-	inline function toString()
-		return this != null ? 'Float32Array [byteLength:${this.byteLength}, length:${this.length}]' : null;
-}
-#else
 import lime.utils.ArrayBuffer;
 import lime.utils.ArrayBufferView;
 
@@ -159,4 +79,3 @@ abstract Float32Array(ArrayBufferView) from ArrayBufferView to ArrayBufferView
 		return val;
 	}
 }
-#end // !js

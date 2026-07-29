@@ -43,7 +43,7 @@ class AssetsMacro
 			}
 		}
 
-		var superCall = Context.defined("html5") ? macro super(bytes.b.buffer) : macro super(bytes.length, bytes.b);
+		var superCall = macro super(bytes.length, bytes.b);
 
 		var definition = macro class Temp
 			{
@@ -201,12 +201,6 @@ class AssetsMacro
 
 		if (path != null && path != "")
 		{
-			if (Context.defined("html5"))
-			{
-				Sys.command("haxelib", ["run", "lime", "generate", "-font-hash", sys.FileSystem.fullPath(path)]);
-				path += ".hash";
-			}
-
 			var bytes = File.getBytes(path);
 			var resourceName = "LIME_font_" + (classType.pack.length > 0 ? classType.pack.join("_") + "_" : "") + classType.name;
 
@@ -244,61 +238,19 @@ class AssetsMacro
 
 	macro public static function embedImage():Array<Field>
 	{
-		var fields = embedData(":image", Context.defined("html5"));
+		var fields = embedData(":image");
 		if (fields == null) return null;
 
-		var definition:TypeDefinition;
-		if (Context.defined("html5"))
-		{
-			definition = macro class Temp
+		var definition:TypeDefinition = macro class Temp
+			{
+				public function new(?buffer:lime.graphics.ImageBuffer, ?offsetX:Int, ?offsetY:Int, ?width:Int, ?height:Int, ?color:Null<Int>,
+						?type:lime.graphics.ImageType)
 				{
-					public static var preload:js.html.Image;
+					super();
 
-					public function new(?buffer:lime.graphics.ImageBuffer, ?offsetX:Int, ?offsetY:Int, ?width:Int, ?height:Int, ?color:Null<Int>,
-							?type:lime.graphics.ImageType, ?onload:Dynamic = true)
-					{
-						super();
-
-						if (preload != null)
-						{
-							var buffer = new lime.graphics.ImageBuffer();
-							buffer.__srcImage = preload;
-							buffer.width = preload.width;
-							buffer.width = preload.height;
-
-							__fromImageBuffer(buffer);
-						}
-						else
-						{
-							__fromBase64(haxe.Resource.getString(resourceName), resourceType, function(image)
-							{
-								if (preload == null)
-								{
-									preload = image.buffer.__srcImage;
-								}
-
-								if (onload != null)
-								{
-									onload(image);
-								}
-							});
-						}
-					}
-				};
-		}
-		else
-		{
-			definition = macro class Temp
-				{
-					public function new(?buffer:lime.graphics.ImageBuffer, ?offsetX:Int, ?offsetY:Int, ?width:Int, ?height:Int, ?color:Null<Int>,
-							?type:lime.graphics.ImageType)
-					{
-						super();
-
-						__fromBytes(haxe.Resource.getBytes(resourceName), null);
-					}
-				};
-		}
+					__fromBytes(haxe.Resource.getBytes(resourceName), null);
+				}
+			};
 
 		for (field in definition.fields)
 		{
@@ -312,7 +264,7 @@ class AssetsMacro
 	{
 		var fields = embedData(":sound");
 		// CFFILoader.h(248) : NOT Implemented:api_buffer_data
-		if (fields == null || Context.defined("html5") || !Context.defined("openfl")) return null;
+		if (fields == null || !Context.defined("openfl")) return null;
 
 		var definition = macro class Temp
 			{

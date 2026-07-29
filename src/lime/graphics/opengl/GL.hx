@@ -1,6 +1,6 @@
 package lime.graphics.opengl;
 
-#if (!lime_doc_gen || lime_opengl || lime_opengles || lime_webgl)
+#if (!lime_doc_gen || lime_opengl || lime_opengles)
 import haxe.io.Bytes;
 import haxe.Int64;
 import lime.utils.ArrayBufferView;
@@ -313,11 +313,6 @@ class GL
 	public static inline var RENDERBUFFER_BINDING = 0x8CA7;
 	public static inline var MAX_RENDERBUFFER_SIZE = 0x84E8;
 	public static inline var INVALID_FRAMEBUFFER_OPERATION = 0x0506;
-	public static inline var UNPACK_FLIP_Y_WEBGL = 0x9240;
-	public static inline var UNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241;
-	public static inline var CONTEXT_LOST_WEBGL = 0x9242;
-	public static inline var UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
-	public static inline var BROWSER_DEFAULT_WEBGL = 0x9244;
 	public static inline var READ_BUFFER = 0x0C02;
 	public static inline var UNPACK_ROW_LENGTH = 0x0CF2;
 	public static inline var UNPACK_SKIP_ROWS = 0x0CF3;
@@ -580,13 +575,10 @@ class GL
 	public static inline var DEPTH32F_STENCIL8 = 0x8CAD;
 	public static inline var INVALID_INDEX = 0xFFFFFFFF;
 	public static inline var TIMEOUT_IGNORED = -1;
-	public static inline var MAX_CLIENT_WAIT_TIMEOUT_WEBGL = 0x9247;
 	#if lime_opengl
 	public static var context(default, null):OpenGLRenderContext;
 	#elseif lime_opengles
 	public static var context(default, null):OpenGLES3RenderContext;
-	#elseif lime_webgl
-	public static var context(default, null):WebGL2RenderContext;
 	#else
 	public static var context(default, null):Dynamic;
 	#end
@@ -706,12 +698,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function bufferDataWEBGL(target:Int, srcData:Dynamic, usage:Int, ?srcOffset:Int, ?length:Int):Void
-	{
-		context.bufferData(target, srcData, usage, srcOffset, length);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function bufferSubData(target:Int, dstByteOffset:Int, size:Int, srcData:DataPointer):Void
@@ -720,12 +706,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function bufferSubDataWEBGL(target:Int, dstByteOffset:Int, srcData:Dynamic, ?srcOffset:Int, ?length:Int):Void
-	{
-		context.bufferSubData(target, dstByteOffset, srcData, srcOffset, length);
-	}
-	#end
 
 	public static inline function checkFramebufferStatus(target:Int):Int
 	{
@@ -749,12 +729,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function clearBufferfvWEBGL(buffer:Int, drawbuffer:Int, values:Dynamic, ?srcOffset:Int):Void
-	{
-		context.clearBufferfv(buffer, drawbuffer, values, srcOffset);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function clearBufferiv(buffer:Int, drawbuffer:Int, value:DataPointer):Void
@@ -763,12 +737,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function clearBufferivWEBGL(buffer:Int, drawbuffer:Int, values:Dynamic, ?srcOffset:Int):Void
-	{
-		context.clearBufferiv(buffer, drawbuffer, values, srcOffset);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function clearBufferuiv(buffer:Int, drawbuffer:Int, value:DataPointer):Void
@@ -777,24 +745,12 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function clearBufferuivWEBGL(buffer:Int, drawbuffer:Int, values:Dynamic, ?srcOffset:Int):Void
-	{
-		context.clearBufferuiv(buffer, drawbuffer, values, srcOffset);
-	}
-	#end
 
 	public static inline function clearColor(red:Float, green:Float, blue:Float, alpha:Float):Void
 	{
 		context.clearColor(red, green, blue, alpha);
 	}
 
-	#if lime_webgl
-	public static inline function clearDepth(depth:Float):Void
-	{
-		context.clearDepth(depth);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function clearDepthf(depth:Float):Void
@@ -808,7 +764,7 @@ class GL
 		context.clearStencil(s);
 	}
 
-	public static inline function clientWaitSync(sync:GLSync, flags:Int, timeout:#if (!js || !html5 || doc_gen) Int64 #else Dynamic #end):Int
+	public static inline function clientWaitSync(sync:GLSync, flags:Int, timeout:Int64):Int
 	{
 		return context.clientWaitSync(sync, flags, timeout);
 	}
@@ -831,13 +787,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function compressedTexImage2DWEBGL(target:Int, level:Int, internalformat:Int, width:Int, height:Int, border:Int, srcData:Dynamic,
-			?srcOffset:Int, ?srcLengthOverride:Int):Void
-	{
-		context.compressedTexImage2D(target, level, internalformat, width, height, border, srcData, srcOffset, srcLengthOverride);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function compressedTexImage3D(target:Int, level:Int, internalformat:Int, width:Int, height:Int, depth:Int, border:Int, imageSize:Int,
@@ -847,13 +796,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function compressedTexImage3DWEBGL(target:Int, level:Int, internalformat:Int, width:Int, height:Int, depth:Int, border:Int,
-			srcData:Dynamic, ?srcOffset:Int, ?srcLengthOverride:Int):Void
-	{
-		context.compressedTexImage3D(target, level, internalformat, width, height, depth, border, srcData, srcOffset, srcLengthOverride);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function compressedTexSubImage2D(target:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Int, imageSize:Int,
@@ -863,13 +805,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function compressedTexSubImage2DWEBGL(target:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Int,
-			srcData:Dynamic, ?srcOffset:Int, ?srcLengthOverride:Int):Void
-	{
-		context.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, srcData, srcOffset, srcLengthOverride);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function compressedTexSubImage3D(target:Int, level:Int, xoffset:Int, yoffset:Int, zoffset:Int, width:Int, height:Int, depth:Int,
@@ -879,13 +814,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function compressedTexSubImage3DWEBGL(target:Int, level:Int, xoffset:Int, yoffset:Int, zoffset:Int, width:Int, height:Int, depth:Int,
-			format:Int, srcData:Dynamic, ?srcOffset:Int, ?srcLengthOverride:Int):Void
-	{
-		context.compressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, srcData, srcOffset, srcLengthOverride);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function copyBufferSubData(readTarget:Int, writeTarget:Int, readOffset:DataPointer, writeOffset:DataPointer, size:Int):Void
@@ -1029,12 +957,6 @@ class GL
 		context.depthMask(flag);
 	}
 
-	#if lime_webgl
-	public static inline function depthRange(zNear:Float, zFar:Float):Void
-	{
-		context.depthRange(zNear, zFar);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function depthRangef(zNear:Float, zFar:Float):Void
@@ -1258,12 +1180,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function getBufferSubDataWEBGL(target:Int, srcByteOffset:DataPointer, dstData:Dynamic, ?srcOffset:Dynamic, ?length:Int):Void
-	{
-		context.getBufferSubData(target, srcByteOffset, dstData, srcOffset, length);
-	}
-	#end
 
 	public static inline function getContextAttributes():GLContextAttributes
 	{
@@ -1750,12 +1666,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function getVertexAttribOffset(index:Int, pname:Int):DataPointer
-	{
-		return context.getVertexAttribOffset(index, pname);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function getVertexAttribPointerv(index:Int, pname:Int):DataPointer
@@ -1902,12 +1812,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function readPixelsWEBGL(x:Int, y:Int, width:Int, height:Int, format:Int, type:Int, pixels:Dynamic, ?dstOffset:Int):Void
-	{
-		context.readPixels(x, y, width, height, format, type, pixels, dstOffset);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function releaseShaderCompiler():Void
@@ -2001,13 +1905,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function texImage2DWEBGL(target:Int, level:Int, internalformat:Int, width:Int, height:Int, border:Dynamic, ?format:Int, ?type:Int,
-			?srcData:Dynamic, ?srcOffset:Int):Void
-	{
-		context.texImage2D(target, level, internalformat, width, height, border, format, type, srcData, srcOffset);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function texImage3D(target:Int, level:Int, internalformat:Int, width:Int, height:Int, depth:Int, border:Int, format:Int, type:Int,
@@ -2017,13 +1914,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function texImage3DWEBGL(target:Int, level:Int, internalformat:Int, width:Int, height:Int, depth:Int, border:Int, format:Int,
-			type:Int, srcData:Dynamic, ?srcOffset:Int):Void
-	{
-		context.texImage3D(target, level, internalformat, width, height, depth, border, format, type, srcData, srcOffset);
-	}
-	#end
 
 	public static inline function texStorage2D(target:Int, level:Int, internalformat:Int, width:Int, height:Int):Void
 	{
@@ -2053,13 +1943,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function texSubImage2DWEBGL(target:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Dynamic, ?type:Int,
-			?srcData:Dynamic, ?srcOffset:Int):Void
-	{
-		context.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, srcData, srcOffset);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function texSubImage3D(target:Int, level:Int, xoffset:Int, yoffset:Int, zoffset:Int, width:Int, height:Int, depth:Int, format:Int,
@@ -2069,13 +1952,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function texSubImage3DWEBGL(target:Int, level:Int, xoffset:Int, yoffset:Int, zoffset:Int, width:Int, height:Int, depth:Int,
-			format:Int, type:Int, source:Dynamic, ?srcOffset:Int):Void
-	{
-		context.texSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, source, srcOffset);
-	}
-	#end
 
 	public static inline function transformFeedbackVaryings(program:GLProgram, varyings:Array<String>, bufferMode:Int):Void
 	{
@@ -2094,12 +1970,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform1fvWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform1fv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform1i(location:GLUniformLocation, v0:Int):Void
 	{
@@ -2113,12 +1983,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform1ivWEBGL(location:GLUniformLocation, ?data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform1iv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform1ui(location:GLUniformLocation, v0:Int):Void
 	{
@@ -2132,12 +1996,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform1uivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform1uiv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform2f(location:GLUniformLocation, v0:Float, v1:Float):Void
 	{
@@ -2151,12 +2009,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform2fvWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform2fv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform2i(location:GLUniformLocation, x:Int, y:Int):Void
 	{
@@ -2170,12 +2022,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform2ivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform2iv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform2ui(location:GLUniformLocation, x:Int, y:Int):Void
 	{
@@ -2189,12 +2035,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform2uivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform2uiv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform3f(location:GLUniformLocation, v0:Float, v1:Float, v2:Float):Void
 	{
@@ -2208,12 +2048,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform3fvWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform3fv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform3i(location:GLUniformLocation, v0:Int, v1:Int, v2:Int):Void
 	{
@@ -2227,12 +2061,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform3ivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform3iv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform3ui(location:GLUniformLocation, v0:Int, v1:Int, v2:Int):Void
 	{
@@ -2246,12 +2074,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform3uivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform3uiv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform4f(location:GLUniformLocation, v0:Float, v1:Float, v2:Float, v3:Float):Void
 	{
@@ -2265,12 +2087,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform4fvWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform4fv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform4i(location:GLUniformLocation, v0:Int, v1:Int, v2:Int, v3:Int):Void
 	{
@@ -2284,12 +2100,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform4ivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform4iv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniform4ui(location:GLUniformLocation, v0:Int, v1:Int, v2:Int, v3:Int):Void
 	{
@@ -2303,12 +2113,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniform4uivWEBGL(location:GLUniformLocation, data:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniform4uiv(location, data, srcOffset, srcLength);
-	}
-	#end
 
 	public static inline function uniformBlockBinding(program:GLProgram, uniformBlockIndex:Int, uniformBlockBinding:Int):Void
 	{
@@ -2322,12 +2126,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniformMatrix2fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniformMatrix2fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix2x3fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2336,12 +2134,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniformMatrix2x3fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniformMatrix2x3fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix2x4fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2350,12 +2142,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniformMatrix2x4fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniformMatrix2x4fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix3fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2364,12 +2150,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniformMatrix3fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniformMatrix3fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix3x2fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2378,12 +2158,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniformMatrix3x2fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniformMatrix3x2fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix3x4fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2392,12 +2166,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniformMatrix3x4fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniformMatrix3x4fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix4fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2406,12 +2174,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniformMatrix4fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniformMatrix4fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix4x2fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2420,12 +2182,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniformMatrix4x2fvWEBGL(location:GLUniformLocation, transpose:Bool, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniformMatrix4x2fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix4x3fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2434,12 +2190,6 @@ class GL
 	}
 	#end
 
-	#if lime_webgl
-	public static inline function uniformMatrix4x3fvWEBGL(location:GLUniformLocation, transpose:Dynamic, v:Dynamic, ?srcOffset:Int, ?srcLength:Int):Void
-	{
-		context.uniformMatrix4x3fv(location, transpose, v, srcOffset, srcLength);
-	}
-	#end
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function unmapBuffer(target:Int):Bool
@@ -2463,76 +2213,52 @@ class GL
 		context.vertexAttrib1f(index, v0);
 	}
 
-	public static inline function vertexAttrib1fv(index:Int, v:#if (!js || !html5 || doc_gen) DataPointer #else Dynamic #end):Void
+	public static inline function vertexAttrib1fv(index:Int, v:DataPointer):Void
 	{
 		#if !doc_gen
 		context.vertexAttrib1fv(index, v);
 		#end
 	}
 
-	#if lime_webgl
-	public static inline function vertexAttrib1fvWEBGL(index:Int, v:Dynamic):Void
-	{
-		context.vertexAttrib1fv(index, v);
-	}
-	#end
 
 	public static inline function vertexAttrib2f(index:Int, v0:Float, v1:Float):Void
 	{
 		context.vertexAttrib2f(index, v0, v1);
 	}
 
-	public static inline function vertexAttrib2fv(index:Int, v:#if (!js || !html5 || doc_gen) DataPointer #else Dynamic #end):Void
+	public static inline function vertexAttrib2fv(index:Int, v:DataPointer):Void
 	{
 		#if !doc_gen
 		context.vertexAttrib2fv(index, v);
 		#end
 	}
 
-	#if lime_webgl
-	public static inline function vertexAttrib2fvWEBGL(index:Int, v:Dynamic):Void
-	{
-		context.vertexAttrib2fv(index, v);
-	}
-	#end
 
 	public static inline function vertexAttrib3f(index:Int, v0:Float, v1:Float, v2:Float):Void
 	{
 		context.vertexAttrib3f(index, v0, v1, v2);
 	}
 
-	public static inline function vertexAttrib3fv(index:Int, v:#if (!js || !html5 || doc_gen) DataPointer #else Dynamic #end):Void
+	public static inline function vertexAttrib3fv(index:Int, v:DataPointer):Void
 	{
 		#if !doc_gen
 		context.vertexAttrib3fv(index, v);
 		#end
 	}
 
-	#if lime_webgl
-	public static inline function vertexAttrib3fvWEBGL(index:Int, v:Dynamic):Void
-	{
-		context.vertexAttrib3fv(index, v);
-	}
-	#end
 
 	public static inline function vertexAttrib4f(index:Int, v0:Float, v1:Float, v2:Float, v3:Float):Void
 	{
 		context.vertexAttrib4f(index, v0, v1, v2, v3);
 	}
 
-	public static inline function vertexAttrib4fv(index:Int, v:#if (!js || !html5 || doc_gen) DataPointer #else Dynamic #end):Void
+	public static inline function vertexAttrib4fv(index:Int, v:DataPointer):Void
 	{
 		#if !doc_gen
 		context.vertexAttrib4fv(index, v);
 		#end
 	}
 
-	#if lime_webgl
-	public static inline function vertexAttrib4fvWEBGL(index:Int, v:Dynamic):Void
-	{
-		context.vertexAttrib4fv(index, v);
-	}
-	#end
 
 	public static inline function vertexAttribDivisor(index:Int, divisor:Int):Void
 	{
@@ -2544,38 +2270,26 @@ class GL
 		context.vertexAttribI4i(index, v0, v1, v2, v3);
 	}
 
-	public static inline function vertexAttribI4iv(index:Int, v:#if (!js || !html5 || doc_gen) DataPointer #else Dynamic #end):Void
+	public static inline function vertexAttribI4iv(index:Int, v:DataPointer):Void
 	{
 		#if !doc_gen
 		context.vertexAttribI4iv(index, v);
 		#end
 	}
 
-	#if lime_webgl
-	public static inline function vertexAttribI4ivWEBGL(index:Int, v:Dynamic):Void
-	{
-		context.vertexAttribI4iv(index, v);
-	}
-	#end
 
 	public static inline function vertexAttribI4ui(index:Int, v0:Int, v1:Int, v2:Int, v3:Int):Void
 	{
 		context.vertexAttribI4ui(index, v0, v1, v2, v3);
 	}
 
-	public static inline function vertexAttribI4uiv(index:Int, v:#if (!js || !html5 || doc_gen) DataPointer #else Dynamic #end):Void
+	public static inline function vertexAttribI4uiv(index:Int, v:DataPointer):Void
 	{
 		#if !doc_gen
 		context.vertexAttribI4uiv(index, v);
 		#end
 	}
 
-	#if lime_webgl
-	public static inline function vertexAttribI4uivWEBGL(index:Int, v:Dynamic):Void
-	{
-		context.vertexAttribI4uiv(index, v);
-	}
-	#end
 
 	public static inline function vertexAttribIPointer(index:Int, size:Int, type:Int, stride:Int, offset:DataPointer):Void
 	{
@@ -2592,18 +2306,17 @@ class GL
 		context.viewport(x, y, width, height);
 	}
 
-	public static inline function waitSync(sync:GLSync, flags:Int, timeout:#if (!js || !html5 || doc_gen) Int64 #else Dynamic #end):Void
+	public static inline function waitSync(sync:GLSync, flags:Int, timeout:Int64):Void
 	{
 		context.waitSync(sync, flags, timeout);
 	}
 
-	private static inline function __getObjectID(object:#if (!js || !html5 || doc_gen) GLObject #else Dynamic #end):Int
+	private static inline function __getObjectID(object:GLObject):Int
 	{
 		return (object == null) ? 0 : @:privateAccess object.id;
 	}
 }
 
-#if (!js || !html5 || doc_gen)
 @:access(lime._internal.backend.native.NativeCFFI)
 @:dox(hide) @:noCompletion class GLObject
 {
@@ -2652,5 +2365,4 @@ class GL
 	var SYNC = 10;
 	var TRANSFORM_FEEDBACK = 11;
 }
-#end
 #end

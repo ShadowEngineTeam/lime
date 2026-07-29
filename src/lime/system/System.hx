@@ -10,11 +10,7 @@ import lime.ui.WindowAttributes;
 import lime.utils.ArrayBuffer;
 import lime.utils.UInt8Array;
 import lime.utils.UInt16Array;
-#if ((js && html5) || electron)
-import js.html.Element;
-import js.Browser;
-#end
-#if sys
+	#if sys
 import sys.io.Process;
 #end
 
@@ -113,70 +109,6 @@ class System
 	@:noCompletion private static var __platformVersion:String;
 	@:noCompletion private static var __userDirectory:String;
 
-	#if (js && html5)
-	@:keep @:expose("lime.embed")
-	public static function embed(projectName:String, element:Dynamic, width:Null<Int> = null, height:Null<Int> = null, config:Dynamic = null):Void
-	{
-		if (__applicationEntryPoint == null) return;
-
-		if (__applicationEntryPoint.exists(projectName))
-		{
-			var htmlElement:Element = null;
-
-			if ((element is String))
-			{
-				htmlElement = cast Browser.document.getElementById(element);
-			}
-			else if (element == null)
-			{
-				htmlElement = cast Browser.document.createElement("div");
-			}
-			else
-			{
-				htmlElement = cast element;
-			}
-
-			if (htmlElement == null)
-			{
-				Browser.window.console.log("[lime.embed] ERROR: Cannot find target element: " + element);
-				return;
-			}
-
-			if (width == null)
-			{
-				width = 0;
-			}
-
-			if (height == null)
-			{
-				height = 0;
-			}
-
-			if (config == null) config = {};
-
-			if (Reflect.hasField(config, "background") && (config.background is String))
-			{
-				var background = StringTools.replace(Std.string(config.background), "#", "");
-
-				if (background.indexOf("0x") > -1)
-				{
-					config.background = Std.parseInt(background);
-				}
-				else
-				{
-					config.background = Std.parseInt("0x" + background);
-				}
-			}
-
-			config.element = htmlElement;
-			config.width = width;
-			config.height = height;
-
-			__applicationEntryPoint[projectName](config);
-		}
-	}
-	#end
-
 	#if (!lime_doc_gen || sys)
 	/**
 		Attempts to exit the application. Dispatches `onExit`, and will not
@@ -197,7 +129,7 @@ class System
 	{
 		var currentApp = Application.current;
 
-		#if ((sys || (js && html5)) && !macro)
+		#if (sys && !macro)
 		if (currentApp != null)
 		{
 			currentApp.onExit.dispatch(code);
@@ -211,11 +143,6 @@ class System
 
 		#if sys
 		Sys.exit(code);
-		#elseif (js && html5)
-		if (currentApp != null && currentApp.window != null)
-		{
-			currentApp.window.close();
-		}
 		#end
 	}
 	#end
@@ -268,41 +195,6 @@ class System
 
 			return display;
 		}
-		#elseif (js && html5)
-		if (id == 0)
-		{
-			var display = new Display();
-			display.id = 0;
-			display.name = "Generic Display";
-			display.dpi = 96 * Browser.window.devicePixelRatio;
-			display.currentMode = new DisplayMode(Browser.window.screen.width, Browser.window.screen.height, 60, ARGB32);
-
-			if (Browser.window.screen.orientation != null)
-			{
-				switch (Browser.window.screen.orientation.type)
-				{
-					case PORTRAIT_PRIMARY:
-						display.orientation = PORTRAIT;
-					case PORTRAIT_SECONDARY:
-						display.orientation = PORTRAIT_FLIPPED;
-					case LANDSCAPE_PRIMARY:
-						display.orientation = LANDSCAPE;
-					case LANDSCAPE_SECONDARY:
-						display.orientation = LANDSCAPE_FLIPPED;
-					default:
-						display.orientation = UNKNOWN;
-				}
-			}
-			else
-			{
-				display.orientation = UNKNOWN;
-			}
-
-			display.supportedModes = [display.currentMode];
-			display.bounds = new Rectangle(0, 0, display.currentMode.width, display.currentMode.height);
-			display.safeArea = new Rectangle(0, 0, display.currentMode.width, display.currentMode.height);
-			return display;
-		}
 		#end
 
 		return null;
@@ -313,9 +205,7 @@ class System
 	**/
 	public static function getTimer():Float
 	{
-		#if (js || electron)
-		return Browser.window.performance.now();
-		#elseif (lime_cffi && !macro && !neko)
+		#if (lime_cffi && !macro && !neko)
 		return NativeCFFI.lime_system_get_timer() / 1e+6;
 		#elseif cpp
 		return untyped __global__.__time_stamp() * 1000;
@@ -331,18 +221,7 @@ class System
 	**/
 	public static function getTheme():Theme
 	{
-		#if (js || electron)
-		if (Browser.window.matchMedia('(prefers-color-scheme: dark)').matches)
-		{
-			return DARK;
-		}
-		else if (Browser.window.matchMedia('(prefers-color-scheme: light)').matches)
-		{
-			return LIGHT;
-		}
-
-		return UNKNOWN;
-		#elseif (lime_cffi && !macro)
+		#if (lime_cffi && !macro)
 		return cast NativeCFFI.lime_system_get_theme();
 		#else
 		return UNKNOWN;
@@ -369,17 +248,15 @@ class System
 	{
 		if (path != null)
 		{
-			#if (sys && windows)
-			Sys.command("start", ["", path]);
-			#elseif mac
-			Sys.command("/usr/bin/open", [path]);
-			#elseif linux
-			Sys.command("/usr/bin/xdg-open", [path]);
-			#elseif (js && html5)
-			Browser.window.open(path, "_blank");
-			#elseif (lime_cffi && !macro)
-			NativeCFFI.lime_system_open_file(path);
-			#end
+		#if (sys && windows)
+		Sys.command("start", ["", path]);
+		#elseif mac
+		Sys.command("/usr/bin/open", [path]);
+		#elseif linux
+		Sys.command("/usr/bin/xdg-open", [path]);
+		#elseif (lime_cffi && !macro)
+		NativeCFFI.lime_system_open_file(path);
+		#end
 		}
 	}
 
@@ -390,13 +267,11 @@ class System
 	{
 		if (url != null)
 		{
-			#if desktop
-			openFile(url);
-			#elseif (js && html5)
-			Browser.window.open(url, target);
-			#elseif (lime_cffi && !macro)
-			NativeCFFI.lime_system_open_url(url, target);
-			#end
+		#if desktop
+		openFile(url);
+		#elseif (lime_cffi && !macro)
+		NativeCFFI.lime_system_open_url(url, target);
+		#end
 		}
 	}
 
@@ -698,7 +573,7 @@ class System
 	{
 		if (__deviceVendor == null)
 		{
-			#if (lime_cffi && !macro && windows && !html5)
+			#if (lime_cffi && !macro && windows)
 			__deviceVendor = NativeCFFI.lime_system_get_device_vendor();
 			#elseif android
 			var vendor:String = android.os.Build.MANUFACTURER;
@@ -790,7 +665,7 @@ class System
 	{
 		if (__platformLabel == null)
 		{
-			#if (lime_cffi && !macro && windows && !html5)
+			#if (lime_cffi && !macro && windows)
 			var label:String = NativeCFFI.lime_system_get_platform_label();
 			if (label != null) __platformLabel = StringTools.trim(label);
 			#elseif linux
@@ -820,8 +695,6 @@ class System
 			__platformName = "iOS";
 			#elseif android
 			__platformName = "Android";
-			#elseif js
-			__platformName = "HTML5";
 			#end
 		}
 
@@ -832,7 +705,7 @@ class System
 	{
 		if (__platformVersion == null)
 		{
-			#if (lime_cffi && !macro && windows && !html5)
+			#if (lime_cffi && !macro && windows)
 			__platformVersion = NativeCFFI.lime_system_get_platform_version();
 			#elseif android
 			var release = android.os.Build.VERSION.RELEASE;

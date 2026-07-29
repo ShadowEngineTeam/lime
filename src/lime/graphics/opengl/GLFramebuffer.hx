@@ -1,6 +1,6 @@
 package lime.graphics.opengl;
 
-#if (!lime_doc_gen || lime_opengl || lime_opengles || lime_webgl)
+#if (!lime_doc_gen || lime_opengl || lime_opengles)
 #if ((lime_opengl || lime_opengles) && !doc_gen)
 import lime.graphics.opengl.GL;
 
@@ -12,8 +12,6 @@ abstract GLFramebuffer(GLObject) from GLObject to GLObject
 		return GLObject.fromInt(FRAMEBUFFER, id);
 	}
 }
-#elseif (lime_webgl && !doc_gen)
-typedef GLFramebuffer = js.html.webgl.Framebuffer;
 #else
 typedef GLFramebuffer = Dynamic;
 #end

@@ -23,7 +23,7 @@ abstract DataPointer(DataPointerType) to DataPointerType
 		this = data;
 	}
 
-	#if (lime_cffi && !js && !doc_gen)
+	#if (lime_cffi && !doc_gen)
 	@:from @:noCompletion private static function fromInt(value:Int):DataPointer
 	{
 		#if (lime_cffi && !macro)
@@ -66,7 +66,7 @@ abstract DataPointer(DataPointerType) to DataPointerType
 		#if (cpp && !doc_gen)
 		if (arrayBufferView == null) return cast 0;
 		return Pointer.arrayElem(arrayBufferView.buffer.b, 0).add(arrayBufferView.byteOffset);
-		#elseif (lime_cffi && !js && !macro)
+		#elseif (lime_cffi && !macro)
 		if (arrayBufferView == null) return cast 0;
 		var data:Float = NativeCFFI.lime_bytes_get_data_pointer_offset(arrayBufferView.buffer, arrayBufferView.byteOffset);
 		return new DataPointer(data);
@@ -235,7 +235,7 @@ abstract DataPointer(DataPointerType) to DataPointerType
 	}
 }
 
-#if (lime_cffi && !js)
+#if lime_cffi
 private typedef DataPointerType = Float;
 #else
 private typedef DataPointerType = Int;
