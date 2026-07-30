@@ -12,6 +12,7 @@
 		<section unless="isMsvc">
 
 			<compilerflag value="-DHAVE_UNISTD_H" />
+			<compilerflag value="-DZLIB_WINAPI" if="windows" />
 			<compilerflag value="-DHAVE_CPUID_GNU" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
 			<compilerflag value="-DHAVE_ATTRIBUTE_ALIGNED" />
 			<compilerflag value="-DHAVE_BUILTIN_ASSUME_ALIGNED" />
@@ -23,7 +24,8 @@
 
 			<compilerflag value="-D_CRT_SECURE_NO_DEPRECATE" />
 			<compilerflag value="-D_CRT_NONSTDC_NO_DEPRECATE" />
-			<compilerflag value="-DHAVE_CPUID_MS" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+			<compilerflag value="-DZLIB_WINAPI" />
+			<compilerflag value="-DHAVE_CPUID_MS" unless="HXCPP_ARM64" />
 			<compilerflag value="-D__SSE__=1" />
 			<compilerflag value="-D__SSE2__=1" />
 
@@ -48,8 +50,13 @@
 			<compilerflag value="-DARM_NEON" />
 			<compilerflag value="-DARM_CRC32" />
 			<compilerflag value="-DARM_NEON_HASLD4" />
-			<compilerflag value="-DARM_NEON_DOTPROD" />
-			<compilerflag value="-DARM_PMULL_EOR3" />
+
+			<section if="HXCPP_ARM64">
+
+				<compilerflag value="-DARM_NEON_DOTPROD" />
+				<!--<compilerflag value="-DARM_PMULL_EOR3" />-->
+
+			</section>
 
 		</section>
 
@@ -130,8 +137,13 @@
 			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/compare256_neon.c" />
 			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/slide_hash_neon.c" />
 			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/crc32_armv8.c" />
-			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/adler32_neon_dotprod.c" />
-			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/crc32_armv8_pmull_eor3.c" />
+
+			<section if="HXCPP_ARM64">
+
+				<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/adler32_neon_dotprod.c" />
+				<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/crc32_armv8_pmull_eor3.c" />
+
+			</section>
 
 		</section>
 
