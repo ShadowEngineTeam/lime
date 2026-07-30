@@ -1,0 +1,4 @@
+#ifndef ZLIB_NAME_MANGLING_H
+#define ZLIB_NAME_MANGLING_H
+
+#endif /* ZLIB_NAME_MANGLING_H */

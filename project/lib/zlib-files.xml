@@ -2,29 +2,138 @@
 
 	<files id="native-toolkit-zlib">
 
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/zlib" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/zlib" />
+
+		<compilerflag value="-DZLIB_COMPAT" />
+		<compilerflag value="-DWITH_GZFILEOP" />
+		<compilerflag value="-DWITH_OPTIM" />
 
 		<section unless="isMsvc">
 
 			<compilerflag value="-DHAVE_UNISTD_H" />
+			<compilerflag value="-DHAVE_CPUID_GNU" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+			<compilerflag value="-DHAVE_ATTRIBUTE_ALIGNED" />
+			<compilerflag value="-DHAVE_BUILTIN_ASSUME_ALIGNED" />
+			<compilerflag value="-DHAVE_VISIBILITY_HIDDEN" />
+
+		</section>
+
+		<section if="isMsvc">
+
+			<compilerflag value="-D_CRT_SECURE_NO_DEPRECATE" />
+			<compilerflag value="-D_CRT_NONSTDC_NO_DEPRECATE" />
+			<compilerflag value="-DHAVE_CPUID_MS" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
+			<compilerflag value="-D__SSE__=1" />
+			<compilerflag value="-D__SSE2__=1" />
+
+		</section>
+
+		<section unless="HXCPP_ARM64 || HXCPP_ARMV7">
+
+			<compilerflag value="-DX86_FEATURES" />
+			<compilerflag value="-DX86_HAVE_XSAVE_INTRIN" unless="isMsvc" />
+			<compilerflag value="-DX86_SSE2" />
+			<compilerflag value="-DX86_SSSE3" />
+			<compilerflag value="-DX86_SSE41" />
+			<compilerflag value="-DX86_SSE42" />
+			<compilerflag value="-DX86_PCLMULQDQ_CRC" />
+			<compilerflag value="-DX86_AVX2" />
+
+		</section>
+
+		<section if="HXCPP_ARM64 || HXCPP_ARMV7">
+
+			<compilerflag value="-DARM_FEATURES" />
+			<compilerflag value="-DARM_NEON" />
+			<compilerflag value="-DARM_CRC32" />
+			<compilerflag value="-DARM_NEON_HASLD4" />
+			<compilerflag value="-DARM_NEON_DOTPROD" />
+			<compilerflag value="-DARM_PMULL_EOR3" />
 
 		</section>
 
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/adler32.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/compress.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/crc32.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/crc32_braid_comb.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/deflate.c" />
-		<file name="${NATIVE_TOOLKIT_PATH}/zlib/gzclose.c" />
-		<file name="${NATIVE_TOOLKIT_PATH}/zlib/gzlib.c" />
-		<file name="${NATIVE_TOOLKIT_PATH}/zlib/gzread.c" />
-		<file name="${NATIVE_TOOLKIT_PATH}/zlib/gzwrite.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/deflate_fast.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/deflate_huff.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/deflate_medium.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/deflate_quick.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/deflate_rle.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/deflate_slow.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/deflate_stored.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/functable.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/infback.c" />
-		<file name="${NATIVE_TOOLKIT_PATH}/zlib/inffast.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/inflate.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/inftrees.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/insert_string.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/trees.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/uncompr.c" />
 		<file name="${NATIVE_TOOLKIT_PATH}/zlib/zutil.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/gzlib.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/gzread.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/gzwrite.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/zlib/cpu_features.c" />
+
+		<section>
+
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/generic/adler32_c.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/generic/chunkset_c.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/generic/compare256_c.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/generic/crc32_braid_c.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/generic/crc32_chorba_c.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/generic/slide_hash_c.c" />
+
+		</section>
+
+		<section unless="HXCPP_ARM64 || HXCPP_ARMV7">
+
+			<section unless="isMsvc">
+
+				<compilerflag value="-msse2" />
+				<compilerflag value="-mssse3" />
+				<compilerflag value="-msse4.1" />
+				<compilerflag value="-msse4.2" />
+				<compilerflag value="-mpclmul" />
+				<compilerflag value="-mavx2" />
+				<compilerflag value="-mbmi" />
+				<compilerflag value="-mbmi2" />
+
+			</section>
+
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/x86_features.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/chunkset_sse2.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/compare256_sse2.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/crc32_chorba_sse2.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/slide_hash_sse2.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/adler32_ssse3.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/chunkset_ssse3.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/crc32_chorba_sse41.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/adler32_sse42.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/crc32_pclmulqdq.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/adler32_avx2.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/chunkset_avx2.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/compare256_avx2.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/x86/slide_hash_avx2.c" />
+
+		</section>
+
+		<section if="HXCPP_ARM64 || HXCPP_ARMV7">
+
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/arm_features.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/slide_hash_armv6.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/adler32_neon.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/chunkset_neon.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/compare256_neon.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/slide_hash_neon.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/crc32_armv8.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/adler32_neon_dotprod.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/crc32_armv8_pmull_eor3.c" />
+
+		</section>
 
 	</files>
 
