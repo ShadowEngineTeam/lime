@@ -5,6 +5,7 @@
 		<section>
 
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/harfbuzz/src" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/zlib" />
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/zlib" />
 
 		</section>
