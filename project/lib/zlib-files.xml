@@ -54,7 +54,7 @@
 			<section if="HXCPP_ARM64">
 
 				<compilerflag value="-DARM_NEON_DOTPROD" />
-				<!--<compilerflag value="-DARM_PMULL_EOR3" />-->
+				<compilerflag value="-DARM_PMULL_EOR3" />
 
 			</section>
 
@@ -136,10 +136,10 @@
 			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/chunkset_neon.c" />
 			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/compare256_neon.c" />
 			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/slide_hash_neon.c" />
-			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/crc32_armv8.c" />
 
 			<section if="HXCPP_ARM64">
 
+				<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/crc32_armv8.c" />
 				<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/adler32_neon_dotprod.c" />
 				<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/crc32_armv8_pmull_eor3.c" />
 
