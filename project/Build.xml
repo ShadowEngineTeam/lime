@@ -27,6 +27,7 @@
 	<set name="LIME_OGG" value="1" />
 	<set name="LIME_OPUS" value="1" />
 	<set name="LIME_DR_LIBS" value="1" />
+	<set name="LIME_OBOE" value="1" if="android" />
 	<set name="LIME_OPENAL" value="1" if="windows || linux || mac || android || iphone" />
 	<set name="LIME_OPENGL" value="1" />
 	<set name="LIME_GLAD" value="1" if="LIME_OPENGL" unless="iphone" />
@@ -280,6 +281,7 @@
 	<include name="lib/opusfile-files.xml" />
 	<include name="lib/opus-files.xml" />
 	<include name="lib/dr_libs-files.xml" />
+	<include name="lib/oboe-files.xml" />
 	<include name="lib/openal-files.xml" />
 	<include name="lib/pixman-files.xml" />
 	<include name="lib/sdl-files.xml" />
@@ -305,6 +307,7 @@
 		<files id="native-toolkit-opusfile" if="LIME_OPUS" />
 		<files id="native-toolkit-opus" if="LIME_OPUS" />
 		<files id="native-toolkit-dr_libs" if="LIME_DR_LIBS" />
+		<files id="native-toolkit-oboe" if="LIME_OBOE" />
 		<files id="native-toolkit-openal" if="LIME_OPENAL" />
 		<files id="native-toolkit-pixman" if="LIME_PIXMAN" />
 		<files id="native-toolkit-sdl" if="LIME_SDL" />
@@ -423,7 +426,7 @@
 				<lib name="-lEGL" />
 				<lib name="-lGLESv2" />
 				<lib name="-lOpenSLES" />
-				<lib name="-laaudio" />
+				<lib name="-lAAudio" />
 
 			</section>
 
