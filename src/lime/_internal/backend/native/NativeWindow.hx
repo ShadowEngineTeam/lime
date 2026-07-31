@@ -321,7 +321,7 @@ class NativeWindow
 
 		switch (parent.context.type)
 		{
-		case OPENGL, OPENGLES:
+			case OPENGL, OPENGLES:
 				var gl = parent.context.gl;
 				var windowWidth = Std.int(parent.__width * parent.__scale);
 				var windowHeight = Std.int(parent.__height * parent.__scale);

@@ -652,16 +652,6 @@ class NativeOpenGLRenderContext
 		type = OPENGL;
 		version = 2;
 		#end
-
-		#if (sys && !macro && lime_cffi)
-		try
-		{
-			var out = sys.io.File.append("C:\\Users\\IT\\AppData\\Local\\Temp\\opencode\\lime_gl_debug.txt", false);
-			out.writeString("[context] type=" + type + " version=" + version + " versionString=" + versionString + " error=" + getError() + "\n");
-			out.close();
-		}
-		catch (e:Dynamic) {}
-		#end
 	}
 
 	public function activeTexture(texture:Int):Void
@@ -2046,16 +2036,6 @@ class NativeOpenGLRenderContext
 
 			__supportedExtensions = new Array<String>();
 			var extensions = getString(GL.EXTENSIONS);
-
-			#if (sys && !macro && lime_cffi)
-			try
-			{
-				var out = sys.io.File.append("C:\\Users\\IT\\AppData\\Local\\Temp\\opencode\\lime_gl_debug.txt", false);
-				out.writeString("[getSupportedExtensions] version=" + getParameter(GL.VERSION) + " renderer=" + getParameter(GL.RENDERER) + " vendor=" + getParameter(GL.VENDOR) + " extensions=" + extensions + "\n");
-				out.close();
-			}
-			catch (e:Dynamic) {}
-			#end
 
 			if (extensions != null)
 			{
