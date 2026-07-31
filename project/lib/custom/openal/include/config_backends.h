@@ -48,10 +48,6 @@
 
 #define HAVE_WAVE 0
 
-#if defined (NATIVE_TOOLKIT_HAVE_SDL)
-# define HAVE_SDL3 1
-#else
-# define HAVE_SDL3 0
-#endif
+#define HAVE_SDL3 1
 
 #define HAVE_SDL2 0
