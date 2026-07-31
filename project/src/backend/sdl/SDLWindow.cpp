@@ -45,7 +45,12 @@ namespace lime {
 		#else
 		SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		#endif
+
+		#if defined(LIME_OPENGL_GLES)
+		SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+		#else
 		SDL_GL_SetAttribute (SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+		#endif
 
 		if (flags & WINDOW_FLAG_DEPTH_BUFFER) {
 
