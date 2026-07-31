@@ -341,6 +341,11 @@ class NativeOpenGLRenderContext
 	public var RENDERBUFFER_BINDING = 0x8CA7;
 	public var MAX_RENDERBUFFER_SIZE = 0x84E8;
 	public var INVALID_FRAMEBUFFER_OPERATION = 0x0506;
+	public var UNPACK_FLIP_Y_WEBGL = 0x9240;
+	public var UNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241;
+	public var CONTEXT_LOST_WEBGL = 0x9242;
+	public var UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
+	public var BROWSER_DEFAULT_WEBGL = 0x9244;
 	public var READ_BUFFER = 0x0C02;
 	public var UNPACK_ROW_LENGTH = 0x0CF2;
 	public var UNPACK_SKIP_ROWS = 0x0CF3;
@@ -603,6 +608,7 @@ class NativeOpenGLRenderContext
 	public var DEPTH32F_STENCIL8 = 0x8CAD;
 	public var INVALID_INDEX = 0xFFFFFFFF;
 	public var TIMEOUT_IGNORED = -1;
+	public var MAX_CLIENT_WAIT_TIMEOUT_WEBGL = 0x9247;
 	public var type(default, null):RenderContextType;
 	public var version(default, null):Float;
 
@@ -645,6 +651,16 @@ class NativeOpenGLRenderContext
 		#else
 		type = OPENGL;
 		version = 2;
+		#end
+
+		#if (sys && !macro && lime_cffi)
+		try
+		{
+			var out = sys.io.File.append("C:\\Users\\IT\\AppData\\Local\\Temp\\opencode\\lime_gl_debug.txt", false);
+			out.writeString("[context] type=" + type + " version=" + version + " versionString=" + versionString + " error=" + getError() + "\n");
+			out.close();
+		}
+		catch (e:Dynamic) {}
 		#end
 	}
 
@@ -1731,7 +1747,7 @@ class NativeOpenGLRenderContext
 		switch (pname)
 		{
 			case GL.BLEND, GL.CULL_FACE, GL.DEPTH_TEST, GL.DEPTH_WRITEMASK, GL.DITHER, GL.POLYGON_OFFSET_FILL, GL.SAMPLE_COVERAGE_INVERT, GL.SCISSOR_TEST,
-				GL.STENCIL_TEST:
+				GL.STENCIL_TEST, GL.UNPACK_FLIP_Y_WEBGL, GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL:
 				return getBoolean(pname);
 
 			case GL.COLOR_WRITEMASK:
@@ -1764,7 +1780,7 @@ class NativeOpenGLRenderContext
 				GL.MAX_VERTEX_UNIFORM_VECTORS, GL.PACK_ALIGNMENT, GL.RED_BITS, GL.SAMPLE_BUFFERS, GL.SAMPLES, GL.STENCIL_BACK_FAIL, GL.STENCIL_BACK_FUNC,
 				GL.STENCIL_BACK_PASS_DEPTH_FAIL, GL.STENCIL_BACK_PASS_DEPTH_PASS, GL.STENCIL_BACK_REF, GL.STENCIL_BACK_VALUE_MASK, GL.STENCIL_BACK_WRITEMASK,
 				GL.STENCIL_BITS, GL.STENCIL_CLEAR_VALUE, GL.STENCIL_FAIL, GL.STENCIL_FUNC, GL.STENCIL_PASS_DEPTH_FAIL, GL.STENCIL_PASS_DEPTH_PASS,
-				GL.STENCIL_REF, GL.STENCIL_VALUE_MASK, GL.STENCIL_WRITEMASK, GL.SUBPIXEL_BITS, GL.UNPACK_ALIGNMENT:
+				GL.STENCIL_REF, GL.STENCIL_VALUE_MASK, GL.STENCIL_WRITEMASK, GL.SUBPIXEL_BITS, GL.UNPACK_ALIGNMENT, GL.UNPACK_COLORSPACE_CONVERSION_WEBGL:
 				return getInteger(pname);
 
 			case GL.COMPRESSED_TEXTURE_FORMATS:
@@ -2030,6 +2046,16 @@ class NativeOpenGLRenderContext
 
 			__supportedExtensions = new Array<String>();
 			var extensions = getString(GL.EXTENSIONS);
+
+			#if (sys && !macro && lime_cffi)
+			try
+			{
+				var out = sys.io.File.append("C:\\Users\\IT\\AppData\\Local\\Temp\\opencode\\lime_gl_debug.txt", false);
+				out.writeString("[getSupportedExtensions] version=" + getParameter(GL.VERSION) + " renderer=" + getParameter(GL.RENDERER) + " vendor=" + getParameter(GL.VENDOR) + " extensions=" + extensions + "\n");
+				out.close();
+			}
+			catch (e:Dynamic) {}
+			#end
 
 			if (extensions != null)
 			{

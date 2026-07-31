@@ -313,6 +313,11 @@ class GL
 	public static inline var RENDERBUFFER_BINDING = 0x8CA7;
 	public static inline var MAX_RENDERBUFFER_SIZE = 0x84E8;
 	public static inline var INVALID_FRAMEBUFFER_OPERATION = 0x0506;
+	public static inline var UNPACK_FLIP_Y_WEBGL = 0x9240;
+	public static inline var UNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241;
+	public static inline var CONTEXT_LOST_WEBGL = 0x9242;
+	public static inline var UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
+	public static inline var BROWSER_DEFAULT_WEBGL = 0x9244;
 	public static inline var READ_BUFFER = 0x0C02;
 	public static inline var UNPACK_ROW_LENGTH = 0x0CF2;
 	public static inline var UNPACK_SKIP_ROWS = 0x0CF3;
@@ -575,6 +580,7 @@ class GL
 	public static inline var DEPTH32F_STENCIL8 = 0x8CAD;
 	public static inline var INVALID_INDEX = 0xFFFFFFFF;
 	public static inline var TIMEOUT_IGNORED = -1;
+	public static inline var MAX_CLIENT_WAIT_TIMEOUT_WEBGL = 0x9247;
 	#if lime_opengl
 	public static var context(default, null):OpenGLRenderContext;
 	#elseif lime_opengles
