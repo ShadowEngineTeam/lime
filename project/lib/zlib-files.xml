@@ -12,7 +12,6 @@
 		<section unless="isMsvc">
 
 			<compilerflag value="-DHAVE_UNISTD_H" />
-			<compilerflag value="-DZLIB_WINAPI" if="windows" />
 			<compilerflag value="-DHAVE_CPUID_GNU" unless="HXCPP_ARMV7 || HXCPP_ARM64" />
 			<compilerflag value="-DHAVE_ATTRIBUTE_ALIGNED" />
 			<compilerflag value="-DHAVE_BUILTIN_ASSUME_ALIGNED" />
@@ -24,7 +23,6 @@
 
 			<compilerflag value="-D_CRT_SECURE_NO_DEPRECATE" />
 			<compilerflag value="-D_CRT_NONSTDC_NO_DEPRECATE" />
-			<compilerflag value="-DZLIB_WINAPI" />
 
 			<section unless="HXCPP_ARM64">
 

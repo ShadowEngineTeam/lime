@@ -2,7 +2,6 @@ package lime.media;
 
 import lime.utils.Log;
 
-@:access(lime.media.FlashAudioContext)
 @:access(lime.media.OpenALAudioContext)
 class AudioContext
 {
