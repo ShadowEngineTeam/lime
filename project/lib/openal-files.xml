@@ -28,8 +28,8 @@
 
             <section if="android">
 
-                <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/openal/oboe/include" />
-                <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/openal/oboe/src" />
+                <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/oboe/include" />
+                <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/oboe/src" />
 
             </section>
 
