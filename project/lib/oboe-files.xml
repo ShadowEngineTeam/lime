@@ -2,6 +2,9 @@
 
     <files id="native-toolkit-oboe">
 
+        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/openal/oboe/include" />
+        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/openal/oboe/src" />
+
         <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/aaudio/AAudioLoader.cpp" />
         <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/aaudio/AudioStreamAAudio.cpp" />
 
