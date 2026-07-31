@@ -426,7 +426,7 @@
 				<lib name="-lEGL" />
 				<lib name="-lGLESv2" />
 				<lib name="-lOpenSLES" />
-				<lib name="-lAAudio" />
+				<lib name="-laaudio" />
 
 			</section>
 
