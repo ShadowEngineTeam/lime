@@ -26,6 +26,13 @@
 
             <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/openal/gsl/include" />
 
+            <section if="android">
+
+                <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/openal/oboe/include" />
+                <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/openal/oboe/src" />
+
+            </section>
+
             <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include" />
             <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/include" />
 
