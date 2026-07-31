@@ -40,11 +40,11 @@ namespace lime {
 		if (flags & WINDOW_FLAG_MAXIMIZED) sdlWindowFlags |= SDL_WINDOW_MAXIMIZED;
 		if (flags & WINDOW_FLAG_ALWAYS_ON_TOP) sdlWindowFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
 
-		#ifdef LIME_OPENGL_GL
+		/*#if defined(LIME_OPENGL_GL) && !defined(TARGET_OS_MAC)
 		SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		#else
+		#else*/
 		SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		#endif
+		//#endif
 
 		if (flags & WINDOW_FLAG_DEPTH_BUFFER) {
 
