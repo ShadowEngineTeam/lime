@@ -616,6 +616,19 @@ class NativeOpenGLRenderContext
 	private var __renderbufferBinding:GLRenderbuffer;
 	private var __texture2DBinding:GLTexture;
 	private var __textureCubeMapBinding:GLTexture;
+	private var __activeTextureUnit:Int = 0x84C0; // GL_TEXTURE0
+	private var __textureUnitBindings:Map<Int, Int> = new Map(); // key = unit*2 + (target==TEXTURE_2D ? 0 : 1), value = texture id
+	private var __blendSFactor:Int = -1;
+	private var __blendDFactor:Int = -1;
+	private var __blendSFactorRGB:Int = -1;
+	private var __blendDFactorRGB:Int = -1;
+	private var __blendSFactorAlpha:Int = -1;
+	private var __blendDFactorAlpha:Int = -1;
+	private var __capState:Map<Int, Bool> = new Map();
+	private var __lastArrayBufferID:Int = -1;
+	private var __lastElementBufferID:Int = -1;
+	private var __lastFramebufferID:Int = -1;
+	private var __lastProgramID:Int = -1;
 
 	private function new()
 	{
@@ -650,6 +663,9 @@ class NativeOpenGLRenderContext
 
 	public function activeTexture(texture:Int):Void
 	{
+		if (__activeTextureUnit == texture) return;
+		__activeTextureUnit = texture;
+
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		NativeCFFI.lime_gl_active_texture(texture);
 		#end
@@ -697,11 +713,23 @@ class NativeOpenGLRenderContext
 
 	public function bindBuffer(target:Int, buffer:GLBuffer):Void
 	{
-		if (target == ARRAY_BUFFER) __arrayBufferBinding = buffer;
-		if (target == ELEMENT_ARRAY_BUFFER) __elementBufferBinding = buffer;
+		var id = __getObjectID(buffer);
+
+		if (target == ARRAY_BUFFER)
+		{
+			if (__lastArrayBufferID == id) return;
+			__lastArrayBufferID = id;
+			__arrayBufferBinding = buffer;
+		}
+		else if (target == ELEMENT_ARRAY_BUFFER)
+		{
+			if (__lastElementBufferID == id) return;
+			__lastElementBufferID = id;
+			__elementBufferBinding = buffer;
+		}
 
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
-		NativeCFFI.lime_gl_bind_buffer(target, __getObjectID(buffer));
+		NativeCFFI.lime_gl_bind_buffer(target, id);
 		#end
 	}
 
@@ -721,10 +749,13 @@ class NativeOpenGLRenderContext
 
 	public function bindFramebuffer(target:Int, framebuffer:GLFramebuffer):Void
 	{
+		var id = __getObjectID(framebuffer);
+		if (__lastFramebufferID == id) return;
+		__lastFramebufferID = id;
 		__framebufferBinding = framebuffer;
 
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
-		NativeCFFI.lime_gl_bind_framebuffer(target, __getObjectID(framebuffer));
+		NativeCFFI.lime_gl_bind_framebuffer(target, id);
 		#end
 	}
 
@@ -746,11 +777,18 @@ class NativeOpenGLRenderContext
 
 	public function bindTexture(target:Int, texture:GLTexture):Void
 	{
+		var id = __getObjectID(texture);
+		var slot = (target == TEXTURE_CUBE_MAP) ? 1 : 0;
+		var key = __activeTextureUnit * 2 + slot;
+
+		if (__textureUnitBindings.get(key) == id) return;
+		__textureUnitBindings.set(key, id);
+
 		if (target == TEXTURE_2D) __texture2DBinding = texture;
 		if (target == TEXTURE_CUBE_MAP) __textureCubeMapBinding = texture;
 
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
-		NativeCFFI.lime_gl_bind_texture(target, __getObjectID(texture));
+		NativeCFFI.lime_gl_bind_texture(target, id);
 		#end
 	}
 
@@ -791,6 +829,13 @@ class NativeOpenGLRenderContext
 
 	public function blendFunc(sfactor:Int, dfactor:Int):Void
 	{
+		if (__blendSFactor == sfactor && __blendDFactor == dfactor
+			&& __blendSFactorRGB == sfactor && __blendDFactorRGB == dfactor
+			&& __blendSFactorAlpha == sfactor && __blendDFactorAlpha == dfactor) return;
+
+		__blendSFactor = __blendSFactorRGB = __blendSFactorAlpha = sfactor;
+		__blendDFactor = __blendDFactorRGB = __blendDFactorAlpha = dfactor;
+
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		NativeCFFI.lime_gl_blend_func(sfactor, dfactor);
 		#end
@@ -798,6 +843,16 @@ class NativeOpenGLRenderContext
 
 	public function blendFuncSeparate(srcRGB:Int, dstRGB:Int, srcAlpha:Int, dstAlpha:Int):Void
 	{
+		if (__blendSFactorRGB == srcRGB && __blendDFactorRGB == dstRGB
+			&& __blendSFactorAlpha == srcAlpha && __blendDFactorAlpha == dstAlpha) return;
+
+		__blendSFactorRGB = srcRGB;
+		__blendDFactorRGB = dstRGB;
+		__blendSFactorAlpha = srcAlpha;
+		__blendDFactorAlpha = dstAlpha;
+		__blendSFactor = -1; // no longer a single uniform state
+		__blendDFactor = -1;
+
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		NativeCFFI.lime_gl_blend_func_separate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 		#end
@@ -1237,6 +1292,9 @@ class NativeOpenGLRenderContext
 
 	public function disable(cap:Int):Void
 	{
+		if (__capState.get(cap) == false) return;
+		__capState.set(cap, false);
+
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		NativeCFFI.lime_gl_disable(cap);
 		#end
@@ -1293,6 +1351,9 @@ class NativeOpenGLRenderContext
 
 	public function enable(cap:Int):Void
 	{
+		if (__capState.get(cap) == true) return;
+		__capState.set(cap, true);
+
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		NativeCFFI.lime_gl_enable(cap);
 		#end
@@ -3017,10 +3078,13 @@ class NativeOpenGLRenderContext
 
 	public function useProgram(program:GLProgram):Void
 	{
+		var id = __getObjectID(program);
+		if (__lastProgramID == id) return;
+		__lastProgramID = id;
 		__currentProgram = program;
 
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
-		NativeCFFI.lime_gl_use_program(__getObjectID(program));
+		NativeCFFI.lime_gl_use_program(id);
 		#end
 	}
 
@@ -3158,6 +3222,16 @@ class NativeOpenGLRenderContext
 		__currentProgram = null;
 		__framebufferBinding = null;
 		__renderbufferBinding = null;
+		__activeTextureUnit = 0x84C0; // GL_TEXTURE0
+		__textureUnitBindings = new Map();
+		__blendSFactor = __blendDFactor = -1;
+		__blendSFactorRGB = __blendDFactorRGB = -1;
+		__blendSFactorAlpha = __blendDFactorAlpha = -1;
+		__capState = new Map();
+		__lastArrayBufferID = -1;
+		__lastElementBufferID = -1;
+		__lastFramebufferID = -1;
+		__lastProgramID = -1;
 		__texture2DBinding = null;
 		__textureCubeMapBinding = null;
 	}
