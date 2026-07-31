@@ -1,0 +1,74 @@
+<xml>
+
+    <files id="native-toolkit-oboe">
+
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/aaudio/AAudioLoader.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/aaudio/AudioStreamAAudio.cpp" />
+
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/AdpfWrapper.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/AudioSourceCaller.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/AudioStream.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/AudioStreamBuilder.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/DataConversionFlowGraph.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/FilterAudioStream.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/FixedBlockAdapter.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/FixedBlockReader.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/FixedBlockWriter.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/LatencyTuner.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/OboeExtensions.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/QuirksManager.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/SourceFloatCaller.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/SourceI16Caller.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/SourceI24Caller.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/SourceI32Caller.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/StabilizedCallback.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/Trace.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/Utilities.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/common/Version.cpp" />
+
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/fifo/FifoBuffer.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/fifo/FifoController.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/fifo/FifoControllerBase.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/fifo/FifoControllerIndirect.cpp" />
+
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/ChannelCountConverter.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/ClipToRange.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/FlowGraphNode.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/Limiter.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/ManyToMultiConverter.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/MonoBlend.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/MonoToMultiConverter.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/MultiToManyConverter.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/MultiToMonoConverter.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/RampLinear.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SampleRateConverter.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SinkFloat.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SinkI16.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SinkI24.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SinkI32.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SinkI8_24.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SourceFloat.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SourceI16.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SourceI24.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SourceI32.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/SourceI8_24.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/resampler/IntegerRatio.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/resampler/LinearResampler.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/resampler/MultiChannelResampler.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/resampler/PolyphaseResampler.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/resampler/PolyphaseResamplerMono.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/resampler/PolyphaseResamplerStereo.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/resampler/SincResampler.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/flowgraph/resampler/SincResamplerStereo.cpp" />
+
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/opensles/AudioInputStreamOpenSLES.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/opensles/AudioOutputStreamOpenSLES.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/opensles/AudioStreamBuffered.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/opensles/AudioStreamOpenSLES.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/opensles/EngineOpenSLES.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/opensles/OpenSLESUtilities.cpp" />
+        <file name="${NATIVE_TOOLKIT_PATH}/oboe/src/opensles/OutputMixerOpenSLES.cpp" />
+
+    </files>
+
+</xml>
