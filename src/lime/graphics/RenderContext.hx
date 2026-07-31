@@ -48,7 +48,6 @@ class RenderContext
 
 	public var version(default, null):String;
 
-
 	public var window(default, null):Window;
 
 	@:noCompletion private function new() {}
