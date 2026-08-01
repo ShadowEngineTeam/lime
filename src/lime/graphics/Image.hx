@@ -178,9 +178,7 @@ class Image
 		version = 0;
 
 		if (type == null)
-		{
 			type = DATA;
-		}
 
 		this.type = type;
 
@@ -875,50 +873,8 @@ class Image
 
 	@:noCompletion private function __fromFile(path:String, onload:Image->Void = null, onerror:Void->Void = null):Bool
 	{
-		#if lime_cffi
-		var buffer:ImageBuffer = null;
-
-		#if (!sys || disable_cffi || macro)
-		if (false) {}
-		#else
-		if (CFFI.enabled)
-		{
-			buffer = NativeCFFI.lime_image_load_file(path, new ImageBuffer(new UInt8Array(Bytes.alloc(0))));
-		}
-		#end
-
-		#if (sys && format)
-		else
-		{
-			try
-			{
-				var bytes = File.getBytes(path);
-				var input = new BytesInput(bytes, 0, bytes.length);
-				var png = new Reader(input).read();
-				var data = Tools.extract32(png);
-				var header = Tools.getHeader(png);
-
-				var data = new UInt8Array(Bytes.ofData(data.getData()));
-				var length = header.width * header.height;
-
-				for (i in 0...length)
-				{
-					var b = data[i * 4];
-					var g = data[i * 4 + 1];
-					var r = data[i * 4 + 2];
-					var a = data[i * 4 + 3];
-
-					data[i * 4] = r;
-					data[i * 4 + 1] = g;
-					data[i * 4 + 2] = b;
-					data[i * 4 + 3] = a;
-				}
-
-				buffer = new ImageBuffer(data, header.width, header.height);
-			}
-			catch (e:Dynamic) {}
-		}
-		#end
+		#if (lime_cffi && !macro)
+		var buffer:ImageBuffer = NativeCFFI.lime_image_load_file(path, new ImageBuffer(new UInt8Array(Bytes.alloc(0))));
 
 		if (buffer != null)
 		{
