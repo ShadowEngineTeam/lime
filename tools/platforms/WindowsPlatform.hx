@@ -94,10 +94,6 @@ class WindowsPlatform extends PlatformTarget
 		{
 			switch (System.hostArchitecture)
 			{
-				case ARMV6:
-					defaults.architectures = [ARMV6];
-				case ARMV7:
-					defaults.architectures = [ARMV7];
 				case ARM64:
 					defaults.architectures = [ARM64];
 				case X86:
@@ -129,8 +125,7 @@ class WindowsPlatform extends PlatformTarget
 			{
 				is64 = true;
 			}
-			if ((project.flags.exists("armv7") || architecture == Architecture.ARMV7)
-				|| (project.flags.exists("arm64") || architecture == Architecture.ARM64))
+			if (project.flags.exists("arm64") || architecture == Architecture.ARM64)
 			{
 				isArm = true;
 			}
@@ -206,18 +201,9 @@ class WindowsPlatform extends PlatformTarget
 		}
 		else
 		{
-			if (isArm)
-			{
-				haxeArgs.push("-D");
-				haxeArgs.push("HXCPP_ARMV7");
-				flags.push("-DHXCPP_ARMV7");
-			}
-			else
-			{
-				haxeArgs.push("-D");
-				haxeArgs.push("HXCPP_M32");
-				flags.push("-DHXCPP_M32");
-			}
+			haxeArgs.push("-D");
+			haxeArgs.push("HXCPP_M32");
+			flags.push("-DHXCPP_M32");
 		}
 
 		if (!project.environment.exists("SHOW_CONSOLE"))
@@ -313,48 +299,16 @@ class WindowsPlatform extends PlatformTarget
 	{
 		var commands:Array<Array<String>> = [];
 
-		if (((!targetFlags.exists("armv7") && project.architectures.indexOf(Architecture.ARM64) != -1) || targetFlags.exists("arm64"))
-			&& command != "rebuild")
+		var args:Array<String> = ["-Dwindows"];
+
+		if (project.targetFlags.exists("mingw"))
 		{
-			commands.push(["-Dwindows", "-DHXCPP_ARM64"]);
+			args.push("-Dmingw");
+			// For some reason `MinGW` uses the shared deps by default, which we dont really want do we?
+			args.push("-Dno_shared_libs");
 		}
 
-		if (((!targetFlags.exists("arm64") && project.architectures.indexOf(Architecture.ARMV7) != -1) || targetFlags.exists("armv7"))
-			&& command != "rebuild")
-		{
-			commands.push(["-Dwindows", "-DHXCPP_ARMV7"]);
-		}
-
-		if (!targetFlags.exists("64") && !targetFlags.exists("x86_64") && project.architectures.indexOf(Architecture.X86) != -1)
-		{
-			var args:Array<String> = ["-Dwindows", "-DHXCPP_M32"];
-
-			if (project.targetFlags.exists("mingw"))
-			{
-				args.push("-Dmingw");
-
-				// For some reason `MinGW` uses the shared deps by default, which we dont really want do we?
-				args.push("-Dno_shared_libs");
-			}
-
-			commands.push(args);
-		}
-
-		if (!targetFlags.exists("32") && !targetFlags.exists("x86_32")
-			&& project.architectures.indexOf(Architecture.X64) != -1)
-		{
-			var args:Array<String> = ["-Dwindows", "-DHXCPP_M64"];
-
-			if (project.targetFlags.exists("mingw"))
-			{
-				args.push("-Dmingw");
-
-				// For some reason `MinGW` uses the shared deps by default, which we dont really want do we?
-				args.push("-Dno_shared_libs");
-			}
-
-			commands.push(args);
-		}
+		commands.push(args);
 
 		CPPHelper.rebuild(project, commands);
 	}
