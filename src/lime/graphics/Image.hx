@@ -27,16 +27,6 @@ import lime.utils.ArrayBuffer;
 import lime.utils.BytePointer;
 import lime.utils.Log;
 import lime.utils.UInt8Array;
-#if format
-import format.png.Data;
-import format.png.Reader;
-import format.png.Tools;
-import format.png.Writer;
-import format.tools.Deflate;
-#if sys
-import sys.io.File;
-#end
-#end
 
 /**
 	`Image` is a convenience class for working with bitmap images in Lime.
