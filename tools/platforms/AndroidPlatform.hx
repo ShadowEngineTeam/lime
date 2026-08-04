@@ -1,6 +1,7 @@
 package;
 
 import hxp.ArrayTools;
+import hxp.Haxelib;
 import hxp.HXML;
 import hxp.Log;
 import hxp.Path;
