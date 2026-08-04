@@ -481,9 +481,6 @@ namespace lime {
 
 	void lime_hb_buffer_set_script (value buffer, int script) {
 
-		if (script == -1) script = HB_SCRIPT_COMMON; // Workaround for Neko
-		// TODO: COMMON is an int32 and doesn't translate properly on Neko
-
 		hb_buffer_set_script ((hb_buffer_t*)val_data (buffer), (hb_script_t)script);
 
 	}
