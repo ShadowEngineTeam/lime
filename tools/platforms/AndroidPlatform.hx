@@ -30,73 +30,13 @@ class AndroidPlatform extends PlatformTarget
 	{
 		super(command, _project, targetFlags);
 
-		var defaults = new HXProject();
-
-		defaults.meta =
-			{
-				title: "MyApplication",
-				description: "",
-				packageName: "com.example.myapp",
-				version: "1.0.0",
-				company: "",
-				companyUrl: "",
-				buildNumber: null,
-				companyId: ""
-			};
-
-		defaults.app =
-			{
-				main: "Main",
-				file: "MyApplication",
-				path: "bin",
-				preloader: "",
-				url: "",
-				init: null
-			};
-
-		defaults.window =
-			{
-				width: 0,
-				height: 0,
-				parameters: "{}",
-				background: 0xFFFFFF,
-				fps: 60,
-				hardware: true,
-				display: 0,
-				resizable: true,
-				transparent: false,
-				borderless: false,
-				orientation: Orientation.AUTO,
-				vsync: false,
-				fullscreen: true,
-				allowHighDPI: true,
-				alwaysOnTop: false,
-				antialiasing: 0,
-				allowShaders: true,
-				requireShaders: true,
-				depthBuffer: true,
-				stencilBuffer: true,
-				colorDepth: 32,
-				maximized: false,
-				minimized: false,
-				hidden: false,
-				title: ""
-			};
-
-		if (project.targetFlags.exists("simulator") || project.targetFlags.exists("emulator"))
-		{
-			defaults.architectures = [Architecture.X64, Architecture.ARM64];
-		}
-		else
-		{
-			defaults.architectures = [Architecture.ARM64, Architecture.ARMV7];
-		}
-
-		for (i in 1...project.windows.length)
-		{
-			defaults.windows.push(defaults.window);
-		}
-
+		var defaults:HXProject = createDefaultProject();
+		defaults.window.width = 0;
+		defaults.window.height = 0;
+		defaults.window.fullscreen = true;
+		defaults.window.allowHighDPI = true;
+		defaults.window.requireShaders = true;
+		defaults.architectures = project.targetFlags.exists("simulator") ? [Architecture.X64, Architecture.ARM64] : [Architecture.ARM64, Architecture.ARMV7];
 		defaults.merge(project);
 
 		project = defaults;
@@ -333,6 +273,7 @@ class AndroidPlatform extends PlatformTarget
 			var hxml = HXML.fromString(context.HAXE_FLAGS);
 			hxml.addClassName(context.APP_MAIN);
 			hxml.cpp = "_";
+			hxml.define("android");
 			hxml.noOutput = true;
 			return hxml;
 		}
@@ -769,7 +710,7 @@ class AndroidPlatform extends PlatformTarget
 		ProjectHelper.recursiveSmartCopyTemplate(project, "android/template", destination, context);
 		System.copyFileTemplate(project.templatePaths, "android/MainActivity.java", packageDirectory + "/MainActivity.java", context);
 		ProjectHelper.recursiveSmartCopyTemplate(project, "haxe", targetDirectory + "/haxe", context);
-		ProjectHelper.recursiveSmartCopyTemplate(project, "android/hxml", targetDirectory + "/haxe", context);
+		ProjectHelper.recursiveSmartCopyTemplate(project, "cpp/hxml", targetDirectory + "/haxe", context);
 
 		copyProjectAssets(destination, sourceSet + "/assets/");
 	}
