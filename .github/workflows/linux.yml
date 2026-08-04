@@ -36,8 +36,8 @@ jobs:
         run: haxelib dev lime ${{ github.workspace }}
       - name: Rebuild Lime
         run: |
-          CC="clang-22 --target=i686-linux-gnu" CXX="clang++-22 --target=i686-linux-gnu" LDFLAGS="-fuse-ld=lld" linux32 haxelib run lime rebuild linux -32 -release -nocolor -nocffi -D HXCPP_M32
-          CC=clang-22 CXX=clang++-22 haxelib run lime rebuild linux -64 -release -nocolor -nocffi -D HXCPP_M64
+          CC="clang-22 --target=i686-linux-gnu" CXX="clang++-22 --target=i686-linux-gnu" LDFLAGS="-fuse-ld=lld" linux32 haxelib run lime rebuild linux -32 -release -D HXCPP_M32
+          CC=clang-22 CXX=clang++-22 haxelib run lime rebuild linux -64 -release -D HXCPP_M64
       - name: Upload Artifact (x86)
         uses: actions/upload-artifact@main
         with:
@@ -84,8 +84,8 @@ jobs:
         run: haxelib dev lime ${{ github.workspace }}
       - name: Rebuild Lime
         run: |
-          CC="clang-22 --target=arm-linux-gnueabihf" CXX="clang++-22 --target=arm-linux-gnueabihf" LDFLAGS="-fuse-ld=lld" linux32 haxelib run lime rebuild linux -armv7 -release -nocolor -nocffi -D HXCPP_ARMV7
-          CC=clang-22 CXX=clang++-22 haxelib run lime rebuild linux -arm64 -release -nocolor -nocffi -D HXCPP_ARM64
+          CC="clang-22 --target=arm-linux-gnueabihf" CXX="clang++-22 --target=arm-linux-gnueabihf" LDFLAGS="-fuse-ld=lld" linux32 haxelib run lime rebuild linux -armv7 -release -D HXCPP_ARMV7
+          CC=clang-22 CXX=clang++-22 haxelib run lime rebuild linux -arm64 -release -D HXCPP_ARM64
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
