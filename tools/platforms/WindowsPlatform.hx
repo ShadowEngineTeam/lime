@@ -240,7 +240,7 @@ class WindowsPlatform extends PlatformTarget
 		if (project.targetFlags.exists("mingw"))
 		{
 			args.push("-Dmingw");
-			// For some reason `MinGW` uses the shared deps by default, which we dont really want do we?
+			// For some reason `MinGW` uses the shared deps by default, which we don't really want, do we?
 			args.push("-Dno_shared_libs");
 		}
 
