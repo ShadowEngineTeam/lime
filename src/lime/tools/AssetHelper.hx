@@ -1,6 +1,5 @@
 package lime.tools;
 
-#if lime
 import haxe.io.Bytes as HaxeBytes;
 import haxe.Serializer;
 import haxe.Unserializer;
@@ -677,4 +676,3 @@ class AssetHelper
 		}
 	}
 }
-#end

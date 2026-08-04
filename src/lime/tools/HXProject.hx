@@ -93,9 +93,7 @@ class HXProject extends Script
 		Log.verbose = inputData.logVerbose;
 		Log.enableColor = inputData.logEnableColor;
 
-		#if lime
 		System.dryRun = inputData.processDryRun;
-		#end
 
 		Haxelib.debug = inputData.haxelibDebug;
 
@@ -392,9 +390,10 @@ class HXProject extends Script
 
 		var args = [
 			name,
-			#if lime
-			"-lib", "lime", "-lib", "hxp",
-			#end
+			"-lib",
+			"lime",
+			"-lib",
+			"hxp",
 			"-cp",
 			tempDirectory,
 			"-cp",
@@ -666,15 +665,12 @@ class HXProject extends Script
 		}
 	}
 
-	// #if lime
 	public function includeXML(xml:String):Void
 	{
 		var projectXML = new ProjectXMLParser();
 		@:privateAccess projectXML.parseXML(new Access(Xml.parse(xml).firstElement()), "");
 		merge(projectXML);
 	}
-
-	// #end
 
 	private function initializeDefines():Void
 	{
@@ -779,9 +775,7 @@ class HXProject extends Script
 				defines.set("host", "unknown");
 		}
 
-		#if lime
 		defines.set("lime-tools", "1");
-		#end
 
 		defines.set("hxp", "1"); // TODO: Version?
 	}
@@ -911,7 +905,6 @@ class HXProject extends Script
 		}
 	}
 
-	// #if lime
 	@:noCompletion private static function processHaxelibs(project:HXProject, userDefines:Map<String, Dynamic>):Void
 	{
 		var haxelibs = project.haxelibs.copy();
@@ -953,7 +946,6 @@ class HXProject extends Script
 		}
 	}
 
-	// #end
 	public function setenv(name:String, value:String):Void
 	{
 		if (value == null)
@@ -1164,16 +1156,12 @@ class HXProject extends Script
 		{
 			var name = haxelib.name;
 
-			// TODO: Handle real version when better/smarter haxelib available
 			var version = haxelib.version;
-			// var version = Haxelib.getVersion (haxelib);
 
 			if (version != null && version != "")
 			{
 				name += ":" + version;
 			}
-
-			// #if lime
 
 			if (Haxelib.pathOverrides.exists(name))
 			{
@@ -1276,12 +1264,6 @@ class HXProject extends Script
 					}
 				}
 			}
-
-			// #else
-
-			// compilerFlags.push ("-lib " + name);
-
-			// #end
 
 			Reflect.setField(context, "LIB_" + StringTools.formatUppercaseVariable(haxelib.name), true);
 
