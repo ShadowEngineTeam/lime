@@ -5,5 +5,5 @@
 --macro haxe.macro.Compiler.addMetadata("@:build(lime._internal.macros.TimerMacro.build())", "haxe.Timer")
 -cp platforms
 -cp ../src
--lib format
+-lib lime
 -lib hxp

@@ -7,8 +7,8 @@ class RunScript
 {
 	private static function rebuildTools(limeDirectory:String, toolsDirectory:String):Void
 	{
+		System.runCommand(limeDirectory, "haxe", ["run.hxml"]);
 		System.runCommand(toolsDirectory, "haxe", ["tools.hxml"]);
-		System.runCommand(toolsDirectory, "haxe", ["run.hxml"]);
 	}
 
 	public static function runCommand(path:String, command:String, args:Array<String>, throwErrors:Bool = true):Int
@@ -76,7 +76,7 @@ class RunScript
 		if (args.length > 2 && args[0] == "rebuild" && args[1] == "tools")
 		{
 			var cacheDirectory = Sys.getCwd();
-			// used for Path.tryFullPath when setting overrides
+
 			Sys.setCwd(Haxelib.workingDirectory);
 
 			for (arg in args)
@@ -121,30 +121,13 @@ class RunScript
 			}
 		}
 
-		if (args.indexOf("-eval") >= 0)
-		{
-			args.remove("-eval");
-			Log.info("Experimental: executing `lime " + args.slice(0, args.length - 1).join(" ") + "` using Eval (https://haxe.org/blog/eval/)");
-
-			var args = [
-				   "-D",                                    "lime",
-				  "-cp",                            toolsDirectory,
-				  "-cp", Path.combine(toolsDirectory, "platforms"),
-				  "-cp",        Path.combine(limeDirectory, "src"),
-				 "-lib",                                  "format",
-				 "-lib",                                     "hxp",
-				"--run",                        "CommandLineTools"
-			].concat(args);
-			Sys.exit(runCommand("", "haxe", args));
-		}
-
 		var tools_n = Path.combine(toolsDirectory, "tools.n");
+
 		if (!FileSystem.exists(tools_n) || args.indexOf("-rebuild") > -1)
 		{
 			rebuildTools(limeDirectory, toolsDirectory);
 		}
 
-		var args = [tools_n].concat(args);
-		Sys.exit(runCommand("", "neko", args));
+		Sys.exit(runCommand("", "neko", [tools_n].concat(args)));
 	}
 }
