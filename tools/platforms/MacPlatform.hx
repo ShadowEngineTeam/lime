@@ -155,10 +155,8 @@ class MacPlatform extends PlatformTarget
 	private function generateContext():Dynamic
 	{
 		var context = project.templateContext;
-		context.CPP_DIR = targetDirectory + "/obj/";
-		context.BUILD_DIR = project.app.path + "/mac" + dirSuffix.toLowerCase();
+		context.CPP_DIR = targetDirectory + "/obj";
 		context.CATEGORY_TYPE = project.config.getString("mac.category_type", "public.app-category.entertainment");
-
 		return context;
 	}
 
@@ -279,7 +277,7 @@ class MacPlatform extends PlatformTarget
 			icons = [new Icon(System.findTemplate(project.templatePaths, "default/icon.svg"))];
 		}
 
-		context.HAS_ICON = IconHelper.createMacIcon(icons, Path.combine(contentDirectory, "icon.icns"));
+		IconHelper.createMacIcon(icons, Path.combine(contentDirectory, "icon.icns"));
 
 		copyProjectAssets(targetDirectory, contentDirectory);
 

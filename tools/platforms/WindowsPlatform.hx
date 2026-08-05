@@ -201,7 +201,6 @@ class WindowsPlatform extends PlatformTarget
 		context.FILE_VERSION = versionParts.join(".");
 		context.VERSION_NUMBER = versionParts.join(",");
 		context.CPP_DIR = targetDirectory + "/obj";
-		context.BUILD_DIR = project.app.path + "/windows" + (isArm ? "arm" : "") + (is64 ? "64" : "");
 
 		return context;
 	}

@@ -702,7 +702,7 @@ class ProjectXMLParser extends HXProject
 		{
 			switch (attribute)
 			{
-				case "title", "description", "package", "version", "company", "company-id", "build-number", "company-url", "copyright-years":
+				case "title", "description", "package", "version", "company", "build-number", "copyright-years":
 					var value = substitute(element.att.resolve(attribute));
 
 					defines.set("APP_" + StringTools.replace(attribute, "-", "_").toUpperCase(), value);
@@ -1834,26 +1834,6 @@ class ProjectXMLParser extends HXProject
 
 						// If it is specified, assume the dev knows what they are doing!
 						config.set("ios.deployment", deployment);
-					}
-
-					if (element.has.binaries)
-					{
-						var binaries = substitute(element.att.binaries);
-
-						switch (binaries)
-						{
-							case "fat":
-								ArrayTools.addUnique(architectures, Architecture.ARMV6);
-								ArrayTools.addUnique(architectures, Architecture.ARMV7);
-
-							case "armv6":
-								ArrayTools.addUnique(architectures, Architecture.ARMV6);
-								architectures.remove(Architecture.ARMV7);
-
-							case "armv7":
-								ArrayTools.addUnique(architectures, Architecture.ARMV7);
-								architectures.remove(Architecture.ARMV6);
-						}
 					}
 
 					if (element.has.devices)
