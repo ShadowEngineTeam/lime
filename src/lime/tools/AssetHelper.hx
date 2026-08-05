@@ -3,7 +3,9 @@ package lime.tools;
 import haxe.io.Bytes as HaxeBytes;
 import haxe.Serializer;
 import haxe.Unserializer;
+
 import hxp.*;
+
 import lime._internal.format.Base64;
 import lime.tools.AssetType;
 import lime.tools.Asset;
@@ -11,6 +13,7 @@ import lime.tools.HXProject;
 import lime.tools.Library;
 import lime.utils.AssetManifest;
 import lime.utils.Bytes;
+
 import sys.io.File;
 import sys.io.FileOutput;
 import sys.FileSystem;
@@ -161,7 +164,8 @@ class AssetHelper
 		var pathGroups = new Map<String, Array<String>>();
 
 		var libraries = new Map<String, Library>();
-		if (library == null) library = DEFAULT_LIBRARY_NAME;
+		if (library == null)
+			library = DEFAULT_LIBRARY_NAME;
 
 		for (lib in project.libraries)
 		{
@@ -247,8 +251,10 @@ class AssetHelper
 	private static function getAssetData(project:HXProject, pathGroups:Map<String, Array<String>>, libraries:Map<String, Library>, library:String,
 			asset:Asset):Dynamic
 	{
-		if ((asset.library != null && asset.library != library) || asset.type == TEMPLATE) return null;
-		if (asset.library == null && library != DEFAULT_LIBRARY_NAME) return null;
+		if ((asset.library != null && asset.library != library) || asset.type == TEMPLATE)
+			return null;
+		if (asset.library == null && library != DEFAULT_LIBRARY_NAME)
+			return null;
 
 		var size = 100;
 
@@ -257,12 +263,11 @@ class AssetHelper
 			size = FileSystem.stat(asset.sourcePath).size;
 		}
 
-		var assetData:Dynamic =
-			{
-				id: asset.id,
-				size: size,
-				type: Std.string(asset.type)
-			};
+		var assetData:Dynamic = {
+			id: asset.id,
+			size: size,
+			type: Std.string(asset.type)
+		};
 
 		if (asset.embed == true || asset.type == FONT)
 		{
@@ -279,7 +284,8 @@ class AssetHelper
 	private static function getPackedAssetData(project:HXProject, output:FileOutput, pathGroups:Map<String, Array<String>>, libraries:Map<String, Library>,
 			library:Library, asset:Asset):Dynamic
 	{
-		if (asset.type == TEMPLATE) return null;
+		if (asset.type == TEMPLATE)
+			return null;
 		if (asset.library == library.name || (asset.library == null && library.name == DEFAULT_LIBRARY_NAME))
 		{
 			if (output.tell() == 0)
@@ -289,56 +295,55 @@ class AssetHelper
 				output.writeString("lime-asset-pack");
 			}
 
-			var assetData:Dynamic =
-				{
-					id: asset.id,
-					size: 0,
-					type: Std.string(asset.type),
-					position: output.tell()
-				};
+			var assetData:Dynamic = {
+				id: asset.id,
+				size: 0,
+				type: Std.string(asset.type),
+				position: output.tell()
+			};
 
 			switch (library.type)
-				{
-					case "deflate", "zip":
-						if (asset.data != null)
-						{
-							var bytes:Bytes = asset.data;
-							bytes = bytes.compress(DEFLATE);
-							output.writeBytes(bytes, 0, bytes.length);
-						}
-						else if (asset.sourcePath != null)
-						{
-							var tempBytes:Bytes = File.getBytes(asset.sourcePath);
-							tempBytes = tempBytes.compress(DEFLATE);
-							output.writeBytes(tempBytes, 0, tempBytes.length);
-						}
+			{
+				case "deflate", "zip":
+					if (asset.data != null)
+					{
+						var bytes:Bytes = asset.data;
+						bytes = bytes.compress(DEFLATE);
+						output.writeBytes(bytes, 0, bytes.length);
+					}
+					else if (asset.sourcePath != null)
+					{
+						var tempBytes:Bytes = File.getBytes(asset.sourcePath);
+						tempBytes = tempBytes.compress(DEFLATE);
+						output.writeBytes(tempBytes, 0, tempBytes.length);
+					}
 
-					case "gzip":
-						if (asset.data != null)
-						{
-							var bytes:Bytes = asset.data;
-							bytes = bytes.compress(GZIP);
-							output.writeBytes(bytes, 0, asset.data.length);
-						}
-						else if (asset.sourcePath != null)
-						{
-							var tempBytes:Bytes = File.getBytes(asset.sourcePath);
-							tempBytes = tempBytes.compress(GZIP);
-							output.writeBytes(tempBytes, 0, tempBytes.length);
-						}
+				case "gzip":
+					if (asset.data != null)
+					{
+						var bytes:Bytes = asset.data;
+						bytes = bytes.compress(GZIP);
+						output.writeBytes(bytes, 0, asset.data.length);
+					}
+					else if (asset.sourcePath != null)
+					{
+						var tempBytes:Bytes = File.getBytes(asset.sourcePath);
+						tempBytes = tempBytes.compress(GZIP);
+						output.writeBytes(tempBytes, 0, tempBytes.length);
+					}
 
-					default:
-						if (asset.data != null)
-						{
-							output.writeBytes(asset.data, 0, asset.data.length);
-						}
-						else if (asset.sourcePath != null)
-						{
-							var input = File.read(asset.sourcePath, true);
-							output.writeInput(input);
-							input.close();
-						}
-				}
+				default:
+					if (asset.data != null)
+					{
+						output.writeBytes(asset.data, 0, asset.data.length);
+					}
+					else if (asset.sourcePath != null)
+					{
+						var input = File.read(asset.sourcePath, true);
+						output.writeInput(input);
+						input.close();
+					}
+			}
 
 			var position = output.tell();
 			assetData.length = position - assetData.position;
@@ -552,7 +557,8 @@ class AssetHelper
 							}
 						}
 
-						if (allEmbedded) embed = true;
+						if (allEmbedded)
+							embed = true;
 					}
 
 					asset = new Asset("", "manifest/" + library.name + ".json", AssetType.MANIFEST);
@@ -599,7 +605,8 @@ class AssetHelper
 			if (isPackedLibrary(project, library))
 			{
 				// TODO
-				if (type == "zip") type = "deflate";
+				if (type == "zip")
+					type = "deflate";
 
 				// TODO: Support library.embed=true by embedding all the assets instead of packing
 

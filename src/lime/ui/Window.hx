@@ -170,13 +170,13 @@ class Window
 	@:noCompletion private var __maxWidth:Int = 0x7FFFFFFF;
 	@:noCompletion private var __maxHeight:Int = 0x7FFFFFFF;
 
-
 	@:noCompletion private function new(application:Application, attributes:WindowAttributes)
 	{
 		this.application = application;
 		__attributes = attributes != null ? attributes : {};
 
-		if (Reflect.hasField(__attributes, "parameters")) parameters = __attributes.parameters;
+		if (Reflect.hasField(__attributes, "parameters"))
+			parameters = __attributes.parameters;
 
 		__width = 0;
 		__height = 0;

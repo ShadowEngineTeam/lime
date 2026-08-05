@@ -1,7 +1,9 @@
 package lime.tools;
 
 import haxe.xml.Access;
+
 import hxp.*;
+
 import lime.tools.Asset;
 import lime.tools.AssetType;
 import lime.tools.CommandHelper;
@@ -9,6 +11,7 @@ import lime.tools.Dependency;
 import lime.tools.HXProject;
 import lime.tools.ModuleHelper;
 import lime.utils.AssetManifest;
+
 import sys.FileSystem;
 import sys.io.File;
 
@@ -152,8 +155,10 @@ class ProjectXMLParser extends HXProject
 	private function checkArchitectureCondition(check:String):Bool
 	{
 		var lower = check.toLowerCase();
-		if (lower == "x86_64") return architectures.indexOf(Architecture.X64) != -1;
-		if (lower == "x86_32") return architectures.indexOf(Architecture.X86) != -1;
+		if (lower == "x86_64")
+			return architectures.indexOf(Architecture.X64) != -1;
+		if (lower == "x86_32")
+			return architectures.indexOf(Architecture.X86) != -1;
 		var arch = new Architecture(check);
 		return arch != null && architectures.indexOf(arch) != -1;
 	}
@@ -250,7 +255,8 @@ class ProjectXMLParser extends HXProject
 	public static function fromFile(path:String, defines:Map<String, Dynamic> = null, includePaths:Array<String> = null,
 			useExtensionPath:Bool = false):ProjectXMLParser
 	{
-		if (path == null) return null;
+		if (path == null)
+			return null;
 
 		if (FileSystem.exists(path))
 		{
@@ -838,7 +844,8 @@ class ProjectXMLParser extends HXProject
 	{
 		for (element in xml.elements)
 		{
-			if (!isValidElement(element, section)) continue;
+			if (!isValidElement(element, section))
+				continue;
 
 			switch (element.name)
 			{
@@ -901,7 +908,8 @@ class ProjectXMLParser extends HXProject
 					environment.set(name, value);
 					setenv(name, value);
 
-					if (needRerun) return;
+					if (needRerun)
+						return;
 
 				case "error":
 					Log.error(substitute(element.att.value));
@@ -972,7 +980,8 @@ class ProjectXMLParser extends HXProject
 					else if (element.has.path)
 					{
 						var subPath = substitute(element.att.path);
-						if (subPath == "") subPath = element.att.path;
+						if (subPath == "")
+							subPath = element.att.path;
 
 						path = findIncludeFile(Path.combine(extensionPath, subPath));
 					}
@@ -1052,7 +1061,8 @@ class ProjectXMLParser extends HXProject
 					if (element.has.repository)
 					{
 						setenv("HAXELIB_PATH", Path.combine(Sys.getCwd(), element.att.repository));
-						if (needRerun) return;
+						if (needRerun)
+							return;
 						continue;
 					}
 
@@ -1162,8 +1172,10 @@ class ProjectXMLParser extends HXProject
 					if (element.has.type)
 					{
 						var typeString = substitute(element.att.type).toLowerCase();
-						if (typeString == "static") staticLink = true;
-						if (typeString == "dynamic") staticLink = false;
+						if (typeString == "static")
+							staticLink = true;
+						if (typeString == "dynamic")
+							staticLink = false;
 					}
 
 					if (element.has.register)
@@ -1287,7 +1299,8 @@ class ProjectXMLParser extends HXProject
 
 						for (attr in element.x.attributes())
 						{
-							if (attr == "assetsPath") continue;
+							if (attr == "assetsPath")
+								continue;
 
 							var valueType = "String";
 							var valueName = attr;
@@ -1331,7 +1344,8 @@ class ProjectXMLParser extends HXProject
 
 					for (childElement in element.elements)
 					{
-						if (!isValidElement(childElement, "")) continue;
+						if (!isValidElement(childElement, ""))
+							continue;
 
 						if (childElement.name == "imageset")
 						{
@@ -1826,7 +1840,8 @@ class ProjectXMLParser extends HXProject
 				case "ios":
 					// deprecated
 
-					if (target != Platform.IOS) continue;
+					if (target != Platform.IOS)
+						continue;
 
 					if (element.has.deployment)
 					{
@@ -1917,7 +1932,8 @@ class ProjectXMLParser extends HXProject
 					}
 					else
 					{
-						if (value.indexOf("0x") == -1) value = "0x" + value;
+						if (value.indexOf("0x") == -1)
+							value = "0x" + value;
 
 						if (value.length == 10 && StringTools.startsWith(value, "0x00"))
 						{

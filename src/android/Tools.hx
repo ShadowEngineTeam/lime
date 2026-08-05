@@ -1,12 +1,16 @@
 package android;
 
 import lime._internal.backend.android.JNICache;
+
 import android.Permissions;
+
 import haxe.io.Path;
+
 import lime.app.Event;
 import lime.math.Rectangle;
 import lime.utils.Log;
 import lime.system.JNI;
+
 #if sys
 import sys.io.Process;
 #end

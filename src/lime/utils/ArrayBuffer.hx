@@ -27,9 +27,12 @@ abstract ArrayBuffer(Bytes) from Bytes to Bytes
 
 	public inline function slice(begin:Int, end:Null<Int> = null)
 	{
-		if (end == null) end = this.length;
-		if (begin < 0) begin = 0;
-		if (end > this.length) end = this.length;
+		if (end == null)
+			end = this.length;
+		if (begin < 0)
+			begin = 0;
+		if (end > this.length)
+			end = this.length;
 		var length = end - begin;
 		if (begin < 0 || length <= 0)
 		{
@@ -43,4 +46,3 @@ abstract ArrayBuffer(Bytes) from Bytes to Bytes
 		}
 	}
 }
-

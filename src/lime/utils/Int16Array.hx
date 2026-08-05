@@ -78,4 +78,3 @@ abstract Int16Array(ArrayBufferView) from ArrayBufferView to ArrayBufferView
 	inline function toString()
 		return this != null ? 'Int16Array [byteLength:${this.byteLength}, length:${this.length}]' : null;
 }
-

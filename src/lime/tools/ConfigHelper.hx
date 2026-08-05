@@ -1,9 +1,11 @@
 package lime.tools;
 
 import hxp.*;
+
 import lime.tools.HXProject;
 import lime.tools.Platform;
 import lime.tools.ProjectXMLParser;
+
 import sys.io.File;
 import sys.FileSystem;
 

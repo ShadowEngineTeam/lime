@@ -4,6 +4,7 @@ import lime.app.Application;
 import lime.app.Event;
 import lime.system.WorkOutput;
 import lime.utils.Log;
+
 #if target.threaded
 import sys.thread.Deque;
 import sys.thread.Thread;
@@ -11,6 +12,7 @@ import sys.thread.Thread;
 import cpp.vm.Deque;
 import cpp.vm.Thread;
 #end
+
 import haxe.Exception;
 
 /**
@@ -526,7 +528,8 @@ class ThreadPool extends WorkOutput
 
 			case EXIT:
 				var threadData:ThreadData = __threads[event.threadID];
-				if (threadData.jobID != null) activeThreads--;
+				if (threadData.jobID != null)
+					activeThreads--;
 				else
 					__idleThreads--;
 
@@ -855,13 +858,12 @@ class ThreadPool extends WorkOutput
 			throw "Job " + job.id + " was already started!";
 		}
 
-		var threadEvent:ThreadEvent =
-			{
-				event: WORK,
-				jobID: job.id,
-				doWork: job.doWork,
-				state: job.state
-			};
+		var threadEvent:ThreadEvent = {
+			event: WORK,
+			jobID: job.id,
+			doWork: job.doWork,
+			state: job.state
+		};
 
 		#if lime_threads_deque
 		__multiThreadedQueue.add(threadEvent);
@@ -950,14 +952,13 @@ class ThreadPool extends WorkOutput
 		__threads[index] = {thread: thread, jobID: null};
 		__idleThreads++;
 
-		thread.sendMessage(
-			{
-				output: this,
-				#if lime_threads_deque
-				queue: __multiThreadedQueue,
-				#end
-				threadID: index
-			});
+		thread.sendMessage({
+			output: this,
+			#if lime_threads_deque
+			queue: __multiThreadedQueue,
+			#end
+			threadID: index
+		});
 
 		return thread;
 	}
