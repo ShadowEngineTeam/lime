@@ -23,19 +23,24 @@ import lime.utils.Log;
 		{
 			var message;
 
-			if (compileStatus == 0) message = "Error ";
+			if (compileStatus == 0)
+				message = "Error ";
 			else
 				message = "Info ";
 
-			if (type == gl.VERTEX_SHADER) message = "compiling vertex shader";
-			else if (type == gl.FRAGMENT_SHADER) message = "compiling fragment shader";
+			if (type == gl.VERTEX_SHADER)
+				message = "compiling vertex shader";
+			else if (type == gl.FRAGMENT_SHADER)
+				message = "compiling fragment shader";
 			else
 				message = "compiling unknown shader type";
 
 			message += "\n" + shaderInfoLog;
 
-			if (compileStatus == 0) Log.error(message);
-			else if (shaderInfoLog != null) Log.debug(message);
+			if (compileStatus == 0)
+				Log.error(message);
+			else if (shaderInfoLog != null)
+				Log.debug(message);
 		}
 
 		return shader;

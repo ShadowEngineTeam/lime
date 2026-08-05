@@ -25,7 +25,8 @@ import lime.utils.Log;
 		{
 			var message = "Unable to initialize the shader program";
 			var log = gl.getProgramInfoLog(program);
-			if (log != null && log != "") message += "\n" + log;
+			if (log != null && log != "")
+				message += "\n" + log;
 			Log.error(message);
 		}
 

@@ -69,7 +69,6 @@ class Promise<T>
 
 	private var jobID:Int = -1;
 
-
 	/**
 		Create a new `Promise` instance
 	**/

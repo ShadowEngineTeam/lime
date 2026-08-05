@@ -1,8 +1,10 @@
 package lime.tools;
 
 import hxp.*;
+
 import lime.tools.HXProject;
 import lime.tools.Platform;
+
 import sys.io.File;
 import sys.FileSystem;
 
@@ -220,7 +222,8 @@ class CPPHelper
 			buildFile = project.config.get("project.rebuild.file");
 		}
 
-		if (buildFile == null) buildFile = "Build.xml";
+		if (buildFile == null)
+			buildFile = "Build.xml";
 
 		if (!FileSystem.exists(Path.combine(path, buildFile)))
 		{

@@ -2,6 +2,7 @@ package lime.system;
 
 import haxe.io.Path;
 import haxe.Constraints;
+
 import lime._internal.backend.native.NativeCFFI;
 import lime.app.Application;
 import lime.graphics.RenderContextAttributes;
@@ -10,7 +11,8 @@ import lime.ui.WindowAttributes;
 import lime.utils.ArrayBuffer;
 import lime.utils.UInt8Array;
 import lime.utils.UInt16Array;
-	#if sys
+
+#if sys
 import sys.io.Process;
 #end
 
@@ -248,15 +250,15 @@ class System
 	{
 		if (path != null)
 		{
-		#if (sys && windows)
-		Sys.command("start", ["", path]);
-		#elseif mac
-		Sys.command("/usr/bin/open", [path]);
-		#elseif linux
-		Sys.command("/usr/bin/xdg-open", [path]);
-		#elseif (lime_cffi && !macro)
-		NativeCFFI.lime_system_open_file(path);
-		#end
+			#if (sys && windows)
+			Sys.command("start", ["", path]);
+			#elseif mac
+			Sys.command("/usr/bin/open", [path]);
+			#elseif linux
+			Sys.command("/usr/bin/xdg-open", [path]);
+			#elseif (lime_cffi && !macro)
+			NativeCFFI.lime_system_open_file(path);
+			#end
 		}
 	}
 
@@ -267,11 +269,11 @@ class System
 	{
 		if (url != null)
 		{
-		#if desktop
-		openFile(url);
-		#elseif (lime_cffi && !macro)
-		NativeCFFI.lime_system_open_url(url, target);
-		#end
+			#if desktop
+			openFile(url);
+			#elseif (lime_cffi && !macro)
+			NativeCFFI.lime_system_open_url(url, target);
+			#end
 		}
 	}
 
@@ -299,7 +301,8 @@ class System
 
 	@:noCompletion private static function __copyMissingFields(target:Dynamic, source:Dynamic):Void
 	{
-		if (source == null || target == null) return;
+		if (source == null || target == null)
+			return;
 
 		for (field in Reflect.fields(source))
 		{
@@ -390,7 +393,8 @@ class System
 						argValue = stripQuotes.matched(1);
 					}
 
-					if (parameters == null) parameters = new Map<String, String>();
+					if (parameters == null)
+						parameters = new Map<String, String>();
 					parameters.set(argument.substr(0, equals), argValue);
 				}
 			}
@@ -398,8 +402,10 @@ class System
 
 		if (parameters != null)
 		{
-			if (attributes.parameters == null) attributes.parameters = {};
-			if (attributes.context == null) attributes.context = {};
+			if (attributes.parameters == null)
+				attributes.parameters = {};
+			if (attributes.context == null)
+				attributes.context = {};
 
 			for (parameter in parameters.keys())
 			{
@@ -487,7 +493,8 @@ class System
 		#if sys
 		try
 		{
-			if (args == null) args = [];
+			if (args == null)
+				args = [];
 
 			var process = new Process(command, args);
 			var value = StringTools.trim(process.stdout.readLine().toString());
@@ -623,7 +630,8 @@ class System
 			var uint16array = new UInt16Array(arrayBuffer);
 			uint8Array[0] = 0xAA;
 			uint8Array[1] = 0xBB;
-			if (uint16array[0] == 0xAABB) __endianness = BIG_ENDIAN;
+			if (uint16array[0] == 0xAABB)
+				__endianness = BIG_ENDIAN;
 			else
 				__endianness = LITTLE_ENDIAN;
 			#end
@@ -667,14 +675,17 @@ class System
 		{
 			#if (lime_cffi && !macro && windows)
 			var label:String = NativeCFFI.lime_system_get_platform_label();
-			if (label != null) __platformLabel = StringTools.trim(label);
+			if (label != null)
+				__platformLabel = StringTools.trim(label);
 			#elseif linux
 			__platformLabel = __runProcess("lsb_release", ["-ds"]);
 			#else
 			var name = System.platformName;
 			var version = System.platformVersion;
-			if (name != null && version != null) __platformLabel = name + " " + version;
-			else if (name != null) __platformLabel = name;
+			if (name != null && version != null)
+				__platformLabel = name + " " + version;
+			else if (name != null)
+				__platformLabel = name;
 			#end
 		}
 

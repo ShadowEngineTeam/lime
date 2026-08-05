@@ -1,6 +1,7 @@
 package lime.graphics;
 
 import haxe.io.Bytes;
+
 import lime.graphics.cairo.CairoSurface;
 import lime.utils.UInt8Array;
 
@@ -59,7 +60,6 @@ class ImageBuffer
 
 	@:noCompletion private var __srcCustom:Dynamic;
 	@:noCompletion private var __srcImage:Dynamic;
-
 
 	/**
 		Creates a new `ImageBuffer` instance

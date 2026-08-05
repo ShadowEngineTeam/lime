@@ -1,9 +1,12 @@
 package lime.tools;
 
 import haxe.rtti.Meta;
+
 import hxp.*;
+
 import lime.tools.AssetHelper;
 import lime.tools.CommandHelper;
+
 import sys.FileSystem;
 import sys.io.File;
 
@@ -272,7 +275,8 @@ class PlatformTarget
 
 	private function deleteStaleFiles(touchedFiles:Array<String>):Void
 	{
-		if (project.defines.exists("lime-ignore-stale-files")) return;
+		if (project.defines.exists("lime-ignore-stale-files"))
+			return;
 
 		for (asset in project.assets)
 		{
@@ -303,13 +307,15 @@ class PlatformTarget
 	{
 		System.recursiveCopy(source, destination, context, process);
 
-		if (_touchedFiles == null || !FileSystem.exists(source)) return;
+		if (_touchedFiles == null || !FileSystem.exists(source))
+			return;
 
 		function recurse(source:String, destination:String):Void
 		{
 			for (file in FileSystem.readDirectory(source))
 			{
-				if (file.charAt(0) == ".") continue;
+				if (file.charAt(0) == ".")
+					continue;
 
 				if (FileSystem.isDirectory(source + "/" + file))
 				{
@@ -323,58 +329,55 @@ class PlatformTarget
 		}
 
 		recurse(source, destination);
-	}	
+	}
 
 	private function createDefaultProject():HXProject
 	{
 		var defaults = new HXProject();
 
-		defaults.meta =
-			{
-				title: "MyApplication",
-				description: "",
-				packageName: "com.example.myapp",
-				version: "1.0.0",
-				company: "",
-				buildNumber: null
-			};
+		defaults.meta = {
+			title: "MyApplication",
+			description: "",
+			packageName: "com.example.myapp",
+			version: "1.0.0",
+			company: "",
+			buildNumber: null
+		};
 
-		defaults.app =
-			{
-				main: "Main",
-				file: "MyApplication",
-				path: "bin",
-				preloader: ""
-			};
+		defaults.app = {
+			main: "Main",
+			file: "MyApplication",
+			path: "bin",
+			preloader: ""
+		};
 
-		defaults.window =
-			{
-				width: 800,
-				height: 600,
-				parameters: "{}",
-				background: 0xFFFFFF,
-				fps: 60,
-				hardware: true,
-				display: 0,
-				resizable: true,
-				transparent: false,
-				borderless: false,
-				orientation: Orientation.AUTO,
-				vsync: false,
-				fullscreen: false,
-				allowHighDPI: false,
-				alwaysOnTop: false,
-				antialiasing: 0,
-				allowShaders: true,
-				requireShaders: false,
-				depthBuffer: true,
-				stencilBuffer: true,
-				colorDepth: 32,
-				maximized: false,
-				minimized: false,
-				hidden: false,
-				title: ""
-			};
+		defaults.window = {
+			width: 800,
+			height: 600,
+			parameters: "{}",
+			background: 0xFFFFFF,
+			fps: 60,
+			hardware: true,
+			display: 0,
+			resizable: true,
+			transparent: false,
+			borderless: false,
+			orientation: Orientation.AUTO,
+			vsync: false,
+			fullscreen: false,
+			allowHighDPI: false,
+			alwaysOnTop: false,
+			antialiasing: 0,
+			allowShaders: true,
+			requireShaders: false,
+			depthBuffer: true,
+			stencilBuffer: true,
+			colorDepth: 32,
+			maximized: false,
+			minimized: false,
+			hidden: false,
+			title: ""
+		};
 
 		for (i in 1...project.windows.length)
 		{

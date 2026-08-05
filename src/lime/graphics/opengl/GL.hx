@@ -3,6 +3,7 @@ package lime.graphics.opengl;
 #if (!lime_doc_gen || lime_opengl || lime_opengles)
 import haxe.io.Bytes;
 import haxe.Int64;
+
 import lime.utils.ArrayBufferView;
 import lime.utils.ArrayBuffer;
 import lime.utils.BytePointer;
@@ -698,14 +699,12 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function bufferSubData(target:Int, dstByteOffset:Int, size:Int, srcData:DataPointer):Void
 	{
 		context.bufferSubData(target, dstByteOffset, size, srcData);
 	}
 	#end
-
 
 	public static inline function checkFramebufferStatus(target:Int):Int
 	{
@@ -729,14 +728,12 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function clearBufferiv(buffer:Int, drawbuffer:Int, value:DataPointer):Void
 	{
 		context.clearBufferiv(buffer, drawbuffer, value);
 	}
 	#end
-
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function clearBufferuiv(buffer:Int, drawbuffer:Int, value:DataPointer):Void
@@ -745,12 +742,10 @@ class GL
 	}
 	#end
 
-
 	public static inline function clearColor(red:Float, green:Float, blue:Float, alpha:Float):Void
 	{
 		context.clearColor(red, green, blue, alpha);
 	}
-
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function clearDepthf(depth:Float):Void
@@ -787,7 +782,6 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function compressedTexImage3D(target:Int, level:Int, internalformat:Int, width:Int, height:Int, depth:Int, border:Int, imageSize:Int,
 			data:DataPointer):Void
@@ -795,7 +789,6 @@ class GL
 		context.compressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data);
 	}
 	#end
-
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function compressedTexSubImage2D(target:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Int, imageSize:Int,
@@ -805,7 +798,6 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function compressedTexSubImage3D(target:Int, level:Int, xoffset:Int, yoffset:Int, zoffset:Int, width:Int, height:Int, depth:Int,
 			format:Int, imageSize:Int, data:DataPointer):Void
@@ -813,7 +805,6 @@ class GL
 		context.compressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data);
 	}
 	#end
-
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function copyBufferSubData(readTarget:Int, writeTarget:Int, readOffset:DataPointer, writeOffset:DataPointer, size:Int):Void
@@ -956,7 +947,6 @@ class GL
 	{
 		context.depthMask(flag);
 	}
-
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function depthRangef(zNear:Float, zFar:Float):Void
@@ -1179,7 +1169,6 @@ class GL
 		context.getBufferSubData(target, offset, size, data);
 	}
 	#end
-
 
 	public static inline function getContextAttributes():GLContextAttributes
 	{
@@ -1666,7 +1655,6 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function getVertexAttribPointerv(index:Int, pname:Int):DataPointer
 	{
@@ -1812,7 +1800,6 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function releaseShaderCompiler():Void
 	{
@@ -1905,7 +1892,6 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function texImage3D(target:Int, level:Int, internalformat:Int, width:Int, height:Int, depth:Int, border:Int, format:Int, type:Int,
 			data:DataPointer):Void
@@ -1913,7 +1899,6 @@ class GL
 		context.texImage3D(target, level, internalformat, width, height, depth, border, format, type, data);
 	}
 	#end
-
 
 	public static inline function texStorage2D(target:Int, level:Int, internalformat:Int, width:Int, height:Int):Void
 	{
@@ -1943,7 +1928,6 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function texSubImage3D(target:Int, level:Int, xoffset:Int, yoffset:Int, zoffset:Int, width:Int, height:Int, depth:Int, format:Int,
 			type:Int, data:DataPointer):Void
@@ -1951,7 +1935,6 @@ class GL
 		context.texSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, data);
 	}
 	#end
-
 
 	public static inline function transformFeedbackVaryings(program:GLProgram, varyings:Array<String>, bufferMode:Int):Void
 	{
@@ -1970,7 +1953,6 @@ class GL
 	}
 	#end
 
-
 	public static inline function uniform1i(location:GLUniformLocation, v0:Int):Void
 	{
 		context.uniform1i(location, v0);
@@ -1982,7 +1964,6 @@ class GL
 		context.uniform1iv(location, count, v);
 	}
 	#end
-
 
 	public static inline function uniform1ui(location:GLUniformLocation, v0:Int):Void
 	{
@@ -1996,7 +1977,6 @@ class GL
 	}
 	#end
 
-
 	public static inline function uniform2f(location:GLUniformLocation, v0:Float, v1:Float):Void
 	{
 		context.uniform2f(location, v0, v1);
@@ -2008,7 +1988,6 @@ class GL
 		context.uniform2fv(location, count, v);
 	}
 	#end
-
 
 	public static inline function uniform2i(location:GLUniformLocation, x:Int, y:Int):Void
 	{
@@ -2022,7 +2001,6 @@ class GL
 	}
 	#end
 
-
 	public static inline function uniform2ui(location:GLUniformLocation, x:Int, y:Int):Void
 	{
 		context.uniform2ui(location, x, y);
@@ -2034,7 +2012,6 @@ class GL
 		context.uniform2uiv(location, count, v);
 	}
 	#end
-
 
 	public static inline function uniform3f(location:GLUniformLocation, v0:Float, v1:Float, v2:Float):Void
 	{
@@ -2048,7 +2025,6 @@ class GL
 	}
 	#end
 
-
 	public static inline function uniform3i(location:GLUniformLocation, v0:Int, v1:Int, v2:Int):Void
 	{
 		context.uniform3i(location, v0, v1, v2);
@@ -2060,7 +2036,6 @@ class GL
 		context.uniform3iv(location, count, v);
 	}
 	#end
-
 
 	public static inline function uniform3ui(location:GLUniformLocation, v0:Int, v1:Int, v2:Int):Void
 	{
@@ -2074,7 +2049,6 @@ class GL
 	}
 	#end
 
-
 	public static inline function uniform4f(location:GLUniformLocation, v0:Float, v1:Float, v2:Float, v3:Float):Void
 	{
 		context.uniform4f(location, v0, v1, v2, v3);
@@ -2086,7 +2060,6 @@ class GL
 		context.uniform4fv(location, count, v);
 	}
 	#end
-
 
 	public static inline function uniform4i(location:GLUniformLocation, v0:Int, v1:Int, v2:Int, v3:Int):Void
 	{
@@ -2100,7 +2073,6 @@ class GL
 	}
 	#end
 
-
 	public static inline function uniform4ui(location:GLUniformLocation, v0:Int, v1:Int, v2:Int, v3:Int):Void
 	{
 		context.uniform4ui(location, v0, v1, v2, v3);
@@ -2112,7 +2084,6 @@ class GL
 		context.uniform4uiv(location, count, v);
 	}
 	#end
-
 
 	public static inline function uniformBlockBinding(program:GLProgram, uniformBlockIndex:Int, uniformBlockBinding:Int):Void
 	{
@@ -2126,14 +2097,12 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix2x3fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
 	{
 		context.uniformMatrix2x3fv(location, count, transpose, v);
 	}
 	#end
-
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix2x4fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2142,14 +2111,12 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix3fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
 	{
 		context.uniformMatrix3fv(location, count, transpose, v);
 	}
 	#end
-
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix3x2fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2158,14 +2125,12 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix3x4fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
 	{
 		context.uniformMatrix3x4fv(location, count, transpose, v);
 	}
 	#end
-
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix4fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
@@ -2174,7 +2139,6 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix4x2fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
 	{
@@ -2182,14 +2146,12 @@ class GL
 	}
 	#end
 
-
 	#if (lime_opengl || lime_opengles)
 	public static inline function uniformMatrix4x3fv(location:GLUniformLocation, count:Int, transpose:Bool, v:DataPointer):Void
 	{
 		context.uniformMatrix4x3fv(location, count, transpose, v);
 	}
 	#end
-
 
 	#if (lime_opengl || lime_opengles)
 	public static inline function unmapBuffer(target:Int):Bool
@@ -2220,7 +2182,6 @@ class GL
 		#end
 	}
 
-
 	public static inline function vertexAttrib2f(index:Int, v0:Float, v1:Float):Void
 	{
 		context.vertexAttrib2f(index, v0, v1);
@@ -2232,7 +2193,6 @@ class GL
 		context.vertexAttrib2fv(index, v);
 		#end
 	}
-
 
 	public static inline function vertexAttrib3f(index:Int, v0:Float, v1:Float, v2:Float):Void
 	{
@@ -2246,7 +2206,6 @@ class GL
 		#end
 	}
 
-
 	public static inline function vertexAttrib4f(index:Int, v0:Float, v1:Float, v2:Float, v3:Float):Void
 	{
 		context.vertexAttrib4f(index, v0, v1, v2, v3);
@@ -2258,7 +2217,6 @@ class GL
 		context.vertexAttrib4fv(index, v);
 		#end
 	}
-
 
 	public static inline function vertexAttribDivisor(index:Int, divisor:Int):Void
 	{
@@ -2277,7 +2235,6 @@ class GL
 		#end
 	}
 
-
 	public static inline function vertexAttribI4ui(index:Int, v0:Int, v1:Int, v2:Int, v3:Int):Void
 	{
 		context.vertexAttribI4ui(index, v0, v1, v2, v3);
@@ -2289,7 +2246,6 @@ class GL
 		context.vertexAttribI4uiv(index, v);
 		#end
 	}
-
 
 	public static inline function vertexAttribIPointer(index:Int, size:Int, type:Int, stride:Int, offset:DataPointer):Void
 	{
@@ -2331,7 +2287,8 @@ class GL
 
 	public static function fromInt(type:GLObjectType, id:Int):GLObject
 	{
-		if (id == 0) return null;
+		if (id == 0)
+			return null;
 
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		var object = NativeCFFI.lime_gl_object_from_id(id, type);

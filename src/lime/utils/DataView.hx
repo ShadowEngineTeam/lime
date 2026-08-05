@@ -11,20 +11,24 @@ class DataView
 
 	public inline function new(buffer:ArrayBuffer, byteOffset:Int = 0, byteLength:Null<Int> = null)
 	{
-		if (byteOffset < 0) throw TAError.RangeError;
+		if (byteOffset < 0)
+			throw TAError.RangeError;
 
 		var bufferByteLength = buffer.length;
 		var viewByteLength = bufferByteLength - byteOffset;
 
-		if (byteOffset > bufferByteLength) throw TAError.RangeError;
+		if (byteOffset > bufferByteLength)
+			throw TAError.RangeError;
 
 		if (byteLength != null)
 		{
-			if (byteLength < 0) throw TAError.RangeError;
+			if (byteLength < 0)
+				throw TAError.RangeError;
 
 			viewByteLength = byteLength;
 
-			if (byteOffset + viewByteLength > bufferByteLength) throw TAError.RangeError;
+			if (byteOffset + viewByteLength > bufferByteLength)
+				throw TAError.RangeError;
 		}
 
 		this.buffer = buffer;
@@ -118,4 +122,3 @@ class DataView
 		littleEndian ? ArrayBufferIO.setFloat64(buffer, byteOffset, value) : ArrayBufferIO.setFloat64_BE(buffer, byteOffset, value);
 	}
 }
-

@@ -1,7 +1,9 @@
 package;
 
 import hxp.*;
+
 import lime.tools.HXProject;
+
 import sys.FileSystem;
 
 @:access(lime.tools.HXProject)
@@ -106,7 +108,8 @@ class CreateTemplate
 					for (samplePath in samplePaths)
 					{
 						var path = Path.tryFullPath(samplePath);
-						if (!FileSystem.exists(path)) continue;
+						if (!FileSystem.exists(path))
+							continue;
 
 						for (name in FileSystem.readDirectory(path))
 						{

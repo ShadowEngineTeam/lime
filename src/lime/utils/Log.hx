@@ -70,7 +70,7 @@ class Log
 	{
 		if (level >= LogLevel.WARN)
 		{
-				println("[" + info.className + "] WARNING: " + Std.string(message));
+			println("[" + info.className + "] WARNING: " + Std.string(message));
 		}
 	}
 
@@ -97,7 +97,5 @@ class Log
 			#end
 		}
 		#end
-
-	
 	}
 }

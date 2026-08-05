@@ -32,7 +32,6 @@ class Clipboard
 
 		#if (lime_cffi && !macro)
 		_text = NativeCFFI.lime_clipboard_get_text();
-
 		#end
 		__updated = true;
 
@@ -82,7 +81,6 @@ class Clipboard
 
 		#if (lime_cffi && !macro)
 		NativeCFFI.lime_clipboard_set_text(value);
-
 		#end
 
 		if (_text != cacheText)

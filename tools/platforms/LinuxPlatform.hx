@@ -4,6 +4,7 @@ import hxp.HXML;
 import hxp.Log;
 import hxp.Path;
 import hxp.System;
+
 import lime.tools.Architecture;
 import lime.tools.AssetHelper;
 import lime.tools.CPPHelper;
@@ -12,6 +13,7 @@ import lime.tools.HXProject;
 import lime.tools.Orientation;
 import lime.tools.PlatformTarget;
 import lime.tools.ProjectHelper;
+
 import sys.FileSystem;
 import sys.io.File;
 
@@ -53,9 +55,7 @@ class LinuxPlatform extends PlatformTarget
 
 		for (architecture in project.architectures)
 		{
-			if (!targetFlags.exists("32")
-				&& !targetFlags.exists("x86_32")
-				&& architecture == Architecture.X64)
+			if (!targetFlags.exists("32") && !targetFlags.exists("x86_32") && architecture == Architecture.X64)
 			{
 				is64 = true;
 			}
@@ -91,11 +91,16 @@ class LinuxPlatform extends PlatformTarget
 			}
 			else if (dependency.type != null)
 			{
-				copyIfNewer(Path.combine(dependency.path, "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name), applicationDirectory + "/" + dependency.name);
+				copyIfNewer(Path.combine(dependency.path, "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name),
+					applicationDirectory + "/" + dependency.name);
 			}
 			else
 			{
-				copyIfNewer(Path.combine(dependency.path, "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name + ".so"), applicationDirectory + "/" + dependency.name + ".so");
+				copyIfNewer(Path.combine(dependency.path, "Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name + ".so"),
+					applicationDirectory
+					+ "/"
+					+ dependency.name
+					+ ".so");
 			}
 		}
 
@@ -142,7 +147,8 @@ class LinuxPlatform extends PlatformTarget
 
 		System.runCommand("", "haxe", haxeArgs);
 
-		if (noOutput) return;
+		if (noOutput)
+			return;
 
 		CPPHelper.compile(project, targetDirectory + "/obj", flags);
 

@@ -9,6 +9,7 @@ import cpp.vm.Deque;
 import cpp.vm.Thread;
 import cpp.vm.Tls;
 #end
+
 #if macro
 import haxe.macro.Expr;
 
@@ -184,14 +185,14 @@ enum abstract ThreadMode(Bool)
 	var SINGLE_THREADED = false;
 
 	/**
-		All work will be done on a background thread.
+			All work will be done on a background thread.
 
-		Unlike single-threaded mode, there is no risk of causing lag spikes.
-		Even so, `doWork` should return periodically, to allow canceling the
-		thread. If not canceled, `doWork` will be called again immediately.
+			Unlike single-threaded mode, there is no risk of causing lag spikes.
+			Even so, `doWork` should return periodically, to allow canceling the
+			thread. If not canceled, `doWork` will be called again immediately.
 
-	This means `doWork`
-	must be a static function, and you can't use `bind()`.
+		This means `doWork`
+		must be a static function, and you can't use `bind()`.
 	**/
 	var MULTI_THREADED = true;
 }

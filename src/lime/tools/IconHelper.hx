@@ -8,13 +8,16 @@ package lime.tools;
 // import format.SVG;
 import haxe.io.Bytes;
 import haxe.io.BytesOutput;
+
 import hxp.*;
+
 import lime.tools.ImageHelper;
 #if (lime && lime_cffi && !macro)
 import lime.graphics.Image;
 import lime.math.Rectangle;
 #end
 import lime.tools.Icon;
+
 import sys.io.File;
 import sys.FileSystem;
 

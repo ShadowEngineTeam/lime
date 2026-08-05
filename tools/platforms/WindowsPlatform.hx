@@ -4,6 +4,7 @@ import hxp.HXML;
 import hxp.Log;
 import hxp.Path;
 import hxp.System;
+
 import lime.tools.Architecture;
 import lime.tools.AssetHelper;
 import lime.tools.CPPHelper;
@@ -14,6 +15,7 @@ import lime.tools.IconHelper;
 import lime.tools.Orientation;
 import lime.tools.PlatformTarget;
 import lime.tools.ProjectHelper;
+
 import sys.FileSystem;
 import sys.io.File;
 
@@ -100,7 +102,8 @@ class WindowsPlatform extends PlatformTarget
 			}
 			else if (dependency.type != null)
 			{
-				copyIfNewer(Path.combine(dependency.path, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name), applicationDirectory + "/" + dependency.name);
+				copyIfNewer(Path.combine(dependency.path, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : "") + "/" + dependency.name),
+					applicationDirectory + "/" + dependency.name);
 			}
 			else
 			{
@@ -151,7 +154,8 @@ class WindowsPlatform extends PlatformTarget
 
 		System.runCommand("", "haxe", haxeArgs);
 
-		if (noOutput) return;
+		if (noOutput)
+			return;
 
 		IconHelper.createWindowsIcon(icons, Path.combine(targetDirectory + "/obj", "ApplicationMain.ico"));
 
@@ -319,4 +323,3 @@ class WindowsPlatform extends PlatformTarget
 
 	public override function uninstall():Void {}
 }
-

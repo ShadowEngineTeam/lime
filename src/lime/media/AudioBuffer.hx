@@ -3,6 +3,7 @@ package lime.media;
 import haxe.Int64;
 import haxe.io.Bytes;
 import haxe.io.Path;
+
 import lime._internal.backend.native.NativeCFFI;
 import lime._internal.format.Base64;
 import lime.app.Future;
@@ -65,7 +66,8 @@ class AudioBuffer
 
 	public static function fromBase64(base64String:String):AudioBuffer
 	{
-		if (base64String == null) return null;
+		if (base64String == null)
+			return null;
 
 		#if (lime_cffi && !macro)
 		var base64StringSplit = base64String.split(",");
@@ -88,7 +90,8 @@ class AudioBuffer
 
 	public static function fromBytes(bytes:Bytes):AudioBuffer
 	{
-		if (bytes == null) return null;
+		if (bytes == null)
+			return null;
 
 		#if (lime_cffi && !macro)
 		var decoder:AudioDecoder = AudioDecoder.fromBytes(bytes);
@@ -109,7 +112,8 @@ class AudioBuffer
 
 	public static function fromFile(path:String):AudioBuffer
 	{
-		if (path == null) return null;
+		if (path == null)
+			return null;
 
 		#if (lime_cffi && !macro)
 		var decoder:AudioDecoder = AudioDecoder.fromFile(path);
@@ -135,7 +139,8 @@ class AudioBuffer
 		for (path in paths)
 		{
 			buffer = AudioBuffer.fromFile(path);
-			if (buffer != null) break;
+			if (buffer != null)
+				break;
 		}
 
 		return buffer;

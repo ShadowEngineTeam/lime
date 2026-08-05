@@ -2,11 +2,14 @@ package lime.tools;
 
 #if !macro
 import hxp.*;
+
 import lime.tools.Dependency;
 import lime.tools.HXProject;
 import lime.tools.ModuleData;
+
 import sys.io.File;
 import sys.FileSystem;
+
 class ModuleHelper
 {
 	public static function addModuleSource(source:String, moduleData:ModuleData, include:Array<String>, exclude:Array<String>, packageName:String = null)
@@ -147,7 +150,8 @@ class ModuleHelper
 			}
 			else
 			{
-				if (Path.extension(file) != "hx") continue;
+				if (Path.extension(file) != "hx")
+					continue;
 
 				className = StringTools.replace(filePath, source, "");
 				className = StringTools.replace(className, "\\", "/");
@@ -207,8 +211,10 @@ class ModuleHelper
 
 	public static function shortFirst(a, b):Int
 	{
-		if (a.length < b.length) return -1;
-		else if (a.length > b.length) return 1;
+		if (a.length < b.length)
+			return -1;
+		else if (a.length > b.length)
+			return 1;
 		return 0;
 	}
 }
@@ -220,6 +226,7 @@ import haxe.macro.Expr;
 import haxe.macro.JSGenApi;
 
 using haxe.macro.Tools;
+
 using Lambda;
 using StringTools;
 
@@ -247,6 +254,4 @@ class ModuleHelper
 		// Compiler.setCustomJSGenerator(function(api) new Generator(api).generate());
 	}
 }
-
-
 #end
