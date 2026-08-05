@@ -30,8 +30,6 @@ class LinuxPlatform extends PlatformTarget
 
 		switch (System.hostArchitecture)
 		{
-			case ARMV6:
-				defaults.architectures = [ARMV6];
 			case ARMV7:
 				defaults.architectures = [ARMV7];
 			case ARM64:
@@ -182,8 +180,7 @@ class LinuxPlatform extends PlatformTarget
 
 		var context = project.templateContext;
 
-		context.CPP_DIR = targetDirectory + "/obj/";
-		context.BUILD_DIR = project.app.path + "/linux" + (isArm ? "arm" : "") + (is64 ? "64" : "");
+		context.CPP_DIR = targetDirectory + "/obj";
 
 		return context;
 	}

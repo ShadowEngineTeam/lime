@@ -7,7 +7,7 @@ class RunScript
 {
 	private static function rebuildTools(limeDirectory:String, toolsDirectory:String):Void
 	{
-		System.runCommand(limeDirectory, "haxe", ["run.hxml"]);
+		System.runCommand(toolsDirectory, "haxe", ["run.hxml"]);
 		System.runCommand(toolsDirectory, "haxe", ["tools.hxml"]);
 	}
 
