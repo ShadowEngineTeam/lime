@@ -91,21 +91,31 @@ class EventMacro
 				{
 					canceled = false;
 
-					var listeners = __listeners;
-					var repeat = __repeat;
 					var i = 0;
 
-					while (i < listeners.length)
+					while (i < __listeners.length)
 					{
-						listeners[i]($a{argNames});
+						var listener = __listeners[i];
+						var lengthBefore = __listeners.length;
 
-						if (!repeat[i])
+						listener($a{argNames});
+
+						// A listener is allowed to add or remove listeners while it runs, and the
+						// audio backends do exactly that: the completion poll removes itself from
+						// Application.onUpdate from inside its own call. Advancing blindly would
+						// then step over whichever listener shifted down into index i and skip it
+						// for this dispatch, which for onUpdate means dropping a frame of work.
+						// Only advance once index i is confirmed to still hold this listener.
+						if (__listeners.length == lengthBefore || (i < __listeners.length && Reflect.compareMethods(__listeners[i], listener)))
 						{
-							this.remove(cast listeners[i]);
-						}
-						else
-						{
-							i++;
+							if (!__repeat[i])
+							{
+								this.remove(cast listener);
+							}
+							else
+							{
+								i++;
+							}
 						}
 
 						if (canceled)

@@ -665,6 +665,93 @@ class NativeCFFI
 	#end
 
 
+	#if (lime_cffi && !macro && lime_miniaudio)
+	#if cpp
+	private static var lime_miniaudio_backend_init = new cpp.Callable<Void->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_init", "v", false));
+	private static var lime_miniaudio_backend_uninit = new cpp.Callable<Void->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_uninit", "v", false));
+	private static var lime_miniaudio_backend_engine_init = new cpp.Callable<Int->Int->Int->Int->cpp.Int32>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_engine_init", "iiiii", false));
+	private static var lime_miniaudio_backend_engine_uninit = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_engine_uninit", "iv", false));
+	private static var lime_miniaudio_backend_engine_start = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_engine_start", "iv", false));
+	private static var lime_miniaudio_backend_engine_stop = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_engine_stop", "iv", false));
+	private static var lime_miniaudio_backend_sound_init_from_file = new cpp.Callable<Int->cpp.Float32->cpp.ConstCharStar->cpp.Int32>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_init_from_file", "ifci", false));
+	private static var lime_miniaudio_backend_sound_init_from_bytes = new cpp.Callable<Int->cpp.Float32->Bool->cpp.Object->cpp.Int32>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_init_from_bytes", "ifboi", false));
+	private static var lime_miniaudio_backend_sound_init_from_audio_buffer = new cpp.Callable<Int->cpp.Float32->cpp.UInt32->cpp.UInt32->cpp.UInt32->cpp.Object->cpp.UInt32->cpp.Int32>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_init_from_audio_buffer", "ifiiioii", false));
+	private static var lime_miniaudio_backend_sound_uninit = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_uninit", "iv", false));
+	private static var lime_miniaudio_backend_sound_start = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_start", "iv", false));
+	private static var lime_miniaudio_backend_sound_stop = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_stop", "iv", false));
+	private static var lime_miniaudio_backend_sound_reset = new cpp.Callable<Int->cpp.Float32->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_reset", "ifv", false));
+	private static var lime_miniaudio_backend_sound_get_time = new cpp.Callable<Int->cpp.Float32->cpp.Float32>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_get_time", "iff", false));
+	private static var lime_miniaudio_backend_sound_set_time = new cpp.Callable<Int->cpp.Float32->cpp.Float32->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_set_time", "iffv", false));
+	private static var lime_miniaudio_backend_sound_get_volume = new cpp.Callable<Int->cpp.Float32>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_get_volume", "if", false));
+	private static var lime_miniaudio_backend_sound_set_volume = new cpp.Callable<Int->cpp.Float32->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_set_volume", "ifv", false));
+	private static var lime_miniaudio_backend_sound_get_pitch = new cpp.Callable<Int->cpp.Float32>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_get_pitch", "if", false));
+	private static var lime_miniaudio_backend_sound_set_pitch = new cpp.Callable<Int->cpp.Float32->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_set_pitch", "ifv", false));
+	private static var lime_miniaudio_backend_sound_get_position = new cpp.Callable<Int->cpp.Object>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_get_position", "io", false));
+	private static var lime_miniaudio_backend_sound_set_position = new cpp.Callable<Int->cpp.Float32->cpp.Float32->cpp.Float32->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_set_position", "ifffv", false));
+	private static var lime_miniaudio_backend_sound_get_length = new cpp.Callable<Int->cpp.Float32->cpp.Float32>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_get_length", "iff", false));
+	private static var lime_miniaudio_backend_sound_set_length = new cpp.Callable<Int->cpp.Float32->cpp.Float32->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_set_length", "iffv", false));
+	private static var lime_miniaudio_backend_sound_get_loops = new cpp.Callable<Int->cpp.Int32>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_get_loops", "ii", false));
+	private static var lime_miniaudio_backend_sound_set_loops = new cpp.Callable<Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_set_loops", "iiv", false));
+	private static var lime_miniaudio_backend_sound_is_playing = new cpp.Callable<Int->Bool>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_is_playing", "ib", false));
+	private static var lime_miniaudio_backend_sound_readback_pcm = new cpp.Callable<Int->cpp.Object>(cpp.Prime._loadPrime("lime",
+		"lime_miniaudio_backend_sound_readback_pcm", "io", false));
+	#else
+	private static var lime_miniaudio_backend_init = CFFI.load("lime", "lime_miniaudio_backend_init", 0);
+	private static var lime_miniaudio_backend_uninit = CFFI.load("lime", "lime_miniaudio_backend_uninit", 0);
+	private static var lime_miniaudio_backend_engine_init = CFFI.load("lime", "lime_miniaudio_backend_engine_init", 4);
+	private static var lime_miniaudio_backend_engine_uninit = CFFI.load("lime", "lime_miniaudio_backend_engine_uninit", 1);
+	private static var lime_miniaudio_backend_engine_start = CFFI.load("lime", "lime_miniaudio_backend_engine_start", 1);
+	private static var lime_miniaudio_backend_engine_stop = CFFI.load("lime", "lime_miniaudio_backend_engine_stop", 1);
+	private static var lime_miniaudio_backend_sound_init_from_file = CFFI.load("lime", "lime_miniaudio_backend_sound_init_from_file", 3);
+	private static var lime_miniaudio_backend_sound_init_from_bytes = CFFI.load("lime", "lime_miniaudio_backend_sound_init_from_bytes", 4);
+	private static var lime_miniaudio_backend_sound_init_from_audio_buffer = CFFI.load("lime", "lime_miniaudio_backend_sound_init_from_audio_buffer", -1);
+	private static var lime_miniaudio_backend_sound_uninit = CFFI.load("lime", "lime_miniaudio_backend_sound_uninit", 1);
+	private static var lime_miniaudio_backend_sound_start = CFFI.load("lime", "lime_miniaudio_backend_sound_start", 1);
+	private static var lime_miniaudio_backend_sound_stop = CFFI.load("lime", "lime_miniaudio_backend_sound_stop", 1);
+	private static var lime_miniaudio_backend_sound_reset = CFFI.load("lime", "lime_miniaudio_backend_sound_reset", 2);
+	private static var lime_miniaudio_backend_sound_get_time = CFFI.load("lime", "lime_miniaudio_backend_sound_get_time", 2);
+	private static var lime_miniaudio_backend_sound_set_time = CFFI.load("lime", "lime_miniaudio_backend_sound_set_time", 3);
+	private static var lime_miniaudio_backend_sound_get_volume = CFFI.load("lime", "lime_miniaudio_backend_sound_get_volume", 1);
+	private static var lime_miniaudio_backend_sound_set_volume = CFFI.load("lime", "lime_miniaudio_backend_sound_set_volume", 2);
+	private static var lime_miniaudio_backend_sound_get_pitch = CFFI.load("lime", "lime_miniaudio_backend_sound_get_pitch", 1);
+	private static var lime_miniaudio_backend_sound_set_pitch = CFFI.load("lime", "lime_miniaudio_backend_sound_set_pitch", 2);
+	private static var lime_miniaudio_backend_sound_get_position = CFFI.load("lime", "lime_miniaudio_backend_sound_get_position", 1);
+	private static var lime_miniaudio_backend_sound_set_position = CFFI.load("lime", "lime_miniaudio_backend_sound_set_position", 4);
+	private static var lime_miniaudio_backend_sound_get_length = CFFI.load("lime", "lime_miniaudio_backend_sound_get_length", 2);
+	private static var lime_miniaudio_backend_sound_set_length = CFFI.load("lime", "lime_miniaudio_backend_sound_set_length", 3);
+	private static var lime_miniaudio_backend_sound_get_loops = CFFI.load("lime", "lime_miniaudio_backend_sound_get_loops", 1);
+	private static var lime_miniaudio_backend_sound_set_loops = CFFI.load("lime", "lime_miniaudio_backend_sound_set_loops", 2);
+	private static var lime_miniaudio_backend_sound_is_playing = CFFI.load("lime", "lime_miniaudio_backend_sound_is_playing", 1);
+	private static var lime_miniaudio_backend_sound_readback_pcm = CFFI.load("lime", "lime_miniaudio_backend_sound_readback_pcm", 1);
+	#end
+	#end
+
 
 	#if (lime_cffi && !macro && lime_cairo)
 	#if cpp

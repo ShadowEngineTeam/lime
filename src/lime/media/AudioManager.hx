@@ -40,25 +40,29 @@ class AudioManager
 				if (context.type == OPENAL)
 				{
 					var alc = context.openal;
-					var device = alc.openDevice();
-					if (device != null)
+
+					if (alc.getCurrentContext() == null)
 					{
-						var ctx = alc.createContext(device);
-						alc.makeContextCurrent(ctx);
-						alc.processContext(ctx);
-
-						if (alc.isExtensionPresent('ALC_SOFT_system_events', device)
-							&& alc.isExtensionPresent('ALC_SOFT_reopen_device', device))
+						var device = alc.openDevice();
+						if (device != null)
 						{
-							if (alc.isExtensionPresent('AL_SOFT_hold_on_disconnect')) alc.disable(AL.STOP_SOURCES_ON_DISCONNECT_SOFT);
+							var ctx = alc.createContext(device);
+							alc.makeContextCurrent(ctx);
+							alc.processContext(ctx);
 
-							alc.eventControlSOFT([
-								ALC.EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT,
-								ALC.EVENT_TYPE_DEVICE_ADDED_SOFT,
-								ALC.EVENT_TYPE_DEVICE_REMOVED_SOFT
-							], true);
+							if (alc.isExtensionPresent('ALC_SOFT_system_events', device)
+								&& alc.isExtensionPresent('ALC_SOFT_reopen_device', device))
+							{
+								if (alc.isExtensionPresent('AL_SOFT_hold_on_disconnect')) alc.disable(AL.STOP_SOURCES_ON_DISCONNECT_SOFT);
 
-							alc.eventCallbackSOFT(deviceEventCallback);
+								alc.eventControlSOFT([
+									ALC.EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT,
+									ALC.EVENT_TYPE_DEVICE_ADDED_SOFT,
+									ALC.EVENT_TYPE_DEVICE_REMOVED_SOFT
+								], true);
+
+								alc.eventCallbackSOFT(deviceEventCallback);
+							}
 						}
 					}
 				}
@@ -74,16 +78,25 @@ class AudioManager
 		if (active) return;
 
 		#if !lime_doc_gen
-		if (context != null && context.type == OPENAL)
+		if (context != null)
 		{
-			var alc = context.openal;
-			var currentContext = alc.getCurrentContext();
-
-			if (currentContext != null)
+			if (context.type == OPENAL)
 			{
-				var device = alc.getContextsDevice(currentContext);
-				alc.resumeDevice(device);
-				alc.processContext(currentContext);
+				var alc = context.openal;
+				var currentContext = alc.getCurrentContext();
+
+				if (currentContext != null)
+				{
+					var device = alc.getContextsDevice(currentContext);
+					alc.resumeDevice(device);
+					alc.processContext(currentContext);
+				}
+			}
+			else if (context.type == MINIAUDIO)
+			{
+				#if (lime_cffi && lime_miniaudio && !macro)
+				NativeCFFI.lime_miniaudio_backend_engine_start(context.maEngine);
+				#end
 			}
 		}
 		#end
@@ -94,21 +107,31 @@ class AudioManager
 	public static function shutdown():Void
 	{
 		#if !lime_doc_gen
-		if (context != null && context.type == OPENAL)
+		if (context != null)
 		{
-			var alc = context.openal;
-			var currentContext = alc.getCurrentContext();
-			var device = alc.getContextsDevice(currentContext);
-
-			if (currentContext != null)
+			if (context.type == OPENAL)
 			{
-				alc.makeContextCurrent(null);
-				alc.destroyContext(currentContext);
+				var alc = context.openal;
+				var currentContext = alc.getCurrentContext();
+				var device = alc.getContextsDevice(currentContext);
 
-				if (device != null)
+				if (currentContext != null)
 				{
-					alc.closeDevice(device);
+					alc.makeContextCurrent(null);
+					alc.destroyContext(currentContext);
+
+					if (device != null)
+					{
+						alc.closeDevice(device);
+					}
 				}
+			}
+			else if (context.type == MINIAUDIO)
+			{
+				#if (lime_cffi && lime_miniaudio && !macro)
+				NativeCFFI.lime_miniaudio_backend_engine_uninit(context.maEngine);
+				NativeCFFI.lime_miniaudio_backend_uninit();
+				#end
 			}
 		}
 		#end
@@ -121,20 +144,29 @@ class AudioManager
 		if (!active) return;
 
 		#if !lime_doc_gen
-		if (context != null && context.type == OPENAL)
+		if (context != null)
 		{
-			var alc = context.openal;
-			var currentContext = alc.getCurrentContext();
-			var device = alc.getContextsDevice(currentContext);
-
-			if (currentContext != null)
+			if (context.type == OPENAL)
 			{
-				alc.suspendContext(currentContext);
+				var alc = context.openal;
+				var currentContext = alc.getCurrentContext();
+				var device = alc.getContextsDevice(currentContext);
 
-				if (device != null)
+				if (currentContext != null)
 				{
-					alc.pauseDevice(device);
+					alc.suspendContext(currentContext);
+
+					if (device != null)
+					{
+						alc.pauseDevice(device);
+					}
 				}
+			}
+			else if (context.type == MINIAUDIO)
+			{
+				#if (lime_cffi && lime_miniaudio && !macro)
+				NativeCFFI.lime_miniaudio_backend_engine_stop(context.maEngine);
+				#end
 			}
 		}
 		#end

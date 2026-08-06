@@ -963,9 +963,9 @@ namespace lime {
 		alGetSource3i (id, param, &val1, &val2, &val3);
 
 		value result = alloc_array (3);
-		val_array_set_i (result, 1, alloc_int (val1));
-		val_array_set_i (result, 2, alloc_int (val2));
-		val_array_set_i (result, 3, alloc_int (val3));
+		val_array_set_i (result, 0, alloc_int (val1));
+		val_array_set_i (result, 1, alloc_int (val2));
+		val_array_set_i (result, 2, alloc_int (val3));
 		return result;
 
 	}

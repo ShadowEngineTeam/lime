@@ -11,6 +11,7 @@
 	<define name="lime-cairo" if="native" />
 	<define name="lime-cffi" if="native" />
 	<define name="lime-harfbuzz" if="native" />
+	<define name="lime-miniaudio" if="windows || linux || mac || android || ios" />
 	<define name="lime-native" if="native" />
 	<define name="lime-openal" if="windows || linux || mac || android || ios" />
 	<define name="lime-opengl" if="desktop" />
