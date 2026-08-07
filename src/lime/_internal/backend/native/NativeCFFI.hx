@@ -26,6 +26,7 @@ typedef CFFIPointer = Dynamic;
 // @formatter:off
 class NativeCFFI
 {
+	// Lime bindings
 	#if (lime_cffi && !macro)
 	#if cpp
 	private static var lime_application_create = new cpp.Callable<Void->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_application_create", "o", false));
@@ -392,8 +393,7 @@ class NativeCFFI
 	#end
 	#end
 
-
-
+	// JNI bindings
 	#if (lime_cffi && !macro && android)
 	#if cpp
 	private static var lime_jni_call_member = new cpp.Callable<cpp.Object->cpp.Object->cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_jni_call_member", "oooo", false));
@@ -409,8 +409,7 @@ class NativeCFFI
 	#end
 	#end
 
-
-
+	// OpenAL bindings
 	#if (lime_cffi && !macro && lime_openal)
 	#if cpp
 	private static var lime_al_buffer_data = new cpp.Callable<cpp.Object->Int->cpp.Object->Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_al_buffer_data", "oioiiv", false));
@@ -665,8 +664,7 @@ class NativeCFFI
 	#end
 	#end
 
-
-
+	// Cairo bindings
 	#if (lime_cffi && !macro && lime_cairo)
 	#if cpp
 	private static var lime_cairo_arc = new cpp.Callable<cpp.Object->Float->Float->Float->Float->Float->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_cairo_arc", "odddddv", false));
@@ -905,8 +903,7 @@ class NativeCFFI
 	#end
 	#end
 
-
-
+	// OpenGL bindings
 	#if (lime_cffi && !macro && (lime_opengl || lime_opengles))
 	#if cpp
 	private static var lime_gl_active_texture = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_gl_active_texture", "iv", false));
@@ -1453,8 +1450,7 @@ class NativeCFFI
 	#end
 	#end
 
-
-
+	// Hurfbuzz bindings
 	#if (lime_cffi && !macro && lime_harfbuzz)
 	#if cpp
 	private static var lime_hb_blob_create = new cpp.Callable<lime.utils.DataPointer->Int->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_hb_blob_create", "diio", false));

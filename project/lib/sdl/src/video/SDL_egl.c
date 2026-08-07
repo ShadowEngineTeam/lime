@@ -1288,19 +1288,8 @@ EGLSurface SDL_EGL_CreateSurface(SDL_VideoDevice *_this, SDL_Window *window, Nat
                                         _this->egl_data->egl_config,
                                         EGL_NATIVE_VISUAL_ID, &format_wanted);
 
-    // Format based on selected egl config, keeping the configured draw scale: passing 0, 0
-    // here would reset the buffer size to the native window's, so the scaled-down geometry
-    // set by Android_CreateWindow()/Android_SendResize() would be lost and the app would
-    // render at the scaled size into a full resolution surface.
-    {
-        float scale = Android_GetDrawScale();
-
-        if (Android_ShouldUseDrawScale(scale)) {
-            ANativeWindow_setBuffersGeometry(nw, (int)(Android_SurfaceWidth * scale), (int)(Android_SurfaceHeight * scale), format_wanted);
-        } else {
-            ANativeWindow_setBuffersGeometry(nw, 0, 0, format_wanted);
-        }
-    }
+    // Format based on selected egl config.
+    ANativeWindow_setBuffersGeometry(nw, 0, 0, format_wanted);
 #endif
 
 #ifdef EGL_KHR_gl_colorspace

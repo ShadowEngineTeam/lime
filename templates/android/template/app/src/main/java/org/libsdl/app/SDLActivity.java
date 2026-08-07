@@ -388,6 +388,9 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         Log.v(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
 
+        if (Build.VERSION.SDK_INT >= 30 /* Android 11 (R) */) {
+            getWindow().setDecorFitsSystemWindows(false);
+        }
 
         /* Control activity re-creation */
         if (mSDLMainFinished || mActivityCreated) {
@@ -1041,7 +1044,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
                                 // Android 15+ (API 35+), where edge-to-edge is enforced for
                                 // apps targeting that SDK, so the status/navigation bars
                                 // would never hide. Use WindowInsetsController instead.
-                                window.setDecorFitsSystemWindows(false);
                                 final WindowInsetsController controller = window.getInsetsController();
                                 if (controller != null) {
                                     controller.hide(WindowInsets.Type.systemBars());
@@ -1063,7 +1065,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
                             }
                             SDLActivity.mFullscreenModeActive = true;
                         } else {
-                             if (Build.VERSION.SDK_INT >= 30 /* Android 11 (R) */) {
+                            if (Build.VERSION.SDK_INT >= 30 /* Android 11 (R) */) {
                                 // The legacy setSystemUiVisibility() flags are ignored on
                                 // API 30+, so the bars hidden by the modern enter path above
                                 // would never come back. Restore them via WindowInsetsController.
@@ -1083,10 +1085,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
                         }
                         if (Build.VERSION.SDK_INT >= 30 /* Android 11 (R) */) {
                             window.getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
-                        }
-                        if (Build.VERSION.SDK_INT >= 30 /* Android 11 (R) */ &&
-                            Build.VERSION.SDK_INT < 35 /* Android 15 */) {
-                            SDLActivity.onNativeInsetsChanged(0, 0, 0, 0);
                         }
                     }
                 } else {

@@ -30,14 +30,14 @@
 
         </section>
 
-        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/src/core/windows/gameinput" if="windows" />
-
         <section>
 
             <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/custom/sdl/include" />
             <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/include" />
 
         </section>
+
+        <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/src/core/windows/gameinput" if="windows" />
 
         <compilerflag value="-I${NATIVE_TOOLKIT_PATH}/sdl/src" />
 

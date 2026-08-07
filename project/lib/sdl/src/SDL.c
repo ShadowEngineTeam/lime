@@ -848,13 +848,7 @@ const char *SDL_GetPlatform(void)
 
 bool SDL_IsPhone(void)
 {
-#if defined(SDL_PLATFORM_ANDROID) || \
-    (defined(SDL_PLATFORM_IOS) && !defined(SDL_PLATFORM_VISIONOS))
-    if (!SDL_IsTablet() && !SDL_IsTV()) {
-        return true;
-    }
-#endif
-    return false;
+    return SDL_GetDeviceFormFactor() == SDL_FORMFACTOR_PHONE;
 }
 
 bool SDL_IsTablet(void)
@@ -874,7 +868,7 @@ SDL_FormFactor SDL_GetDeviceFormFactor(void)
 #elif defined(SDL_PLATFORM_ANDROID)
     return SDL_GetAndroidDeviceFormFactor();
 #elif defined(SDL_PLATFORM_IOS)
-    extern bool SDL_GetUIKitDeviceFormFactor(void);
+    extern SDL_FormFactor SDL_GetUIKitDeviceFormFactor(void);
     return SDL_GetUIKitDeviceFormFactor();
 #elif defined(SDL_PLATFORM_XBOXONE) || defined(SDL_PLATFORM_XBOXSERIES) || defined(SDL_PLATFORM_PS2)
     return SDL_FORMFACTOR_CONSOLE;

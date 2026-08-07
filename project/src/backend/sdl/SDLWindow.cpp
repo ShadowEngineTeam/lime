@@ -32,20 +32,28 @@ namespace lime
 
 		if (flags & WINDOW_FLAG_FULLSCREEN)
 			sdlWindowFlags |= SDL_WINDOW_FULLSCREEN;
+
 		if (flags & WINDOW_FLAG_RESIZABLE)
 			sdlWindowFlags |= SDL_WINDOW_RESIZABLE;
+
 		if (flags & WINDOW_FLAG_TRANSPARENT)
 			sdlWindowFlags |= SDL_WINDOW_TRANSPARENT;
+
 		if (flags & WINDOW_FLAG_BORDERLESS)
 			sdlWindowFlags |= SDL_WINDOW_BORDERLESS;
+
 		if (flags & WINDOW_FLAG_ALLOW_HIGHDPI)
 			sdlWindowFlags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
+
 		if (flags & WINDOW_FLAG_HIDDEN)
 			sdlWindowFlags |= SDL_WINDOW_HIDDEN;
+
 		if (flags & WINDOW_FLAG_MINIMIZED)
 			sdlWindowFlags |= SDL_WINDOW_MINIMIZED;
+
 		if (flags & WINDOW_FLAG_MAXIMIZED)
 			sdlWindowFlags |= SDL_WINDOW_MAXIMIZED;
+
 		if (flags & WINDOW_FLAG_ALWAYS_ON_TOP)
 			sdlWindowFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
 
