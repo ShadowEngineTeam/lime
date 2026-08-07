@@ -118,8 +118,6 @@ class IOSPlatform extends PlatformTarget
 
 		project.haxedefs.set("IPHONE_VER", project.environment.get("IPHONE_VER"));
 
-		project.haxedefs.set("HXCPP_CPP20", "1");
-
 		if (project.config.getString("ios.compiler") == "llvm" || project.config.getString("ios.compiler", "clang") == "clang")
 		{
 			project.haxedefs.set("HXCPP_CLANG", "1");
@@ -132,6 +130,7 @@ class IOSPlatform extends PlatformTarget
 		{
 			context.APP_TITLE = ~/ /ig.replace(context.APP_TITLE, "\u2002");
 		}
+
 		context.OBJC_ARC = false;
 
 		if (project.config.exists("ios.provisioning-profile"))
@@ -141,7 +140,7 @@ class IOSPlatform extends PlatformTarget
 
 		if (project.config.exists("ios.team-id"))
 		{
-			context.DEVELOPMENT_TEAM_ID = project.config.getString("ios.team-id");
+			context.IOS_DEVELOPMENT_TEAM_ID = project.config.getString("ios.team-id");
 		}
 
 		context.linkedLibraries = [];
@@ -188,7 +187,7 @@ class IOSPlatform extends PlatformTarget
 			architectures = [Architecture.ARM64];
 		}
 
-		for (architecture in architectures)
+		for (architecture in project.architectures)
 		{
 			switch (architecture)
 			{
@@ -485,6 +484,7 @@ class IOSPlatform extends PlatformTarget
 		}
 
 		IOSHelper.getIOSVersion(project);
+
 		var iphoneVer = project.environment.get("IPHONE_VER");
 
 		for (command in commands)
