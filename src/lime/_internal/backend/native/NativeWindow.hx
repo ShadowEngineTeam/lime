@@ -134,7 +134,7 @@ class NativeWindow
 
 		var gl = new NativeOpenGLRenderContext();
 
-		#if lime_opengl
+		#if (lime_opengl || lime_opengles]
 		context.gl = gl;
 		#end
 
