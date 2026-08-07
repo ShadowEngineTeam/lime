@@ -404,6 +404,14 @@ class NativeApplication
 					}
 
 				case RENDER_CONTEXT_RESTORED:
+					// RENDER_CONTEXT_LOST set window.context to null, so rebuild it (with a
+					// fresh identity) before notifying, otherwise listeners receive null and
+					// have no context to render with
+					if (window.context == null)
+					{
+						window.__backend.recreateContext();
+					}
+
 					window.onRenderContextRestored.dispatch(window.context);
 			}
 		}
