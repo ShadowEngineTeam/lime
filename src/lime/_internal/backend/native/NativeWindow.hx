@@ -38,7 +38,6 @@ class NativeWindow
 	private var frameRate:Float;
 	private var mouseLock:Bool;
 	private var parent:Window;
-	private var __contextAttributes:Dynamic;
 
 	public function new(parent:Window)
 	{
@@ -155,7 +154,6 @@ class NativeWindow
 
 		contextAttributes.type = context.type;
 		context.attributes = contextAttributes;
-		__contextAttributes = contextAttributes;
 		parent.context = context;
 
 		setFrameRate(Reflect.hasField(attributes, "frameRate") ? attributes.frameRate : 60);
