@@ -66,6 +66,16 @@ bool Android_GLES_SwapWindow(SDL_VideoDevice *_this, SDL_Window *window)
 
     Android_LockActivityMutex();
 
+    /* If the Android surface has been destroyed, its ANativeWindow BufferQueue is already abandoned.
+     * Presenting here blocks inside eglSwapBuffers while holding this mutex,
+     * which wedges the pause handshake in onNativeSurfaceDestroyed() and ends with
+     * the EGL surface being torn down while it is still current, leaving nothing to render
+     * into after the resume. Skip until valid. */
+    if (!window->internal->surface_valid || window->internal->egl_surface == EGL_NO_SURFACE) {
+        Android_UnlockActivityMutex();
+        return true;
+    }
+
     /* The following two calls existed in the original Java code
      * If you happen to have a device that's affected by their removal,
      * please report to our bug tracker. -- Gabriel

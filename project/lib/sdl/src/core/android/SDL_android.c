@@ -1276,6 +1276,9 @@ JNIEXPORT void JNICALL SDL_JAVA_INTERFACE(onNativeSurfaceChanged)(JNIEnv *env, j
             SDL_SetPointerProperty(SDL_GetWindowProperties(Android_Window), SDL_PROP_WINDOW_ANDROID_SURFACE_POINTER, data->egl_surface);
         }
 
+        // The surface (and its BufferQueue) is live again; allow the GL thread to present to it
+        data->surface_valid = (data->egl_surface != EGL_NO_SURFACE);
+
         // GL Context handling is done in the event loop because this function is run from the Java thread
     }
 #endif
@@ -1298,6 +1301,12 @@ retry:
 
     if (Android_Window) {
         SDL_WindowData *data = Android_Window->internal;
+
+        /* The Android surface is gone: its BufferQueue is already abandoned even though we
+         * still hold the ANativeWindow/EGLSurface. Flag it immediately so the GL thread stops
+         * presenting to it (see Android_GLES_SwapWindow), which lets the pause handshake below
+         * complete instead of timing out with the context still current. */
+        data->surface_valid = false;
 
         // Wait for Main thread being paused and context un-activated to release 'egl_surface'
         if ((Android_Window->flags & SDL_WINDOW_OPENGL) && !data->backup_done) {
