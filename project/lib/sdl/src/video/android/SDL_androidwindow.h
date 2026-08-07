@@ -44,6 +44,7 @@ struct SDL_WindowData
     int swap_interval;
 #endif
     bool backup_done;
+    bool surface_valid;
     ANativeWindow *native_window;
 
 };
