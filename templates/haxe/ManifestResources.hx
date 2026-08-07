@@ -59,10 +59,8 @@ import sys.FileSystem;
 			rootPath = "assets/";
 			#elseif android
 			rootPath = "";
-			#elseif (console || sys)
-			rootPath = lime.system.System.applicationDirectory;
 			#else
-			rootPath = "./";
+			rootPath = lime.system.System.applicationDirectory;
 			#end
 
 		}
@@ -96,10 +94,7 @@ import sys.FileSystem;
 
 }
 
-#end
-
 #if !display
-#if (desktop || cpp)
 
 ::if (assets != null)::::foreach assets::::if (embed)::@:keep ::if (type == "image")::@:image("::sourcePath::") @:noCompletion #if display private #end class __ASSET__::flatName:: extends lime.graphics.Image {}
 ::elseif (type == "sound")::@:file("::sourcePath::") @:noCompletion #if display private #end class __ASSET__::flatName:: extends haxe.io.Bytes {}
@@ -110,17 +105,11 @@ import sys.FileSystem;
 ::if (assets != null)::::foreach assets::::if (!embed)::::if (type == "font")::@:keep @:noCompletion #if display private #end class __ASSET__::flatName:: extends lime.text.Font { public function new () { ::if (targetPath != null)::__fontPath = ManifestResources.rootPath + "::targetPath::";::else::::if (library != null)::__fontID = "::library:::::id::";::else::__fontID = "::id::";::end::::end:: ::if (fontName)::name = "::fontName::";::end:: super (); }}
 ::end::::end::::end::::end::
 
-#else
-
-::if (assets != null)::::foreach assets::::if (type == "font")::@:keep @:expose('__ASSET__::flatName::') @:noCompletion #if display private #end class __ASSET__::flatName:: extends lime.text.Font { public function new () { __fontPath = "::targetPath::"; ::if (fontName):: name = "::fontName::";::end:: super (); }}
-::end::::end::::end::
-
-#end
-
 #if openfl
-
 ::if (assets != null)::::foreach assets::::if (type == "font")::@:keep @:expose('__ASSET__OPENFL__::flatName::') @:noCompletion #if display private #end class __ASSET__OPENFL__::flatName:: extends openfl.text.Font { public function new () {::if (embed):: __fromLimeFont (new __ASSET__::flatName:: ());::else:: ::if (targetPath != null)::__fontPath = ManifestResources.rootPath + "::targetPath::";::else::::if (library != null)::__fontID = "::library:::::id::";::else::__fontID = "::id::";::end::::end::::if (fontName):: name = "::fontName::";::end::::end:: super (); }}
 ::end::::end::::end::
+#end
+
 #end
 
 #end

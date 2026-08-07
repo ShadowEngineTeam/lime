@@ -169,49 +169,6 @@ class NativeWindow
 		setTextInputEnabled(false);
 	}
 
-	/**
-		Rebuilds `parent.context` after the native GL context was lost and recreated
-		(Android destroys the EGL surface when the activity is backgrounded). The
-		`RENDER_CONTEXT_LOST` handler sets `parent.context` to null, so without this the
-		window would be left with no context at all and nothing would render.
-
-		A brand new `RenderContext` identity is created on purpose, so that consumers like
-		OpenFL rebuild their renderer instead of reusing now-dead texture/buffer handles.
-	**/
-	public function recreateContext():Void
-	{
-		#if (!macro && lime_cffi)
-		var context = new RenderContext();
-		context.window = parent;
-
-		var gl = new NativeOpenGLRenderContext();
-
-		#if (lime_opengl || lime_opengles)
-		context.gl = gl;
-		#end
-
-		context.gles2 = gl;
-		context.type = gl.type;
-		context.version = Std.string(gl.version);
-
-		if (gl.type == OPENGLES && gl.version >= 3)
-		{
-			context.gles3 = gl;
-		}
-
-		// the previous context was invalidated by the loss, so always take over here
-		GL.context = gl;
-
-		if (__contextAttributes != null)
-		{
-			__contextAttributes.type = context.type;
-			context.attributes = __contextAttributes;
-		}
-
-		parent.context = context;
-		#end
-	}
-
 	public function alert(type:lime.ui.MessageBoxType, message:String, title:String, buttons:Array<String>):Int
 	{
 		if (handle != null)
