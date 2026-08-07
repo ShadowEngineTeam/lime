@@ -46,6 +46,10 @@ namespace lime
 		SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "3");
 #endif
 
+#ifdef HX_LINUX
+		SDL_SetHint(SDL_HINT_VIDEO_WAYLAND_SCALE_TO_DISPLAY, "1");
+#endif
+
 #ifdef HX_MACOS
 		SDL_SetHint(SDL_HINT_MAC_SCROLL_MOMENTUM, "1");
 #endif
@@ -481,24 +485,34 @@ namespace lime
 			{
 				if (keyEvent.keyCode == SDLK_CAPSLOCK)
 					keyEvent.modifier |= SDL_KMOD_CAPS;
+
 				if (keyEvent.keyCode == SDLK_LALT)
 					keyEvent.modifier |= SDL_KMOD_LALT;
+
 				if (keyEvent.keyCode == SDLK_LCTRL)
 					keyEvent.modifier |= SDL_KMOD_LCTRL;
+
 				if (keyEvent.keyCode == SDLK_LGUI)
 					keyEvent.modifier |= SDL_KMOD_LGUI;
+
 				if (keyEvent.keyCode == SDLK_LSHIFT)
 					keyEvent.modifier |= SDL_KMOD_LSHIFT;
+
 				if (keyEvent.keyCode == SDLK_MODE)
 					keyEvent.modifier |= SDL_KMOD_MODE;
+
 				if (keyEvent.keyCode == SDLK_NUMLOCKCLEAR)
 					keyEvent.modifier |= SDL_KMOD_NUM;
+
 				if (keyEvent.keyCode == SDLK_RALT)
 					keyEvent.modifier |= SDL_KMOD_RALT;
+
 				if (keyEvent.keyCode == SDLK_RCTRL)
 					keyEvent.modifier |= SDL_KMOD_RCTRL;
+
 				if (keyEvent.keyCode == SDLK_RGUI)
 					keyEvent.modifier |= SDL_KMOD_RGUI;
+
 				if (keyEvent.keyCode == SDLK_RSHIFT)
 					keyEvent.modifier |= SDL_KMOD_RSHIFT;
 			}
