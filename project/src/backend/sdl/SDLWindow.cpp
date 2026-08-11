@@ -62,6 +62,7 @@ namespace lime
 #else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 #endif
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
 #if defined(LIME_OPENGL_GLES)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -278,6 +279,29 @@ namespace lime
 	{
 		if (context)
 		{
+#if defined(LIME_OPENGL)
+			// The depth and stencil attachments of the default framebuffer do not survive the
+			// swap, so their contents never need resolving out of tile memory. Saying so lets a
+			// tile-based GPU skip the store, which is most of the win on mobile. Color is left
+			// alone deliberately -- that is what gets presented.
+			//
+			// GL_DEPTH and GL_STENCIL name default-framebuffer attachments only, so this has to
+			// be skipped when the app left a framebuffer object bound; passing them against an
+			// FBO is GL_INVALID_ENUM. glInvalidateFramebuffer is GLES 3.0 / GL 4.3, and glad
+			// leaves the pointer null below that.
+			if (glInvalidateFramebuffer)
+			{
+				GLint boundFramebuffer = 0;
+				glGetIntegerv(GL_FRAMEBUFFER_BINDING, &boundFramebuffer);
+
+				if (boundFramebuffer == OpenGLBindings::defaultFramebuffer)
+				{
+					const GLenum attachments[] = {GL_DEPTH, GL_STENCIL};
+					glInvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+				}
+			}
+#endif
+
 			SDL_GL_SwapWindow(sdlWindow);
 		}
 	}
@@ -655,7 +679,14 @@ namespace lime
 
 	double SDLWindow::GetDrawScale()
 	{
-		return GetWidth() / GetNativeWidth();
+		const int nativeWidth = GetNativeWidth();
+
+		if (nativeWidth <= 0)
+		{
+			return 1.0;
+		}
+
+		return (double)GetWidth() / (double)nativeWidth;
 	}
 
 	int SDLWindow::GetNativeWidth()

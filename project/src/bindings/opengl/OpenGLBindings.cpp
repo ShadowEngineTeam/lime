@@ -2106,6 +2106,958 @@ namespace lime
 		glWaitSync((GLsync)val_data(sync), flags, timeout);
 	}
 
+	// Modern OpenGL / OpenGL ES entry points. glad leaves the function pointer null when
+	// the driver does not expose the entry point, so each call is guarded; callers should
+	// still gate on the context version or an extension before relying on one.
+
+	void lime_gl_flush_mapped_buffer_range(int target, double offset, int length)
+	{
+		if (glFlushMappedBufferRange)
+		{
+			glFlushMappedBufferRange(target, (GLintptr)(uintptr_t)offset, length);
+		}
+	}
+
+	void lime_gl_dispatch_compute(int x, int y, int z)
+	{
+		if (glDispatchCompute)
+		{
+			glDispatchCompute(x, y, z);
+		}
+	}
+
+	void lime_gl_dispatch_compute_indirect(double indirect)
+	{
+		if (glDispatchComputeIndirect)
+		{
+			glDispatchComputeIndirect((GLintptr)(uintptr_t)indirect);
+		}
+	}
+
+	void lime_gl_memory_barrier(int barriers)
+	{
+		if (glMemoryBarrier)
+		{
+			glMemoryBarrier(barriers);
+		}
+	}
+
+	void lime_gl_memory_barrier_by_region(int barriers)
+	{
+		if (glMemoryBarrierByRegion)
+		{
+			glMemoryBarrierByRegion(barriers);
+		}
+	}
+
+	void lime_gl_bind_image_texture(int unit, int texture, int level, bool layered, int layer, int access, int format)
+	{
+		if (glBindImageTexture)
+		{
+			glBindImageTexture(unit, texture, level, layered, layer, access, format);
+		}
+	}
+
+	void lime_gl_draw_arrays_indirect(int mode, double indirect)
+	{
+		if (glDrawArraysIndirect)
+		{
+			glDrawArraysIndirect(mode, (const void *)(uintptr_t)indirect);
+		}
+	}
+
+	void lime_gl_draw_elements_indirect(int mode, int type, double indirect)
+	{
+		if (glDrawElementsIndirect)
+		{
+			glDrawElementsIndirect(mode, type, (const void *)(uintptr_t)indirect);
+		}
+	}
+
+	int lime_gl_get_program_interfacei(int program, int programInterface, int pname)
+	{
+		if (glGetProgramInterfaceiv)
+		{
+			GLint value = 0;
+			glGetProgramInterfaceiv(program, programInterface, pname, &value);
+			return value;
+		}
+		return 0;
+	}
+
+	void lime_gl_get_program_interfaceiv(int program, int programInterface, int pname, double params)
+	{
+		if (glGetProgramInterfaceiv)
+		{
+			glGetProgramInterfaceiv(program, programInterface, pname, (GLint *)(uintptr_t)params);
+		}
+	}
+
+	int lime_gl_get_program_resource_index(int program, int programInterface, HxString name)
+	{
+		if (glGetProgramResourceIndex)
+		{
+			return glGetProgramResourceIndex(program, programInterface, name.__s);
+		}
+		return 0;
+	}
+
+	int lime_gl_get_program_resource_location(int program, int programInterface, HxString name)
+	{
+		if (glGetProgramResourceLocation)
+		{
+			return glGetProgramResourceLocation(program, programInterface, name.__s);
+		}
+		return 0;
+	}
+
+	value lime_gl_get_program_resource_name(int program, int programInterface, int index)
+	{
+		if (glGetProgramResourceName)
+		{
+			GLint length = 0;
+			glGetProgramInterfaceiv(program, programInterface, GL_MAX_NAME_LENGTH, &length);
+			if (length <= 0) return alloc_null();
+			std::string buffer(length, 0);
+			glGetProgramResourceName(program, programInterface, index, length, 0, &buffer[0]);
+			return alloc_string(buffer.c_str());
+		}
+		return alloc_null();
+	}
+
+	void lime_gl_get_program_resourceiv(int program, int programInterface, int index, int propCount, double props, int bufSize, double params)
+	{
+		if (glGetProgramResourceiv)
+		{
+			glGetProgramResourceiv(program, programInterface, index, propCount, (const GLenum *)(uintptr_t)props, bufSize, 0, (GLint *)(uintptr_t)params);
+		}
+	}
+
+	int lime_gl_create_program_pipeline()
+	{
+		if (glGenProgramPipelines)
+		{
+			GLuint id = 0;
+			glGenProgramPipelines(1, &id);
+			return id;
+		}
+		return 0;
+	}
+
+	void lime_gl_delete_program_pipeline(int pipeline)
+	{
+		if (glDeleteProgramPipelines)
+		{
+			GLuint id = pipeline;
+			glDeleteProgramPipelines(1, &id);
+		}
+	}
+
+	void lime_gl_bind_program_pipeline(int pipeline)
+	{
+		if (glBindProgramPipeline)
+		{
+			glBindProgramPipeline(pipeline);
+		}
+	}
+
+	bool lime_gl_is_program_pipeline(int pipeline)
+	{
+		if (glIsProgramPipeline)
+		{
+			return glIsProgramPipeline(pipeline);
+		}
+		return false;
+	}
+
+	void lime_gl_use_program_stages(int pipeline, int stages, int program)
+	{
+		if (glUseProgramStages)
+		{
+			glUseProgramStages(pipeline, stages, program);
+		}
+	}
+
+	void lime_gl_active_shader_program(int pipeline, int program)
+	{
+		if (glActiveShaderProgram)
+		{
+			glActiveShaderProgram(pipeline, program);
+		}
+	}
+
+	int lime_gl_create_shader_programv(int type, HxString source)
+	{
+		if (glCreateShaderProgramv)
+		{
+			const char *strings[1] = {source.__s};
+			return glCreateShaderProgramv(type, 1, strings);
+		}
+		return 0;
+	}
+
+	void lime_gl_validate_program_pipeline(int pipeline)
+	{
+		if (glValidateProgramPipeline)
+		{
+			glValidateProgramPipeline(pipeline);
+		}
+	}
+
+	int lime_gl_get_program_pipelinei(int pipeline, int pname)
+	{
+		if (glGetProgramPipelineiv)
+		{
+			GLint value = 0;
+			glGetProgramPipelineiv(pipeline, pname, &value);
+			return value;
+		}
+		return 0;
+	}
+
+	value lime_gl_get_program_pipeline_info_log(int pipeline)
+	{
+		if (glGetProgramPipelineInfoLog)
+		{
+			GLint length = 0;
+			glGetProgramPipelineiv(pipeline, GL_INFO_LOG_LENGTH, &length);
+			if (length <= 0) return alloc_string("");
+			std::string buffer(length, 0);
+			glGetProgramPipelineInfoLog(pipeline, length, 0, &buffer[0]);
+			return alloc_string(buffer.c_str());
+		}
+		return alloc_null();
+	}
+
+	void lime_gl_program_uniform1i(int program, int location, int v0)
+	{
+		if (glProgramUniform1i)
+		{
+			glProgramUniform1i(program, location, v0);
+		}
+	}
+
+	void lime_gl_program_uniform1f(int program, int location, float v0)
+	{
+		if (glProgramUniform1f)
+		{
+			glProgramUniform1f(program, location, v0);
+		}
+	}
+
+	void lime_gl_program_uniform2f(int program, int location, float v0, float v1)
+	{
+		if (glProgramUniform2f)
+		{
+			glProgramUniform2f(program, location, v0, v1);
+		}
+	}
+
+	void lime_gl_program_uniform3f(int program, int location, float v0, float v1, float v2)
+	{
+		if (glProgramUniform3f)
+		{
+			glProgramUniform3f(program, location, v0, v1, v2);
+		}
+	}
+
+	void lime_gl_program_uniform4f(int program, int location, float v0, float v1, float v2, float v3)
+	{
+		if (glProgramUniform4f)
+		{
+			glProgramUniform4f(program, location, v0, v1, v2, v3);
+		}
+	}
+
+	void lime_gl_program_uniform_matrix4fv(int program, int location, int count, bool transpose, double value)
+	{
+		if (glProgramUniformMatrix4fv)
+		{
+			glProgramUniformMatrix4fv(program, location, count, transpose, (const GLfloat *)(uintptr_t)value);
+		}
+	}
+
+	void lime_gl_bind_vertex_buffer(int bindingIndex, int buffer, double offset, int stride)
+	{
+		if (glBindVertexBuffer)
+		{
+			glBindVertexBuffer(bindingIndex, buffer, (GLintptr)(uintptr_t)offset, stride);
+		}
+	}
+
+	void lime_gl_vertex_attrib_format(int attribIndex, int size, int type, bool normalized, int relativeOffset)
+	{
+		if (glVertexAttribFormat)
+		{
+			glVertexAttribFormat(attribIndex, size, type, normalized, relativeOffset);
+		}
+	}
+
+	void lime_gl_vertex_attrib_iformat(int attribIndex, int size, int type, int relativeOffset)
+	{
+		if (glVertexAttribIFormat)
+		{
+			glVertexAttribIFormat(attribIndex, size, type, relativeOffset);
+		}
+	}
+
+	void lime_gl_vertex_attrib_binding(int attribIndex, int bindingIndex)
+	{
+		if (glVertexAttribBinding)
+		{
+			glVertexAttribBinding(attribIndex, bindingIndex);
+		}
+	}
+
+	void lime_gl_vertex_binding_divisor(int bindingIndex, int divisor)
+	{
+		if (glVertexBindingDivisor)
+		{
+			glVertexBindingDivisor(bindingIndex, divisor);
+		}
+	}
+
+	void lime_gl_tex_storage_2d_multisample(int target, int samples, int internalformat, int width, int height, bool fixedSampleLocations)
+	{
+		if (glTexStorage2DMultisample)
+		{
+			glTexStorage2DMultisample(target, samples, internalformat, width, height, fixedSampleLocations);
+		}
+	}
+
+	void lime_gl_get_multisamplefv(int pname, int index, double val)
+	{
+		if (glGetMultisamplefv)
+		{
+			glGetMultisamplefv(pname, index, (GLfloat *)(uintptr_t)val);
+		}
+	}
+
+	void lime_gl_sample_maski(int maskNumber, int mask)
+	{
+		if (glSampleMaski)
+		{
+			glSampleMaski(maskNumber, mask);
+		}
+	}
+
+	int lime_gl_get_tex_level_parameteri(int target, int level, int pname)
+	{
+		if (glGetTexLevelParameteriv)
+		{
+			GLint value = 0;
+			glGetTexLevelParameteriv(target, level, pname, &value);
+			return value;
+		}
+		return 0;
+	}
+
+	float lime_gl_get_tex_level_parameterf(int target, int level, int pname)
+	{
+		if (glGetTexLevelParameterfv)
+		{
+			GLfloat value = 0;
+			glGetTexLevelParameterfv(target, level, pname, &value);
+			return value;
+		}
+		return 0;
+	}
+
+	bool lime_gl_get_booleani(int target, int index)
+	{
+		if (glGetBooleani_v)
+		{
+			GLboolean value = 0;
+			glGetBooleani_v(target, index, &value);
+			return value != 0;
+		}
+		return false;
+	}
+
+	void lime_gl_framebuffer_parameteri(int target, int pname, int param)
+	{
+		if (glFramebufferParameteri)
+		{
+			glFramebufferParameteri(target, pname, param);
+		}
+	}
+
+	int lime_gl_get_framebuffer_parameteri(int target, int pname)
+	{
+		if (glGetFramebufferParameteriv)
+		{
+			GLint value = 0;
+			glGetFramebufferParameteriv(target, pname, &value);
+			return value;
+		}
+		return 0;
+	}
+
+	void lime_gl_copy_image_sub_data(int srcName, int srcTarget, int srcLevel, int srcX, int srcY, int srcZ, int dstName, int dstTarget, int dstLevel, int dstX, int dstY, int dstZ, int srcWidth, int srcHeight, int srcDepth)
+	{
+		if (glCopyImageSubData)
+		{
+			glCopyImageSubData(srcName, srcTarget, srcLevel, srcX, srcY, srcZ, dstName, dstTarget, dstLevel, dstX, dstY, dstZ, srcWidth, srcHeight, srcDepth);
+		}
+	}
+
+	void lime_gl_draw_elements_base_vertex(int mode, int count, int type, double indices, int baseVertex)
+	{
+		if (glDrawElementsBaseVertex)
+		{
+			glDrawElementsBaseVertex(mode, count, type, (const void *)(uintptr_t)indices, baseVertex);
+		}
+	}
+
+	void lime_gl_draw_range_elements_base_vertex(int mode, int start, int end, int count, int type, double indices, int baseVertex)
+	{
+		if (glDrawRangeElementsBaseVertex)
+		{
+			glDrawRangeElementsBaseVertex(mode, start, end, count, type, (const void *)(uintptr_t)indices, baseVertex);
+		}
+	}
+
+	void lime_gl_draw_elements_instanced_base_vertex(int mode, int count, int type, double indices, int instanceCount, int baseVertex)
+	{
+		if (glDrawElementsInstancedBaseVertex)
+		{
+			glDrawElementsInstancedBaseVertex(mode, count, type, (const void *)(uintptr_t)indices, instanceCount, baseVertex);
+		}
+	}
+
+	void lime_gl_framebuffer_texture(int target, int attachment, int texture, int level)
+	{
+		if (glFramebufferTexture)
+		{
+			glFramebufferTexture(target, attachment, texture, level);
+		}
+	}
+
+	void lime_gl_tex_buffer(int target, int internalformat, int buffer)
+	{
+		if (glTexBuffer)
+		{
+			glTexBuffer(target, internalformat, buffer);
+		}
+	}
+
+	void lime_gl_tex_buffer_range(int target, int internalformat, int buffer, double offset, int size)
+	{
+		if (glTexBufferRange)
+		{
+			glTexBufferRange(target, internalformat, buffer, (GLintptr)(uintptr_t)offset, size);
+		}
+	}
+
+	void lime_gl_patch_parameteri(int pname, int value)
+	{
+		if (glPatchParameteri)
+		{
+			glPatchParameteri(pname, value);
+		}
+	}
+
+	void lime_gl_min_sample_shading(float value)
+	{
+		if (glMinSampleShading)
+		{
+			glMinSampleShading(value);
+		}
+	}
+
+	void lime_gl_blend_equationi(int buf, int mode)
+	{
+		if (glBlendEquationi)
+		{
+			glBlendEquationi(buf, mode);
+		}
+	}
+
+	void lime_gl_blend_equation_separatei(int buf, int modeRGB, int modeAlpha)
+	{
+		if (glBlendEquationSeparatei)
+		{
+			glBlendEquationSeparatei(buf, modeRGB, modeAlpha);
+		}
+	}
+
+	void lime_gl_blend_funci(int buf, int src, int dst)
+	{
+		if (glBlendFunci)
+		{
+			glBlendFunci(buf, src, dst);
+		}
+	}
+
+	void lime_gl_blend_func_separatei(int buf, int srcRGB, int dstRGB, int srcAlpha, int dstAlpha)
+	{
+		if (glBlendFuncSeparatei)
+		{
+			glBlendFuncSeparatei(buf, srcRGB, dstRGB, srcAlpha, dstAlpha);
+		}
+	}
+
+	void lime_gl_color_maski(int index, bool r, bool g, bool b, bool a)
+	{
+		if (glColorMaski)
+		{
+			glColorMaski(index, r, g, b, a);
+		}
+	}
+
+	void lime_gl_enablei(int target, int index)
+	{
+		if (glEnablei)
+		{
+			glEnablei(target, index);
+		}
+	}
+
+	void lime_gl_disablei(int target, int index)
+	{
+		if (glDisablei)
+		{
+			glDisablei(target, index);
+		}
+	}
+
+	bool lime_gl_is_enabledi(int target, int index)
+	{
+		if (glIsEnabledi)
+		{
+			return glIsEnabledi(target, index);
+		}
+		return false;
+	}
+
+	void lime_gl_tex_storage_3d_multisample(int target, int samples, int internalformat, int width, int height, int depth, bool fixedSampleLocations)
+	{
+		if (glTexStorage3DMultisample)
+		{
+			glTexStorage3DMultisample(target, samples, internalformat, width, height, depth, fixedSampleLocations);
+		}
+	}
+
+	void lime_gl_push_debug_group(int source, int id, HxString message)
+	{
+		if (glPushDebugGroup)
+		{
+			glPushDebugGroup(source, id, -1, message.__s);
+		}
+	}
+
+	void lime_gl_pop_debug_group()
+	{
+		if (glPopDebugGroup)
+		{
+			glPopDebugGroup();
+		}
+	}
+
+	void lime_gl_object_label(int identifier, int name, HxString label)
+	{
+		if (glObjectLabel)
+		{
+			glObjectLabel(identifier, name, -1, label.__s);
+		}
+	}
+
+	value lime_gl_get_object_label(int identifier, int name)
+	{
+		if (glGetObjectLabel)
+		{
+			GLsizei length = 0;
+			std::string buffer(512, 0);
+			glGetObjectLabel(identifier, name, 512, &length, &buffer[0]);
+			return alloc_string(buffer.c_str());
+		}
+		return alloc_null();
+	}
+
+	void lime_gl_debug_message_insert(int source, int type, int id, int severity, HxString buf)
+	{
+		if (glDebugMessageInsert)
+		{
+			glDebugMessageInsert(source, type, id, severity, -1, buf.__s);
+		}
+	}
+
+	void lime_gl_debug_message_control(int source, int type, int severity, int count, double ids, bool enabled)
+	{
+		if (glDebugMessageControl)
+		{
+			glDebugMessageControl(source, type, severity, count, (const GLuint *)(uintptr_t)ids, enabled);
+		}
+	}
+
+	int lime_gl_create_buffer_dsa()
+	{
+#ifdef LIME_OPENGL_GL
+		if (glCreateBuffers)
+		{
+			GLuint id = 0;
+			glCreateBuffers(1, &id);
+			return id;
+		}
+#endif
+		return 0;
+	}
+
+	void lime_gl_named_buffer_data(int buffer, int size, double data, int usage)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glNamedBufferData)
+		{
+			glNamedBufferData(buffer, size, (const void *)(uintptr_t)data, usage);
+		}
+#endif
+	}
+
+	void lime_gl_named_buffer_sub_data(int buffer, double offset, int size, double data)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glNamedBufferSubData)
+		{
+			glNamedBufferSubData(buffer, (GLintptr)(uintptr_t)offset, size, (const void *)(uintptr_t)data);
+		}
+#endif
+	}
+
+	void lime_gl_named_buffer_storage(int buffer, int size, double data, int flags)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glNamedBufferStorage)
+		{
+			glNamedBufferStorage(buffer, size, (const void *)(uintptr_t)data, flags);
+		}
+#endif
+	}
+
+	double lime_gl_map_named_buffer_range(int buffer, double offset, int length, int access)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glMapNamedBufferRange)
+		{
+			return (double)(uintptr_t)glMapNamedBufferRange(buffer, (GLintptr)(uintptr_t)offset, length, access);
+		}
+#endif
+		return 0;
+	}
+
+	bool lime_gl_unmap_named_buffer(int buffer)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glUnmapNamedBuffer)
+		{
+			return glUnmapNamedBuffer(buffer);
+		}
+#endif
+		return false;
+	}
+
+	void lime_gl_flush_mapped_named_buffer_range(int buffer, double offset, int length)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glFlushMappedNamedBufferRange)
+		{
+			glFlushMappedNamedBufferRange(buffer, (GLintptr)(uintptr_t)offset, length);
+		}
+#endif
+	}
+
+	void lime_gl_buffer_storage(int target, int size, double data, int flags)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glBufferStorage)
+		{
+			glBufferStorage(target, size, (const void *)(uintptr_t)data, flags);
+		}
+#endif
+	}
+
+	int lime_gl_create_texture_dsa(int target)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glCreateTextures)
+		{
+			GLuint id = 0;
+			glCreateTextures(target, 1, &id);
+			return id;
+		}
+#endif
+		return 0;
+	}
+
+	void lime_gl_texture_storage_2d(int texture, int levels, int internalformat, int width, int height)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glTextureStorage2D)
+		{
+			glTextureStorage2D(texture, levels, internalformat, width, height);
+		}
+#endif
+	}
+
+	void lime_gl_texture_storage_3d(int texture, int levels, int internalformat, int width, int height, int depth)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glTextureStorage3D)
+		{
+			glTextureStorage3D(texture, levels, internalformat, width, height, depth);
+		}
+#endif
+	}
+
+	void lime_gl_texture_sub_image_2d(int texture, int level, int xoffset, int yoffset, int width, int height, int format, int type, double pixels)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glTextureSubImage2D)
+		{
+			glTextureSubImage2D(texture, level, xoffset, yoffset, width, height, format, type, (const void *)(uintptr_t)pixels);
+		}
+#endif
+	}
+
+	void lime_gl_texture_parameteri(int texture, int pname, int param)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glTextureParameteri)
+		{
+			glTextureParameteri(texture, pname, param);
+		}
+#endif
+	}
+
+	void lime_gl_texture_parameterf(int texture, int pname, float param)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glTextureParameterf)
+		{
+			glTextureParameterf(texture, pname, param);
+		}
+#endif
+	}
+
+	void lime_gl_generate_texture_mipmap(int texture)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glGenerateTextureMipmap)
+		{
+			glGenerateTextureMipmap(texture);
+		}
+#endif
+	}
+
+	void lime_gl_bind_texture_unit(int unit, int texture)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glBindTextureUnit)
+		{
+			glBindTextureUnit(unit, texture);
+		}
+#endif
+	}
+
+	int lime_gl_create_framebuffer_dsa()
+	{
+#ifdef LIME_OPENGL_GL
+		if (glCreateFramebuffers)
+		{
+			GLuint id = 0;
+			glCreateFramebuffers(1, &id);
+			return id;
+		}
+#endif
+		return 0;
+	}
+
+	void lime_gl_named_framebuffer_texture(int framebuffer, int attachment, int texture, int level)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glNamedFramebufferTexture)
+		{
+			glNamedFramebufferTexture(framebuffer, attachment, texture, level);
+		}
+#endif
+	}
+
+	void lime_gl_named_framebuffer_renderbuffer(int framebuffer, int attachment, int renderbufferTarget, int renderbuffer)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glNamedFramebufferRenderbuffer)
+		{
+			glNamedFramebufferRenderbuffer(framebuffer, attachment, renderbufferTarget, renderbuffer);
+		}
+#endif
+	}
+
+	int lime_gl_check_named_framebuffer_status(int framebuffer, int target)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glCheckNamedFramebufferStatus)
+		{
+			return glCheckNamedFramebufferStatus(framebuffer, target);
+		}
+#endif
+		return 0;
+	}
+
+	void lime_gl_clear_named_framebufferfv(int framebuffer, int buffer, int drawbuffer, double value)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glClearNamedFramebufferfv)
+		{
+			glClearNamedFramebufferfv(framebuffer, buffer, drawbuffer, (const GLfloat *)(uintptr_t)value);
+		}
+#endif
+	}
+
+	void lime_gl_blit_named_framebuffer(int readFramebuffer, int drawFramebuffer, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, int mask, int filter)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glBlitNamedFramebuffer)
+		{
+			glBlitNamedFramebuffer(readFramebuffer, drawFramebuffer, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+		}
+#endif
+	}
+
+	int lime_gl_create_renderbuffer_dsa()
+	{
+#ifdef LIME_OPENGL_GL
+		if (glCreateRenderbuffers)
+		{
+			GLuint id = 0;
+			glCreateRenderbuffers(1, &id);
+			return id;
+		}
+#endif
+		return 0;
+	}
+
+	void lime_gl_named_renderbuffer_storage(int renderbuffer, int internalformat, int width, int height)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glNamedRenderbufferStorage)
+		{
+			glNamedRenderbufferStorage(renderbuffer, internalformat, width, height);
+		}
+#endif
+	}
+
+	int lime_gl_create_vertex_array_dsa()
+	{
+#ifdef LIME_OPENGL_GL
+		if (glCreateVertexArrays)
+		{
+			GLuint id = 0;
+			glCreateVertexArrays(1, &id);
+			return id;
+		}
+#endif
+		return 0;
+	}
+
+	void lime_gl_vertex_array_vertex_buffer(int vaobj, int bindingIndex, int buffer, double offset, int stride)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glVertexArrayVertexBuffer)
+		{
+			glVertexArrayVertexBuffer(vaobj, bindingIndex, buffer, (GLintptr)(uintptr_t)offset, stride);
+		}
+#endif
+	}
+
+	void lime_gl_vertex_array_attrib_format(int vaobj, int attribIndex, int size, int type, bool normalized, int relativeOffset)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glVertexArrayAttribFormat)
+		{
+			glVertexArrayAttribFormat(vaobj, attribIndex, size, type, normalized, relativeOffset);
+		}
+#endif
+	}
+
+	void lime_gl_vertex_array_attrib_binding(int vaobj, int attribIndex, int bindingIndex)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glVertexArrayAttribBinding)
+		{
+			glVertexArrayAttribBinding(vaobj, attribIndex, bindingIndex);
+		}
+#endif
+	}
+
+	void lime_gl_vertex_array_element_buffer(int vaobj, int buffer)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glVertexArrayElementBuffer)
+		{
+			glVertexArrayElementBuffer(vaobj, buffer);
+		}
+#endif
+	}
+
+	void lime_gl_enable_vertex_array_attrib(int vaobj, int index)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glEnableVertexArrayAttrib)
+		{
+			glEnableVertexArrayAttrib(vaobj, index);
+		}
+#endif
+	}
+
+	void lime_gl_multi_draw_arrays_indirect(int mode, double indirect, int drawCount, int stride)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glMultiDrawArraysIndirect)
+		{
+			glMultiDrawArraysIndirect(mode, (const void *)(uintptr_t)indirect, drawCount, stride);
+		}
+#endif
+	}
+
+	void lime_gl_multi_draw_elements_indirect(int mode, int type, double indirect, int drawCount, int stride)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glMultiDrawElementsIndirect)
+		{
+			glMultiDrawElementsIndirect(mode, type, (const void *)(uintptr_t)indirect, drawCount, stride);
+		}
+#endif
+	}
+
+	void lime_gl_clip_control(int origin, int depth)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glClipControl)
+		{
+			glClipControl(origin, depth);
+		}
+#endif
+	}
+
+	void lime_gl_texture_barrier()
+	{
+#ifdef LIME_OPENGL_GL
+		if (glTextureBarrier)
+		{
+			glTextureBarrier();
+		}
+#endif
+	}
+
+	void lime_gl_polygon_mode(int face, int mode)
+	{
+#ifdef LIME_OPENGL_GL
+		if (glPolygonMode)
+		{
+			glPolygonMode(face, mode);
+		}
+#endif
+	}
+
 	bool OpenGLBindings::Init()
 	{
 		static bool result = true;
@@ -2399,6 +3351,108 @@ namespace lime
 	DEFINE_PRIME5v(lime_gl_vertex_attrib4f);
 	DEFINE_PRIME2v(lime_gl_vertex_attrib4fv);
 	DEFINE_PRIME4v(lime_gl_viewport);
+	DEFINE_PRIME3v(lime_gl_flush_mapped_buffer_range);
+	DEFINE_PRIME3v(lime_gl_dispatch_compute);
+	DEFINE_PRIME1v(lime_gl_dispatch_compute_indirect);
+	DEFINE_PRIME1v(lime_gl_memory_barrier);
+	DEFINE_PRIME1v(lime_gl_memory_barrier_by_region);
+	DEFINE_PRIME7v(lime_gl_bind_image_texture);
+	DEFINE_PRIME2v(lime_gl_draw_arrays_indirect);
+	DEFINE_PRIME3v(lime_gl_draw_elements_indirect);
+	DEFINE_PRIME3(lime_gl_get_program_interfacei);
+	DEFINE_PRIME4v(lime_gl_get_program_interfaceiv);
+	DEFINE_PRIME3(lime_gl_get_program_resource_index);
+	DEFINE_PRIME3(lime_gl_get_program_resource_location);
+	DEFINE_PRIME3(lime_gl_get_program_resource_name);
+	DEFINE_PRIME7v(lime_gl_get_program_resourceiv);
+	DEFINE_PRIME0(lime_gl_create_program_pipeline);
+	DEFINE_PRIME1v(lime_gl_delete_program_pipeline);
+	DEFINE_PRIME1v(lime_gl_bind_program_pipeline);
+	DEFINE_PRIME1(lime_gl_is_program_pipeline);
+	DEFINE_PRIME3v(lime_gl_use_program_stages);
+	DEFINE_PRIME2v(lime_gl_active_shader_program);
+	DEFINE_PRIME2(lime_gl_create_shader_programv);
+	DEFINE_PRIME1v(lime_gl_validate_program_pipeline);
+	DEFINE_PRIME2(lime_gl_get_program_pipelinei);
+	DEFINE_PRIME1(lime_gl_get_program_pipeline_info_log);
+	DEFINE_PRIME3v(lime_gl_program_uniform1i);
+	DEFINE_PRIME3v(lime_gl_program_uniform1f);
+	DEFINE_PRIME4v(lime_gl_program_uniform2f);
+	DEFINE_PRIME5v(lime_gl_program_uniform3f);
+	DEFINE_PRIME6v(lime_gl_program_uniform4f);
+	DEFINE_PRIME5v(lime_gl_program_uniform_matrix4fv);
+	DEFINE_PRIME4v(lime_gl_bind_vertex_buffer);
+	DEFINE_PRIME5v(lime_gl_vertex_attrib_format);
+	DEFINE_PRIME4v(lime_gl_vertex_attrib_iformat);
+	DEFINE_PRIME2v(lime_gl_vertex_attrib_binding);
+	DEFINE_PRIME2v(lime_gl_vertex_binding_divisor);
+	DEFINE_PRIME6v(lime_gl_tex_storage_2d_multisample);
+	DEFINE_PRIME3v(lime_gl_get_multisamplefv);
+	DEFINE_PRIME2v(lime_gl_sample_maski);
+	DEFINE_PRIME3(lime_gl_get_tex_level_parameteri);
+	DEFINE_PRIME3(lime_gl_get_tex_level_parameterf);
+	DEFINE_PRIME2(lime_gl_get_booleani);
+	DEFINE_PRIME3v(lime_gl_framebuffer_parameteri);
+	DEFINE_PRIME2(lime_gl_get_framebuffer_parameteri);
+	DEFINE_PRIME15v(lime_gl_copy_image_sub_data);
+	DEFINE_PRIME5v(lime_gl_draw_elements_base_vertex);
+	DEFINE_PRIME7v(lime_gl_draw_range_elements_base_vertex);
+	DEFINE_PRIME6v(lime_gl_draw_elements_instanced_base_vertex);
+	DEFINE_PRIME4v(lime_gl_framebuffer_texture);
+	DEFINE_PRIME3v(lime_gl_tex_buffer);
+	DEFINE_PRIME5v(lime_gl_tex_buffer_range);
+	DEFINE_PRIME2v(lime_gl_patch_parameteri);
+	DEFINE_PRIME1v(lime_gl_min_sample_shading);
+	DEFINE_PRIME2v(lime_gl_blend_equationi);
+	DEFINE_PRIME3v(lime_gl_blend_equation_separatei);
+	DEFINE_PRIME3v(lime_gl_blend_funci);
+	DEFINE_PRIME5v(lime_gl_blend_func_separatei);
+	DEFINE_PRIME5v(lime_gl_color_maski);
+	DEFINE_PRIME2v(lime_gl_enablei);
+	DEFINE_PRIME2v(lime_gl_disablei);
+	DEFINE_PRIME2(lime_gl_is_enabledi);
+	DEFINE_PRIME7v(lime_gl_tex_storage_3d_multisample);
+	DEFINE_PRIME3v(lime_gl_push_debug_group);
+	DEFINE_PRIME0v(lime_gl_pop_debug_group);
+	DEFINE_PRIME3v(lime_gl_object_label);
+	DEFINE_PRIME2(lime_gl_get_object_label);
+	DEFINE_PRIME5v(lime_gl_debug_message_insert);
+	DEFINE_PRIME6v(lime_gl_debug_message_control);
+	DEFINE_PRIME0(lime_gl_create_buffer_dsa);
+	DEFINE_PRIME4v(lime_gl_named_buffer_data);
+	DEFINE_PRIME4v(lime_gl_named_buffer_sub_data);
+	DEFINE_PRIME4v(lime_gl_named_buffer_storage);
+	DEFINE_PRIME4(lime_gl_map_named_buffer_range);
+	DEFINE_PRIME1(lime_gl_unmap_named_buffer);
+	DEFINE_PRIME3v(lime_gl_flush_mapped_named_buffer_range);
+	DEFINE_PRIME4v(lime_gl_buffer_storage);
+	DEFINE_PRIME1(lime_gl_create_texture_dsa);
+	DEFINE_PRIME5v(lime_gl_texture_storage_2d);
+	DEFINE_PRIME6v(lime_gl_texture_storage_3d);
+	DEFINE_PRIME9v(lime_gl_texture_sub_image_2d);
+	DEFINE_PRIME3v(lime_gl_texture_parameteri);
+	DEFINE_PRIME3v(lime_gl_texture_parameterf);
+	DEFINE_PRIME1v(lime_gl_generate_texture_mipmap);
+	DEFINE_PRIME2v(lime_gl_bind_texture_unit);
+	DEFINE_PRIME0(lime_gl_create_framebuffer_dsa);
+	DEFINE_PRIME4v(lime_gl_named_framebuffer_texture);
+	DEFINE_PRIME4v(lime_gl_named_framebuffer_renderbuffer);
+	DEFINE_PRIME2(lime_gl_check_named_framebuffer_status);
+	DEFINE_PRIME4v(lime_gl_clear_named_framebufferfv);
+	DEFINE_PRIME12v(lime_gl_blit_named_framebuffer);
+	DEFINE_PRIME0(lime_gl_create_renderbuffer_dsa);
+	DEFINE_PRIME4v(lime_gl_named_renderbuffer_storage);
+	DEFINE_PRIME0(lime_gl_create_vertex_array_dsa);
+	DEFINE_PRIME5v(lime_gl_vertex_array_vertex_buffer);
+	DEFINE_PRIME6v(lime_gl_vertex_array_attrib_format);
+	DEFINE_PRIME3v(lime_gl_vertex_array_attrib_binding);
+	DEFINE_PRIME2v(lime_gl_vertex_array_element_buffer);
+	DEFINE_PRIME2v(lime_gl_enable_vertex_array_attrib);
+	DEFINE_PRIME4v(lime_gl_multi_draw_arrays_indirect);
+	DEFINE_PRIME5v(lime_gl_multi_draw_elements_indirect);
+	DEFINE_PRIME2v(lime_gl_clip_control);
+	DEFINE_PRIME0v(lime_gl_texture_barrier);
+	DEFINE_PRIME2v(lime_gl_polygon_mode);
 	DEFINE_PRIME4v(lime_gl_wait_sync);
 
 } // namespace lime

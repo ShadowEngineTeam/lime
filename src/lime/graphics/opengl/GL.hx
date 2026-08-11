@@ -18,6 +18,131 @@ import lime.system.CFFIPointer;
 @:allow(lime.ui.Window)
 class GL
 {
+	// Modern OpenGL / OpenGL ES enums (compute, SSBOs, memory barriers, program interface
+	// query, separable programs, vertex attrib bindings, multisample textures, KHR_debug,
+	// buffer storage and clip control).
+	public static inline var COMPUTE_SHADER = 0x91B9;
+	public static inline var MAX_COMPUTE_WORK_GROUP_COUNT = 0x91BE;
+	public static inline var MAX_COMPUTE_WORK_GROUP_SIZE = 0x91BF;
+	public static inline var MAX_COMPUTE_WORK_GROUP_INVOCATIONS = 0x90EB;
+	public static inline var COMPUTE_WORK_GROUP_SIZE = 0x8267;
+	public static inline var DISPATCH_INDIRECT_BUFFER = 0x90EE;
+	public static inline var DISPATCH_INDIRECT_BUFFER_BINDING = 0x90EF;
+	public static inline var DRAW_INDIRECT_BUFFER = 0x8F3F;
+	public static inline var DRAW_INDIRECT_BUFFER_BINDING = 0x8F43;
+	public static inline var SHADER_STORAGE_BUFFER = 0x90D2;
+	public static inline var SHADER_STORAGE_BUFFER_BINDING = 0x90D3;
+	public static inline var SHADER_STORAGE_BUFFER_START = 0x90D4;
+	public static inline var SHADER_STORAGE_BUFFER_SIZE = 0x90D5;
+	public static inline var MAX_SHADER_STORAGE_BLOCK_SIZE = 0x90DE;
+	public static inline var MAX_SHADER_STORAGE_BUFFER_BINDINGS = 0x90DD;
+	public static inline var SHADER_STORAGE_BARRIER_BIT = 0x00002000;
+	public static inline var VERTEX_ATTRIB_ARRAY_BARRIER_BIT = 0x00000001;
+	public static inline var ELEMENT_ARRAY_BARRIER_BIT = 0x00000002;
+	public static inline var UNIFORM_BARRIER_BIT = 0x00000004;
+	public static inline var TEXTURE_FETCH_BARRIER_BIT = 0x00000008;
+	public static inline var SHADER_IMAGE_ACCESS_BARRIER_BIT = 0x00000020;
+	public static inline var COMMAND_BARRIER_BIT = 0x00000040;
+	public static inline var PIXEL_BUFFER_BARRIER_BIT = 0x00000080;
+	public static inline var TEXTURE_UPDATE_BARRIER_BIT = 0x00000100;
+	public static inline var BUFFER_UPDATE_BARRIER_BIT = 0x00000200;
+	public static inline var FRAMEBUFFER_BARRIER_BIT = 0x00000400;
+	public static inline var TRANSFORM_FEEDBACK_BARRIER_BIT = 0x00000800;
+	public static inline var ATOMIC_COUNTER_BARRIER_BIT = 0x00001000;
+	public static inline var ALL_BARRIER_BITS = 0xFFFFFFFF;
+	public static inline var ATOMIC_COUNTER_BUFFER = 0x92C0;
+	public static inline var READ_ONLY = 0x88B8;
+	public static inline var WRITE_ONLY = 0x88B9;
+	public static inline var READ_WRITE = 0x88BA;
+	public static inline var IMAGE_2D = 0x904D;
+	public static inline var MAX_IMAGE_UNITS = 0x8F38;
+	public static inline var UNIFORM = 0x92E1;
+	public static inline var UNIFORM_BLOCK = 0x92E2;
+	public static inline var PROGRAM_INPUT = 0x92E3;
+	public static inline var PROGRAM_OUTPUT = 0x92E4;
+	public static inline var BUFFER_VARIABLE = 0x92E5;
+	public static inline var SHADER_STORAGE_BLOCK = 0x92E6;
+	public static inline var ACTIVE_RESOURCES = 0x92F5;
+	public static inline var MAX_NAME_LENGTH = 0x92F6;
+	public static inline var MAX_NUM_ACTIVE_VARIABLES = 0x92F7;
+	public static inline var NAME_LENGTH = 0x92F9;
+	public static inline var TYPE = 0x92FA;
+	public static inline var ARRAY_SIZE = 0x92FB;
+	public static inline var OFFSET = 0x92FC;
+	public static inline var BLOCK_INDEX = 0x92FD;
+	public static inline var LOCATION = 0x930E;
+	public static inline var VERTEX_SHADER_BIT = 0x00000001;
+	public static inline var FRAGMENT_SHADER_BIT = 0x00000002;
+	public static inline var COMPUTE_SHADER_BIT = 0x00000020;
+	public static inline var ALL_SHADER_BITS = 0xFFFFFFFF;
+	public static inline var PROGRAM_SEPARABLE = 0x8258;
+	public static inline var ACTIVE_PROGRAM = 0x8259;
+	public static inline var PROGRAM_PIPELINE_BINDING = 0x825A;
+	public static inline var VERTEX_ATTRIB_BINDING = 0x82D4;
+	public static inline var VERTEX_ATTRIB_RELATIVE_OFFSET = 0x82D5;
+	public static inline var VERTEX_BINDING_DIVISOR = 0x82D6;
+	public static inline var VERTEX_BINDING_OFFSET = 0x82D7;
+	public static inline var VERTEX_BINDING_STRIDE = 0x82D8;
+	public static inline var VERTEX_BINDING_BUFFER = 0x8F4F;
+	public static inline var MAX_VERTEX_ATTRIB_BINDINGS = 0x82DA;
+	public static inline var MAX_VERTEX_ATTRIB_STRIDE = 0x82E5;
+	public static inline var TEXTURE_2D_MULTISAMPLE = 0x9100;
+	public static inline var TEXTURE_2D_MULTISAMPLE_ARRAY = 0x9102;
+	public static inline var SAMPLE_POSITION = 0x8E50;
+	public static inline var SAMPLE_MASK = 0x8E51;
+	public static inline var MAX_SAMPLE_MASK_WORDS = 0x8E59;
+	public static inline var MAX_COLOR_TEXTURE_SAMPLES = 0x910E;
+	public static inline var MAX_DEPTH_TEXTURE_SAMPLES = 0x910F;
+	public static inline var FRAMEBUFFER_DEFAULT_WIDTH = 0x9310;
+	public static inline var FRAMEBUFFER_DEFAULT_HEIGHT = 0x9311;
+	public static inline var FRAMEBUFFER_DEFAULT_SAMPLES = 0x9313;
+	public static inline var TEXTURE_BUFFER = 0x8C2A;
+	public static inline var TEXTURE_BUFFER_BINDING = 0x8C2A;
+	public static inline var TEXTURE_BUFFER_OFFSET = 0x919D;
+	public static inline var TEXTURE_BUFFER_SIZE = 0x919E;
+	public static inline var PATCHES = 0x000E;
+	public static inline var PATCH_VERTICES = 0x8E72;
+	public static inline var MIN_SAMPLE_SHADING_VALUE = 0x8C37;
+	public static inline var SAMPLE_SHADING = 0x8C36;
+	public static inline var DEBUG_OUTPUT = 0x92E0;
+	public static inline var DEBUG_OUTPUT_SYNCHRONOUS = 0x8242;
+	public static inline var DEBUG_SOURCE_APPLICATION = 0x824A;
+	public static inline var DEBUG_SOURCE_THIRD_PARTY = 0x824B;
+	public static inline var DEBUG_TYPE_ERROR = 0x824C;
+	public static inline var DEBUG_TYPE_PERFORMANCE = 0x8250;
+	public static inline var DEBUG_TYPE_MARKER = 0x8268;
+	public static inline var DEBUG_TYPE_PUSH_GROUP = 0x8269;
+	public static inline var DEBUG_TYPE_POP_GROUP = 0x826A;
+	public static inline var DEBUG_SEVERITY_HIGH = 0x9146;
+	public static inline var DEBUG_SEVERITY_MEDIUM = 0x9147;
+	public static inline var DEBUG_SEVERITY_LOW = 0x9148;
+	public static inline var DEBUG_SEVERITY_NOTIFICATION = 0x826B;
+	public static inline var MAX_DEBUG_MESSAGE_LENGTH = 0x9143;
+	public static inline var MAX_LABEL_LENGTH = 0x82E8;
+	public static inline var BUFFER_OBJECT = 0x9151;
+	public static inline var SHADER_OBJECT = 0x82E1;
+	public static inline var PROGRAM_OBJECT = 0x82E2;
+	public static inline var QUERY_OBJECT = 0x82E3;
+	public static inline var MAP_PERSISTENT_BIT = 0x0040;
+	public static inline var MAP_COHERENT_BIT = 0x0080;
+	public static inline var DYNAMIC_STORAGE_BIT = 0x0100;
+	public static inline var CLIENT_STORAGE_BIT = 0x0200;
+	public static inline var LOWER_LEFT = 0x8CA1;
+	public static inline var UPPER_LEFT = 0x8CA2;
+	public static inline var NEGATIVE_ONE_TO_ONE = 0x935E;
+	public static inline var ZERO_TO_ONE = 0x935F;
+	public static inline var FILL = 0x1B02;
+	public static inline var LINE = 0x1B01;
+	public static inline var POINT = 0x1B00;
+
+	public static inline var FIXED = 0x0140C;
+	public static inline var ACTIVE_UNIFORMS_MAX_LENGTH = 0x8B87;
+	public static inline var ACTIVE_ATTRIBUTES_MAX_LENGTH = 0x8B8A;
+	public static inline var INFO_LOG_LENGTH = 0x8B84;
+	public static inline var SHADER_SOURCE_LENGTH = 0x8B88;
+	public static inline var SHADER_COMPILER = 0x8DFA;
+	public static inline var SHADER_BINARY_FORMATS = 0x8DF8;
+	public static inline var NUM_SHADER_BINARY_FORMATS = 0x8DF9;
 	public static inline var DEPTH_BUFFER_BIT = 0x00000100;
 	public static inline var STENCIL_BUFFER_BIT = 0x00000400;
 	public static inline var COLOR_BUFFER_BIT = 0x00004000;
@@ -577,6 +702,7 @@ class GL
 	public static inline var INVALID_INDEX = 0xFFFFFFFF;
 	public static inline var TIMEOUT_IGNORED = -1;
 	#if lime_opengl
+
 	public static var context(default, null):OpenGLRenderContext;
 	#elseif lime_opengles
 	public static var context(default, null):OpenGLES3RenderContext;
@@ -2265,6 +2391,516 @@ class GL
 	public static inline function waitSync(sync:GLSync, flags:Int, timeout:Int64):Void
 	{
 		context.waitSync(sync, flags, timeout);
+	}
+
+	public static inline function flushMappedBufferRange(target:Int, offset:DataPointer, length:Int):Void
+	{
+		context.flushMappedBufferRange(target, offset, length);
+	}
+
+	public static inline function dispatchCompute(x:Int, y:Int, z:Int):Void
+	{
+		context.dispatchCompute(x, y, z);
+	}
+
+	public static inline function dispatchComputeIndirect(indirect:DataPointer):Void
+	{
+		context.dispatchComputeIndirect(indirect);
+	}
+
+	public static inline function memoryBarrier(barriers:Int):Void
+	{
+		context.memoryBarrier(barriers);
+	}
+
+	public static inline function memoryBarrierByRegion(barriers:Int):Void
+	{
+		context.memoryBarrierByRegion(barriers);
+	}
+
+	public static inline function bindImageTexture(unit:Int, texture:Int, level:Int, layered:Bool, layer:Int, access:Int, format:Int):Void
+	{
+		context.bindImageTexture(unit, texture, level, layered, layer, access, format);
+	}
+
+	public static inline function drawArraysIndirect(mode:Int, indirect:DataPointer):Void
+	{
+		context.drawArraysIndirect(mode, indirect);
+	}
+
+	public static inline function drawElementsIndirect(mode:Int, type:Int, indirect:DataPointer):Void
+	{
+		context.drawElementsIndirect(mode, type, indirect);
+	}
+
+	public static inline function getProgramInterfacei(program:Int, programInterface:Int, pname:Int):Int
+	{
+		return context.getProgramInterfacei(program, programInterface, pname);
+	}
+
+	public static inline function getProgramInterfaceiv(program:Int, programInterface:Int, pname:Int, params:DataPointer):Void
+	{
+		context.getProgramInterfaceiv(program, programInterface, pname, params);
+	}
+
+	public static inline function getProgramResourceIndex(program:Int, programInterface:Int, name:String):Int
+	{
+		return context.getProgramResourceIndex(program, programInterface, name);
+	}
+
+	public static inline function getProgramResourceLocation(program:Int, programInterface:Int, name:String):Int
+	{
+		return context.getProgramResourceLocation(program, programInterface, name);
+	}
+
+	public static inline function getProgramResourceName(program:Int, programInterface:Int, index:Int):String
+	{
+		return context.getProgramResourceName(program, programInterface, index);
+	}
+
+	public static inline function getProgramResourceiv(program:Int, programInterface:Int, index:Int, propCount:Int, props:DataPointer, bufSize:Int, params:DataPointer):Void
+	{
+		context.getProgramResourceiv(program, programInterface, index, propCount, props, bufSize, params);
+	}
+
+	public static inline function createProgramPipeline():Int
+	{
+		return context.createProgramPipeline();
+	}
+
+	public static inline function deleteProgramPipeline(pipeline:Int):Void
+	{
+		context.deleteProgramPipeline(pipeline);
+	}
+
+	public static inline function bindProgramPipeline(pipeline:Int):Void
+	{
+		context.bindProgramPipeline(pipeline);
+	}
+
+	public static inline function isProgramPipeline(pipeline:Int):Bool
+	{
+		return context.isProgramPipeline(pipeline);
+	}
+
+	public static inline function useProgramStages(pipeline:Int, stages:Int, program:Int):Void
+	{
+		context.useProgramStages(pipeline, stages, program);
+	}
+
+	public static inline function activeShaderProgram(pipeline:Int, program:Int):Void
+	{
+		context.activeShaderProgram(pipeline, program);
+	}
+
+	public static inline function createShaderProgram(type:Int, source:String):Int
+	{
+		return context.createShaderProgram(type, source);
+	}
+
+	public static inline function validateProgramPipeline(pipeline:Int):Void
+	{
+		context.validateProgramPipeline(pipeline);
+	}
+
+	public static inline function getProgramPipelinei(pipeline:Int, pname:Int):Int
+	{
+		return context.getProgramPipelinei(pipeline, pname);
+	}
+
+	public static inline function getProgramPipelineInfoLog(pipeline:Int):String
+	{
+		return context.getProgramPipelineInfoLog(pipeline);
+	}
+
+	public static inline function programUniform1i(program:Int, location:Int, v0:Int):Void
+	{
+		context.programUniform1i(program, location, v0);
+	}
+
+	public static inline function programUniform1f(program:Int, location:Int, v0:Float):Void
+	{
+		context.programUniform1f(program, location, v0);
+	}
+
+	public static inline function programUniform2f(program:Int, location:Int, v0:Float, v1:Float):Void
+	{
+		context.programUniform2f(program, location, v0, v1);
+	}
+
+	public static inline function programUniform3f(program:Int, location:Int, v0:Float, v1:Float, v2:Float):Void
+	{
+		context.programUniform3f(program, location, v0, v1, v2);
+	}
+
+	public static inline function programUniform4f(program:Int, location:Int, v0:Float, v1:Float, v2:Float, v3:Float):Void
+	{
+		context.programUniform4f(program, location, v0, v1, v2, v3);
+	}
+
+	public static inline function programUniformMatrix4fv(program:Int, location:Int, count:Int, transpose:Bool, value:DataPointer):Void
+	{
+		context.programUniformMatrix4fv(program, location, count, transpose, value);
+	}
+
+	public static inline function bindVertexBuffer(bindingIndex:Int, buffer:Int, offset:DataPointer, stride:Int):Void
+	{
+		context.bindVertexBuffer(bindingIndex, buffer, offset, stride);
+	}
+
+	public static inline function vertexAttribFormat(attribIndex:Int, size:Int, type:Int, normalized:Bool, relativeOffset:Int):Void
+	{
+		context.vertexAttribFormat(attribIndex, size, type, normalized, relativeOffset);
+	}
+
+	public static inline function vertexAttribIFormat(attribIndex:Int, size:Int, type:Int, relativeOffset:Int):Void
+	{
+		context.vertexAttribIFormat(attribIndex, size, type, relativeOffset);
+	}
+
+	public static inline function vertexAttribBinding(attribIndex:Int, bindingIndex:Int):Void
+	{
+		context.vertexAttribBinding(attribIndex, bindingIndex);
+	}
+
+	public static inline function vertexBindingDivisor(bindingIndex:Int, divisor:Int):Void
+	{
+		context.vertexBindingDivisor(bindingIndex, divisor);
+	}
+
+	public static inline function texStorage2DMultisample(target:Int, samples:Int, internalformat:Int, width:Int, height:Int, fixedSampleLocations:Bool):Void
+	{
+		context.texStorage2DMultisample(target, samples, internalformat, width, height, fixedSampleLocations);
+	}
+
+	public static inline function getMultisamplefv(pname:Int, index:Int, val:DataPointer):Void
+	{
+		context.getMultisamplefv(pname, index, val);
+	}
+
+	public static inline function sampleMaski(maskNumber:Int, mask:Int):Void
+	{
+		context.sampleMaski(maskNumber, mask);
+	}
+
+	public static inline function getTexLevelParameteri(target:Int, level:Int, pname:Int):Int
+	{
+		return context.getTexLevelParameteri(target, level, pname);
+	}
+
+	public static inline function getTexLevelParameterf(target:Int, level:Int, pname:Int):Float
+	{
+		return context.getTexLevelParameterf(target, level, pname);
+	}
+
+	public static inline function getBooleani(target:Int, index:Int):Bool
+	{
+		return context.getBooleani(target, index);
+	}
+
+	public static inline function framebufferParameteri(target:Int, pname:Int, param:Int):Void
+	{
+		context.framebufferParameteri(target, pname, param);
+	}
+
+	public static inline function getFramebufferParameteri(target:Int, pname:Int):Int
+	{
+		return context.getFramebufferParameteri(target, pname);
+	}
+
+	public static inline function copyImageSubData(srcName:Int, srcTarget:Int, srcLevel:Int, srcX:Int, srcY:Int, srcZ:Int, dstName:Int, dstTarget:Int, dstLevel:Int, dstX:Int, dstY:Int, dstZ:Int, srcWidth:Int, srcHeight:Int, srcDepth:Int):Void
+	{
+		context.copyImageSubData(srcName, srcTarget, srcLevel, srcX, srcY, srcZ, dstName, dstTarget, dstLevel, dstX, dstY, dstZ, srcWidth, srcHeight, srcDepth);
+	}
+
+	public static inline function drawElementsBaseVertex(mode:Int, count:Int, type:Int, indices:DataPointer, baseVertex:Int):Void
+	{
+		context.drawElementsBaseVertex(mode, count, type, indices, baseVertex);
+	}
+
+	public static inline function drawRangeElementsBaseVertex(mode:Int, start:Int, end:Int, count:Int, type:Int, indices:DataPointer, baseVertex:Int):Void
+	{
+		context.drawRangeElementsBaseVertex(mode, start, end, count, type, indices, baseVertex);
+	}
+
+	public static inline function drawElementsInstancedBaseVertex(mode:Int, count:Int, type:Int, indices:DataPointer, instanceCount:Int, baseVertex:Int):Void
+	{
+		context.drawElementsInstancedBaseVertex(mode, count, type, indices, instanceCount, baseVertex);
+	}
+
+	public static inline function framebufferTexture(target:Int, attachment:Int, texture:Int, level:Int):Void
+	{
+		context.framebufferTexture(target, attachment, texture, level);
+	}
+
+	public static inline function texBuffer(target:Int, internalformat:Int, buffer:Int):Void
+	{
+		context.texBuffer(target, internalformat, buffer);
+	}
+
+	public static inline function texBufferRange(target:Int, internalformat:Int, buffer:Int, offset:DataPointer, size:Int):Void
+	{
+		context.texBufferRange(target, internalformat, buffer, offset, size);
+	}
+
+	public static inline function patchParameteri(pname:Int, value:Int):Void
+	{
+		context.patchParameteri(pname, value);
+	}
+
+	public static inline function minSampleShading(value:Float):Void
+	{
+		context.minSampleShading(value);
+	}
+
+	public static inline function blendEquationi(buf:Int, mode:Int):Void
+	{
+		context.blendEquationi(buf, mode);
+	}
+
+	public static inline function blendEquationSeparatei(buf:Int, modeRGB:Int, modeAlpha:Int):Void
+	{
+		context.blendEquationSeparatei(buf, modeRGB, modeAlpha);
+	}
+
+	public static inline function blendFunci(buf:Int, src:Int, dst:Int):Void
+	{
+		context.blendFunci(buf, src, dst);
+	}
+
+	public static inline function blendFuncSeparatei(buf:Int, srcRGB:Int, dstRGB:Int, srcAlpha:Int, dstAlpha:Int):Void
+	{
+		context.blendFuncSeparatei(buf, srcRGB, dstRGB, srcAlpha, dstAlpha);
+	}
+
+	public static inline function colorMaski(index:Int, r:Bool, g:Bool, b:Bool, a:Bool):Void
+	{
+		context.colorMaski(index, r, g, b, a);
+	}
+
+	public static inline function enablei(target:Int, index:Int):Void
+	{
+		context.enablei(target, index);
+	}
+
+	public static inline function disablei(target:Int, index:Int):Void
+	{
+		context.disablei(target, index);
+	}
+
+	public static inline function isEnabledi(target:Int, index:Int):Bool
+	{
+		return context.isEnabledi(target, index);
+	}
+
+	public static inline function texStorage3DMultisample(target:Int, samples:Int, internalformat:Int, width:Int, height:Int, depth:Int, fixedSampleLocations:Bool):Void
+	{
+		context.texStorage3DMultisample(target, samples, internalformat, width, height, depth, fixedSampleLocations);
+	}
+
+	public static inline function pushDebugGroup(source:Int, id:Int, message:String):Void
+	{
+		context.pushDebugGroup(source, id, message);
+	}
+
+	public static inline function popDebugGroup():Void
+	{
+		context.popDebugGroup();
+	}
+
+	public static inline function objectLabel(identifier:Int, name:Int, label:String):Void
+	{
+		context.objectLabel(identifier, name, label);
+	}
+
+	public static inline function getObjectLabel(identifier:Int, name:Int):String
+	{
+		return context.getObjectLabel(identifier, name);
+	}
+
+	public static inline function debugMessageInsert(source:Int, type:Int, id:Int, severity:Int, buf:String):Void
+	{
+		context.debugMessageInsert(source, type, id, severity, buf);
+	}
+
+	public static inline function debugMessageControl(source:Int, type:Int, severity:Int, count:Int, ids:DataPointer, enabled:Bool):Void
+	{
+		context.debugMessageControl(source, type, severity, count, ids, enabled);
+	}
+
+	public static inline function createBufferDSA():Int
+	{
+		return context.createBufferDSA();
+	}
+
+	public static inline function namedBufferData(buffer:Int, size:Int, data:DataPointer, usage:Int):Void
+	{
+		context.namedBufferData(buffer, size, data, usage);
+	}
+
+	public static inline function namedBufferSubData(buffer:Int, offset:DataPointer, size:Int, data:DataPointer):Void
+	{
+		context.namedBufferSubData(buffer, offset, size, data);
+	}
+
+	public static inline function namedBufferStorage(buffer:Int, size:Int, data:DataPointer, flags:Int):Void
+	{
+		context.namedBufferStorage(buffer, size, data, flags);
+	}
+
+	public static inline function mapNamedBufferRange(buffer:Int, offset:DataPointer, length:Int, access:Int):DataPointer
+	{
+		return context.mapNamedBufferRange(buffer, offset, length, access);
+	}
+
+	public static inline function unmapNamedBuffer(buffer:Int):Bool
+	{
+		return context.unmapNamedBuffer(buffer);
+	}
+
+	public static inline function flushMappedNamedBufferRange(buffer:Int, offset:DataPointer, length:Int):Void
+	{
+		context.flushMappedNamedBufferRange(buffer, offset, length);
+	}
+
+	public static inline function bufferStorage(target:Int, size:Int, data:DataPointer, flags:Int):Void
+	{
+		context.bufferStorage(target, size, data, flags);
+	}
+
+	public static inline function createTextureDSA(target:Int):Int
+	{
+		return context.createTextureDSA(target);
+	}
+
+	public static inline function textureStorage2D(texture:Int, levels:Int, internalformat:Int, width:Int, height:Int):Void
+	{
+		context.textureStorage2D(texture, levels, internalformat, width, height);
+	}
+
+	public static inline function textureStorage3D(texture:Int, levels:Int, internalformat:Int, width:Int, height:Int, depth:Int):Void
+	{
+		context.textureStorage3D(texture, levels, internalformat, width, height, depth);
+	}
+
+	public static inline function textureSubImage2D(texture:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Int, type:Int, pixels:DataPointer):Void
+	{
+		context.textureSubImage2D(texture, level, xoffset, yoffset, width, height, format, type, pixels);
+	}
+
+	public static inline function textureParameteri(texture:Int, pname:Int, param:Int):Void
+	{
+		context.textureParameteri(texture, pname, param);
+	}
+
+	public static inline function textureParameterf(texture:Int, pname:Int, param:Float):Void
+	{
+		context.textureParameterf(texture, pname, param);
+	}
+
+	public static inline function generateTextureMipmap(texture:Int):Void
+	{
+		context.generateTextureMipmap(texture);
+	}
+
+	public static inline function bindTextureUnit(unit:Int, texture:Int):Void
+	{
+		context.bindTextureUnit(unit, texture);
+	}
+
+	public static inline function createFramebufferDSA():Int
+	{
+		return context.createFramebufferDSA();
+	}
+
+	public static inline function namedFramebufferTexture(framebuffer:Int, attachment:Int, texture:Int, level:Int):Void
+	{
+		context.namedFramebufferTexture(framebuffer, attachment, texture, level);
+	}
+
+	public static inline function namedFramebufferRenderbuffer(framebuffer:Int, attachment:Int, renderbufferTarget:Int, renderbuffer:Int):Void
+	{
+		context.namedFramebufferRenderbuffer(framebuffer, attachment, renderbufferTarget, renderbuffer);
+	}
+
+	public static inline function checkNamedFramebufferStatus(framebuffer:Int, target:Int):Int
+	{
+		return context.checkNamedFramebufferStatus(framebuffer, target);
+	}
+
+	public static inline function clearNamedFramebufferfv(framebuffer:Int, buffer:Int, drawbuffer:Int, value:DataPointer):Void
+	{
+		context.clearNamedFramebufferfv(framebuffer, buffer, drawbuffer, value);
+	}
+
+	public static inline function blitNamedFramebuffer(readFramebuffer:Int, drawFramebuffer:Int, srcX0:Int, srcY0:Int, srcX1:Int, srcY1:Int, dstX0:Int, dstY0:Int, dstX1:Int, dstY1:Int, mask:Int, filter:Int):Void
+	{
+		context.blitNamedFramebuffer(readFramebuffer, drawFramebuffer, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+	}
+
+	public static inline function createRenderbufferDSA():Int
+	{
+		return context.createRenderbufferDSA();
+	}
+
+	public static inline function namedRenderbufferStorage(renderbuffer:Int, internalformat:Int, width:Int, height:Int):Void
+	{
+		context.namedRenderbufferStorage(renderbuffer, internalformat, width, height);
+	}
+
+	public static inline function createVertexArrayDSA():Int
+	{
+		return context.createVertexArrayDSA();
+	}
+
+	public static inline function vertexArrayVertexBuffer(vaobj:Int, bindingIndex:Int, buffer:Int, offset:DataPointer, stride:Int):Void
+	{
+		context.vertexArrayVertexBuffer(vaobj, bindingIndex, buffer, offset, stride);
+	}
+
+	public static inline function vertexArrayAttribFormat(vaobj:Int, attribIndex:Int, size:Int, type:Int, normalized:Bool, relativeOffset:Int):Void
+	{
+		context.vertexArrayAttribFormat(vaobj, attribIndex, size, type, normalized, relativeOffset);
+	}
+
+	public static inline function vertexArrayAttribBinding(vaobj:Int, attribIndex:Int, bindingIndex:Int):Void
+	{
+		context.vertexArrayAttribBinding(vaobj, attribIndex, bindingIndex);
+	}
+
+	public static inline function vertexArrayElementBuffer(vaobj:Int, buffer:Int):Void
+	{
+		context.vertexArrayElementBuffer(vaobj, buffer);
+	}
+
+	public static inline function enableVertexArrayAttrib(vaobj:Int, index:Int):Void
+	{
+		context.enableVertexArrayAttrib(vaobj, index);
+	}
+
+	public static inline function multiDrawArraysIndirect(mode:Int, indirect:DataPointer, drawCount:Int, stride:Int):Void
+	{
+		context.multiDrawArraysIndirect(mode, indirect, drawCount, stride);
+	}
+
+	public static inline function multiDrawElementsIndirect(mode:Int, type:Int, indirect:DataPointer, drawCount:Int, stride:Int):Void
+	{
+		context.multiDrawElementsIndirect(mode, type, indirect, drawCount, stride);
+	}
+
+	public static inline function clipControl(origin:Int, depth:Int):Void
+	{
+		context.clipControl(origin, depth);
+	}
+
+	public static inline function textureBarrier():Void
+	{
+		context.textureBarrier();
+	}
+
+	public static inline function polygonMode(face:Int, mode:Int):Void
+	{
+		context.polygonMode(face, mode);
 	}
 
 	private static inline function __getObjectID(object:GLObject):Int
