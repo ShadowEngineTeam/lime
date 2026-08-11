@@ -38,572 +38,690 @@ class NativeOpenGLRenderContext
 	private static var __lastContextID = 0;
 	private static var __supportedExtensions:Array<String>;
 
-	public var DEPTH_BUFFER_BIT = 0x00000100;
-	public var STENCIL_BUFFER_BIT = 0x00000400;
-	public var COLOR_BUFFER_BIT = 0x00004000;
-	public var POINTS = 0x0000;
-	public var LINES = 0x0001;
-	public var LINE_LOOP = 0x0002;
-	public var LINE_STRIP = 0x0003;
-	public var TRIANGLES = 0x0004;
-	public var TRIANGLE_STRIP = 0x0005;
-	public var TRIANGLE_FAN = 0x0006;
-	public var ZERO = 0;
-	public var ONE = 1;
-	public var SRC_COLOR = 0x0300;
-	public var ONE_MINUS_SRC_COLOR = 0x0301;
-	public var SRC_ALPHA = 0x0302;
-	public var ONE_MINUS_SRC_ALPHA = 0x0303;
-	public var DST_ALPHA = 0x0304;
-	public var ONE_MINUS_DST_ALPHA = 0x0305;
-	public var DST_COLOR = 0x0306;
-	public var ONE_MINUS_DST_COLOR = 0x0307;
-	public var SRC_ALPHA_SATURATE = 0x0308;
-	public var FUNC_ADD = 0x8006;
-	public var BLEND_EQUATION = 0x8009;
-	public var BLEND_EQUATION_RGB = 0x8009;
-	public var BLEND_EQUATION_ALPHA = 0x883D;
-	public var FUNC_SUBTRACT = 0x800A;
-	public var FUNC_REVERSE_SUBTRACT = 0x800B;
-	public var BLEND_DST_RGB = 0x80C8;
-	public var BLEND_SRC_RGB = 0x80C9;
-	public var BLEND_DST_ALPHA = 0x80CA;
-	public var BLEND_SRC_ALPHA = 0x80CB;
-	public var CONSTANT_COLOR = 0x8001;
-	public var ONE_MINUS_CONSTANT_COLOR = 0x8002;
-	public var CONSTANT_ALPHA = 0x8003;
-	public var ONE_MINUS_CONSTANT_ALPHA = 0x8004;
-	public var BLEND_COLOR = 0x8005;
-	public var ARRAY_BUFFER = 0x8892;
-	public var ELEMENT_ARRAY_BUFFER = 0x8893;
-	public var ARRAY_BUFFER_BINDING = 0x8894;
-	public var ELEMENT_ARRAY_BUFFER_BINDING = 0x8895;
-	public var STREAM_DRAW = 0x88E0;
-	public var STATIC_DRAW = 0x88E4;
-	public var DYNAMIC_DRAW = 0x88E8;
-	public var BUFFER_SIZE = 0x8764;
-	public var BUFFER_USAGE = 0x8765;
-	public var CURRENT_VERTEX_ATTRIB = 0x8626;
-	public var FRONT = 0x0404;
-	public var BACK = 0x0405;
-	public var FRONT_AND_BACK = 0x0408;
-	public var TEXTURE_2D = 0x0DE1;
-	public var CULL_FACE = 0x0B44;
-	public var BLEND = 0x0BE2;
-	public var DITHER = 0x0BD0;
-	public var STENCIL_TEST = 0x0B90;
-	public var DEPTH_TEST = 0x0B71;
-	public var SCISSOR_TEST = 0x0C11;
-	public var POLYGON_OFFSET_FILL = 0x8037;
-	public var SAMPLE_ALPHA_TO_COVERAGE = 0x809E;
-	public var SAMPLE_COVERAGE = 0x80A0;
-	public var NO_ERROR = 0;
-	public var INVALID_ENUM = 0x0500;
-	public var INVALID_VALUE = 0x0501;
-	public var INVALID_OPERATION = 0x0502;
-	public var OUT_OF_MEMORY = 0x0505;
-	public var CW = 0x0900;
-	public var CCW = 0x0901;
-	public var LINE_WIDTH = 0x0B21;
-	public var ALIASED_POINT_SIZE_RANGE = 0x846D;
-	public var ALIASED_LINE_WIDTH_RANGE = 0x846E;
-	public var CULL_FACE_MODE = 0x0B45;
-	public var FRONT_FACE = 0x0B46;
-	public var DEPTH_RANGE = 0x0B70;
-	public var DEPTH_WRITEMASK = 0x0B72;
-	public var DEPTH_CLEAR_VALUE = 0x0B73;
-	public var DEPTH_FUNC = 0x0B74;
-	public var STENCIL_CLEAR_VALUE = 0x0B91;
-	public var STENCIL_FUNC = 0x0B92;
-	public var STENCIL_FAIL = 0x0B94;
-	public var STENCIL_PASS_DEPTH_FAIL = 0x0B95;
-	public var STENCIL_PASS_DEPTH_PASS = 0x0B96;
-	public var STENCIL_REF = 0x0B97;
-	public var STENCIL_VALUE_MASK = 0x0B93;
-	public var STENCIL_WRITEMASK = 0x0B98;
-	public var STENCIL_BACK_FUNC = 0x8800;
-	public var STENCIL_BACK_FAIL = 0x8801;
-	public var STENCIL_BACK_PASS_DEPTH_FAIL = 0x8802;
-	public var STENCIL_BACK_PASS_DEPTH_PASS = 0x8803;
-	public var STENCIL_BACK_REF = 0x8CA3;
-	public var STENCIL_BACK_VALUE_MASK = 0x8CA4;
-	public var STENCIL_BACK_WRITEMASK = 0x8CA5;
-	public var VIEWPORT = 0x0BA2;
-	public var SCISSOR_BOX = 0x0C10;
-	public var COLOR_CLEAR_VALUE = 0x0C22;
-	public var COLOR_WRITEMASK = 0x0C23;
-	public var UNPACK_ALIGNMENT = 0x0CF5;
-	public var PACK_ALIGNMENT = 0x0D05;
-	public var MAX_TEXTURE_SIZE = 0x0D33;
-	public var MAX_VIEWPORT_DIMS = 0x0D3A;
-	public var SUBPIXEL_BITS = 0x0D50;
-	public var RED_BITS = 0x0D52;
-	public var GREEN_BITS = 0x0D53;
-	public var BLUE_BITS = 0x0D54;
-	public var ALPHA_BITS = 0x0D55;
-	public var DEPTH_BITS = 0x0D56;
-	public var STENCIL_BITS = 0x0D57;
-	public var POLYGON_OFFSET_UNITS = 0x2A00;
-	public var POLYGON_OFFSET_FACTOR = 0x8038;
-	public var TEXTURE_BINDING_2D = 0x8069;
-	public var SAMPLE_BUFFERS = 0x80A8;
-	public var SAMPLES = 0x80A9;
-	public var SAMPLE_COVERAGE_VALUE = 0x80AA;
-	public var SAMPLE_COVERAGE_INVERT = 0x80AB;
-	public var NUM_COMPRESSED_TEXTURE_FORMATS = 0x86A2;
-	public var COMPRESSED_TEXTURE_FORMATS = 0x86A3;
-	public var DONT_CARE = 0x1100;
-	public var FASTEST = 0x1101;
-	public var NICEST = 0x1102;
-	public var GENERATE_MIPMAP_HINT = 0x8192;
-	public var BYTE = 0x1400;
-	public var UNSIGNED_BYTE = 0x1401;
-	public var SHORT = 0x1402;
-	public var UNSIGNED_SHORT = 0x1403;
-	public var INT = 0x1404;
-	public var UNSIGNED_INT = 0x1405;
-	public var FLOAT = 0x1406;
-	public var FIXED = 0x0140C;
-	public var DEPTH_COMPONENT = 0x1902;
-	public var ALPHA = 0x1906;
-	public var RGB = 0x1907;
-	public var RGBA = 0x1908;
-	public var LUMINANCE = 0x1909;
-	public var LUMINANCE_ALPHA = 0x190A;
-	public var UNSIGNED_SHORT_4_4_4_4 = 0x8033;
-	public var UNSIGNED_SHORT_5_5_5_1 = 0x8034;
-	public var UNSIGNED_SHORT_5_6_5 = 0x8363;
-	public var FRAGMENT_SHADER = 0x8B30;
-	public var VERTEX_SHADER = 0x8B31;
-	public var MAX_VERTEX_ATTRIBS = 0x8869;
-	public var MAX_VERTEX_UNIFORM_VECTORS = 0x8DFB;
-	public var MAX_VARYING_VECTORS = 0x8DFC;
-	public var MAX_COMBINED_TEXTURE_IMAGE_UNITS = 0x8B4D;
-	public var MAX_VERTEX_TEXTURE_IMAGE_UNITS = 0x8B4C;
-	public var MAX_TEXTURE_IMAGE_UNITS = 0x8872;
-	public var MAX_FRAGMENT_UNIFORM_VECTORS = 0x8DFD;
-	public var SHADER_TYPE = 0x8B4F;
-	public var DELETE_STATUS = 0x8B80;
-	public var LINK_STATUS = 0x8B82;
-	public var VALIDATE_STATUS = 0x8B83;
-	public var ATTACHED_SHADERS = 0x8B85;
-	public var ACTIVE_UNIFORMS = 0x8B86;
-	public var ACTIVE_UNIFORMS_MAX_LENGTH = 0x8B87;
-	public var ACTIVE_ATTRIBUTES = 0x8B89;
-	public var ACTIVE_ATTRIBUTES_MAX_LENGTH = 0x8B8A;
-	public var SHADING_LANGUAGE_VERSION = 0x8B8C;
-	public var CURRENT_PROGRAM = 0x8B8D;
-	public var NEVER = 0x0200;
-	public var LESS = 0x0201;
-	public var EQUAL = 0x0202;
-	public var LEQUAL = 0x0203;
-	public var GREATER = 0x0204;
-	public var NOTEQUAL = 0x0205;
-	public var GEQUAL = 0x0206;
-	public var ALWAYS = 0x0207;
-	public var KEEP = 0x1E00;
-	public var REPLACE = 0x1E01;
-	public var INCR = 0x1E02;
-	public var DECR = 0x1E03;
-	public var INVERT = 0x150A;
-	public var INCR_WRAP = 0x8507;
-	public var DECR_WRAP = 0x8508;
-	public var VENDOR = 0x1F00;
-	public var RENDERER = 0x1F01;
-	public var VERSION = 0x1F02;
-	public var EXTENSIONS = 0x1F03;
-	public var NEAREST = 0x2600;
-	public var LINEAR = 0x2601;
-	public var NEAREST_MIPMAP_NEAREST = 0x2700;
-	public var LINEAR_MIPMAP_NEAREST = 0x2701;
-	public var NEAREST_MIPMAP_LINEAR = 0x2702;
-	public var LINEAR_MIPMAP_LINEAR = 0x2703;
-	public var TEXTURE_MAG_FILTER = 0x2800;
-	public var TEXTURE_MIN_FILTER = 0x2801;
-	public var TEXTURE_WRAP_S = 0x2802;
-	public var TEXTURE_WRAP_T = 0x2803;
-	public var TEXTURE = 0x1702;
-	public var TEXTURE_CUBE_MAP = 0x8513;
-	public var TEXTURE_BINDING_CUBE_MAP = 0x8514;
-	public var TEXTURE_CUBE_MAP_POSITIVE_X = 0x8515;
-	public var TEXTURE_CUBE_MAP_NEGATIVE_X = 0x8516;
-	public var TEXTURE_CUBE_MAP_POSITIVE_Y = 0x8517;
-	public var TEXTURE_CUBE_MAP_NEGATIVE_Y = 0x8518;
-	public var TEXTURE_CUBE_MAP_POSITIVE_Z = 0x8519;
-	public var TEXTURE_CUBE_MAP_NEGATIVE_Z = 0x851A;
-	public var MAX_CUBE_MAP_TEXTURE_SIZE = 0x851C;
-	public var TEXTURE0 = 0x84C0;
-	public var TEXTURE1 = 0x84C1;
-	public var TEXTURE2 = 0x84C2;
-	public var TEXTURE3 = 0x84C3;
-	public var TEXTURE4 = 0x84C4;
-	public var TEXTURE5 = 0x84C5;
-	public var TEXTURE6 = 0x84C6;
-	public var TEXTURE7 = 0x84C7;
-	public var TEXTURE8 = 0x84C8;
-	public var TEXTURE9 = 0x84C9;
-	public var TEXTURE10 = 0x84CA;
-	public var TEXTURE11 = 0x84CB;
-	public var TEXTURE12 = 0x84CC;
-	public var TEXTURE13 = 0x84CD;
-	public var TEXTURE14 = 0x84CE;
-	public var TEXTURE15 = 0x84CF;
-	public var TEXTURE16 = 0x84D0;
-	public var TEXTURE17 = 0x84D1;
-	public var TEXTURE18 = 0x84D2;
-	public var TEXTURE19 = 0x84D3;
-	public var TEXTURE20 = 0x84D4;
-	public var TEXTURE21 = 0x84D5;
-	public var TEXTURE22 = 0x84D6;
-	public var TEXTURE23 = 0x84D7;
-	public var TEXTURE24 = 0x84D8;
-	public var TEXTURE25 = 0x84D9;
-	public var TEXTURE26 = 0x84DA;
-	public var TEXTURE27 = 0x84DB;
-	public var TEXTURE28 = 0x84DC;
-	public var TEXTURE29 = 0x84DD;
-	public var TEXTURE30 = 0x84DE;
-	public var TEXTURE31 = 0x84DF;
-	public var ACTIVE_TEXTURE = 0x84E0;
-	public var REPEAT = 0x2901;
-	public var CLAMP_TO_EDGE = 0x812F;
-	public var MIRRORED_REPEAT = 0x8370;
-	public var FLOAT_VEC2 = 0x8B50;
-	public var FLOAT_VEC3 = 0x8B51;
-	public var FLOAT_VEC4 = 0x8B52;
-	public var INT_VEC2 = 0x8B53;
-	public var INT_VEC3 = 0x8B54;
-	public var INT_VEC4 = 0x8B55;
-	public var BOOL = 0x8B56;
-	public var BOOL_VEC2 = 0x8B57;
-	public var BOOL_VEC3 = 0x8B58;
-	public var BOOL_VEC4 = 0x8B59;
-	public var FLOAT_MAT2 = 0x8B5A;
-	public var FLOAT_MAT3 = 0x8B5B;
-	public var FLOAT_MAT4 = 0x8B5C;
-	public var SAMPLER_2D = 0x8B5E;
-	public var SAMPLER_CUBE = 0x8B60;
-	public var VERTEX_ATTRIB_ARRAY_ENABLED = 0x8622;
-	public var VERTEX_ATTRIB_ARRAY_SIZE = 0x8623;
-	public var VERTEX_ATTRIB_ARRAY_STRIDE = 0x8624;
-	public var VERTEX_ATTRIB_ARRAY_TYPE = 0x8625;
-	public var VERTEX_ATTRIB_ARRAY_NORMALIZED = 0x886A;
-	public var VERTEX_ATTRIB_ARRAY_POINTER = 0x8645;
-	public var VERTEX_ATTRIB_ARRAY_BUFFER_BINDING = 0x889F;
-	public var IMPLEMENTATION_COLOR_READ_TYPE = 0x8B9A;
-	public var IMPLEMENTATION_COLOR_READ_FORMAT = 0x8B9B;
-	public var VERTEX_PROGRAM_POINT_SIZE = 0x8642;
-	public var POINT_SPRITE = 0x8861;
-	public var COMPILE_STATUS = 0x8B81;
-	public var INFO_LOG_LENGTH = 0x8B84;
-	public var SHADER_SOURCE_LENGTH = 0x8B88;
-	public var SHADER_COMPILER = 0x8DFA;
-	public var SHADER_BINARY_FORMATS = 0x8DF8;
-	public var NUM_SHADER_BINARY_FORMATS = 0x8DF9;
-	public var LOW_FLOAT = 0x8DF0;
-	public var MEDIUM_FLOAT = 0x8DF1;
-	public var HIGH_FLOAT = 0x8DF2;
-	public var LOW_INT = 0x8DF3;
-	public var MEDIUM_INT = 0x8DF4;
-	public var HIGH_INT = 0x8DF5;
-	public var FRAMEBUFFER = 0x8D40;
-	public var RENDERBUFFER = 0x8D41;
-	public var RGBA4 = 0x8056;
-	public var RGB5_A1 = 0x8057;
-	public var RGB565 = 0x8D62;
-	public var DEPTH_COMPONENT16 = 0x81A5;
-	public var STENCIL_INDEX = 0x1901;
-	public var STENCIL_INDEX8 = 0x8D48;
-	public var DEPTH_STENCIL = 0x84F9;
-	public var RENDERBUFFER_WIDTH = 0x8D42;
-	public var RENDERBUFFER_HEIGHT = 0x8D43;
-	public var RENDERBUFFER_INTERNAL_FORMAT = 0x8D44;
-	public var RENDERBUFFER_RED_SIZE = 0x8D50;
-	public var RENDERBUFFER_GREEN_SIZE = 0x8D51;
-	public var RENDERBUFFER_BLUE_SIZE = 0x8D52;
-	public var RENDERBUFFER_ALPHA_SIZE = 0x8D53;
-	public var RENDERBUFFER_DEPTH_SIZE = 0x8D54;
-	public var RENDERBUFFER_STENCIL_SIZE = 0x8D55;
-	public var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE = 0x8CD0;
-	public var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME = 0x8CD1;
-	public var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL = 0x8CD2;
-	public var FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE = 0x8CD3;
-	public var COLOR_ATTACHMENT0 = 0x8CE0;
-	public var DEPTH_ATTACHMENT = 0x8D00;
-	public var STENCIL_ATTACHMENT = 0x8D20;
-	public var DEPTH_STENCIL_ATTACHMENT = 0x821A;
-	public var NONE = 0;
-	public var FRAMEBUFFER_COMPLETE = 0x8CD5;
-	public var FRAMEBUFFER_INCOMPLETE_ATTACHMENT = 0x8CD6;
-	public var FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT = 0x8CD7;
-	public var FRAMEBUFFER_INCOMPLETE_DIMENSIONS = 0x8CD9;
-	public var FRAMEBUFFER_UNSUPPORTED = 0x8CDD;
-	public var FRAMEBUFFER_BINDING = 0x8CA6;
-	public var RENDERBUFFER_BINDING = 0x8CA7;
-	public var MAX_RENDERBUFFER_SIZE = 0x84E8;
-	public var INVALID_FRAMEBUFFER_OPERATION = 0x0506;
-	public var READ_BUFFER = 0x0C02;
-	public var UNPACK_ROW_LENGTH = 0x0CF2;
-	public var UNPACK_SKIP_ROWS = 0x0CF3;
-	public var UNPACK_SKIP_PIXELS = 0x0CF4;
-	public var PACK_ROW_LENGTH = 0x0D02;
-	public var PACK_SKIP_ROWS = 0x0D03;
-	public var PACK_SKIP_PIXELS = 0x0D04;
-	public var TEXTURE_BINDING_3D = 0x806A;
-	public var UNPACK_SKIP_IMAGES = 0x806D;
-	public var UNPACK_IMAGE_HEIGHT = 0x806E;
-	public var MAX_3D_TEXTURE_SIZE = 0x8073;
-	public var MAX_ELEMENTS_VERTICES = 0x80E8;
-	public var MAX_ELEMENTS_INDICES = 0x80E9;
-	public var MAX_TEXTURE_LOD_BIAS = 0x84FD;
-	public var MAX_FRAGMENT_UNIFORM_COMPONENTS = 0x8B49;
-	public var MAX_VERTEX_UNIFORM_COMPONENTS = 0x8B4A;
-	public var MAX_ARRAY_TEXTURE_LAYERS = 0x88FF;
-	public var MIN_PROGRAM_TEXEL_OFFSET = 0x8904;
-	public var MAX_PROGRAM_TEXEL_OFFSET = 0x8905;
-	public var MAX_VARYING_COMPONENTS = 0x8B4B;
-	public var FRAGMENT_SHADER_DERIVATIVE_HINT = 0x8B8B;
-	public var RASTERIZER_DISCARD = 0x8C89;
-	public var VERTEX_ARRAY_BINDING = 0x85B5;
-	public var MAX_VERTEX_OUTPUT_COMPONENTS = 0x9122;
-	public var MAX_FRAGMENT_INPUT_COMPONENTS = 0x9125;
-	public var MAX_SERVER_WAIT_TIMEOUT = 0x9111;
-	public var MAX_ELEMENT_INDEX = 0x8D6B;
-	public var RED = 0x1903;
-	public var RGB8 = 0x8051;
-	public var RGBA8 = 0x8058;
-	public var RGB10_A2 = 0x8059;
-	public var TEXTURE_3D = 0x806F;
-	public var TEXTURE_WRAP_R = 0x8072;
-	public var TEXTURE_MIN_LOD = 0x813A;
-	public var TEXTURE_MAX_LOD = 0x813B;
-	public var TEXTURE_BASE_LEVEL = 0x813C;
-	public var TEXTURE_MAX_LEVEL = 0x813D;
-	public var TEXTURE_COMPARE_MODE = 0x884C;
-	public var TEXTURE_COMPARE_FUNC = 0x884D;
-	public var SRGB = 0x8C40;
-	public var SRGB8 = 0x8C41;
-	public var SRGB8_ALPHA8 = 0x8C43;
-	public var COMPARE_REF_TO_TEXTURE = 0x884E;
-	public var RGBA32F = 0x8814;
-	public var RGB32F = 0x8815;
-	public var RGBA16F = 0x881A;
-	public var RGB16F = 0x881B;
-	public var TEXTURE_2D_ARRAY = 0x8C1A;
-	public var TEXTURE_BINDING_2D_ARRAY = 0x8C1D;
-	public var R11F_G11F_B10F = 0x8C3A;
-	public var RGB9_E5 = 0x8C3D;
-	public var RGBA32UI = 0x8D70;
-	public var RGB32UI = 0x8D71;
-	public var RGBA16UI = 0x8D76;
-	public var RGB16UI = 0x8D77;
-	public var RGBA8UI = 0x8D7C;
-	public var RGB8UI = 0x8D7D;
-	public var RGBA32I = 0x8D82;
-	public var RGB32I = 0x8D83;
-	public var RGBA16I = 0x8D88;
-	public var RGB16I = 0x8D89;
-	public var RGBA8I = 0x8D8E;
-	public var RGB8I = 0x8D8F;
-	public var RED_INTEGER = 0x8D94;
-	public var RGB_INTEGER = 0x8D98;
-	public var RGBA_INTEGER = 0x8D99;
-	public var R8 = 0x8229;
-	public var RG8 = 0x822B;
-	public var R16F = 0x822D;
-	public var R32F = 0x822E;
-	public var RG16F = 0x822F;
-	public var RG32F = 0x8230;
-	public var R8I = 0x8231;
-	public var R8UI = 0x8232;
-	public var R16I = 0x8233;
-	public var R16UI = 0x8234;
-	public var R32I = 0x8235;
-	public var R32UI = 0x8236;
-	public var RG8I = 0x8237;
-	public var RG8UI = 0x8238;
-	public var RG16I = 0x8239;
-	public var RG16UI = 0x823A;
-	public var RG32I = 0x823B;
-	public var RG32UI = 0x823C;
-	public var R8_SNORM = 0x8F94;
-	public var RG8_SNORM = 0x8F95;
-	public var RGB8_SNORM = 0x8F96;
-	public var RGBA8_SNORM = 0x8F97;
-	public var RGB10_A2UI = 0x906F;
-	public var TEXTURE_IMMUTABLE_FORMAT = 0x912F;
-	public var TEXTURE_IMMUTABLE_LEVELS = 0x82DF;
-	public var UNSIGNED_INT_2_10_10_10_REV = 0x8368;
-	public var UNSIGNED_INT_10F_11F_11F_REV = 0x8C3B;
-	public var UNSIGNED_INT_5_9_9_9_REV = 0x8C3E;
-	public var FLOAT_32_UNSIGNED_INT_24_8_REV = 0x8DAD;
-	public var UNSIGNED_INT_24_8 = 0x84FA;
-	public var HALF_FLOAT = 0x140B;
-	public var RG = 0x8227;
-	public var RG_INTEGER = 0x8228;
-	public var INT_2_10_10_10_REV = 0x8D9F;
-	public var CURRENT_QUERY = 0x8865;
-	public var QUERY_RESULT = 0x8866;
-	public var QUERY_RESULT_AVAILABLE = 0x8867;
-	public var ANY_SAMPLES_PASSED = 0x8C2F;
-	public var ANY_SAMPLES_PASSED_CONSERVATIVE = 0x8D6A;
-	public var MAX_DRAW_BUFFERS = 0x8824;
-	public var DRAW_BUFFER0 = 0x8825;
-	public var DRAW_BUFFER1 = 0x8826;
-	public var DRAW_BUFFER2 = 0x8827;
-	public var DRAW_BUFFER3 = 0x8828;
-	public var DRAW_BUFFER4 = 0x8829;
-	public var DRAW_BUFFER5 = 0x882A;
-	public var DRAW_BUFFER6 = 0x882B;
-	public var DRAW_BUFFER7 = 0x882C;
-	public var DRAW_BUFFER8 = 0x882D;
-	public var DRAW_BUFFER9 = 0x882E;
-	public var DRAW_BUFFER10 = 0x882F;
-	public var DRAW_BUFFER11 = 0x8830;
-	public var DRAW_BUFFER12 = 0x8831;
-	public var DRAW_BUFFER13 = 0x8832;
-	public var DRAW_BUFFER14 = 0x8833;
-	public var DRAW_BUFFER15 = 0x8834;
-	public var MAX_COLOR_ATTACHMENTS = 0x8CDF;
-	public var COLOR_ATTACHMENT1 = 0x8CE1;
-	public var COLOR_ATTACHMENT2 = 0x8CE2;
-	public var COLOR_ATTACHMENT3 = 0x8CE3;
-	public var COLOR_ATTACHMENT4 = 0x8CE4;
-	public var COLOR_ATTACHMENT5 = 0x8CE5;
-	public var COLOR_ATTACHMENT6 = 0x8CE6;
-	public var COLOR_ATTACHMENT7 = 0x8CE7;
-	public var COLOR_ATTACHMENT8 = 0x8CE8;
-	public var COLOR_ATTACHMENT9 = 0x8CE9;
-	public var COLOR_ATTACHMENT10 = 0x8CEA;
-	public var COLOR_ATTACHMENT11 = 0x8CEB;
-	public var COLOR_ATTACHMENT12 = 0x8CEC;
-	public var COLOR_ATTACHMENT13 = 0x8CED;
-	public var COLOR_ATTACHMENT14 = 0x8CEE;
-	public var COLOR_ATTACHMENT15 = 0x8CEF;
-	public var SAMPLER_3D = 0x8B5F;
-	public var SAMPLER_2D_SHADOW = 0x8B62;
-	public var SAMPLER_2D_ARRAY = 0x8DC1;
-	public var SAMPLER_2D_ARRAY_SHADOW = 0x8DC4;
-	public var SAMPLER_CUBE_SHADOW = 0x8DC5;
-	public var INT_SAMPLER_2D = 0x8DCA;
-	public var INT_SAMPLER_3D = 0x8DCB;
-	public var INT_SAMPLER_CUBE = 0x8DCC;
-	public var INT_SAMPLER_2D_ARRAY = 0x8DCF;
-	public var UNSIGNED_INT_SAMPLER_2D = 0x8DD2;
-	public var UNSIGNED_INT_SAMPLER_3D = 0x8DD3;
-	public var UNSIGNED_INT_SAMPLER_CUBE = 0x8DD4;
-	public var UNSIGNED_INT_SAMPLER_2D_ARRAY = 0x8DD7;
-	public var MAX_SAMPLES = 0x8D57;
-	public var SAMPLER_BINDING = 0x8919;
-	public var PIXEL_PACK_BUFFER = 0x88EB;
-	public var PIXEL_UNPACK_BUFFER = 0x88EC;
-	public var PIXEL_PACK_BUFFER_BINDING = 0x88ED;
-	public var PIXEL_UNPACK_BUFFER_BINDING = 0x88EF;
-	public var COPY_READ_BUFFER = 0x8F36;
-	public var COPY_WRITE_BUFFER = 0x8F37;
-	public var COPY_READ_BUFFER_BINDING = 0x8F36;
-	public var COPY_WRITE_BUFFER_BINDING = 0x8F37;
+	public var DEPTH_BUFFER_BIT(get, never):Int;
+	public var STENCIL_BUFFER_BIT(get, never):Int;
+	public var COLOR_BUFFER_BIT(get, never):Int;
+	public var POINTS(get, never):Int;
+	public var LINES(get, never):Int;
+	public var LINE_LOOP(get, never):Int;
+	public var LINE_STRIP(get, never):Int;
+	public var TRIANGLES(get, never):Int;
+	public var TRIANGLE_STRIP(get, never):Int;
+	public var TRIANGLE_FAN(get, never):Int;
+	public var ZERO(get, never):Int;
+	public var ONE(get, never):Int;
+	public var SRC_COLOR(get, never):Int;
+	public var ONE_MINUS_SRC_COLOR(get, never):Int;
+	public var SRC_ALPHA(get, never):Int;
+	public var ONE_MINUS_SRC_ALPHA(get, never):Int;
+	public var DST_ALPHA(get, never):Int;
+	public var ONE_MINUS_DST_ALPHA(get, never):Int;
+	public var DST_COLOR(get, never):Int;
+	public var ONE_MINUS_DST_COLOR(get, never):Int;
+	public var SRC_ALPHA_SATURATE(get, never):Int;
+	public var FUNC_ADD(get, never):Int;
+	public var BLEND_EQUATION(get, never):Int;
+	public var BLEND_EQUATION_RGB(get, never):Int;
+	public var BLEND_EQUATION_ALPHA(get, never):Int;
+	public var FUNC_SUBTRACT(get, never):Int;
+	public var FUNC_REVERSE_SUBTRACT(get, never):Int;
+	public var BLEND_DST_RGB(get, never):Int;
+	public var BLEND_SRC_RGB(get, never):Int;
+	public var BLEND_DST_ALPHA(get, never):Int;
+	public var BLEND_SRC_ALPHA(get, never):Int;
+	public var CONSTANT_COLOR(get, never):Int;
+	public var ONE_MINUS_CONSTANT_COLOR(get, never):Int;
+	public var CONSTANT_ALPHA(get, never):Int;
+	public var ONE_MINUS_CONSTANT_ALPHA(get, never):Int;
+	public var BLEND_COLOR(get, never):Int;
+	public var ARRAY_BUFFER(get, never):Int;
+	public var ELEMENT_ARRAY_BUFFER(get, never):Int;
+	public var ARRAY_BUFFER_BINDING(get, never):Int;
+	public var ELEMENT_ARRAY_BUFFER_BINDING(get, never):Int;
+	public var STREAM_DRAW(get, never):Int;
+	public var STATIC_DRAW(get, never):Int;
+	public var DYNAMIC_DRAW(get, never):Int;
+	public var BUFFER_SIZE(get, never):Int;
+	public var BUFFER_USAGE(get, never):Int;
+	public var CURRENT_VERTEX_ATTRIB(get, never):Int;
+	public var FRONT(get, never):Int;
+	public var BACK(get, never):Int;
+	public var FRONT_AND_BACK(get, never):Int;
+	public var TEXTURE_2D(get, never):Int;
+	public var CULL_FACE(get, never):Int;
+	public var BLEND(get, never):Int;
+	public var DITHER(get, never):Int;
+	public var STENCIL_TEST(get, never):Int;
+	public var DEPTH_TEST(get, never):Int;
+	public var SCISSOR_TEST(get, never):Int;
+	public var POLYGON_OFFSET_FILL(get, never):Int;
+	public var SAMPLE_ALPHA_TO_COVERAGE(get, never):Int;
+	public var SAMPLE_COVERAGE(get, never):Int;
+	public var NO_ERROR(get, never):Int;
+	public var INVALID_ENUM(get, never):Int;
+	public var INVALID_VALUE(get, never):Int;
+	public var INVALID_OPERATION(get, never):Int;
+	public var OUT_OF_MEMORY(get, never):Int;
+	public var CW(get, never):Int;
+	public var CCW(get, never):Int;
+	public var LINE_WIDTH(get, never):Int;
+	public var ALIASED_POINT_SIZE_RANGE(get, never):Int;
+	public var ALIASED_LINE_WIDTH_RANGE(get, never):Int;
+	public var CULL_FACE_MODE(get, never):Int;
+	public var FRONT_FACE(get, never):Int;
+	public var DEPTH_RANGE(get, never):Int;
+	public var DEPTH_WRITEMASK(get, never):Int;
+	public var DEPTH_CLEAR_VALUE(get, never):Int;
+	public var DEPTH_FUNC(get, never):Int;
+	public var STENCIL_CLEAR_VALUE(get, never):Int;
+	public var STENCIL_FUNC(get, never):Int;
+	public var STENCIL_FAIL(get, never):Int;
+	public var STENCIL_PASS_DEPTH_FAIL(get, never):Int;
+	public var STENCIL_PASS_DEPTH_PASS(get, never):Int;
+	public var STENCIL_REF(get, never):Int;
+	public var STENCIL_VALUE_MASK(get, never):Int;
+	public var STENCIL_WRITEMASK(get, never):Int;
+	public var STENCIL_BACK_FUNC(get, never):Int;
+	public var STENCIL_BACK_FAIL(get, never):Int;
+	public var STENCIL_BACK_PASS_DEPTH_FAIL(get, never):Int;
+	public var STENCIL_BACK_PASS_DEPTH_PASS(get, never):Int;
+	public var STENCIL_BACK_REF(get, never):Int;
+	public var STENCIL_BACK_VALUE_MASK(get, never):Int;
+	public var STENCIL_BACK_WRITEMASK(get, never):Int;
+	public var VIEWPORT(get, never):Int;
+	public var SCISSOR_BOX(get, never):Int;
+	public var COLOR_CLEAR_VALUE(get, never):Int;
+	public var COLOR_WRITEMASK(get, never):Int;
+	public var UNPACK_ALIGNMENT(get, never):Int;
+	public var PACK_ALIGNMENT(get, never):Int;
+	public var MAX_TEXTURE_SIZE(get, never):Int;
+	public var MAX_VIEWPORT_DIMS(get, never):Int;
+	public var SUBPIXEL_BITS(get, never):Int;
+	public var RED_BITS(get, never):Int;
+	public var GREEN_BITS(get, never):Int;
+	public var BLUE_BITS(get, never):Int;
+	public var ALPHA_BITS(get, never):Int;
+	public var DEPTH_BITS(get, never):Int;
+	public var STENCIL_BITS(get, never):Int;
+	public var POLYGON_OFFSET_UNITS(get, never):Int;
+	public var POLYGON_OFFSET_FACTOR(get, never):Int;
+	public var TEXTURE_BINDING_2D(get, never):Int;
+	public var SAMPLE_BUFFERS(get, never):Int;
+	public var SAMPLES(get, never):Int;
+	public var SAMPLE_COVERAGE_VALUE(get, never):Int;
+	public var SAMPLE_COVERAGE_INVERT(get, never):Int;
+	public var NUM_COMPRESSED_TEXTURE_FORMATS(get, never):Int;
+	public var COMPRESSED_TEXTURE_FORMATS(get, never):Int;
+	public var DONT_CARE(get, never):Int;
+	public var FASTEST(get, never):Int;
+	public var NICEST(get, never):Int;
+	public var GENERATE_MIPMAP_HINT(get, never):Int;
+	public var BYTE(get, never):Int;
+	public var UNSIGNED_BYTE(get, never):Int;
+	public var SHORT(get, never):Int;
+	public var UNSIGNED_SHORT(get, never):Int;
+	public var INT(get, never):Int;
+	public var UNSIGNED_INT(get, never):Int;
+	public var FLOAT(get, never):Int;
+	public var FIXED(get, never):Int;
+	public var DEPTH_COMPONENT(get, never):Int;
+	public var ALPHA(get, never):Int;
+	public var RGB(get, never):Int;
+	public var RGBA(get, never):Int;
+	public var LUMINANCE(get, never):Int;
+	public var LUMINANCE_ALPHA(get, never):Int;
+	public var UNSIGNED_SHORT_4_4_4_4(get, never):Int;
+	public var UNSIGNED_SHORT_5_5_5_1(get, never):Int;
+	public var UNSIGNED_SHORT_5_6_5(get, never):Int;
+	public var FRAGMENT_SHADER(get, never):Int;
+	public var VERTEX_SHADER(get, never):Int;
+	public var MAX_VERTEX_ATTRIBS(get, never):Int;
+	public var MAX_VERTEX_UNIFORM_VECTORS(get, never):Int;
+	public var MAX_VARYING_VECTORS(get, never):Int;
+	public var MAX_COMBINED_TEXTURE_IMAGE_UNITS(get, never):Int;
+	public var MAX_VERTEX_TEXTURE_IMAGE_UNITS(get, never):Int;
+	public var MAX_TEXTURE_IMAGE_UNITS(get, never):Int;
+	public var MAX_FRAGMENT_UNIFORM_VECTORS(get, never):Int;
+	public var SHADER_TYPE(get, never):Int;
+	public var DELETE_STATUS(get, never):Int;
+	public var LINK_STATUS(get, never):Int;
+	public var VALIDATE_STATUS(get, never):Int;
+	public var ATTACHED_SHADERS(get, never):Int;
+	public var ACTIVE_UNIFORMS(get, never):Int;
+	public var ACTIVE_UNIFORMS_MAX_LENGTH(get, never):Int;
+	public var ACTIVE_ATTRIBUTES(get, never):Int;
+	public var ACTIVE_ATTRIBUTES_MAX_LENGTH(get, never):Int;
+	public var SHADING_LANGUAGE_VERSION(get, never):Int;
+	public var CURRENT_PROGRAM(get, never):Int;
+	public var NEVER(get, never):Int;
+	public var LESS(get, never):Int;
+	public var EQUAL(get, never):Int;
+	public var LEQUAL(get, never):Int;
+	public var GREATER(get, never):Int;
+	public var NOTEQUAL(get, never):Int;
+	public var GEQUAL(get, never):Int;
+	public var ALWAYS(get, never):Int;
+	public var KEEP(get, never):Int;
+	public var REPLACE(get, never):Int;
+	public var INCR(get, never):Int;
+	public var DECR(get, never):Int;
+	public var INVERT(get, never):Int;
+	public var INCR_WRAP(get, never):Int;
+	public var DECR_WRAP(get, never):Int;
+	public var VENDOR(get, never):Int;
+	public var RENDERER(get, never):Int;
+	public var VERSION(get, never):Int;
+	public var EXTENSIONS(get, never):Int;
+	public var NEAREST(get, never):Int;
+	public var LINEAR(get, never):Int;
+	public var NEAREST_MIPMAP_NEAREST(get, never):Int;
+	public var LINEAR_MIPMAP_NEAREST(get, never):Int;
+	public var NEAREST_MIPMAP_LINEAR(get, never):Int;
+	public var LINEAR_MIPMAP_LINEAR(get, never):Int;
+	public var TEXTURE_MAG_FILTER(get, never):Int;
+	public var TEXTURE_MIN_FILTER(get, never):Int;
+	public var TEXTURE_WRAP_S(get, never):Int;
+	public var TEXTURE_WRAP_T(get, never):Int;
+	public var TEXTURE(get, never):Int;
+	public var TEXTURE_CUBE_MAP(get, never):Int;
+	public var TEXTURE_BINDING_CUBE_MAP(get, never):Int;
+	public var TEXTURE_CUBE_MAP_POSITIVE_X(get, never):Int;
+	public var TEXTURE_CUBE_MAP_NEGATIVE_X(get, never):Int;
+	public var TEXTURE_CUBE_MAP_POSITIVE_Y(get, never):Int;
+	public var TEXTURE_CUBE_MAP_NEGATIVE_Y(get, never):Int;
+	public var TEXTURE_CUBE_MAP_POSITIVE_Z(get, never):Int;
+	public var TEXTURE_CUBE_MAP_NEGATIVE_Z(get, never):Int;
+	public var MAX_CUBE_MAP_TEXTURE_SIZE(get, never):Int;
+	public var TEXTURE0(get, never):Int;
+	public var TEXTURE1(get, never):Int;
+	public var TEXTURE2(get, never):Int;
+	public var TEXTURE3(get, never):Int;
+	public var TEXTURE4(get, never):Int;
+	public var TEXTURE5(get, never):Int;
+	public var TEXTURE6(get, never):Int;
+	public var TEXTURE7(get, never):Int;
+	public var TEXTURE8(get, never):Int;
+	public var TEXTURE9(get, never):Int;
+	public var TEXTURE10(get, never):Int;
+	public var TEXTURE11(get, never):Int;
+	public var TEXTURE12(get, never):Int;
+	public var TEXTURE13(get, never):Int;
+	public var TEXTURE14(get, never):Int;
+	public var TEXTURE15(get, never):Int;
+	public var TEXTURE16(get, never):Int;
+	public var TEXTURE17(get, never):Int;
+	public var TEXTURE18(get, never):Int;
+	public var TEXTURE19(get, never):Int;
+	public var TEXTURE20(get, never):Int;
+	public var TEXTURE21(get, never):Int;
+	public var TEXTURE22(get, never):Int;
+	public var TEXTURE23(get, never):Int;
+	public var TEXTURE24(get, never):Int;
+	public var TEXTURE25(get, never):Int;
+	public var TEXTURE26(get, never):Int;
+	public var TEXTURE27(get, never):Int;
+	public var TEXTURE28(get, never):Int;
+	public var TEXTURE29(get, never):Int;
+	public var TEXTURE30(get, never):Int;
+	public var TEXTURE31(get, never):Int;
+	public var ACTIVE_TEXTURE(get, never):Int;
+	public var REPEAT(get, never):Int;
+	public var CLAMP_TO_EDGE(get, never):Int;
+	public var MIRRORED_REPEAT(get, never):Int;
+	public var FLOAT_VEC2(get, never):Int;
+	public var FLOAT_VEC3(get, never):Int;
+	public var FLOAT_VEC4(get, never):Int;
+	public var INT_VEC2(get, never):Int;
+	public var INT_VEC3(get, never):Int;
+	public var INT_VEC4(get, never):Int;
+	public var BOOL(get, never):Int;
+	public var BOOL_VEC2(get, never):Int;
+	public var BOOL_VEC3(get, never):Int;
+	public var BOOL_VEC4(get, never):Int;
+	public var FLOAT_MAT2(get, never):Int;
+	public var FLOAT_MAT3(get, never):Int;
+	public var FLOAT_MAT4(get, never):Int;
+	public var SAMPLER_2D(get, never):Int;
+	public var SAMPLER_CUBE(get, never):Int;
+	public var VERTEX_ATTRIB_ARRAY_ENABLED(get, never):Int;
+	public var VERTEX_ATTRIB_ARRAY_SIZE(get, never):Int;
+	public var VERTEX_ATTRIB_ARRAY_STRIDE(get, never):Int;
+	public var VERTEX_ATTRIB_ARRAY_TYPE(get, never):Int;
+	public var VERTEX_ATTRIB_ARRAY_NORMALIZED(get, never):Int;
+	public var VERTEX_ATTRIB_ARRAY_POINTER(get, never):Int;
+	public var VERTEX_ATTRIB_ARRAY_BUFFER_BINDING(get, never):Int;
+	public var IMPLEMENTATION_COLOR_READ_TYPE(get, never):Int;
+	public var IMPLEMENTATION_COLOR_READ_FORMAT(get, never):Int;
+	public var VERTEX_PROGRAM_POINT_SIZE(get, never):Int;
+	public var POINT_SPRITE(get, never):Int;
+	public var COMPILE_STATUS(get, never):Int;
+	public var INFO_LOG_LENGTH(get, never):Int;
+	public var SHADER_SOURCE_LENGTH(get, never):Int;
+	public var SHADER_COMPILER(get, never):Int;
+	public var SHADER_BINARY_FORMATS(get, never):Int;
+	public var NUM_SHADER_BINARY_FORMATS(get, never):Int;
+	public var LOW_FLOAT(get, never):Int;
+	public var MEDIUM_FLOAT(get, never):Int;
+	public var HIGH_FLOAT(get, never):Int;
+	public var LOW_INT(get, never):Int;
+	public var MEDIUM_INT(get, never):Int;
+	public var HIGH_INT(get, never):Int;
+	public var FRAMEBUFFER(get, never):Int;
+	public var RENDERBUFFER(get, never):Int;
+	public var RGBA4(get, never):Int;
+	public var RGB5_A1(get, never):Int;
+	public var RGB565(get, never):Int;
+	public var DEPTH_COMPONENT16(get, never):Int;
+	public var STENCIL_INDEX(get, never):Int;
+	public var STENCIL_INDEX8(get, never):Int;
+	public var DEPTH_STENCIL(get, never):Int;
+	public var RENDERBUFFER_WIDTH(get, never):Int;
+	public var RENDERBUFFER_HEIGHT(get, never):Int;
+	public var RENDERBUFFER_INTERNAL_FORMAT(get, never):Int;
+	public var RENDERBUFFER_RED_SIZE(get, never):Int;
+	public var RENDERBUFFER_GREEN_SIZE(get, never):Int;
+	public var RENDERBUFFER_BLUE_SIZE(get, never):Int;
+	public var RENDERBUFFER_ALPHA_SIZE(get, never):Int;
+	public var RENDERBUFFER_DEPTH_SIZE(get, never):Int;
+	public var RENDERBUFFER_STENCIL_SIZE(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE(get, never):Int;
+	public var COLOR_ATTACHMENT0(get, never):Int;
+	public var DEPTH_ATTACHMENT(get, never):Int;
+	public var STENCIL_ATTACHMENT(get, never):Int;
+	public var DEPTH_STENCIL_ATTACHMENT(get, never):Int;
+	public var NONE(get, never):Int;
+	public var FRAMEBUFFER_COMPLETE(get, never):Int;
+	public var FRAMEBUFFER_INCOMPLETE_ATTACHMENT(get, never):Int;
+	public var FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT(get, never):Int;
+	public var FRAMEBUFFER_INCOMPLETE_DIMENSIONS(get, never):Int;
+	public var FRAMEBUFFER_UNSUPPORTED(get, never):Int;
+	public var FRAMEBUFFER_BINDING(get, never):Int;
+	public var RENDERBUFFER_BINDING(get, never):Int;
+	public var MAX_RENDERBUFFER_SIZE(get, never):Int;
+	public var INVALID_FRAMEBUFFER_OPERATION(get, never):Int;
+	public var READ_BUFFER(get, never):Int;
+	public var UNPACK_ROW_LENGTH(get, never):Int;
+	public var UNPACK_SKIP_ROWS(get, never):Int;
+	public var UNPACK_SKIP_PIXELS(get, never):Int;
+	public var PACK_ROW_LENGTH(get, never):Int;
+	public var PACK_SKIP_ROWS(get, never):Int;
+	public var PACK_SKIP_PIXELS(get, never):Int;
+	public var TEXTURE_BINDING_3D(get, never):Int;
+	public var UNPACK_SKIP_IMAGES(get, never):Int;
+	public var UNPACK_IMAGE_HEIGHT(get, never):Int;
+	public var MAX_3D_TEXTURE_SIZE(get, never):Int;
+	public var MAX_ELEMENTS_VERTICES(get, never):Int;
+	public var MAX_ELEMENTS_INDICES(get, never):Int;
+	public var MAX_TEXTURE_LOD_BIAS(get, never):Int;
+	public var MAX_FRAGMENT_UNIFORM_COMPONENTS(get, never):Int;
+	public var MAX_VERTEX_UNIFORM_COMPONENTS(get, never):Int;
+	public var MAX_ARRAY_TEXTURE_LAYERS(get, never):Int;
+	public var MIN_PROGRAM_TEXEL_OFFSET(get, never):Int;
+	public var MAX_PROGRAM_TEXEL_OFFSET(get, never):Int;
+	public var MAX_VARYING_COMPONENTS(get, never):Int;
+	public var FRAGMENT_SHADER_DERIVATIVE_HINT(get, never):Int;
+	public var RASTERIZER_DISCARD(get, never):Int;
+	public var VERTEX_ARRAY_BINDING(get, never):Int;
+	public var MAX_VERTEX_OUTPUT_COMPONENTS(get, never):Int;
+	public var MAX_FRAGMENT_INPUT_COMPONENTS(get, never):Int;
+	public var MAX_SERVER_WAIT_TIMEOUT(get, never):Int;
+	public var MAX_ELEMENT_INDEX(get, never):Int;
+	public var RED(get, never):Int;
+	public var RGB8(get, never):Int;
+	public var RGBA8(get, never):Int;
+	public var RGB10_A2(get, never):Int;
+	public var TEXTURE_3D(get, never):Int;
+	public var TEXTURE_WRAP_R(get, never):Int;
+	public var TEXTURE_MIN_LOD(get, never):Int;
+	public var TEXTURE_MAX_LOD(get, never):Int;
+	public var TEXTURE_BASE_LEVEL(get, never):Int;
+	public var TEXTURE_MAX_LEVEL(get, never):Int;
+	public var TEXTURE_COMPARE_MODE(get, never):Int;
+	public var TEXTURE_COMPARE_FUNC(get, never):Int;
+	public var SRGB(get, never):Int;
+	public var SRGB8(get, never):Int;
+	public var SRGB8_ALPHA8(get, never):Int;
+	public var COMPARE_REF_TO_TEXTURE(get, never):Int;
+	public var RGBA32F(get, never):Int;
+	public var RGB32F(get, never):Int;
+	public var RGBA16F(get, never):Int;
+	public var RGB16F(get, never):Int;
+	public var TEXTURE_2D_ARRAY(get, never):Int;
+	public var TEXTURE_BINDING_2D_ARRAY(get, never):Int;
+	public var R11F_G11F_B10F(get, never):Int;
+	public var RGB9_E5(get, never):Int;
+	public var RGBA32UI(get, never):Int;
+	public var RGB32UI(get, never):Int;
+	public var RGBA16UI(get, never):Int;
+	public var RGB16UI(get, never):Int;
+	public var RGBA8UI(get, never):Int;
+	public var RGB8UI(get, never):Int;
+	public var RGBA32I(get, never):Int;
+	public var RGB32I(get, never):Int;
+	public var RGBA16I(get, never):Int;
+	public var RGB16I(get, never):Int;
+	public var RGBA8I(get, never):Int;
+	public var RGB8I(get, never):Int;
+	public var RED_INTEGER(get, never):Int;
+	public var RGB_INTEGER(get, never):Int;
+	public var RGBA_INTEGER(get, never):Int;
+	public var R8(get, never):Int;
+	public var RG8(get, never):Int;
+	public var R16F(get, never):Int;
+	public var R32F(get, never):Int;
+	public var RG16F(get, never):Int;
+	public var RG32F(get, never):Int;
+	public var R8I(get, never):Int;
+	public var R8UI(get, never):Int;
+	public var R16I(get, never):Int;
+	public var R16UI(get, never):Int;
+	public var R32I(get, never):Int;
+	public var R32UI(get, never):Int;
+	public var RG8I(get, never):Int;
+	public var RG8UI(get, never):Int;
+	public var RG16I(get, never):Int;
+	public var RG16UI(get, never):Int;
+	public var RG32I(get, never):Int;
+	public var RG32UI(get, never):Int;
+	public var R8_SNORM(get, never):Int;
+	public var RG8_SNORM(get, never):Int;
+	public var RGB8_SNORM(get, never):Int;
+	public var RGBA8_SNORM(get, never):Int;
+	public var RGB10_A2UI(get, never):Int;
+	public var TEXTURE_IMMUTABLE_FORMAT(get, never):Int;
+	public var TEXTURE_IMMUTABLE_LEVELS(get, never):Int;
+	public var UNSIGNED_INT_2_10_10_10_REV(get, never):Int;
+	public var UNSIGNED_INT_10F_11F_11F_REV(get, never):Int;
+	public var UNSIGNED_INT_5_9_9_9_REV(get, never):Int;
+	public var FLOAT_32_UNSIGNED_INT_24_8_REV(get, never):Int;
+	public var UNSIGNED_INT_24_8(get, never):Int;
+	public var HALF_FLOAT(get, never):Int;
+	public var RG(get, never):Int;
+	public var RG_INTEGER(get, never):Int;
+	public var INT_2_10_10_10_REV(get, never):Int;
+	public var CURRENT_QUERY(get, never):Int;
+	public var QUERY_RESULT(get, never):Int;
+	public var QUERY_RESULT_AVAILABLE(get, never):Int;
+	public var ANY_SAMPLES_PASSED(get, never):Int;
+	public var ANY_SAMPLES_PASSED_CONSERVATIVE(get, never):Int;
+	public var MAX_DRAW_BUFFERS(get, never):Int;
+	public var DRAW_BUFFER0(get, never):Int;
+	public var DRAW_BUFFER1(get, never):Int;
+	public var DRAW_BUFFER2(get, never):Int;
+	public var DRAW_BUFFER3(get, never):Int;
+	public var DRAW_BUFFER4(get, never):Int;
+	public var DRAW_BUFFER5(get, never):Int;
+	public var DRAW_BUFFER6(get, never):Int;
+	public var DRAW_BUFFER7(get, never):Int;
+	public var DRAW_BUFFER8(get, never):Int;
+	public var DRAW_BUFFER9(get, never):Int;
+	public var DRAW_BUFFER10(get, never):Int;
+	public var DRAW_BUFFER11(get, never):Int;
+	public var DRAW_BUFFER12(get, never):Int;
+	public var DRAW_BUFFER13(get, never):Int;
+	public var DRAW_BUFFER14(get, never):Int;
+	public var DRAW_BUFFER15(get, never):Int;
+	public var MAX_COLOR_ATTACHMENTS(get, never):Int;
+	public var COLOR_ATTACHMENT1(get, never):Int;
+	public var COLOR_ATTACHMENT2(get, never):Int;
+	public var COLOR_ATTACHMENT3(get, never):Int;
+	public var COLOR_ATTACHMENT4(get, never):Int;
+	public var COLOR_ATTACHMENT5(get, never):Int;
+	public var COLOR_ATTACHMENT6(get, never):Int;
+	public var COLOR_ATTACHMENT7(get, never):Int;
+	public var COLOR_ATTACHMENT8(get, never):Int;
+	public var COLOR_ATTACHMENT9(get, never):Int;
+	public var COLOR_ATTACHMENT10(get, never):Int;
+	public var COLOR_ATTACHMENT11(get, never):Int;
+	public var COLOR_ATTACHMENT12(get, never):Int;
+	public var COLOR_ATTACHMENT13(get, never):Int;
+	public var COLOR_ATTACHMENT14(get, never):Int;
+	public var COLOR_ATTACHMENT15(get, never):Int;
+	public var SAMPLER_3D(get, never):Int;
+	public var SAMPLER_2D_SHADOW(get, never):Int;
+	public var SAMPLER_2D_ARRAY(get, never):Int;
+	public var SAMPLER_2D_ARRAY_SHADOW(get, never):Int;
+	public var SAMPLER_CUBE_SHADOW(get, never):Int;
+	public var INT_SAMPLER_2D(get, never):Int;
+	public var INT_SAMPLER_3D(get, never):Int;
+	public var INT_SAMPLER_CUBE(get, never):Int;
+	public var INT_SAMPLER_2D_ARRAY(get, never):Int;
+	public var UNSIGNED_INT_SAMPLER_2D(get, never):Int;
+	public var UNSIGNED_INT_SAMPLER_3D(get, never):Int;
+	public var UNSIGNED_INT_SAMPLER_CUBE(get, never):Int;
+	public var UNSIGNED_INT_SAMPLER_2D_ARRAY(get, never):Int;
+	public var MAX_SAMPLES(get, never):Int;
+	public var SAMPLER_BINDING(get, never):Int;
+	public var PIXEL_PACK_BUFFER(get, never):Int;
+	public var PIXEL_UNPACK_BUFFER(get, never):Int;
+	public var PIXEL_PACK_BUFFER_BINDING(get, never):Int;
+	public var PIXEL_UNPACK_BUFFER_BINDING(get, never):Int;
+	public var COPY_READ_BUFFER(get, never):Int;
+	public var COPY_WRITE_BUFFER(get, never):Int;
+	public var COPY_READ_BUFFER_BINDING(get, never):Int;
+	public var COPY_WRITE_BUFFER_BINDING(get, never):Int;
 	public var FLOAT_MAT2x3 = 0x8B65;
 	public var FLOAT_MAT2x4 = 0x8B66;
 	public var FLOAT_MAT3x2 = 0x8B67;
 	public var FLOAT_MAT3x4 = 0x8B68;
 	public var FLOAT_MAT4x2 = 0x8B69;
 	public var FLOAT_MAT4x3 = 0x8B6A;
-	public var UNSIGNED_INT_VEC2 = 0x8DC6;
-	public var UNSIGNED_INT_VEC3 = 0x8DC7;
-	public var UNSIGNED_INT_VEC4 = 0x8DC8;
-	public var UNSIGNED_NORMALIZED = 0x8C17;
-	public var SIGNED_NORMALIZED = 0x8F9C;
-	public var VERTEX_ATTRIB_ARRAY_INTEGER = 0x88FD;
-	public var VERTEX_ATTRIB_ARRAY_DIVISOR = 0x88FE;
-	public var TRANSFORM_FEEDBACK_BUFFER_MODE = 0x8C7F;
-	public var MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS = 0x8C80;
-	public var TRANSFORM_FEEDBACK_VARYINGS = 0x8C83;
-	public var TRANSFORM_FEEDBACK_BUFFER_START = 0x8C84;
-	public var TRANSFORM_FEEDBACK_BUFFER_SIZE = 0x8C85;
-	public var TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN = 0x8C88;
-	public var MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS = 0x8C8A;
-	public var MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS = 0x8C8B;
-	public var INTERLEAVED_ATTRIBS = 0x8C8C;
-	public var SEPARATE_ATTRIBS = 0x8C8D;
-	public var TRANSFORM_FEEDBACK_BUFFER = 0x8C8E;
-	public var TRANSFORM_FEEDBACK_BUFFER_BINDING = 0x8C8F;
-	public var TRANSFORM_FEEDBACK = 0x8E22;
-	public var TRANSFORM_FEEDBACK_PAUSED = 0x8E23;
-	public var TRANSFORM_FEEDBACK_ACTIVE = 0x8E24;
-	public var TRANSFORM_FEEDBACK_BINDING = 0x8E25;
-	public var FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING = 0x8210;
-	public var FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE = 0x8211;
-	public var FRAMEBUFFER_ATTACHMENT_RED_SIZE = 0x8212;
-	public var FRAMEBUFFER_ATTACHMENT_GREEN_SIZE = 0x8213;
-	public var FRAMEBUFFER_ATTACHMENT_BLUE_SIZE = 0x8214;
-	public var FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE = 0x8215;
-	public var FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE = 0x8216;
-	public var FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE = 0x8217;
-	public var FRAMEBUFFER_DEFAULT = 0x8218;
-	public var DEPTH24_STENCIL8 = 0x88F0;
-	public var DRAW_FRAMEBUFFER_BINDING = 0x8CA6;
-	public var READ_FRAMEBUFFER = 0x8CA8;
-	public var DRAW_FRAMEBUFFER = 0x8CA9;
-	public var READ_FRAMEBUFFER_BINDING = 0x8CAA;
-	public var RENDERBUFFER_SAMPLES = 0x8CAB;
-	public var FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER = 0x8CD4;
-	public var FRAMEBUFFER_INCOMPLETE_MULTISAMPLE = 0x8D56;
-	public var UNIFORM_BUFFER = 0x8A11;
-	public var UNIFORM_BUFFER_BINDING = 0x8A28;
-	public var UNIFORM_BUFFER_START = 0x8A29;
-	public var UNIFORM_BUFFER_SIZE = 0x8A2A;
-	public var MAX_VERTEX_UNIFORM_BLOCKS = 0x8A2B;
-	public var MAX_FRAGMENT_UNIFORM_BLOCKS = 0x8A2D;
-	public var MAX_COMBINED_UNIFORM_BLOCKS = 0x8A2E;
-	public var MAX_UNIFORM_BUFFER_BINDINGS = 0x8A2F;
-	public var MAX_UNIFORM_BLOCK_SIZE = 0x8A30;
-	public var MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS = 0x8A31;
-	public var MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS = 0x8A33;
-	public var UNIFORM_BUFFER_OFFSET_ALIGNMENT = 0x8A34;
-	public var ACTIVE_UNIFORM_BLOCKS = 0x8A36;
-	public var UNIFORM_TYPE = 0x8A37;
-	public var UNIFORM_SIZE = 0x8A38;
-	public var UNIFORM_BLOCK_INDEX = 0x8A3A;
-	public var UNIFORM_OFFSET = 0x8A3B;
-	public var UNIFORM_ARRAY_STRIDE = 0x8A3C;
-	public var UNIFORM_MATRIX_STRIDE = 0x8A3D;
-	public var UNIFORM_IS_ROW_MAJOR = 0x8A3E;
-	public var UNIFORM_BLOCK_BINDING = 0x8A3F;
-	public var UNIFORM_BLOCK_DATA_SIZE = 0x8A40;
-	public var UNIFORM_BLOCK_ACTIVE_UNIFORMS = 0x8A42;
-	public var UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES = 0x8A43;
-	public var UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER = 0x8A44;
-	public var UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER = 0x8A46;
-	public var OBJECT_TYPE = 0x9112;
-	public var SYNC_CONDITION = 0x9113;
-	public var SYNC_STATUS = 0x9114;
-	public var SYNC_FLAGS = 0x9115;
-	public var SYNC_FENCE = 0x9116;
-	public var SYNC_GPU_COMMANDS_COMPLETE = 0x9117;
-	public var UNSIGNALED = 0x9118;
-	public var SIGNALED = 0x9119;
-	public var ALREADY_SIGNALED = 0x911A;
-	public var TIMEOUT_EXPIRED = 0x911B;
-	public var CONDITION_SATISFIED = 0x911C;
-	public var WAIT_FAILED = 0x911D;
-	public var SYNC_FLUSH_COMMANDS_BIT = 0x00000001;
-	public var COLOR = 0x1800;
-	public var DEPTH = 0x1801;
-	public var STENCIL = 0x1802;
-	public var MIN = 0x8007;
-	public var MAX = 0x8008;
-	public var DEPTH_COMPONENT24 = 0x81A6;
-	public var STREAM_READ = 0x88E1;
-	public var STREAM_COPY = 0x88E2;
-	public var STATIC_READ = 0x88E5;
-	public var STATIC_COPY = 0x88E6;
-	public var DYNAMIC_READ = 0x88E9;
-	public var DYNAMIC_COPY = 0x88EA;
-	public var DEPTH_COMPONENT32F = 0x8CAC;
-	public var DEPTH32F_STENCIL8 = 0x8CAD;
-	public var INVALID_INDEX = 0xFFFFFFFF;
-	public var TIMEOUT_IGNORED = -1;
+	public var UNSIGNED_INT_VEC2(get, never):Int;
+	public var UNSIGNED_INT_VEC3(get, never):Int;
+	public var UNSIGNED_INT_VEC4(get, never):Int;
+	public var UNSIGNED_NORMALIZED(get, never):Int;
+	public var SIGNED_NORMALIZED(get, never):Int;
+	public var VERTEX_ATTRIB_ARRAY_INTEGER(get, never):Int;
+	public var VERTEX_ATTRIB_ARRAY_DIVISOR(get, never):Int;
+	public var TRANSFORM_FEEDBACK_BUFFER_MODE(get, never):Int;
+	public var MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS(get, never):Int;
+	public var TRANSFORM_FEEDBACK_VARYINGS(get, never):Int;
+	public var TRANSFORM_FEEDBACK_BUFFER_START(get, never):Int;
+	public var TRANSFORM_FEEDBACK_BUFFER_SIZE(get, never):Int;
+	public var TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN(get, never):Int;
+	public var MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS(get, never):Int;
+	public var MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS(get, never):Int;
+	public var INTERLEAVED_ATTRIBS(get, never):Int;
+	public var SEPARATE_ATTRIBS(get, never):Int;
+	public var TRANSFORM_FEEDBACK_BUFFER(get, never):Int;
+	public var TRANSFORM_FEEDBACK_BUFFER_BINDING(get, never):Int;
+	public var TRANSFORM_FEEDBACK(get, never):Int;
+	public var TRANSFORM_FEEDBACK_PAUSED(get, never):Int;
+	public var TRANSFORM_FEEDBACK_ACTIVE(get, never):Int;
+	public var TRANSFORM_FEEDBACK_BINDING(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_RED_SIZE(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_GREEN_SIZE(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_BLUE_SIZE(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE(get, never):Int;
+	public var FRAMEBUFFER_DEFAULT(get, never):Int;
+	public var DEPTH24_STENCIL8(get, never):Int;
+	public var DRAW_FRAMEBUFFER_BINDING(get, never):Int;
+	public var READ_FRAMEBUFFER(get, never):Int;
+	public var DRAW_FRAMEBUFFER(get, never):Int;
+	public var READ_FRAMEBUFFER_BINDING(get, never):Int;
+	public var RENDERBUFFER_SAMPLES(get, never):Int;
+	public var FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER(get, never):Int;
+	public var FRAMEBUFFER_INCOMPLETE_MULTISAMPLE(get, never):Int;
+	public var UNIFORM_BUFFER(get, never):Int;
+	public var UNIFORM_BUFFER_BINDING(get, never):Int;
+	public var UNIFORM_BUFFER_START(get, never):Int;
+	public var UNIFORM_BUFFER_SIZE(get, never):Int;
+	public var MAX_VERTEX_UNIFORM_BLOCKS(get, never):Int;
+	public var MAX_FRAGMENT_UNIFORM_BLOCKS(get, never):Int;
+	public var MAX_COMBINED_UNIFORM_BLOCKS(get, never):Int;
+	public var MAX_UNIFORM_BUFFER_BINDINGS(get, never):Int;
+	public var MAX_UNIFORM_BLOCK_SIZE(get, never):Int;
+	public var MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS(get, never):Int;
+	public var MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS(get, never):Int;
+	public var UNIFORM_BUFFER_OFFSET_ALIGNMENT(get, never):Int;
+	public var ACTIVE_UNIFORM_BLOCKS(get, never):Int;
+	public var UNIFORM_TYPE(get, never):Int;
+	public var UNIFORM_SIZE(get, never):Int;
+	public var UNIFORM_BLOCK_INDEX(get, never):Int;
+	public var UNIFORM_OFFSET(get, never):Int;
+	public var UNIFORM_ARRAY_STRIDE(get, never):Int;
+	public var UNIFORM_MATRIX_STRIDE(get, never):Int;
+	public var UNIFORM_IS_ROW_MAJOR(get, never):Int;
+	public var UNIFORM_BLOCK_BINDING(get, never):Int;
+	public var UNIFORM_BLOCK_DATA_SIZE(get, never):Int;
+	public var UNIFORM_BLOCK_ACTIVE_UNIFORMS(get, never):Int;
+	public var UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES(get, never):Int;
+	public var UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER(get, never):Int;
+	public var UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER(get, never):Int;
+	public var OBJECT_TYPE(get, never):Int;
+	public var SYNC_CONDITION(get, never):Int;
+	public var SYNC_STATUS(get, never):Int;
+	public var SYNC_FLAGS(get, never):Int;
+	public var SYNC_FENCE(get, never):Int;
+	public var SYNC_GPU_COMMANDS_COMPLETE(get, never):Int;
+	public var UNSIGNALED(get, never):Int;
+	public var SIGNALED(get, never):Int;
+	public var ALREADY_SIGNALED(get, never):Int;
+	public var TIMEOUT_EXPIRED(get, never):Int;
+	public var CONDITION_SATISFIED(get, never):Int;
+	public var WAIT_FAILED(get, never):Int;
+	public var SYNC_FLUSH_COMMANDS_BIT(get, never):Int;
+	public var COLOR(get, never):Int;
+	public var DEPTH(get, never):Int;
+	public var STENCIL(get, never):Int;
+	public var MIN(get, never):Int;
+	public var MAX(get, never):Int;
+	public var DEPTH_COMPONENT24(get, never):Int;
+	public var STREAM_READ(get, never):Int;
+	public var STREAM_COPY(get, never):Int;
+	public var STATIC_READ(get, never):Int;
+	public var STATIC_COPY(get, never):Int;
+	public var DYNAMIC_READ(get, never):Int;
+	public var DYNAMIC_COPY(get, never):Int;
+	public var DEPTH_COMPONENT32F(get, never):Int;
+	public var DEPTH32F_STENCIL8(get, never):Int;
+	public var INVALID_INDEX(get, never):Int;
+	public var TIMEOUT_IGNORED(get, never):Int;
+
+	// Modern OpenGL / OpenGL ES enums (compute, SSBOs, memory barriers, program interface
+	// query, separable programs, vertex attrib bindings, multisample textures, KHR_debug,
+	// buffer storage and clip control).
+	public var COMPUTE_SHADER(get, never):Int;
+	public var MAX_COMPUTE_WORK_GROUP_COUNT(get, never):Int;
+	public var MAX_COMPUTE_WORK_GROUP_SIZE(get, never):Int;
+	public var MAX_COMPUTE_WORK_GROUP_INVOCATIONS(get, never):Int;
+	public var COMPUTE_WORK_GROUP_SIZE(get, never):Int;
+	public var DISPATCH_INDIRECT_BUFFER(get, never):Int;
+	public var DISPATCH_INDIRECT_BUFFER_BINDING(get, never):Int;
+	public var DRAW_INDIRECT_BUFFER(get, never):Int;
+	public var DRAW_INDIRECT_BUFFER_BINDING(get, never):Int;
+	public var SHADER_STORAGE_BUFFER(get, never):Int;
+	public var SHADER_STORAGE_BUFFER_BINDING(get, never):Int;
+	public var SHADER_STORAGE_BUFFER_START(get, never):Int;
+	public var SHADER_STORAGE_BUFFER_SIZE(get, never):Int;
+	public var MAX_SHADER_STORAGE_BLOCK_SIZE(get, never):Int;
+	public var MAX_SHADER_STORAGE_BUFFER_BINDINGS(get, never):Int;
+	public var SHADER_STORAGE_BARRIER_BIT(get, never):Int;
+	public var VERTEX_ATTRIB_ARRAY_BARRIER_BIT(get, never):Int;
+	public var ELEMENT_ARRAY_BARRIER_BIT(get, never):Int;
+	public var UNIFORM_BARRIER_BIT(get, never):Int;
+	public var TEXTURE_FETCH_BARRIER_BIT(get, never):Int;
+	public var SHADER_IMAGE_ACCESS_BARRIER_BIT(get, never):Int;
+	public var COMMAND_BARRIER_BIT(get, never):Int;
+	public var PIXEL_BUFFER_BARRIER_BIT(get, never):Int;
+	public var TEXTURE_UPDATE_BARRIER_BIT(get, never):Int;
+	public var BUFFER_UPDATE_BARRIER_BIT(get, never):Int;
+	public var FRAMEBUFFER_BARRIER_BIT(get, never):Int;
+	public var TRANSFORM_FEEDBACK_BARRIER_BIT(get, never):Int;
+	public var ATOMIC_COUNTER_BARRIER_BIT(get, never):Int;
+	public var ALL_BARRIER_BITS(get, never):Int;
+	public var ATOMIC_COUNTER_BUFFER(get, never):Int;
+	public var READ_ONLY(get, never):Int;
+	public var WRITE_ONLY(get, never):Int;
+	public var READ_WRITE(get, never):Int;
+	public var IMAGE_2D(get, never):Int;
+	public var MAX_IMAGE_UNITS(get, never):Int;
+	public var UNIFORM(get, never):Int;
+	public var UNIFORM_BLOCK(get, never):Int;
+	public var PROGRAM_INPUT(get, never):Int;
+	public var PROGRAM_OUTPUT(get, never):Int;
+	public var BUFFER_VARIABLE(get, never):Int;
+	public var SHADER_STORAGE_BLOCK(get, never):Int;
+	public var ACTIVE_RESOURCES(get, never):Int;
+	public var MAX_NAME_LENGTH(get, never):Int;
+	public var MAX_NUM_ACTIVE_VARIABLES(get, never):Int;
+	public var NAME_LENGTH(get, never):Int;
+	public var TYPE(get, never):Int;
+	public var ARRAY_SIZE(get, never):Int;
+	public var OFFSET(get, never):Int;
+	public var BLOCK_INDEX(get, never):Int;
+	public var LOCATION(get, never):Int;
+	public var VERTEX_SHADER_BIT(get, never):Int;
+	public var FRAGMENT_SHADER_BIT(get, never):Int;
+	public var COMPUTE_SHADER_BIT(get, never):Int;
+	public var ALL_SHADER_BITS(get, never):Int;
+	public var PROGRAM_SEPARABLE(get, never):Int;
+	public var ACTIVE_PROGRAM(get, never):Int;
+	public var PROGRAM_PIPELINE_BINDING(get, never):Int;
+	public var VERTEX_ATTRIB_BINDING(get, never):Int;
+	public var VERTEX_ATTRIB_RELATIVE_OFFSET(get, never):Int;
+	public var VERTEX_BINDING_DIVISOR(get, never):Int;
+	public var VERTEX_BINDING_OFFSET(get, never):Int;
+	public var VERTEX_BINDING_STRIDE(get, never):Int;
+	public var VERTEX_BINDING_BUFFER(get, never):Int;
+	public var MAX_VERTEX_ATTRIB_BINDINGS(get, never):Int;
+	public var MAX_VERTEX_ATTRIB_STRIDE(get, never):Int;
+	public var TEXTURE_2D_MULTISAMPLE(get, never):Int;
+	public var TEXTURE_2D_MULTISAMPLE_ARRAY(get, never):Int;
+	public var SAMPLE_POSITION(get, never):Int;
+	public var SAMPLE_MASK(get, never):Int;
+	public var MAX_SAMPLE_MASK_WORDS(get, never):Int;
+	public var MAX_COLOR_TEXTURE_SAMPLES(get, never):Int;
+	public var MAX_DEPTH_TEXTURE_SAMPLES(get, never):Int;
+	public var FRAMEBUFFER_DEFAULT_WIDTH(get, never):Int;
+	public var FRAMEBUFFER_DEFAULT_HEIGHT(get, never):Int;
+	public var FRAMEBUFFER_DEFAULT_SAMPLES(get, never):Int;
+	public var TEXTURE_BUFFER(get, never):Int;
+	public var TEXTURE_BUFFER_BINDING(get, never):Int;
+	public var TEXTURE_BUFFER_OFFSET(get, never):Int;
+	public var TEXTURE_BUFFER_SIZE(get, never):Int;
+	public var PATCHES(get, never):Int;
+	public var PATCH_VERTICES(get, never):Int;
+	public var MIN_SAMPLE_SHADING_VALUE(get, never):Int;
+	public var SAMPLE_SHADING(get, never):Int;
+	public var DEBUG_OUTPUT(get, never):Int;
+	public var DEBUG_OUTPUT_SYNCHRONOUS(get, never):Int;
+	public var DEBUG_SOURCE_APPLICATION(get, never):Int;
+	public var DEBUG_SOURCE_THIRD_PARTY(get, never):Int;
+	public var DEBUG_TYPE_ERROR(get, never):Int;
+	public var DEBUG_TYPE_PERFORMANCE(get, never):Int;
+	public var DEBUG_TYPE_MARKER(get, never):Int;
+	public var DEBUG_TYPE_PUSH_GROUP(get, never):Int;
+	public var DEBUG_TYPE_POP_GROUP(get, never):Int;
+	public var DEBUG_SEVERITY_HIGH(get, never):Int;
+	public var DEBUG_SEVERITY_MEDIUM(get, never):Int;
+	public var DEBUG_SEVERITY_LOW(get, never):Int;
+	public var DEBUG_SEVERITY_NOTIFICATION(get, never):Int;
+	public var MAX_DEBUG_MESSAGE_LENGTH(get, never):Int;
+	public var MAX_LABEL_LENGTH(get, never):Int;
+	public var BUFFER_OBJECT(get, never):Int;
+	public var SHADER_OBJECT(get, never):Int;
+	public var PROGRAM_OBJECT(get, never):Int;
+	public var QUERY_OBJECT(get, never):Int;
+	public var MAP_PERSISTENT_BIT(get, never):Int;
+	public var MAP_COHERENT_BIT(get, never):Int;
+	public var DYNAMIC_STORAGE_BIT(get, never):Int;
+	public var CLIENT_STORAGE_BIT(get, never):Int;
+	public var LOWER_LEFT(get, never):Int;
+	public var UPPER_LEFT(get, never):Int;
+	public var NEGATIVE_ONE_TO_ONE(get, never):Int;
+	public var ZERO_TO_ONE(get, never):Int;
+	public var FILL(get, never):Int;
+	public var LINE(get, never):Int;
+	public var POINT(get, never):Int;
+
 	public var type(default, null):RenderContextType;
 	public var version(default, null):Float;
 
@@ -617,18 +735,21 @@ class NativeOpenGLRenderContext
 	private var __renderbufferBinding:GLRenderbuffer;
 	private var __texture2DBinding:GLTexture;
 	private var __textureCubeMapBinding:GLTexture;
+	private static inline var __TEXTURE_UNIT_CACHE_SIZE:Int = 32;
 	private var __activeTextureUnit:Int = 0x84C0; // GL_TEXTURE0
-	private var __textureUnitBindings:Map<Int, Int> = new Map(); // key = unit*2 + (target==TEXTURE_2D ? 0 : 1), value = texture id
+	private var __textureUnitBindings:haxe.ds.Vector<Int> = __newTextureUnitBindings();
 	private var __blendSFactor:Int = -1;
 	private var __blendDFactor:Int = -1;
 	private var __blendSFactorRGB:Int = -1;
 	private var __blendDFactorRGB:Int = -1;
 	private var __blendSFactorAlpha:Int = -1;
 	private var __blendDFactorAlpha:Int = -1;
-	private var __capState:Map<Int, Bool> = new Map();
+	private var __capEnabledMask:Int = 0;
+	private var __capKnownMask:Int = 0;
 	private var __lastArrayBufferID:Int = -1;
 	private var __lastElementBufferID:Int = -1;
-	private var __lastFramebufferID:Int = -1;
+	private var __lastDrawFramebufferID:Int = -1;
+	private var __lastReadFramebufferID:Int = -1;
 	private var __lastProgramID:Int = -1;
 
 	private function new()
@@ -754,9 +875,26 @@ class NativeOpenGLRenderContext
 	public function bindFramebuffer(target:Int, framebuffer:GLFramebuffer):Void
 	{
 		var id = __getObjectID(framebuffer);
-		if (__lastFramebufferID == id)
-			return;
-		__lastFramebufferID = id;
+
+		switch (target)
+		{
+			case 0x8CA9: // DRAW_FRAMEBUFFER
+				if (__lastDrawFramebufferID == id)
+					return;
+				__lastDrawFramebufferID = id;
+
+			case 0x8CA8: // READ_FRAMEBUFFER
+				if (__lastReadFramebufferID == id)
+					return;
+				__lastReadFramebufferID = id;
+
+			default:
+				if (__lastDrawFramebufferID == id && __lastReadFramebufferID == id)
+					return;
+				__lastDrawFramebufferID = id;
+				__lastReadFramebufferID = id;
+		}
+
 		__framebufferBinding = framebuffer;
 
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
@@ -783,17 +921,20 @@ class NativeOpenGLRenderContext
 	public function bindTexture(target:Int, texture:GLTexture):Void
 	{
 		var id = __getObjectID(texture);
-		var slot = (target == TEXTURE_CUBE_MAP) ? 1 : 0;
-		var key = __activeTextureUnit * 2 + slot;
-
-		if (__textureUnitBindings.get(key) == id)
-			return;
-		__textureUnitBindings.set(key, id);
 
 		if (target == TEXTURE_2D)
 			__texture2DBinding = texture;
 		if (target == TEXTURE_CUBE_MAP)
 			__textureCubeMapBinding = texture;
+
+		var index = __textureCacheIndex(target);
+
+		if (index != -1)
+		{
+			if (__textureUnitBindings[index] == id)
+				return;
+			__textureUnitBindings[index] = id;
+		}
 
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		NativeCFFI.lime_gl_bind_texture(target, id);
@@ -1190,6 +1331,9 @@ class NativeOpenGLRenderContext
 
 	public function deleteBuffer(buffer:GLBuffer):Void
 	{
+		__lastArrayBufferID = -1;
+		__lastElementBufferID = -1;
+
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		if (buffer != null)
 			NativeCFFI.lime_gl_object_deregister(buffer);
@@ -1199,6 +1343,9 @@ class NativeOpenGLRenderContext
 
 	public function deleteFramebuffer(framebuffer:GLFramebuffer):Void
 	{
+		__lastDrawFramebufferID = -1;
+		__lastReadFramebufferID = -1;
+
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		if (framebuffer != null)
 			NativeCFFI.lime_gl_object_deregister(framebuffer);
@@ -1208,6 +1355,8 @@ class NativeOpenGLRenderContext
 
 	public function deleteProgram(program:GLProgram):Void
 	{
+		__lastProgramID = -1;
+
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		if (program != null)
 			NativeCFFI.lime_gl_object_deregister(program);
@@ -1260,6 +1409,8 @@ class NativeOpenGLRenderContext
 
 	public function deleteTexture(texture:GLTexture):Void
 	{
+		__resetTextureUnitBindings();
+
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		if (texture != null)
 			NativeCFFI.lime_gl_object_deregister(texture);
@@ -1320,9 +1471,15 @@ class NativeOpenGLRenderContext
 
 	public function disable(cap:Int):Void
 	{
-		if (__capState.get(cap) == false)
-			return;
-		__capState.set(cap, false);
+		var bit = __capCacheBit(cap);
+
+		if (bit != 0)
+		{
+			if ((__capKnownMask & bit) != 0 && (__capEnabledMask & bit) == 0)
+				return;
+			__capKnownMask |= bit;
+			__capEnabledMask &= ~bit;
+		}
 
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		NativeCFFI.lime_gl_disable(cap);
@@ -1380,9 +1537,15 @@ class NativeOpenGLRenderContext
 
 	public function enable(cap:Int):Void
 	{
-		if (__capState.get(cap) == true)
-			return;
-		__capState.set(cap, true);
+		var bit = __capCacheBit(cap);
+
+		if (bit != 0)
+		{
+			if ((__capKnownMask & bit) != 0 && (__capEnabledMask & bit) != 0)
+				return;
+			__capKnownMask |= bit;
+			__capEnabledMask |= bit;
+		}
 
 		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
 		NativeCFFI.lime_gl_enable(cap);
@@ -1513,9 +1676,28 @@ class NativeOpenGLRenderContext
 
 	public function getActiveUniformBlockParameter(program:GLProgram, uniformBlockIndex:Int, pname:Int):Dynamic
 	{
-		// TODO
+		return switch (pname)
+		{
+			case GL.UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER, GL.UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER:
+				getActiveUniformBlocki(program, uniformBlockIndex, pname) != 0;
 
-		return null;
+			case GL.UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES:
+				var count = getActiveUniformBlocki(program, uniformBlockIndex, UNIFORM_BLOCK_ACTIVE_UNIFORMS);
+
+				if (count <= 0)
+				{
+					new Int32Array(0);
+				}
+				else
+				{
+					var indices = new Int32Array(count);
+					getActiveUniformBlockiv(program, uniformBlockIndex, pname, indices);
+					indices;
+				}
+
+			default:
+				getActiveUniformBlocki(program, uniformBlockIndex, pname);
+		}
 	}
 
 	public function getActiveUniforms(program:GLProgram, uniformIndices:Array<Int>, pname:Int):Dynamic
@@ -1984,9 +2166,11 @@ class NativeOpenGLRenderContext
 
 	public function getQueryParameter(query:GLQuery, pname:Int):Dynamic
 	{
-		// TODO
-
-		return null;
+		return switch (pname)
+		{
+			case GL.QUERY_RESULT_AVAILABLE: getQueryObjectui(query, pname) != 0;
+			default: getQueryObjectui(query, pname);
+		}
 	}
 
 	public function getRenderbufferParameter(target:Int, pname:Int):Dynamic
@@ -2012,9 +2196,11 @@ class NativeOpenGLRenderContext
 
 	public function getSamplerParameter(sampler:GLSampler, pname:Int):Dynamic
 	{
-		// TODO
-
-		return null;
+		return switch (pname)
+		{
+			case GL.TEXTURE_MIN_LOD, GL.TEXTURE_MAX_LOD: getSamplerParameterf(sampler, pname);
+			default: getSamplerParameteri(sampler, pname);
+		}
 	}
 
 	public function getSamplerParameterf(sampler:GLSampler, pname:Int):Float
@@ -2119,24 +2305,38 @@ class NativeOpenGLRenderContext
 	{
 		if (__supportedExtensions == null)
 		{
-			// TODO: getStringi for newer GL versions
-
 			__supportedExtensions = new Array<String>();
-			var extensions = getString(GL.EXTENSIONS);
 
-			if (extensions != null)
+			// glGetString(GL_EXTENSIONS) is removed in desktop GL 3.1+ core profiles, where it
+			// returns null and sets GL_INVALID_ENUM. Enumerate individually when the context is
+			// new enough to have glGetStringi, and fall back if that yields nothing.
+			if (version >= 3)
 			{
-				var extensionList = extensions.split(" ");
+				var count = getInteger(0x821D); // NUM_EXTENSIONS
 
-				for (extension in extensionList)
+				for (i in 0...count)
 				{
-					if (StringTools.startsWith(extension, "GL_"))
+					var extension = getStringi(GL.EXTENSIONS, i);
+
+					if (extension != null)
 					{
-						__supportedExtensions.push(extension.substr(3));
+						__pushSupportedExtension(extension);
 					}
-					else
+				}
+			}
+
+			if (__supportedExtensions.length == 0)
+			{
+				var extensions = getString(GL.EXTENSIONS);
+
+				if (extensions != null)
+				{
+					for (extension in extensions.split(" "))
 					{
-						__supportedExtensions.push(extension);
+						if (extension != "")
+						{
+							__pushSupportedExtension(extension);
+						}
 					}
 				}
 			}
@@ -3256,17 +3456,4216 @@ class NativeOpenGLRenderContext
 		__framebufferBinding = null;
 		__renderbufferBinding = null;
 		__activeTextureUnit = 0x84C0; // GL_TEXTURE0
-		__textureUnitBindings = new Map();
+		__resetTextureUnitBindings();
 		__blendSFactor = __blendDFactor = -1;
 		__blendSFactorRGB = __blendDFactorRGB = -1;
 		__blendSFactorAlpha = __blendDFactorAlpha = -1;
-		__capState = new Map();
+		__capEnabledMask = 0;
+		__capKnownMask = 0;
 		__lastArrayBufferID = -1;
 		__lastElementBufferID = -1;
-		__lastFramebufferID = -1;
+		__lastDrawFramebufferID = -1;
+		__lastReadFramebufferID = -1;
 		__lastProgramID = -1;
 		__texture2DBinding = null;
 		__textureCubeMapBinding = null;
+	}
+
+	public function flushMappedBufferRange(target:Int, offset:DataPointer, length:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_flush_mapped_buffer_range(target, offset, length);
+		#end
+	}
+
+	public function dispatchCompute(x:Int, y:Int, z:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_dispatch_compute(x, y, z);
+		#end
+	}
+
+	public function dispatchComputeIndirect(indirect:DataPointer):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_dispatch_compute_indirect(indirect);
+		#end
+	}
+
+	public function memoryBarrier(barriers:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_memory_barrier(barriers);
+		#end
+	}
+
+	public function memoryBarrierByRegion(barriers:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_memory_barrier_by_region(barriers);
+		#end
+	}
+
+	public function bindImageTexture(unit:Int, texture:Int, level:Int, layered:Bool, layer:Int, access:Int, format:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_bind_image_texture(unit, texture, level, layered, layer, access, format);
+		#end
+	}
+
+	public function drawArraysIndirect(mode:Int, indirect:DataPointer):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_draw_arrays_indirect(mode, indirect);
+		#end
+	}
+
+	public function drawElementsIndirect(mode:Int, type:Int, indirect:DataPointer):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_draw_elements_indirect(mode, type, indirect);
+		#end
+	}
+
+	public function getProgramInterfacei(program:Int, programInterface:Int, pname:Int):Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_program_interfacei(program, programInterface, pname);
+		#else
+		return 0;
+		#end
+	}
+
+	public function getProgramInterfaceiv(program:Int, programInterface:Int, pname:Int, params:DataPointer):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_get_program_interfaceiv(program, programInterface, pname, params);
+		#end
+	}
+
+	public function getProgramResourceIndex(program:Int, programInterface:Int, name:String):Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_program_resource_index(program, programInterface, name);
+		#else
+		return 0;
+		#end
+	}
+
+	public function getProgramResourceLocation(program:Int, programInterface:Int, name:String):Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_program_resource_location(program, programInterface, name);
+		#else
+		return 0;
+		#end
+	}
+
+	public function getProgramResourceName(program:Int, programInterface:Int, index:Int):String
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_program_resource_name(program, programInterface, index);
+		#else
+		return null;
+		#end
+	}
+
+	public function getProgramResourceiv(program:Int, programInterface:Int, index:Int, propCount:Int, props:DataPointer, bufSize:Int, params:DataPointer):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_get_program_resourceiv(program, programInterface, index, propCount, props, bufSize, params);
+		#end
+	}
+
+	public function createProgramPipeline():Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_create_program_pipeline();
+		#else
+		return 0;
+		#end
+	}
+
+	public function deleteProgramPipeline(pipeline:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_delete_program_pipeline(pipeline);
+		#end
+	}
+
+	public function bindProgramPipeline(pipeline:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_bind_program_pipeline(pipeline);
+		#end
+	}
+
+	public function isProgramPipeline(pipeline:Int):Bool
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_is_program_pipeline(pipeline);
+		#else
+		return false;
+		#end
+	}
+
+	public function useProgramStages(pipeline:Int, stages:Int, program:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_use_program_stages(pipeline, stages, program);
+		#end
+	}
+
+	public function activeShaderProgram(pipeline:Int, program:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_active_shader_program(pipeline, program);
+		#end
+	}
+
+	public function createShaderProgram(type:Int, source:String):Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_create_shader_programv(type, source);
+		#else
+		return 0;
+		#end
+	}
+
+	public function validateProgramPipeline(pipeline:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_validate_program_pipeline(pipeline);
+		#end
+	}
+
+	public function getProgramPipelinei(pipeline:Int, pname:Int):Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_program_pipelinei(pipeline, pname);
+		#else
+		return 0;
+		#end
+	}
+
+	public function getProgramPipelineInfoLog(pipeline:Int):String
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_program_pipeline_info_log(pipeline);
+		#else
+		return null;
+		#end
+	}
+
+	public function programUniform1i(program:Int, location:Int, v0:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_program_uniform1i(program, location, v0);
+		#end
+	}
+
+	public function programUniform1f(program:Int, location:Int, v0:Float):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_program_uniform1f(program, location, v0);
+		#end
+	}
+
+	public function programUniform2f(program:Int, location:Int, v0:Float, v1:Float):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_program_uniform2f(program, location, v0, v1);
+		#end
+	}
+
+	public function programUniform3f(program:Int, location:Int, v0:Float, v1:Float, v2:Float):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_program_uniform3f(program, location, v0, v1, v2);
+		#end
+	}
+
+	public function programUniform4f(program:Int, location:Int, v0:Float, v1:Float, v2:Float, v3:Float):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_program_uniform4f(program, location, v0, v1, v2, v3);
+		#end
+	}
+
+	public function programUniformMatrix4fv(program:Int, location:Int, count:Int, transpose:Bool, value:DataPointer):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_program_uniform_matrix4fv(program, location, count, transpose, value);
+		#end
+	}
+
+	public function bindVertexBuffer(bindingIndex:Int, buffer:Int, offset:DataPointer, stride:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_bind_vertex_buffer(bindingIndex, buffer, offset, stride);
+		#end
+	}
+
+	public function vertexAttribFormat(attribIndex:Int, size:Int, type:Int, normalized:Bool, relativeOffset:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_vertex_attrib_format(attribIndex, size, type, normalized, relativeOffset);
+		#end
+	}
+
+	public function vertexAttribIFormat(attribIndex:Int, size:Int, type:Int, relativeOffset:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_vertex_attrib_iformat(attribIndex, size, type, relativeOffset);
+		#end
+	}
+
+	public function vertexAttribBinding(attribIndex:Int, bindingIndex:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_vertex_attrib_binding(attribIndex, bindingIndex);
+		#end
+	}
+
+	public function vertexBindingDivisor(bindingIndex:Int, divisor:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_vertex_binding_divisor(bindingIndex, divisor);
+		#end
+	}
+
+	public function texStorage2DMultisample(target:Int, samples:Int, internalformat:Int, width:Int, height:Int, fixedSampleLocations:Bool):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_tex_storage_2d_multisample(target, samples, internalformat, width, height, fixedSampleLocations);
+		#end
+	}
+
+	public function getMultisamplefv(pname:Int, index:Int, val:DataPointer):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_get_multisamplefv(pname, index, val);
+		#end
+	}
+
+	public function sampleMaski(maskNumber:Int, mask:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_sample_maski(maskNumber, mask);
+		#end
+	}
+
+	public function getTexLevelParameteri(target:Int, level:Int, pname:Int):Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_tex_level_parameteri(target, level, pname);
+		#else
+		return 0;
+		#end
+	}
+
+	public function getTexLevelParameterf(target:Int, level:Int, pname:Int):Float
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_tex_level_parameterf(target, level, pname);
+		#else
+		return 0;
+		#end
+	}
+
+	public function getBooleani(target:Int, index:Int):Bool
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_booleani(target, index);
+		#else
+		return false;
+		#end
+	}
+
+	public function framebufferParameteri(target:Int, pname:Int, param:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_framebuffer_parameteri(target, pname, param);
+		#end
+	}
+
+	public function getFramebufferParameteri(target:Int, pname:Int):Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_framebuffer_parameteri(target, pname);
+		#else
+		return 0;
+		#end
+	}
+
+	public function copyImageSubData(srcName:Int, srcTarget:Int, srcLevel:Int, srcX:Int, srcY:Int, srcZ:Int, dstName:Int, dstTarget:Int, dstLevel:Int, dstX:Int, dstY:Int, dstZ:Int, srcWidth:Int, srcHeight:Int, srcDepth:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_copy_image_sub_data(srcName, srcTarget, srcLevel, srcX, srcY, srcZ, dstName, dstTarget, dstLevel, dstX, dstY, dstZ, srcWidth, srcHeight, srcDepth);
+		#end
+	}
+
+	public function drawElementsBaseVertex(mode:Int, count:Int, type:Int, indices:DataPointer, baseVertex:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_draw_elements_base_vertex(mode, count, type, indices, baseVertex);
+		#end
+	}
+
+	public function drawRangeElementsBaseVertex(mode:Int, start:Int, end:Int, count:Int, type:Int, indices:DataPointer, baseVertex:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_draw_range_elements_base_vertex(mode, start, end, count, type, indices, baseVertex);
+		#end
+	}
+
+	public function drawElementsInstancedBaseVertex(mode:Int, count:Int, type:Int, indices:DataPointer, instanceCount:Int, baseVertex:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_draw_elements_instanced_base_vertex(mode, count, type, indices, instanceCount, baseVertex);
+		#end
+	}
+
+	public function framebufferTexture(target:Int, attachment:Int, texture:Int, level:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_framebuffer_texture(target, attachment, texture, level);
+		#end
+	}
+
+	public function texBuffer(target:Int, internalformat:Int, buffer:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_tex_buffer(target, internalformat, buffer);
+		#end
+	}
+
+	public function texBufferRange(target:Int, internalformat:Int, buffer:Int, offset:DataPointer, size:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_tex_buffer_range(target, internalformat, buffer, offset, size);
+		#end
+	}
+
+	public function patchParameteri(pname:Int, value:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_patch_parameteri(pname, value);
+		#end
+	}
+
+	public function minSampleShading(value:Float):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_min_sample_shading(value);
+		#end
+	}
+
+	public function blendEquationi(buf:Int, mode:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_blend_equationi(buf, mode);
+		#end
+	}
+
+	public function blendEquationSeparatei(buf:Int, modeRGB:Int, modeAlpha:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_blend_equation_separatei(buf, modeRGB, modeAlpha);
+		#end
+	}
+
+	public function blendFunci(buf:Int, src:Int, dst:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_blend_funci(buf, src, dst);
+		#end
+	}
+
+	public function blendFuncSeparatei(buf:Int, srcRGB:Int, dstRGB:Int, srcAlpha:Int, dstAlpha:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_blend_func_separatei(buf, srcRGB, dstRGB, srcAlpha, dstAlpha);
+		#end
+	}
+
+	public function colorMaski(index:Int, r:Bool, g:Bool, b:Bool, a:Bool):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_color_maski(index, r, g, b, a);
+		#end
+	}
+
+	public function enablei(target:Int, index:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_enablei(target, index);
+		#end
+	}
+
+	public function disablei(target:Int, index:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_disablei(target, index);
+		#end
+	}
+
+	public function isEnabledi(target:Int, index:Int):Bool
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_is_enabledi(target, index);
+		#else
+		return false;
+		#end
+	}
+
+	public function texStorage3DMultisample(target:Int, samples:Int, internalformat:Int, width:Int, height:Int, depth:Int, fixedSampleLocations:Bool):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_tex_storage_3d_multisample(target, samples, internalformat, width, height, depth, fixedSampleLocations);
+		#end
+	}
+
+	public function pushDebugGroup(source:Int, id:Int, message:String):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_push_debug_group(source, id, message);
+		#end
+	}
+
+	public function popDebugGroup():Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_pop_debug_group();
+		#end
+	}
+
+	public function objectLabel(identifier:Int, name:Int, label:String):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_object_label(identifier, name, label);
+		#end
+	}
+
+	public function getObjectLabel(identifier:Int, name:Int):String
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_get_object_label(identifier, name);
+		#else
+		return null;
+		#end
+	}
+
+	public function debugMessageInsert(source:Int, type:Int, id:Int, severity:Int, buf:String):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_debug_message_insert(source, type, id, severity, buf);
+		#end
+	}
+
+	public function debugMessageControl(source:Int, type:Int, severity:Int, count:Int, ids:DataPointer, enabled:Bool):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_debug_message_control(source, type, severity, count, ids, enabled);
+		#end
+	}
+
+	public function createBufferDSA():Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_create_buffer_dsa();
+		#else
+		return 0;
+		#end
+	}
+
+	public function namedBufferData(buffer:Int, size:Int, data:DataPointer, usage:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_named_buffer_data(buffer, size, data, usage);
+		#end
+	}
+
+	public function namedBufferSubData(buffer:Int, offset:DataPointer, size:Int, data:DataPointer):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_named_buffer_sub_data(buffer, offset, size, data);
+		#end
+	}
+
+	public function namedBufferStorage(buffer:Int, size:Int, data:DataPointer, flags:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_named_buffer_storage(buffer, size, data, flags);
+		#end
+	}
+
+	public function mapNamedBufferRange(buffer:Int, offset:DataPointer, length:Int, access:Int):DataPointer
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_map_named_buffer_range(buffer, offset, length, access);
+		#else
+		return 0;
+		#end
+	}
+
+	public function unmapNamedBuffer(buffer:Int):Bool
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_unmap_named_buffer(buffer);
+		#else
+		return false;
+		#end
+	}
+
+	public function flushMappedNamedBufferRange(buffer:Int, offset:DataPointer, length:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_flush_mapped_named_buffer_range(buffer, offset, length);
+		#end
+	}
+
+	public function bufferStorage(target:Int, size:Int, data:DataPointer, flags:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_buffer_storage(target, size, data, flags);
+		#end
+	}
+
+	public function createTextureDSA(target:Int):Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_create_texture_dsa(target);
+		#else
+		return 0;
+		#end
+	}
+
+	public function textureStorage2D(texture:Int, levels:Int, internalformat:Int, width:Int, height:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_texture_storage_2d(texture, levels, internalformat, width, height);
+		#end
+	}
+
+	public function textureStorage3D(texture:Int, levels:Int, internalformat:Int, width:Int, height:Int, depth:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_texture_storage_3d(texture, levels, internalformat, width, height, depth);
+		#end
+	}
+
+	public function textureSubImage2D(texture:Int, level:Int, xoffset:Int, yoffset:Int, width:Int, height:Int, format:Int, type:Int, pixels:DataPointer):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_texture_sub_image_2d(texture, level, xoffset, yoffset, width, height, format, type, pixels);
+		#end
+	}
+
+	public function textureParameteri(texture:Int, pname:Int, param:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_texture_parameteri(texture, pname, param);
+		#end
+	}
+
+	public function textureParameterf(texture:Int, pname:Int, param:Float):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_texture_parameterf(texture, pname, param);
+		#end
+	}
+
+	public function generateTextureMipmap(texture:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_generate_texture_mipmap(texture);
+		#end
+	}
+
+	public function bindTextureUnit(unit:Int, texture:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_bind_texture_unit(unit, texture);
+		#end
+	}
+
+	public function createFramebufferDSA():Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_create_framebuffer_dsa();
+		#else
+		return 0;
+		#end
+	}
+
+	public function namedFramebufferTexture(framebuffer:Int, attachment:Int, texture:Int, level:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_named_framebuffer_texture(framebuffer, attachment, texture, level);
+		#end
+	}
+
+	public function namedFramebufferRenderbuffer(framebuffer:Int, attachment:Int, renderbufferTarget:Int, renderbuffer:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_named_framebuffer_renderbuffer(framebuffer, attachment, renderbufferTarget, renderbuffer);
+		#end
+	}
+
+	public function checkNamedFramebufferStatus(framebuffer:Int, target:Int):Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_check_named_framebuffer_status(framebuffer, target);
+		#else
+		return 0;
+		#end
+	}
+
+	public function clearNamedFramebufferfv(framebuffer:Int, buffer:Int, drawbuffer:Int, value:DataPointer):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_clear_named_framebufferfv(framebuffer, buffer, drawbuffer, value);
+		#end
+	}
+
+	public function blitNamedFramebuffer(readFramebuffer:Int, drawFramebuffer:Int, srcX0:Int, srcY0:Int, srcX1:Int, srcY1:Int, dstX0:Int, dstY0:Int, dstX1:Int, dstY1:Int, mask:Int, filter:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_blit_named_framebuffer(readFramebuffer, drawFramebuffer, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+		#end
+	}
+
+	public function createRenderbufferDSA():Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_create_renderbuffer_dsa();
+		#else
+		return 0;
+		#end
+	}
+
+	public function namedRenderbufferStorage(renderbuffer:Int, internalformat:Int, width:Int, height:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_named_renderbuffer_storage(renderbuffer, internalformat, width, height);
+		#end
+	}
+
+	public function createVertexArrayDSA():Int
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		return NativeCFFI.lime_gl_create_vertex_array_dsa();
+		#else
+		return 0;
+		#end
+	}
+
+	public function vertexArrayVertexBuffer(vaobj:Int, bindingIndex:Int, buffer:Int, offset:DataPointer, stride:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_vertex_array_vertex_buffer(vaobj, bindingIndex, buffer, offset, stride);
+		#end
+	}
+
+	public function vertexArrayAttribFormat(vaobj:Int, attribIndex:Int, size:Int, type:Int, normalized:Bool, relativeOffset:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_vertex_array_attrib_format(vaobj, attribIndex, size, type, normalized, relativeOffset);
+		#end
+	}
+
+	public function vertexArrayAttribBinding(vaobj:Int, attribIndex:Int, bindingIndex:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_vertex_array_attrib_binding(vaobj, attribIndex, bindingIndex);
+		#end
+	}
+
+	public function vertexArrayElementBuffer(vaobj:Int, buffer:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_vertex_array_element_buffer(vaobj, buffer);
+		#end
+	}
+
+	public function enableVertexArrayAttrib(vaobj:Int, index:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_enable_vertex_array_attrib(vaobj, index);
+		#end
+	}
+
+	public function multiDrawArraysIndirect(mode:Int, indirect:DataPointer, drawCount:Int, stride:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_multi_draw_arrays_indirect(mode, indirect, drawCount, stride);
+		#end
+	}
+
+	public function multiDrawElementsIndirect(mode:Int, type:Int, indirect:DataPointer, drawCount:Int, stride:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_multi_draw_elements_indirect(mode, type, indirect, drawCount, stride);
+		#end
+	}
+
+	public function clipControl(origin:Int, depth:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_clip_control(origin, depth);
+		#end
+	}
+
+	public function textureBarrier():Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_texture_barrier();
+		#end
+	}
+
+	public function polygonMode(face:Int, mode:Int):Void
+	{
+		#if (lime_cffi && (lime_opengl || lime_opengles) && !macro)
+		NativeCFFI.lime_gl_polygon_mode(face, mode);
+		#end
+	}
+
+	@:noCompletion private inline function get_DEPTH_BUFFER_BIT():Int
+	{
+		return GL.DEPTH_BUFFER_BIT;
+	}
+
+	@:noCompletion private inline function get_STENCIL_BUFFER_BIT():Int
+	{
+		return GL.STENCIL_BUFFER_BIT;
+	}
+
+	@:noCompletion private inline function get_COLOR_BUFFER_BIT():Int
+	{
+		return GL.COLOR_BUFFER_BIT;
+	}
+
+	@:noCompletion private inline function get_POINTS():Int
+	{
+		return GL.POINTS;
+	}
+
+	@:noCompletion private inline function get_LINES():Int
+	{
+		return GL.LINES;
+	}
+
+	@:noCompletion private inline function get_LINE_LOOP():Int
+	{
+		return GL.LINE_LOOP;
+	}
+
+	@:noCompletion private inline function get_LINE_STRIP():Int
+	{
+		return GL.LINE_STRIP;
+	}
+
+	@:noCompletion private inline function get_TRIANGLES():Int
+	{
+		return GL.TRIANGLES;
+	}
+
+	@:noCompletion private inline function get_TRIANGLE_STRIP():Int
+	{
+		return GL.TRIANGLE_STRIP;
+	}
+
+	@:noCompletion private inline function get_TRIANGLE_FAN():Int
+	{
+		return GL.TRIANGLE_FAN;
+	}
+
+	@:noCompletion private inline function get_ZERO():Int
+	{
+		return GL.ZERO;
+	}
+
+	@:noCompletion private inline function get_ONE():Int
+	{
+		return GL.ONE;
+	}
+
+	@:noCompletion private inline function get_SRC_COLOR():Int
+	{
+		return GL.SRC_COLOR;
+	}
+
+	@:noCompletion private inline function get_ONE_MINUS_SRC_COLOR():Int
+	{
+		return GL.ONE_MINUS_SRC_COLOR;
+	}
+
+	@:noCompletion private inline function get_SRC_ALPHA():Int
+	{
+		return GL.SRC_ALPHA;
+	}
+
+	@:noCompletion private inline function get_ONE_MINUS_SRC_ALPHA():Int
+	{
+		return GL.ONE_MINUS_SRC_ALPHA;
+	}
+
+	@:noCompletion private inline function get_DST_ALPHA():Int
+	{
+		return GL.DST_ALPHA;
+	}
+
+	@:noCompletion private inline function get_ONE_MINUS_DST_ALPHA():Int
+	{
+		return GL.ONE_MINUS_DST_ALPHA;
+	}
+
+	@:noCompletion private inline function get_DST_COLOR():Int
+	{
+		return GL.DST_COLOR;
+	}
+
+	@:noCompletion private inline function get_ONE_MINUS_DST_COLOR():Int
+	{
+		return GL.ONE_MINUS_DST_COLOR;
+	}
+
+	@:noCompletion private inline function get_SRC_ALPHA_SATURATE():Int
+	{
+		return GL.SRC_ALPHA_SATURATE;
+	}
+
+	@:noCompletion private inline function get_FUNC_ADD():Int
+	{
+		return GL.FUNC_ADD;
+	}
+
+	@:noCompletion private inline function get_BLEND_EQUATION():Int
+	{
+		return GL.BLEND_EQUATION;
+	}
+
+	@:noCompletion private inline function get_BLEND_EQUATION_RGB():Int
+	{
+		return GL.BLEND_EQUATION_RGB;
+	}
+
+	@:noCompletion private inline function get_BLEND_EQUATION_ALPHA():Int
+	{
+		return GL.BLEND_EQUATION_ALPHA;
+	}
+
+	@:noCompletion private inline function get_FUNC_SUBTRACT():Int
+	{
+		return GL.FUNC_SUBTRACT;
+	}
+
+	@:noCompletion private inline function get_FUNC_REVERSE_SUBTRACT():Int
+	{
+		return GL.FUNC_REVERSE_SUBTRACT;
+	}
+
+	@:noCompletion private inline function get_BLEND_DST_RGB():Int
+	{
+		return GL.BLEND_DST_RGB;
+	}
+
+	@:noCompletion private inline function get_BLEND_SRC_RGB():Int
+	{
+		return GL.BLEND_SRC_RGB;
+	}
+
+	@:noCompletion private inline function get_BLEND_DST_ALPHA():Int
+	{
+		return GL.BLEND_DST_ALPHA;
+	}
+
+	@:noCompletion private inline function get_BLEND_SRC_ALPHA():Int
+	{
+		return GL.BLEND_SRC_ALPHA;
+	}
+
+	@:noCompletion private inline function get_CONSTANT_COLOR():Int
+	{
+		return GL.CONSTANT_COLOR;
+	}
+
+	@:noCompletion private inline function get_ONE_MINUS_CONSTANT_COLOR():Int
+	{
+		return GL.ONE_MINUS_CONSTANT_COLOR;
+	}
+
+	@:noCompletion private inline function get_CONSTANT_ALPHA():Int
+	{
+		return GL.CONSTANT_ALPHA;
+	}
+
+	@:noCompletion private inline function get_ONE_MINUS_CONSTANT_ALPHA():Int
+	{
+		return GL.ONE_MINUS_CONSTANT_ALPHA;
+	}
+
+	@:noCompletion private inline function get_BLEND_COLOR():Int
+	{
+		return GL.BLEND_COLOR;
+	}
+
+	@:noCompletion private inline function get_ARRAY_BUFFER():Int
+	{
+		return GL.ARRAY_BUFFER;
+	}
+
+	@:noCompletion private inline function get_ELEMENT_ARRAY_BUFFER():Int
+	{
+		return GL.ELEMENT_ARRAY_BUFFER;
+	}
+
+	@:noCompletion private inline function get_ARRAY_BUFFER_BINDING():Int
+	{
+		return GL.ARRAY_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_ELEMENT_ARRAY_BUFFER_BINDING():Int
+	{
+		return GL.ELEMENT_ARRAY_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_STREAM_DRAW():Int
+	{
+		return GL.STREAM_DRAW;
+	}
+
+	@:noCompletion private inline function get_STATIC_DRAW():Int
+	{
+		return GL.STATIC_DRAW;
+	}
+
+	@:noCompletion private inline function get_DYNAMIC_DRAW():Int
+	{
+		return GL.DYNAMIC_DRAW;
+	}
+
+	@:noCompletion private inline function get_BUFFER_SIZE():Int
+	{
+		return GL.BUFFER_SIZE;
+	}
+
+	@:noCompletion private inline function get_BUFFER_USAGE():Int
+	{
+		return GL.BUFFER_USAGE;
+	}
+
+	@:noCompletion private inline function get_CURRENT_VERTEX_ATTRIB():Int
+	{
+		return GL.CURRENT_VERTEX_ATTRIB;
+	}
+
+	@:noCompletion private inline function get_FRONT():Int
+	{
+		return GL.FRONT;
+	}
+
+	@:noCompletion private inline function get_BACK():Int
+	{
+		return GL.BACK;
+	}
+
+	@:noCompletion private inline function get_FRONT_AND_BACK():Int
+	{
+		return GL.FRONT_AND_BACK;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_2D():Int
+	{
+		return GL.TEXTURE_2D;
+	}
+
+	@:noCompletion private inline function get_CULL_FACE():Int
+	{
+		return GL.CULL_FACE;
+	}
+
+	@:noCompletion private inline function get_BLEND():Int
+	{
+		return GL.BLEND;
+	}
+
+	@:noCompletion private inline function get_DITHER():Int
+	{
+		return GL.DITHER;
+	}
+
+	@:noCompletion private inline function get_STENCIL_TEST():Int
+	{
+		return GL.STENCIL_TEST;
+	}
+
+	@:noCompletion private inline function get_DEPTH_TEST():Int
+	{
+		return GL.DEPTH_TEST;
+	}
+
+	@:noCompletion private inline function get_SCISSOR_TEST():Int
+	{
+		return GL.SCISSOR_TEST;
+	}
+
+	@:noCompletion private inline function get_POLYGON_OFFSET_FILL():Int
+	{
+		return GL.POLYGON_OFFSET_FILL;
+	}
+
+	@:noCompletion private inline function get_SAMPLE_ALPHA_TO_COVERAGE():Int
+	{
+		return GL.SAMPLE_ALPHA_TO_COVERAGE;
+	}
+
+	@:noCompletion private inline function get_SAMPLE_COVERAGE():Int
+	{
+		return GL.SAMPLE_COVERAGE;
+	}
+
+	@:noCompletion private inline function get_NO_ERROR():Int
+	{
+		return GL.NO_ERROR;
+	}
+
+	@:noCompletion private inline function get_INVALID_ENUM():Int
+	{
+		return GL.INVALID_ENUM;
+	}
+
+	@:noCompletion private inline function get_INVALID_VALUE():Int
+	{
+		return GL.INVALID_VALUE;
+	}
+
+	@:noCompletion private inline function get_INVALID_OPERATION():Int
+	{
+		return GL.INVALID_OPERATION;
+	}
+
+	@:noCompletion private inline function get_OUT_OF_MEMORY():Int
+	{
+		return GL.OUT_OF_MEMORY;
+	}
+
+	@:noCompletion private inline function get_CW():Int
+	{
+		return GL.CW;
+	}
+
+	@:noCompletion private inline function get_CCW():Int
+	{
+		return GL.CCW;
+	}
+
+	@:noCompletion private inline function get_LINE_WIDTH():Int
+	{
+		return GL.LINE_WIDTH;
+	}
+
+	@:noCompletion private inline function get_ALIASED_POINT_SIZE_RANGE():Int
+	{
+		return GL.ALIASED_POINT_SIZE_RANGE;
+	}
+
+	@:noCompletion private inline function get_ALIASED_LINE_WIDTH_RANGE():Int
+	{
+		return GL.ALIASED_LINE_WIDTH_RANGE;
+	}
+
+	@:noCompletion private inline function get_CULL_FACE_MODE():Int
+	{
+		return GL.CULL_FACE_MODE;
+	}
+
+	@:noCompletion private inline function get_FRONT_FACE():Int
+	{
+		return GL.FRONT_FACE;
+	}
+
+	@:noCompletion private inline function get_DEPTH_RANGE():Int
+	{
+		return GL.DEPTH_RANGE;
+	}
+
+	@:noCompletion private inline function get_DEPTH_WRITEMASK():Int
+	{
+		return GL.DEPTH_WRITEMASK;
+	}
+
+	@:noCompletion private inline function get_DEPTH_CLEAR_VALUE():Int
+	{
+		return GL.DEPTH_CLEAR_VALUE;
+	}
+
+	@:noCompletion private inline function get_DEPTH_FUNC():Int
+	{
+		return GL.DEPTH_FUNC;
+	}
+
+	@:noCompletion private inline function get_STENCIL_CLEAR_VALUE():Int
+	{
+		return GL.STENCIL_CLEAR_VALUE;
+	}
+
+	@:noCompletion private inline function get_STENCIL_FUNC():Int
+	{
+		return GL.STENCIL_FUNC;
+	}
+
+	@:noCompletion private inline function get_STENCIL_FAIL():Int
+	{
+		return GL.STENCIL_FAIL;
+	}
+
+	@:noCompletion private inline function get_STENCIL_PASS_DEPTH_FAIL():Int
+	{
+		return GL.STENCIL_PASS_DEPTH_FAIL;
+	}
+
+	@:noCompletion private inline function get_STENCIL_PASS_DEPTH_PASS():Int
+	{
+		return GL.STENCIL_PASS_DEPTH_PASS;
+	}
+
+	@:noCompletion private inline function get_STENCIL_REF():Int
+	{
+		return GL.STENCIL_REF;
+	}
+
+	@:noCompletion private inline function get_STENCIL_VALUE_MASK():Int
+	{
+		return GL.STENCIL_VALUE_MASK;
+	}
+
+	@:noCompletion private inline function get_STENCIL_WRITEMASK():Int
+	{
+		return GL.STENCIL_WRITEMASK;
+	}
+
+	@:noCompletion private inline function get_STENCIL_BACK_FUNC():Int
+	{
+		return GL.STENCIL_BACK_FUNC;
+	}
+
+	@:noCompletion private inline function get_STENCIL_BACK_FAIL():Int
+	{
+		return GL.STENCIL_BACK_FAIL;
+	}
+
+	@:noCompletion private inline function get_STENCIL_BACK_PASS_DEPTH_FAIL():Int
+	{
+		return GL.STENCIL_BACK_PASS_DEPTH_FAIL;
+	}
+
+	@:noCompletion private inline function get_STENCIL_BACK_PASS_DEPTH_PASS():Int
+	{
+		return GL.STENCIL_BACK_PASS_DEPTH_PASS;
+	}
+
+	@:noCompletion private inline function get_STENCIL_BACK_REF():Int
+	{
+		return GL.STENCIL_BACK_REF;
+	}
+
+	@:noCompletion private inline function get_STENCIL_BACK_VALUE_MASK():Int
+	{
+		return GL.STENCIL_BACK_VALUE_MASK;
+	}
+
+	@:noCompletion private inline function get_STENCIL_BACK_WRITEMASK():Int
+	{
+		return GL.STENCIL_BACK_WRITEMASK;
+	}
+
+	@:noCompletion private inline function get_VIEWPORT():Int
+	{
+		return GL.VIEWPORT;
+	}
+
+	@:noCompletion private inline function get_SCISSOR_BOX():Int
+	{
+		return GL.SCISSOR_BOX;
+	}
+
+	@:noCompletion private inline function get_COLOR_CLEAR_VALUE():Int
+	{
+		return GL.COLOR_CLEAR_VALUE;
+	}
+
+	@:noCompletion private inline function get_COLOR_WRITEMASK():Int
+	{
+		return GL.COLOR_WRITEMASK;
+	}
+
+	@:noCompletion private inline function get_UNPACK_ALIGNMENT():Int
+	{
+		return GL.UNPACK_ALIGNMENT;
+	}
+
+	@:noCompletion private inline function get_PACK_ALIGNMENT():Int
+	{
+		return GL.PACK_ALIGNMENT;
+	}
+
+	@:noCompletion private inline function get_MAX_TEXTURE_SIZE():Int
+	{
+		return GL.MAX_TEXTURE_SIZE;
+	}
+
+	@:noCompletion private inline function get_MAX_VIEWPORT_DIMS():Int
+	{
+		return GL.MAX_VIEWPORT_DIMS;
+	}
+
+	@:noCompletion private inline function get_SUBPIXEL_BITS():Int
+	{
+		return GL.SUBPIXEL_BITS;
+	}
+
+	@:noCompletion private inline function get_RED_BITS():Int
+	{
+		return GL.RED_BITS;
+	}
+
+	@:noCompletion private inline function get_GREEN_BITS():Int
+	{
+		return GL.GREEN_BITS;
+	}
+
+	@:noCompletion private inline function get_BLUE_BITS():Int
+	{
+		return GL.BLUE_BITS;
+	}
+
+	@:noCompletion private inline function get_ALPHA_BITS():Int
+	{
+		return GL.ALPHA_BITS;
+	}
+
+	@:noCompletion private inline function get_DEPTH_BITS():Int
+	{
+		return GL.DEPTH_BITS;
+	}
+
+	@:noCompletion private inline function get_STENCIL_BITS():Int
+	{
+		return GL.STENCIL_BITS;
+	}
+
+	@:noCompletion private inline function get_POLYGON_OFFSET_UNITS():Int
+	{
+		return GL.POLYGON_OFFSET_UNITS;
+	}
+
+	@:noCompletion private inline function get_POLYGON_OFFSET_FACTOR():Int
+	{
+		return GL.POLYGON_OFFSET_FACTOR;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_BINDING_2D():Int
+	{
+		return GL.TEXTURE_BINDING_2D;
+	}
+
+	@:noCompletion private inline function get_SAMPLE_BUFFERS():Int
+	{
+		return GL.SAMPLE_BUFFERS;
+	}
+
+	@:noCompletion private inline function get_SAMPLES():Int
+	{
+		return GL.SAMPLES;
+	}
+
+	@:noCompletion private inline function get_SAMPLE_COVERAGE_VALUE():Int
+	{
+		return GL.SAMPLE_COVERAGE_VALUE;
+	}
+
+	@:noCompletion private inline function get_SAMPLE_COVERAGE_INVERT():Int
+	{
+		return GL.SAMPLE_COVERAGE_INVERT;
+	}
+
+	@:noCompletion private inline function get_NUM_COMPRESSED_TEXTURE_FORMATS():Int
+	{
+		return GL.NUM_COMPRESSED_TEXTURE_FORMATS;
+	}
+
+	@:noCompletion private inline function get_COMPRESSED_TEXTURE_FORMATS():Int
+	{
+		return GL.COMPRESSED_TEXTURE_FORMATS;
+	}
+
+	@:noCompletion private inline function get_DONT_CARE():Int
+	{
+		return GL.DONT_CARE;
+	}
+
+	@:noCompletion private inline function get_FASTEST():Int
+	{
+		return GL.FASTEST;
+	}
+
+	@:noCompletion private inline function get_NICEST():Int
+	{
+		return GL.NICEST;
+	}
+
+	@:noCompletion private inline function get_GENERATE_MIPMAP_HINT():Int
+	{
+		return GL.GENERATE_MIPMAP_HINT;
+	}
+
+	@:noCompletion private inline function get_BYTE():Int
+	{
+		return GL.BYTE;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_BYTE():Int
+	{
+		return GL.UNSIGNED_BYTE;
+	}
+
+	@:noCompletion private inline function get_SHORT():Int
+	{
+		return GL.SHORT;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_SHORT():Int
+	{
+		return GL.UNSIGNED_SHORT;
+	}
+
+	@:noCompletion private inline function get_INT():Int
+	{
+		return GL.INT;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT():Int
+	{
+		return GL.UNSIGNED_INT;
+	}
+
+	@:noCompletion private inline function get_FLOAT():Int
+	{
+		return GL.FLOAT;
+	}
+
+	@:noCompletion private inline function get_FIXED():Int
+	{
+		return GL.FIXED;
+	}
+
+	@:noCompletion private inline function get_DEPTH_COMPONENT():Int
+	{
+		return GL.DEPTH_COMPONENT;
+	}
+
+	@:noCompletion private inline function get_ALPHA():Int
+	{
+		return GL.ALPHA;
+	}
+
+	@:noCompletion private inline function get_RGB():Int
+	{
+		return GL.RGB;
+	}
+
+	@:noCompletion private inline function get_RGBA():Int
+	{
+		return GL.RGBA;
+	}
+
+	@:noCompletion private inline function get_LUMINANCE():Int
+	{
+		return GL.LUMINANCE;
+	}
+
+	@:noCompletion private inline function get_LUMINANCE_ALPHA():Int
+	{
+		return GL.LUMINANCE_ALPHA;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_SHORT_4_4_4_4():Int
+	{
+		return GL.UNSIGNED_SHORT_4_4_4_4;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_SHORT_5_5_5_1():Int
+	{
+		return GL.UNSIGNED_SHORT_5_5_5_1;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_SHORT_5_6_5():Int
+	{
+		return GL.UNSIGNED_SHORT_5_6_5;
+	}
+
+	@:noCompletion private inline function get_FRAGMENT_SHADER():Int
+	{
+		return GL.FRAGMENT_SHADER;
+	}
+
+	@:noCompletion private inline function get_VERTEX_SHADER():Int
+	{
+		return GL.VERTEX_SHADER;
+	}
+
+	@:noCompletion private inline function get_MAX_VERTEX_ATTRIBS():Int
+	{
+		return GL.MAX_VERTEX_ATTRIBS;
+	}
+
+	@:noCompletion private inline function get_MAX_VERTEX_UNIFORM_VECTORS():Int
+	{
+		return GL.MAX_VERTEX_UNIFORM_VECTORS;
+	}
+
+	@:noCompletion private inline function get_MAX_VARYING_VECTORS():Int
+	{
+		return GL.MAX_VARYING_VECTORS;
+	}
+
+	@:noCompletion private inline function get_MAX_COMBINED_TEXTURE_IMAGE_UNITS():Int
+	{
+		return GL.MAX_COMBINED_TEXTURE_IMAGE_UNITS;
+	}
+
+	@:noCompletion private inline function get_MAX_VERTEX_TEXTURE_IMAGE_UNITS():Int
+	{
+		return GL.MAX_VERTEX_TEXTURE_IMAGE_UNITS;
+	}
+
+	@:noCompletion private inline function get_MAX_TEXTURE_IMAGE_UNITS():Int
+	{
+		return GL.MAX_TEXTURE_IMAGE_UNITS;
+	}
+
+	@:noCompletion private inline function get_MAX_FRAGMENT_UNIFORM_VECTORS():Int
+	{
+		return GL.MAX_FRAGMENT_UNIFORM_VECTORS;
+	}
+
+	@:noCompletion private inline function get_SHADER_TYPE():Int
+	{
+		return GL.SHADER_TYPE;
+	}
+
+	@:noCompletion private inline function get_DELETE_STATUS():Int
+	{
+		return GL.DELETE_STATUS;
+	}
+
+	@:noCompletion private inline function get_LINK_STATUS():Int
+	{
+		return GL.LINK_STATUS;
+	}
+
+	@:noCompletion private inline function get_VALIDATE_STATUS():Int
+	{
+		return GL.VALIDATE_STATUS;
+	}
+
+	@:noCompletion private inline function get_ATTACHED_SHADERS():Int
+	{
+		return GL.ATTACHED_SHADERS;
+	}
+
+	@:noCompletion private inline function get_ACTIVE_UNIFORMS():Int
+	{
+		return GL.ACTIVE_UNIFORMS;
+	}
+
+	@:noCompletion private inline function get_ACTIVE_UNIFORMS_MAX_LENGTH():Int
+	{
+		return GL.ACTIVE_UNIFORMS_MAX_LENGTH;
+	}
+
+	@:noCompletion private inline function get_ACTIVE_ATTRIBUTES():Int
+	{
+		return GL.ACTIVE_ATTRIBUTES;
+	}
+
+	@:noCompletion private inline function get_ACTIVE_ATTRIBUTES_MAX_LENGTH():Int
+	{
+		return GL.ACTIVE_ATTRIBUTES_MAX_LENGTH;
+	}
+
+	@:noCompletion private inline function get_SHADING_LANGUAGE_VERSION():Int
+	{
+		return GL.SHADING_LANGUAGE_VERSION;
+	}
+
+	@:noCompletion private inline function get_CURRENT_PROGRAM():Int
+	{
+		return GL.CURRENT_PROGRAM;
+	}
+
+	@:noCompletion private inline function get_NEVER():Int
+	{
+		return GL.NEVER;
+	}
+
+	@:noCompletion private inline function get_LESS():Int
+	{
+		return GL.LESS;
+	}
+
+	@:noCompletion private inline function get_EQUAL():Int
+	{
+		return GL.EQUAL;
+	}
+
+	@:noCompletion private inline function get_LEQUAL():Int
+	{
+		return GL.LEQUAL;
+	}
+
+	@:noCompletion private inline function get_GREATER():Int
+	{
+		return GL.GREATER;
+	}
+
+	@:noCompletion private inline function get_NOTEQUAL():Int
+	{
+		return GL.NOTEQUAL;
+	}
+
+	@:noCompletion private inline function get_GEQUAL():Int
+	{
+		return GL.GEQUAL;
+	}
+
+	@:noCompletion private inline function get_ALWAYS():Int
+	{
+		return GL.ALWAYS;
+	}
+
+	@:noCompletion private inline function get_KEEP():Int
+	{
+		return GL.KEEP;
+	}
+
+	@:noCompletion private inline function get_REPLACE():Int
+	{
+		return GL.REPLACE;
+	}
+
+	@:noCompletion private inline function get_INCR():Int
+	{
+		return GL.INCR;
+	}
+
+	@:noCompletion private inline function get_DECR():Int
+	{
+		return GL.DECR;
+	}
+
+	@:noCompletion private inline function get_INVERT():Int
+	{
+		return GL.INVERT;
+	}
+
+	@:noCompletion private inline function get_INCR_WRAP():Int
+	{
+		return GL.INCR_WRAP;
+	}
+
+	@:noCompletion private inline function get_DECR_WRAP():Int
+	{
+		return GL.DECR_WRAP;
+	}
+
+	@:noCompletion private inline function get_VENDOR():Int
+	{
+		return GL.VENDOR;
+	}
+
+	@:noCompletion private inline function get_RENDERER():Int
+	{
+		return GL.RENDERER;
+	}
+
+	@:noCompletion private inline function get_VERSION():Int
+	{
+		return GL.VERSION;
+	}
+
+	@:noCompletion private inline function get_EXTENSIONS():Int
+	{
+		return GL.EXTENSIONS;
+	}
+
+	@:noCompletion private inline function get_NEAREST():Int
+	{
+		return GL.NEAREST;
+	}
+
+	@:noCompletion private inline function get_LINEAR():Int
+	{
+		return GL.LINEAR;
+	}
+
+	@:noCompletion private inline function get_NEAREST_MIPMAP_NEAREST():Int
+	{
+		return GL.NEAREST_MIPMAP_NEAREST;
+	}
+
+	@:noCompletion private inline function get_LINEAR_MIPMAP_NEAREST():Int
+	{
+		return GL.LINEAR_MIPMAP_NEAREST;
+	}
+
+	@:noCompletion private inline function get_NEAREST_MIPMAP_LINEAR():Int
+	{
+		return GL.NEAREST_MIPMAP_LINEAR;
+	}
+
+	@:noCompletion private inline function get_LINEAR_MIPMAP_LINEAR():Int
+	{
+		return GL.LINEAR_MIPMAP_LINEAR;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_MAG_FILTER():Int
+	{
+		return GL.TEXTURE_MAG_FILTER;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_MIN_FILTER():Int
+	{
+		return GL.TEXTURE_MIN_FILTER;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_WRAP_S():Int
+	{
+		return GL.TEXTURE_WRAP_S;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_WRAP_T():Int
+	{
+		return GL.TEXTURE_WRAP_T;
+	}
+
+	@:noCompletion private inline function get_TEXTURE():Int
+	{
+		return GL.TEXTURE;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_CUBE_MAP():Int
+	{
+		return GL.TEXTURE_CUBE_MAP;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_BINDING_CUBE_MAP():Int
+	{
+		return GL.TEXTURE_BINDING_CUBE_MAP;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_CUBE_MAP_POSITIVE_X():Int
+	{
+		return GL.TEXTURE_CUBE_MAP_POSITIVE_X;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_CUBE_MAP_NEGATIVE_X():Int
+	{
+		return GL.TEXTURE_CUBE_MAP_NEGATIVE_X;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_CUBE_MAP_POSITIVE_Y():Int
+	{
+		return GL.TEXTURE_CUBE_MAP_POSITIVE_Y;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_CUBE_MAP_NEGATIVE_Y():Int
+	{
+		return GL.TEXTURE_CUBE_MAP_NEGATIVE_Y;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_CUBE_MAP_POSITIVE_Z():Int
+	{
+		return GL.TEXTURE_CUBE_MAP_POSITIVE_Z;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_CUBE_MAP_NEGATIVE_Z():Int
+	{
+		return GL.TEXTURE_CUBE_MAP_NEGATIVE_Z;
+	}
+
+	@:noCompletion private inline function get_MAX_CUBE_MAP_TEXTURE_SIZE():Int
+	{
+		return GL.MAX_CUBE_MAP_TEXTURE_SIZE;
+	}
+
+	@:noCompletion private inline function get_TEXTURE0():Int
+	{
+		return GL.TEXTURE0;
+	}
+
+	@:noCompletion private inline function get_TEXTURE1():Int
+	{
+		return GL.TEXTURE1;
+	}
+
+	@:noCompletion private inline function get_TEXTURE2():Int
+	{
+		return GL.TEXTURE2;
+	}
+
+	@:noCompletion private inline function get_TEXTURE3():Int
+	{
+		return GL.TEXTURE3;
+	}
+
+	@:noCompletion private inline function get_TEXTURE4():Int
+	{
+		return GL.TEXTURE4;
+	}
+
+	@:noCompletion private inline function get_TEXTURE5():Int
+	{
+		return GL.TEXTURE5;
+	}
+
+	@:noCompletion private inline function get_TEXTURE6():Int
+	{
+		return GL.TEXTURE6;
+	}
+
+	@:noCompletion private inline function get_TEXTURE7():Int
+	{
+		return GL.TEXTURE7;
+	}
+
+	@:noCompletion private inline function get_TEXTURE8():Int
+	{
+		return GL.TEXTURE8;
+	}
+
+	@:noCompletion private inline function get_TEXTURE9():Int
+	{
+		return GL.TEXTURE9;
+	}
+
+	@:noCompletion private inline function get_TEXTURE10():Int
+	{
+		return GL.TEXTURE10;
+	}
+
+	@:noCompletion private inline function get_TEXTURE11():Int
+	{
+		return GL.TEXTURE11;
+	}
+
+	@:noCompletion private inline function get_TEXTURE12():Int
+	{
+		return GL.TEXTURE12;
+	}
+
+	@:noCompletion private inline function get_TEXTURE13():Int
+	{
+		return GL.TEXTURE13;
+	}
+
+	@:noCompletion private inline function get_TEXTURE14():Int
+	{
+		return GL.TEXTURE14;
+	}
+
+	@:noCompletion private inline function get_TEXTURE15():Int
+	{
+		return GL.TEXTURE15;
+	}
+
+	@:noCompletion private inline function get_TEXTURE16():Int
+	{
+		return GL.TEXTURE16;
+	}
+
+	@:noCompletion private inline function get_TEXTURE17():Int
+	{
+		return GL.TEXTURE17;
+	}
+
+	@:noCompletion private inline function get_TEXTURE18():Int
+	{
+		return GL.TEXTURE18;
+	}
+
+	@:noCompletion private inline function get_TEXTURE19():Int
+	{
+		return GL.TEXTURE19;
+	}
+
+	@:noCompletion private inline function get_TEXTURE20():Int
+	{
+		return GL.TEXTURE20;
+	}
+
+	@:noCompletion private inline function get_TEXTURE21():Int
+	{
+		return GL.TEXTURE21;
+	}
+
+	@:noCompletion private inline function get_TEXTURE22():Int
+	{
+		return GL.TEXTURE22;
+	}
+
+	@:noCompletion private inline function get_TEXTURE23():Int
+	{
+		return GL.TEXTURE23;
+	}
+
+	@:noCompletion private inline function get_TEXTURE24():Int
+	{
+		return GL.TEXTURE24;
+	}
+
+	@:noCompletion private inline function get_TEXTURE25():Int
+	{
+		return GL.TEXTURE25;
+	}
+
+	@:noCompletion private inline function get_TEXTURE26():Int
+	{
+		return GL.TEXTURE26;
+	}
+
+	@:noCompletion private inline function get_TEXTURE27():Int
+	{
+		return GL.TEXTURE27;
+	}
+
+	@:noCompletion private inline function get_TEXTURE28():Int
+	{
+		return GL.TEXTURE28;
+	}
+
+	@:noCompletion private inline function get_TEXTURE29():Int
+	{
+		return GL.TEXTURE29;
+	}
+
+	@:noCompletion private inline function get_TEXTURE30():Int
+	{
+		return GL.TEXTURE30;
+	}
+
+	@:noCompletion private inline function get_TEXTURE31():Int
+	{
+		return GL.TEXTURE31;
+	}
+
+	@:noCompletion private inline function get_ACTIVE_TEXTURE():Int
+	{
+		return GL.ACTIVE_TEXTURE;
+	}
+
+	@:noCompletion private inline function get_REPEAT():Int
+	{
+		return GL.REPEAT;
+	}
+
+	@:noCompletion private inline function get_CLAMP_TO_EDGE():Int
+	{
+		return GL.CLAMP_TO_EDGE;
+	}
+
+	@:noCompletion private inline function get_MIRRORED_REPEAT():Int
+	{
+		return GL.MIRRORED_REPEAT;
+	}
+
+	@:noCompletion private inline function get_FLOAT_VEC2():Int
+	{
+		return GL.FLOAT_VEC2;
+	}
+
+	@:noCompletion private inline function get_FLOAT_VEC3():Int
+	{
+		return GL.FLOAT_VEC3;
+	}
+
+	@:noCompletion private inline function get_FLOAT_VEC4():Int
+	{
+		return GL.FLOAT_VEC4;
+	}
+
+	@:noCompletion private inline function get_INT_VEC2():Int
+	{
+		return GL.INT_VEC2;
+	}
+
+	@:noCompletion private inline function get_INT_VEC3():Int
+	{
+		return GL.INT_VEC3;
+	}
+
+	@:noCompletion private inline function get_INT_VEC4():Int
+	{
+		return GL.INT_VEC4;
+	}
+
+	@:noCompletion private inline function get_BOOL():Int
+	{
+		return GL.BOOL;
+	}
+
+	@:noCompletion private inline function get_BOOL_VEC2():Int
+	{
+		return GL.BOOL_VEC2;
+	}
+
+	@:noCompletion private inline function get_BOOL_VEC3():Int
+	{
+		return GL.BOOL_VEC3;
+	}
+
+	@:noCompletion private inline function get_BOOL_VEC4():Int
+	{
+		return GL.BOOL_VEC4;
+	}
+
+	@:noCompletion private inline function get_FLOAT_MAT2():Int
+	{
+		return GL.FLOAT_MAT2;
+	}
+
+	@:noCompletion private inline function get_FLOAT_MAT3():Int
+	{
+		return GL.FLOAT_MAT3;
+	}
+
+	@:noCompletion private inline function get_FLOAT_MAT4():Int
+	{
+		return GL.FLOAT_MAT4;
+	}
+
+	@:noCompletion private inline function get_SAMPLER_2D():Int
+	{
+		return GL.SAMPLER_2D;
+	}
+
+	@:noCompletion private inline function get_SAMPLER_CUBE():Int
+	{
+		return GL.SAMPLER_CUBE;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_ARRAY_ENABLED():Int
+	{
+		return GL.VERTEX_ATTRIB_ARRAY_ENABLED;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_ARRAY_SIZE():Int
+	{
+		return GL.VERTEX_ATTRIB_ARRAY_SIZE;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_ARRAY_STRIDE():Int
+	{
+		return GL.VERTEX_ATTRIB_ARRAY_STRIDE;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_ARRAY_TYPE():Int
+	{
+		return GL.VERTEX_ATTRIB_ARRAY_TYPE;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_ARRAY_NORMALIZED():Int
+	{
+		return GL.VERTEX_ATTRIB_ARRAY_NORMALIZED;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_ARRAY_POINTER():Int
+	{
+		return GL.VERTEX_ATTRIB_ARRAY_POINTER;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING():Int
+	{
+		return GL.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_IMPLEMENTATION_COLOR_READ_TYPE():Int
+	{
+		return GL.IMPLEMENTATION_COLOR_READ_TYPE;
+	}
+
+	@:noCompletion private inline function get_IMPLEMENTATION_COLOR_READ_FORMAT():Int
+	{
+		return GL.IMPLEMENTATION_COLOR_READ_FORMAT;
+	}
+
+	@:noCompletion private inline function get_VERTEX_PROGRAM_POINT_SIZE():Int
+	{
+		return GL.VERTEX_PROGRAM_POINT_SIZE;
+	}
+
+	@:noCompletion private inline function get_POINT_SPRITE():Int
+	{
+		return GL.POINT_SPRITE;
+	}
+
+	@:noCompletion private inline function get_COMPILE_STATUS():Int
+	{
+		return GL.COMPILE_STATUS;
+	}
+
+	@:noCompletion private inline function get_INFO_LOG_LENGTH():Int
+	{
+		return GL.INFO_LOG_LENGTH;
+	}
+
+	@:noCompletion private inline function get_SHADER_SOURCE_LENGTH():Int
+	{
+		return GL.SHADER_SOURCE_LENGTH;
+	}
+
+	@:noCompletion private inline function get_SHADER_COMPILER():Int
+	{
+		return GL.SHADER_COMPILER;
+	}
+
+	@:noCompletion private inline function get_SHADER_BINARY_FORMATS():Int
+	{
+		return GL.SHADER_BINARY_FORMATS;
+	}
+
+	@:noCompletion private inline function get_NUM_SHADER_BINARY_FORMATS():Int
+	{
+		return GL.NUM_SHADER_BINARY_FORMATS;
+	}
+
+	@:noCompletion private inline function get_LOW_FLOAT():Int
+	{
+		return GL.LOW_FLOAT;
+	}
+
+	@:noCompletion private inline function get_MEDIUM_FLOAT():Int
+	{
+		return GL.MEDIUM_FLOAT;
+	}
+
+	@:noCompletion private inline function get_HIGH_FLOAT():Int
+	{
+		return GL.HIGH_FLOAT;
+	}
+
+	@:noCompletion private inline function get_LOW_INT():Int
+	{
+		return GL.LOW_INT;
+	}
+
+	@:noCompletion private inline function get_MEDIUM_INT():Int
+	{
+		return GL.MEDIUM_INT;
+	}
+
+	@:noCompletion private inline function get_HIGH_INT():Int
+	{
+		return GL.HIGH_INT;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER():Int
+	{
+		return GL.FRAMEBUFFER;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER():Int
+	{
+		return GL.RENDERBUFFER;
+	}
+
+	@:noCompletion private inline function get_RGBA4():Int
+	{
+		return GL.RGBA4;
+	}
+
+	@:noCompletion private inline function get_RGB5_A1():Int
+	{
+		return GL.RGB5_A1;
+	}
+
+	@:noCompletion private inline function get_RGB565():Int
+	{
+		return GL.RGB565;
+	}
+
+	@:noCompletion private inline function get_DEPTH_COMPONENT16():Int
+	{
+		return GL.DEPTH_COMPONENT16;
+	}
+
+	@:noCompletion private inline function get_STENCIL_INDEX():Int
+	{
+		return GL.STENCIL_INDEX;
+	}
+
+	@:noCompletion private inline function get_STENCIL_INDEX8():Int
+	{
+		return GL.STENCIL_INDEX8;
+	}
+
+	@:noCompletion private inline function get_DEPTH_STENCIL():Int
+	{
+		return GL.DEPTH_STENCIL;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_WIDTH():Int
+	{
+		return GL.RENDERBUFFER_WIDTH;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_HEIGHT():Int
+	{
+		return GL.RENDERBUFFER_HEIGHT;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_INTERNAL_FORMAT():Int
+	{
+		return GL.RENDERBUFFER_INTERNAL_FORMAT;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_RED_SIZE():Int
+	{
+		return GL.RENDERBUFFER_RED_SIZE;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_GREEN_SIZE():Int
+	{
+		return GL.RENDERBUFFER_GREEN_SIZE;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_BLUE_SIZE():Int
+	{
+		return GL.RENDERBUFFER_BLUE_SIZE;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_ALPHA_SIZE():Int
+	{
+		return GL.RENDERBUFFER_ALPHA_SIZE;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_DEPTH_SIZE():Int
+	{
+		return GL.RENDERBUFFER_DEPTH_SIZE;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_STENCIL_SIZE():Int
+	{
+		return GL.RENDERBUFFER_STENCIL_SIZE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT0():Int
+	{
+		return GL.COLOR_ATTACHMENT0;
+	}
+
+	@:noCompletion private inline function get_DEPTH_ATTACHMENT():Int
+	{
+		return GL.DEPTH_ATTACHMENT;
+	}
+
+	@:noCompletion private inline function get_STENCIL_ATTACHMENT():Int
+	{
+		return GL.STENCIL_ATTACHMENT;
+	}
+
+	@:noCompletion private inline function get_DEPTH_STENCIL_ATTACHMENT():Int
+	{
+		return GL.DEPTH_STENCIL_ATTACHMENT;
+	}
+
+	@:noCompletion private inline function get_NONE():Int
+	{
+		return GL.NONE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_COMPLETE():Int
+	{
+		return GL.FRAMEBUFFER_COMPLETE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_INCOMPLETE_ATTACHMENT():Int
+	{
+		return GL.FRAMEBUFFER_INCOMPLETE_ATTACHMENT;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT():Int
+	{
+		return GL.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_INCOMPLETE_DIMENSIONS():Int
+	{
+		return GL.FRAMEBUFFER_INCOMPLETE_DIMENSIONS;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_UNSUPPORTED():Int
+	{
+		return GL.FRAMEBUFFER_UNSUPPORTED;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_BINDING():Int
+	{
+		return GL.FRAMEBUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_BINDING():Int
+	{
+		return GL.RENDERBUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_MAX_RENDERBUFFER_SIZE():Int
+	{
+		return GL.MAX_RENDERBUFFER_SIZE;
+	}
+
+	@:noCompletion private inline function get_INVALID_FRAMEBUFFER_OPERATION():Int
+	{
+		return GL.INVALID_FRAMEBUFFER_OPERATION;
+	}
+
+	@:noCompletion private inline function get_READ_BUFFER():Int
+	{
+		return GL.READ_BUFFER;
+	}
+
+	@:noCompletion private inline function get_UNPACK_ROW_LENGTH():Int
+	{
+		return GL.UNPACK_ROW_LENGTH;
+	}
+
+	@:noCompletion private inline function get_UNPACK_SKIP_ROWS():Int
+	{
+		return GL.UNPACK_SKIP_ROWS;
+	}
+
+	@:noCompletion private inline function get_UNPACK_SKIP_PIXELS():Int
+	{
+		return GL.UNPACK_SKIP_PIXELS;
+	}
+
+	@:noCompletion private inline function get_PACK_ROW_LENGTH():Int
+	{
+		return GL.PACK_ROW_LENGTH;
+	}
+
+	@:noCompletion private inline function get_PACK_SKIP_ROWS():Int
+	{
+		return GL.PACK_SKIP_ROWS;
+	}
+
+	@:noCompletion private inline function get_PACK_SKIP_PIXELS():Int
+	{
+		return GL.PACK_SKIP_PIXELS;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_BINDING_3D():Int
+	{
+		return GL.TEXTURE_BINDING_3D;
+	}
+
+	@:noCompletion private inline function get_UNPACK_SKIP_IMAGES():Int
+	{
+		return GL.UNPACK_SKIP_IMAGES;
+	}
+
+	@:noCompletion private inline function get_UNPACK_IMAGE_HEIGHT():Int
+	{
+		return GL.UNPACK_IMAGE_HEIGHT;
+	}
+
+	@:noCompletion private inline function get_MAX_3D_TEXTURE_SIZE():Int
+	{
+		return GL.MAX_3D_TEXTURE_SIZE;
+	}
+
+	@:noCompletion private inline function get_MAX_ELEMENTS_VERTICES():Int
+	{
+		return GL.MAX_ELEMENTS_VERTICES;
+	}
+
+	@:noCompletion private inline function get_MAX_ELEMENTS_INDICES():Int
+	{
+		return GL.MAX_ELEMENTS_INDICES;
+	}
+
+	@:noCompletion private inline function get_MAX_TEXTURE_LOD_BIAS():Int
+	{
+		return GL.MAX_TEXTURE_LOD_BIAS;
+	}
+
+	@:noCompletion private inline function get_MAX_FRAGMENT_UNIFORM_COMPONENTS():Int
+	{
+		return GL.MAX_FRAGMENT_UNIFORM_COMPONENTS;
+	}
+
+	@:noCompletion private inline function get_MAX_VERTEX_UNIFORM_COMPONENTS():Int
+	{
+		return GL.MAX_VERTEX_UNIFORM_COMPONENTS;
+	}
+
+	@:noCompletion private inline function get_MAX_ARRAY_TEXTURE_LAYERS():Int
+	{
+		return GL.MAX_ARRAY_TEXTURE_LAYERS;
+	}
+
+	@:noCompletion private inline function get_MIN_PROGRAM_TEXEL_OFFSET():Int
+	{
+		return GL.MIN_PROGRAM_TEXEL_OFFSET;
+	}
+
+	@:noCompletion private inline function get_MAX_PROGRAM_TEXEL_OFFSET():Int
+	{
+		return GL.MAX_PROGRAM_TEXEL_OFFSET;
+	}
+
+	@:noCompletion private inline function get_MAX_VARYING_COMPONENTS():Int
+	{
+		return GL.MAX_VARYING_COMPONENTS;
+	}
+
+	@:noCompletion private inline function get_FRAGMENT_SHADER_DERIVATIVE_HINT():Int
+	{
+		return GL.FRAGMENT_SHADER_DERIVATIVE_HINT;
+	}
+
+	@:noCompletion private inline function get_RASTERIZER_DISCARD():Int
+	{
+		return GL.RASTERIZER_DISCARD;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ARRAY_BINDING():Int
+	{
+		return GL.VERTEX_ARRAY_BINDING;
+	}
+
+	@:noCompletion private inline function get_MAX_VERTEX_OUTPUT_COMPONENTS():Int
+	{
+		return GL.MAX_VERTEX_OUTPUT_COMPONENTS;
+	}
+
+	@:noCompletion private inline function get_MAX_FRAGMENT_INPUT_COMPONENTS():Int
+	{
+		return GL.MAX_FRAGMENT_INPUT_COMPONENTS;
+	}
+
+	@:noCompletion private inline function get_MAX_SERVER_WAIT_TIMEOUT():Int
+	{
+		return GL.MAX_SERVER_WAIT_TIMEOUT;
+	}
+
+	@:noCompletion private inline function get_MAX_ELEMENT_INDEX():Int
+	{
+		return GL.MAX_ELEMENT_INDEX;
+	}
+
+	@:noCompletion private inline function get_RED():Int
+	{
+		return GL.RED;
+	}
+
+	@:noCompletion private inline function get_RGB8():Int
+	{
+		return GL.RGB8;
+	}
+
+	@:noCompletion private inline function get_RGBA8():Int
+	{
+		return GL.RGBA8;
+	}
+
+	@:noCompletion private inline function get_RGB10_A2():Int
+	{
+		return GL.RGB10_A2;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_3D():Int
+	{
+		return GL.TEXTURE_3D;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_WRAP_R():Int
+	{
+		return GL.TEXTURE_WRAP_R;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_MIN_LOD():Int
+	{
+		return GL.TEXTURE_MIN_LOD;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_MAX_LOD():Int
+	{
+		return GL.TEXTURE_MAX_LOD;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_BASE_LEVEL():Int
+	{
+		return GL.TEXTURE_BASE_LEVEL;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_MAX_LEVEL():Int
+	{
+		return GL.TEXTURE_MAX_LEVEL;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_COMPARE_MODE():Int
+	{
+		return GL.TEXTURE_COMPARE_MODE;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_COMPARE_FUNC():Int
+	{
+		return GL.TEXTURE_COMPARE_FUNC;
+	}
+
+	@:noCompletion private inline function get_SRGB():Int
+	{
+		return GL.SRGB;
+	}
+
+	@:noCompletion private inline function get_SRGB8():Int
+	{
+		return GL.SRGB8;
+	}
+
+	@:noCompletion private inline function get_SRGB8_ALPHA8():Int
+	{
+		return GL.SRGB8_ALPHA8;
+	}
+
+	@:noCompletion private inline function get_COMPARE_REF_TO_TEXTURE():Int
+	{
+		return GL.COMPARE_REF_TO_TEXTURE;
+	}
+
+	@:noCompletion private inline function get_RGBA32F():Int
+	{
+		return GL.RGBA32F;
+	}
+
+	@:noCompletion private inline function get_RGB32F():Int
+	{
+		return GL.RGB32F;
+	}
+
+	@:noCompletion private inline function get_RGBA16F():Int
+	{
+		return GL.RGBA16F;
+	}
+
+	@:noCompletion private inline function get_RGB16F():Int
+	{
+		return GL.RGB16F;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_2D_ARRAY():Int
+	{
+		return GL.TEXTURE_2D_ARRAY;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_BINDING_2D_ARRAY():Int
+	{
+		return GL.TEXTURE_BINDING_2D_ARRAY;
+	}
+
+	@:noCompletion private inline function get_R11F_G11F_B10F():Int
+	{
+		return GL.R11F_G11F_B10F;
+	}
+
+	@:noCompletion private inline function get_RGB9_E5():Int
+	{
+		return GL.RGB9_E5;
+	}
+
+	@:noCompletion private inline function get_RGBA32UI():Int
+	{
+		return GL.RGBA32UI;
+	}
+
+	@:noCompletion private inline function get_RGB32UI():Int
+	{
+		return GL.RGB32UI;
+	}
+
+	@:noCompletion private inline function get_RGBA16UI():Int
+	{
+		return GL.RGBA16UI;
+	}
+
+	@:noCompletion private inline function get_RGB16UI():Int
+	{
+		return GL.RGB16UI;
+	}
+
+	@:noCompletion private inline function get_RGBA8UI():Int
+	{
+		return GL.RGBA8UI;
+	}
+
+	@:noCompletion private inline function get_RGB8UI():Int
+	{
+		return GL.RGB8UI;
+	}
+
+	@:noCompletion private inline function get_RGBA32I():Int
+	{
+		return GL.RGBA32I;
+	}
+
+	@:noCompletion private inline function get_RGB32I():Int
+	{
+		return GL.RGB32I;
+	}
+
+	@:noCompletion private inline function get_RGBA16I():Int
+	{
+		return GL.RGBA16I;
+	}
+
+	@:noCompletion private inline function get_RGB16I():Int
+	{
+		return GL.RGB16I;
+	}
+
+	@:noCompletion private inline function get_RGBA8I():Int
+	{
+		return GL.RGBA8I;
+	}
+
+	@:noCompletion private inline function get_RGB8I():Int
+	{
+		return GL.RGB8I;
+	}
+
+	@:noCompletion private inline function get_RED_INTEGER():Int
+	{
+		return GL.RED_INTEGER;
+	}
+
+	@:noCompletion private inline function get_RGB_INTEGER():Int
+	{
+		return GL.RGB_INTEGER;
+	}
+
+	@:noCompletion private inline function get_RGBA_INTEGER():Int
+	{
+		return GL.RGBA_INTEGER;
+	}
+
+	@:noCompletion private inline function get_R8():Int
+	{
+		return GL.R8;
+	}
+
+	@:noCompletion private inline function get_RG8():Int
+	{
+		return GL.RG8;
+	}
+
+	@:noCompletion private inline function get_R16F():Int
+	{
+		return GL.R16F;
+	}
+
+	@:noCompletion private inline function get_R32F():Int
+	{
+		return GL.R32F;
+	}
+
+	@:noCompletion private inline function get_RG16F():Int
+	{
+		return GL.RG16F;
+	}
+
+	@:noCompletion private inline function get_RG32F():Int
+	{
+		return GL.RG32F;
+	}
+
+	@:noCompletion private inline function get_R8I():Int
+	{
+		return GL.R8I;
+	}
+
+	@:noCompletion private inline function get_R8UI():Int
+	{
+		return GL.R8UI;
+	}
+
+	@:noCompletion private inline function get_R16I():Int
+	{
+		return GL.R16I;
+	}
+
+	@:noCompletion private inline function get_R16UI():Int
+	{
+		return GL.R16UI;
+	}
+
+	@:noCompletion private inline function get_R32I():Int
+	{
+		return GL.R32I;
+	}
+
+	@:noCompletion private inline function get_R32UI():Int
+	{
+		return GL.R32UI;
+	}
+
+	@:noCompletion private inline function get_RG8I():Int
+	{
+		return GL.RG8I;
+	}
+
+	@:noCompletion private inline function get_RG8UI():Int
+	{
+		return GL.RG8UI;
+	}
+
+	@:noCompletion private inline function get_RG16I():Int
+	{
+		return GL.RG16I;
+	}
+
+	@:noCompletion private inline function get_RG16UI():Int
+	{
+		return GL.RG16UI;
+	}
+
+	@:noCompletion private inline function get_RG32I():Int
+	{
+		return GL.RG32I;
+	}
+
+	@:noCompletion private inline function get_RG32UI():Int
+	{
+		return GL.RG32UI;
+	}
+
+	@:noCompletion private inline function get_R8_SNORM():Int
+	{
+		return GL.R8_SNORM;
+	}
+
+	@:noCompletion private inline function get_RG8_SNORM():Int
+	{
+		return GL.RG8_SNORM;
+	}
+
+	@:noCompletion private inline function get_RGB8_SNORM():Int
+	{
+		return GL.RGB8_SNORM;
+	}
+
+	@:noCompletion private inline function get_RGBA8_SNORM():Int
+	{
+		return GL.RGBA8_SNORM;
+	}
+
+	@:noCompletion private inline function get_RGB10_A2UI():Int
+	{
+		return GL.RGB10_A2UI;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_IMMUTABLE_FORMAT():Int
+	{
+		return GL.TEXTURE_IMMUTABLE_FORMAT;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_IMMUTABLE_LEVELS():Int
+	{
+		return GL.TEXTURE_IMMUTABLE_LEVELS;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_2_10_10_10_REV():Int
+	{
+		return GL.UNSIGNED_INT_2_10_10_10_REV;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_10F_11F_11F_REV():Int
+	{
+		return GL.UNSIGNED_INT_10F_11F_11F_REV;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_5_9_9_9_REV():Int
+	{
+		return GL.UNSIGNED_INT_5_9_9_9_REV;
+	}
+
+	@:noCompletion private inline function get_FLOAT_32_UNSIGNED_INT_24_8_REV():Int
+	{
+		return GL.FLOAT_32_UNSIGNED_INT_24_8_REV;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_24_8():Int
+	{
+		return GL.UNSIGNED_INT_24_8;
+	}
+
+	@:noCompletion private inline function get_HALF_FLOAT():Int
+	{
+		return GL.HALF_FLOAT;
+	}
+
+	@:noCompletion private inline function get_RG():Int
+	{
+		return GL.RG;
+	}
+
+	@:noCompletion private inline function get_RG_INTEGER():Int
+	{
+		return GL.RG_INTEGER;
+	}
+
+	@:noCompletion private inline function get_INT_2_10_10_10_REV():Int
+	{
+		return GL.INT_2_10_10_10_REV;
+	}
+
+	@:noCompletion private inline function get_CURRENT_QUERY():Int
+	{
+		return GL.CURRENT_QUERY;
+	}
+
+	@:noCompletion private inline function get_QUERY_RESULT():Int
+	{
+		return GL.QUERY_RESULT;
+	}
+
+	@:noCompletion private inline function get_QUERY_RESULT_AVAILABLE():Int
+	{
+		return GL.QUERY_RESULT_AVAILABLE;
+	}
+
+	@:noCompletion private inline function get_ANY_SAMPLES_PASSED():Int
+	{
+		return GL.ANY_SAMPLES_PASSED;
+	}
+
+	@:noCompletion private inline function get_ANY_SAMPLES_PASSED_CONSERVATIVE():Int
+	{
+		return GL.ANY_SAMPLES_PASSED_CONSERVATIVE;
+	}
+
+	@:noCompletion private inline function get_MAX_DRAW_BUFFERS():Int
+	{
+		return GL.MAX_DRAW_BUFFERS;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER0():Int
+	{
+		return GL.DRAW_BUFFER0;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER1():Int
+	{
+		return GL.DRAW_BUFFER1;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER2():Int
+	{
+		return GL.DRAW_BUFFER2;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER3():Int
+	{
+		return GL.DRAW_BUFFER3;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER4():Int
+	{
+		return GL.DRAW_BUFFER4;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER5():Int
+	{
+		return GL.DRAW_BUFFER5;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER6():Int
+	{
+		return GL.DRAW_BUFFER6;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER7():Int
+	{
+		return GL.DRAW_BUFFER7;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER8():Int
+	{
+		return GL.DRAW_BUFFER8;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER9():Int
+	{
+		return GL.DRAW_BUFFER9;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER10():Int
+	{
+		return GL.DRAW_BUFFER10;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER11():Int
+	{
+		return GL.DRAW_BUFFER11;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER12():Int
+	{
+		return GL.DRAW_BUFFER12;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER13():Int
+	{
+		return GL.DRAW_BUFFER13;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER14():Int
+	{
+		return GL.DRAW_BUFFER14;
+	}
+
+	@:noCompletion private inline function get_DRAW_BUFFER15():Int
+	{
+		return GL.DRAW_BUFFER15;
+	}
+
+	@:noCompletion private inline function get_MAX_COLOR_ATTACHMENTS():Int
+	{
+		return GL.MAX_COLOR_ATTACHMENTS;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT1():Int
+	{
+		return GL.COLOR_ATTACHMENT1;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT2():Int
+	{
+		return GL.COLOR_ATTACHMENT2;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT3():Int
+	{
+		return GL.COLOR_ATTACHMENT3;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT4():Int
+	{
+		return GL.COLOR_ATTACHMENT4;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT5():Int
+	{
+		return GL.COLOR_ATTACHMENT5;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT6():Int
+	{
+		return GL.COLOR_ATTACHMENT6;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT7():Int
+	{
+		return GL.COLOR_ATTACHMENT7;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT8():Int
+	{
+		return GL.COLOR_ATTACHMENT8;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT9():Int
+	{
+		return GL.COLOR_ATTACHMENT9;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT10():Int
+	{
+		return GL.COLOR_ATTACHMENT10;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT11():Int
+	{
+		return GL.COLOR_ATTACHMENT11;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT12():Int
+	{
+		return GL.COLOR_ATTACHMENT12;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT13():Int
+	{
+		return GL.COLOR_ATTACHMENT13;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT14():Int
+	{
+		return GL.COLOR_ATTACHMENT14;
+	}
+
+	@:noCompletion private inline function get_COLOR_ATTACHMENT15():Int
+	{
+		return GL.COLOR_ATTACHMENT15;
+	}
+
+	@:noCompletion private inline function get_SAMPLER_3D():Int
+	{
+		return GL.SAMPLER_3D;
+	}
+
+	@:noCompletion private inline function get_SAMPLER_2D_SHADOW():Int
+	{
+		return GL.SAMPLER_2D_SHADOW;
+	}
+
+	@:noCompletion private inline function get_SAMPLER_2D_ARRAY():Int
+	{
+		return GL.SAMPLER_2D_ARRAY;
+	}
+
+	@:noCompletion private inline function get_SAMPLER_2D_ARRAY_SHADOW():Int
+	{
+		return GL.SAMPLER_2D_ARRAY_SHADOW;
+	}
+
+	@:noCompletion private inline function get_SAMPLER_CUBE_SHADOW():Int
+	{
+		return GL.SAMPLER_CUBE_SHADOW;
+	}
+
+	@:noCompletion private inline function get_INT_SAMPLER_2D():Int
+	{
+		return GL.INT_SAMPLER_2D;
+	}
+
+	@:noCompletion private inline function get_INT_SAMPLER_3D():Int
+	{
+		return GL.INT_SAMPLER_3D;
+	}
+
+	@:noCompletion private inline function get_INT_SAMPLER_CUBE():Int
+	{
+		return GL.INT_SAMPLER_CUBE;
+	}
+
+	@:noCompletion private inline function get_INT_SAMPLER_2D_ARRAY():Int
+	{
+		return GL.INT_SAMPLER_2D_ARRAY;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_SAMPLER_2D():Int
+	{
+		return GL.UNSIGNED_INT_SAMPLER_2D;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_SAMPLER_3D():Int
+	{
+		return GL.UNSIGNED_INT_SAMPLER_3D;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_SAMPLER_CUBE():Int
+	{
+		return GL.UNSIGNED_INT_SAMPLER_CUBE;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_SAMPLER_2D_ARRAY():Int
+	{
+		return GL.UNSIGNED_INT_SAMPLER_2D_ARRAY;
+	}
+
+	@:noCompletion private inline function get_MAX_SAMPLES():Int
+	{
+		return GL.MAX_SAMPLES;
+	}
+
+	@:noCompletion private inline function get_SAMPLER_BINDING():Int
+	{
+		return GL.SAMPLER_BINDING;
+	}
+
+	@:noCompletion private inline function get_PIXEL_PACK_BUFFER():Int
+	{
+		return GL.PIXEL_PACK_BUFFER;
+	}
+
+	@:noCompletion private inline function get_PIXEL_UNPACK_BUFFER():Int
+	{
+		return GL.PIXEL_UNPACK_BUFFER;
+	}
+
+	@:noCompletion private inline function get_PIXEL_PACK_BUFFER_BINDING():Int
+	{
+		return GL.PIXEL_PACK_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_PIXEL_UNPACK_BUFFER_BINDING():Int
+	{
+		return GL.PIXEL_UNPACK_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_COPY_READ_BUFFER():Int
+	{
+		return GL.COPY_READ_BUFFER;
+	}
+
+	@:noCompletion private inline function get_COPY_WRITE_BUFFER():Int
+	{
+		return GL.COPY_WRITE_BUFFER;
+	}
+
+	@:noCompletion private inline function get_COPY_READ_BUFFER_BINDING():Int
+	{
+		return GL.COPY_READ_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_COPY_WRITE_BUFFER_BINDING():Int
+	{
+		return GL.COPY_WRITE_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_VEC2():Int
+	{
+		return GL.UNSIGNED_INT_VEC2;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_VEC3():Int
+	{
+		return GL.UNSIGNED_INT_VEC3;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_INT_VEC4():Int
+	{
+		return GL.UNSIGNED_INT_VEC4;
+	}
+
+	@:noCompletion private inline function get_UNSIGNED_NORMALIZED():Int
+	{
+		return GL.UNSIGNED_NORMALIZED;
+	}
+
+	@:noCompletion private inline function get_SIGNED_NORMALIZED():Int
+	{
+		return GL.SIGNED_NORMALIZED;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_ARRAY_INTEGER():Int
+	{
+		return GL.VERTEX_ATTRIB_ARRAY_INTEGER;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_ARRAY_DIVISOR():Int
+	{
+		return GL.VERTEX_ATTRIB_ARRAY_DIVISOR;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_BUFFER_MODE():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_BUFFER_MODE;
+	}
+
+	@:noCompletion private inline function get_MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS():Int
+	{
+		return GL.MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_VARYINGS():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_VARYINGS;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_BUFFER_START():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_BUFFER_START;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_BUFFER_SIZE():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_BUFFER_SIZE;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN;
+	}
+
+	@:noCompletion private inline function get_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS():Int
+	{
+		return GL.MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS;
+	}
+
+	@:noCompletion private inline function get_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS():Int
+	{
+		return GL.MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS;
+	}
+
+	@:noCompletion private inline function get_INTERLEAVED_ATTRIBS():Int
+	{
+		return GL.INTERLEAVED_ATTRIBS;
+	}
+
+	@:noCompletion private inline function get_SEPARATE_ATTRIBS():Int
+	{
+		return GL.SEPARATE_ATTRIBS;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_BUFFER():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_BUFFER;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_BUFFER_BINDING():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK():Int
+	{
+		return GL.TRANSFORM_FEEDBACK;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_PAUSED():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_PAUSED;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_ACTIVE():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_ACTIVE;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_BINDING():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_BINDING;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_RED_SIZE():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_RED_SIZE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_GREEN_SIZE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_BLUE_SIZE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_DEFAULT():Int
+	{
+		return GL.FRAMEBUFFER_DEFAULT;
+	}
+
+	@:noCompletion private inline function get_DEPTH24_STENCIL8():Int
+	{
+		return GL.DEPTH24_STENCIL8;
+	}
+
+	@:noCompletion private inline function get_DRAW_FRAMEBUFFER_BINDING():Int
+	{
+		return GL.DRAW_FRAMEBUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_READ_FRAMEBUFFER():Int
+	{
+		return GL.READ_FRAMEBUFFER;
+	}
+
+	@:noCompletion private inline function get_DRAW_FRAMEBUFFER():Int
+	{
+		return GL.DRAW_FRAMEBUFFER;
+	}
+
+	@:noCompletion private inline function get_READ_FRAMEBUFFER_BINDING():Int
+	{
+		return GL.READ_FRAMEBUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_RENDERBUFFER_SAMPLES():Int
+	{
+		return GL.RENDERBUFFER_SAMPLES;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER():Int
+	{
+		return GL.FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE():Int
+	{
+		return GL.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BUFFER():Int
+	{
+		return GL.UNIFORM_BUFFER;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BUFFER_BINDING():Int
+	{
+		return GL.UNIFORM_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BUFFER_START():Int
+	{
+		return GL.UNIFORM_BUFFER_START;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BUFFER_SIZE():Int
+	{
+		return GL.UNIFORM_BUFFER_SIZE;
+	}
+
+	@:noCompletion private inline function get_MAX_VERTEX_UNIFORM_BLOCKS():Int
+	{
+		return GL.MAX_VERTEX_UNIFORM_BLOCKS;
+	}
+
+	@:noCompletion private inline function get_MAX_FRAGMENT_UNIFORM_BLOCKS():Int
+	{
+		return GL.MAX_FRAGMENT_UNIFORM_BLOCKS;
+	}
+
+	@:noCompletion private inline function get_MAX_COMBINED_UNIFORM_BLOCKS():Int
+	{
+		return GL.MAX_COMBINED_UNIFORM_BLOCKS;
+	}
+
+	@:noCompletion private inline function get_MAX_UNIFORM_BUFFER_BINDINGS():Int
+	{
+		return GL.MAX_UNIFORM_BUFFER_BINDINGS;
+	}
+
+	@:noCompletion private inline function get_MAX_UNIFORM_BLOCK_SIZE():Int
+	{
+		return GL.MAX_UNIFORM_BLOCK_SIZE;
+	}
+
+	@:noCompletion private inline function get_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS():Int
+	{
+		return GL.MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS;
+	}
+
+	@:noCompletion private inline function get_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS():Int
+	{
+		return GL.MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BUFFER_OFFSET_ALIGNMENT():Int
+	{
+		return GL.UNIFORM_BUFFER_OFFSET_ALIGNMENT;
+	}
+
+	@:noCompletion private inline function get_ACTIVE_UNIFORM_BLOCKS():Int
+	{
+		return GL.ACTIVE_UNIFORM_BLOCKS;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_TYPE():Int
+	{
+		return GL.UNIFORM_TYPE;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_SIZE():Int
+	{
+		return GL.UNIFORM_SIZE;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BLOCK_INDEX():Int
+	{
+		return GL.UNIFORM_BLOCK_INDEX;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_OFFSET():Int
+	{
+		return GL.UNIFORM_OFFSET;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_ARRAY_STRIDE():Int
+	{
+		return GL.UNIFORM_ARRAY_STRIDE;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_MATRIX_STRIDE():Int
+	{
+		return GL.UNIFORM_MATRIX_STRIDE;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_IS_ROW_MAJOR():Int
+	{
+		return GL.UNIFORM_IS_ROW_MAJOR;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BLOCK_BINDING():Int
+	{
+		return GL.UNIFORM_BLOCK_BINDING;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BLOCK_DATA_SIZE():Int
+	{
+		return GL.UNIFORM_BLOCK_DATA_SIZE;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BLOCK_ACTIVE_UNIFORMS():Int
+	{
+		return GL.UNIFORM_BLOCK_ACTIVE_UNIFORMS;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES():Int
+	{
+		return GL.UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER():Int
+	{
+		return GL.UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER():Int
+	{
+		return GL.UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER;
+	}
+
+	@:noCompletion private inline function get_OBJECT_TYPE():Int
+	{
+		return GL.OBJECT_TYPE;
+	}
+
+	@:noCompletion private inline function get_SYNC_CONDITION():Int
+	{
+		return GL.SYNC_CONDITION;
+	}
+
+	@:noCompletion private inline function get_SYNC_STATUS():Int
+	{
+		return GL.SYNC_STATUS;
+	}
+
+	@:noCompletion private inline function get_SYNC_FLAGS():Int
+	{
+		return GL.SYNC_FLAGS;
+	}
+
+	@:noCompletion private inline function get_SYNC_FENCE():Int
+	{
+		return GL.SYNC_FENCE;
+	}
+
+	@:noCompletion private inline function get_SYNC_GPU_COMMANDS_COMPLETE():Int
+	{
+		return GL.SYNC_GPU_COMMANDS_COMPLETE;
+	}
+
+	@:noCompletion private inline function get_UNSIGNALED():Int
+	{
+		return GL.UNSIGNALED;
+	}
+
+	@:noCompletion private inline function get_SIGNALED():Int
+	{
+		return GL.SIGNALED;
+	}
+
+	@:noCompletion private inline function get_ALREADY_SIGNALED():Int
+	{
+		return GL.ALREADY_SIGNALED;
+	}
+
+	@:noCompletion private inline function get_TIMEOUT_EXPIRED():Int
+	{
+		return GL.TIMEOUT_EXPIRED;
+	}
+
+	@:noCompletion private inline function get_CONDITION_SATISFIED():Int
+	{
+		return GL.CONDITION_SATISFIED;
+	}
+
+	@:noCompletion private inline function get_WAIT_FAILED():Int
+	{
+		return GL.WAIT_FAILED;
+	}
+
+	@:noCompletion private inline function get_SYNC_FLUSH_COMMANDS_BIT():Int
+	{
+		return GL.SYNC_FLUSH_COMMANDS_BIT;
+	}
+
+	@:noCompletion private inline function get_COLOR():Int
+	{
+		return GL.COLOR;
+	}
+
+	@:noCompletion private inline function get_DEPTH():Int
+	{
+		return GL.DEPTH;
+	}
+
+	@:noCompletion private inline function get_STENCIL():Int
+	{
+		return GL.STENCIL;
+	}
+
+	@:noCompletion private inline function get_MIN():Int
+	{
+		return GL.MIN;
+	}
+
+	@:noCompletion private inline function get_MAX():Int
+	{
+		return GL.MAX;
+	}
+
+	@:noCompletion private inline function get_DEPTH_COMPONENT24():Int
+	{
+		return GL.DEPTH_COMPONENT24;
+	}
+
+	@:noCompletion private inline function get_STREAM_READ():Int
+	{
+		return GL.STREAM_READ;
+	}
+
+	@:noCompletion private inline function get_STREAM_COPY():Int
+	{
+		return GL.STREAM_COPY;
+	}
+
+	@:noCompletion private inline function get_STATIC_READ():Int
+	{
+		return GL.STATIC_READ;
+	}
+
+	@:noCompletion private inline function get_STATIC_COPY():Int
+	{
+		return GL.STATIC_COPY;
+	}
+
+	@:noCompletion private inline function get_DYNAMIC_READ():Int
+	{
+		return GL.DYNAMIC_READ;
+	}
+
+	@:noCompletion private inline function get_DYNAMIC_COPY():Int
+	{
+		return GL.DYNAMIC_COPY;
+	}
+
+	@:noCompletion private inline function get_DEPTH_COMPONENT32F():Int
+	{
+		return GL.DEPTH_COMPONENT32F;
+	}
+
+	@:noCompletion private inline function get_DEPTH32F_STENCIL8():Int
+	{
+		return GL.DEPTH32F_STENCIL8;
+	}
+
+	@:noCompletion private inline function get_INVALID_INDEX():Int
+	{
+		return GL.INVALID_INDEX;
+	}
+
+	@:noCompletion private inline function get_TIMEOUT_IGNORED():Int
+	{
+		return GL.TIMEOUT_IGNORED;
+	}
+
+	@:noCompletion private inline function get_COMPUTE_SHADER():Int
+	{
+		return GL.COMPUTE_SHADER;
+	}
+
+	@:noCompletion private inline function get_MAX_COMPUTE_WORK_GROUP_COUNT():Int
+	{
+		return GL.MAX_COMPUTE_WORK_GROUP_COUNT;
+	}
+
+	@:noCompletion private inline function get_MAX_COMPUTE_WORK_GROUP_SIZE():Int
+	{
+		return GL.MAX_COMPUTE_WORK_GROUP_SIZE;
+	}
+
+	@:noCompletion private inline function get_MAX_COMPUTE_WORK_GROUP_INVOCATIONS():Int
+	{
+		return GL.MAX_COMPUTE_WORK_GROUP_INVOCATIONS;
+	}
+
+	@:noCompletion private inline function get_COMPUTE_WORK_GROUP_SIZE():Int
+	{
+		return GL.COMPUTE_WORK_GROUP_SIZE;
+	}
+
+	@:noCompletion private inline function get_DISPATCH_INDIRECT_BUFFER():Int
+	{
+		return GL.DISPATCH_INDIRECT_BUFFER;
+	}
+
+	@:noCompletion private inline function get_DISPATCH_INDIRECT_BUFFER_BINDING():Int
+	{
+		return GL.DISPATCH_INDIRECT_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_DRAW_INDIRECT_BUFFER():Int
+	{
+		return GL.DRAW_INDIRECT_BUFFER;
+	}
+
+	@:noCompletion private inline function get_DRAW_INDIRECT_BUFFER_BINDING():Int
+	{
+		return GL.DRAW_INDIRECT_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_SHADER_STORAGE_BUFFER():Int
+	{
+		return GL.SHADER_STORAGE_BUFFER;
+	}
+
+	@:noCompletion private inline function get_SHADER_STORAGE_BUFFER_BINDING():Int
+	{
+		return GL.SHADER_STORAGE_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_SHADER_STORAGE_BUFFER_START():Int
+	{
+		return GL.SHADER_STORAGE_BUFFER_START;
+	}
+
+	@:noCompletion private inline function get_SHADER_STORAGE_BUFFER_SIZE():Int
+	{
+		return GL.SHADER_STORAGE_BUFFER_SIZE;
+	}
+
+	@:noCompletion private inline function get_MAX_SHADER_STORAGE_BLOCK_SIZE():Int
+	{
+		return GL.MAX_SHADER_STORAGE_BLOCK_SIZE;
+	}
+
+	@:noCompletion private inline function get_MAX_SHADER_STORAGE_BUFFER_BINDINGS():Int
+	{
+		return GL.MAX_SHADER_STORAGE_BUFFER_BINDINGS;
+	}
+
+	@:noCompletion private inline function get_SHADER_STORAGE_BARRIER_BIT():Int
+	{
+		return GL.SHADER_STORAGE_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_ARRAY_BARRIER_BIT():Int
+	{
+		return GL.VERTEX_ATTRIB_ARRAY_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_ELEMENT_ARRAY_BARRIER_BIT():Int
+	{
+		return GL.ELEMENT_ARRAY_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BARRIER_BIT():Int
+	{
+		return GL.UNIFORM_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_FETCH_BARRIER_BIT():Int
+	{
+		return GL.TEXTURE_FETCH_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_SHADER_IMAGE_ACCESS_BARRIER_BIT():Int
+	{
+		return GL.SHADER_IMAGE_ACCESS_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_COMMAND_BARRIER_BIT():Int
+	{
+		return GL.COMMAND_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_PIXEL_BUFFER_BARRIER_BIT():Int
+	{
+		return GL.PIXEL_BUFFER_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_UPDATE_BARRIER_BIT():Int
+	{
+		return GL.TEXTURE_UPDATE_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_BUFFER_UPDATE_BARRIER_BIT():Int
+	{
+		return GL.BUFFER_UPDATE_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_BARRIER_BIT():Int
+	{
+		return GL.FRAMEBUFFER_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_TRANSFORM_FEEDBACK_BARRIER_BIT():Int
+	{
+		return GL.TRANSFORM_FEEDBACK_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_ATOMIC_COUNTER_BARRIER_BIT():Int
+	{
+		return GL.ATOMIC_COUNTER_BARRIER_BIT;
+	}
+
+	@:noCompletion private inline function get_ALL_BARRIER_BITS():Int
+	{
+		return GL.ALL_BARRIER_BITS;
+	}
+
+	@:noCompletion private inline function get_ATOMIC_COUNTER_BUFFER():Int
+	{
+		return GL.ATOMIC_COUNTER_BUFFER;
+	}
+
+	@:noCompletion private inline function get_READ_ONLY():Int
+	{
+		return GL.READ_ONLY;
+	}
+
+	@:noCompletion private inline function get_WRITE_ONLY():Int
+	{
+		return GL.WRITE_ONLY;
+	}
+
+	@:noCompletion private inline function get_READ_WRITE():Int
+	{
+		return GL.READ_WRITE;
+	}
+
+	@:noCompletion private inline function get_IMAGE_2D():Int
+	{
+		return GL.IMAGE_2D;
+	}
+
+	@:noCompletion private inline function get_MAX_IMAGE_UNITS():Int
+	{
+		return GL.MAX_IMAGE_UNITS;
+	}
+
+	@:noCompletion private inline function get_UNIFORM():Int
+	{
+		return GL.UNIFORM;
+	}
+
+	@:noCompletion private inline function get_UNIFORM_BLOCK():Int
+	{
+		return GL.UNIFORM_BLOCK;
+	}
+
+	@:noCompletion private inline function get_PROGRAM_INPUT():Int
+	{
+		return GL.PROGRAM_INPUT;
+	}
+
+	@:noCompletion private inline function get_PROGRAM_OUTPUT():Int
+	{
+		return GL.PROGRAM_OUTPUT;
+	}
+
+	@:noCompletion private inline function get_BUFFER_VARIABLE():Int
+	{
+		return GL.BUFFER_VARIABLE;
+	}
+
+	@:noCompletion private inline function get_SHADER_STORAGE_BLOCK():Int
+	{
+		return GL.SHADER_STORAGE_BLOCK;
+	}
+
+	@:noCompletion private inline function get_ACTIVE_RESOURCES():Int
+	{
+		return GL.ACTIVE_RESOURCES;
+	}
+
+	@:noCompletion private inline function get_MAX_NAME_LENGTH():Int
+	{
+		return GL.MAX_NAME_LENGTH;
+	}
+
+	@:noCompletion private inline function get_MAX_NUM_ACTIVE_VARIABLES():Int
+	{
+		return GL.MAX_NUM_ACTIVE_VARIABLES;
+	}
+
+	@:noCompletion private inline function get_NAME_LENGTH():Int
+	{
+		return GL.NAME_LENGTH;
+	}
+
+	@:noCompletion private inline function get_TYPE():Int
+	{
+		return GL.TYPE;
+	}
+
+	@:noCompletion private inline function get_ARRAY_SIZE():Int
+	{
+		return GL.ARRAY_SIZE;
+	}
+
+	@:noCompletion private inline function get_OFFSET():Int
+	{
+		return GL.OFFSET;
+	}
+
+	@:noCompletion private inline function get_BLOCK_INDEX():Int
+	{
+		return GL.BLOCK_INDEX;
+	}
+
+	@:noCompletion private inline function get_LOCATION():Int
+	{
+		return GL.LOCATION;
+	}
+
+	@:noCompletion private inline function get_VERTEX_SHADER_BIT():Int
+	{
+		return GL.VERTEX_SHADER_BIT;
+	}
+
+	@:noCompletion private inline function get_FRAGMENT_SHADER_BIT():Int
+	{
+		return GL.FRAGMENT_SHADER_BIT;
+	}
+
+	@:noCompletion private inline function get_COMPUTE_SHADER_BIT():Int
+	{
+		return GL.COMPUTE_SHADER_BIT;
+	}
+
+	@:noCompletion private inline function get_ALL_SHADER_BITS():Int
+	{
+		return GL.ALL_SHADER_BITS;
+	}
+
+	@:noCompletion private inline function get_PROGRAM_SEPARABLE():Int
+	{
+		return GL.PROGRAM_SEPARABLE;
+	}
+
+	@:noCompletion private inline function get_ACTIVE_PROGRAM():Int
+	{
+		return GL.ACTIVE_PROGRAM;
+	}
+
+	@:noCompletion private inline function get_PROGRAM_PIPELINE_BINDING():Int
+	{
+		return GL.PROGRAM_PIPELINE_BINDING;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_BINDING():Int
+	{
+		return GL.VERTEX_ATTRIB_BINDING;
+	}
+
+	@:noCompletion private inline function get_VERTEX_ATTRIB_RELATIVE_OFFSET():Int
+	{
+		return GL.VERTEX_ATTRIB_RELATIVE_OFFSET;
+	}
+
+	@:noCompletion private inline function get_VERTEX_BINDING_DIVISOR():Int
+	{
+		return GL.VERTEX_BINDING_DIVISOR;
+	}
+
+	@:noCompletion private inline function get_VERTEX_BINDING_OFFSET():Int
+	{
+		return GL.VERTEX_BINDING_OFFSET;
+	}
+
+	@:noCompletion private inline function get_VERTEX_BINDING_STRIDE():Int
+	{
+		return GL.VERTEX_BINDING_STRIDE;
+	}
+
+	@:noCompletion private inline function get_VERTEX_BINDING_BUFFER():Int
+	{
+		return GL.VERTEX_BINDING_BUFFER;
+	}
+
+	@:noCompletion private inline function get_MAX_VERTEX_ATTRIB_BINDINGS():Int
+	{
+		return GL.MAX_VERTEX_ATTRIB_BINDINGS;
+	}
+
+	@:noCompletion private inline function get_MAX_VERTEX_ATTRIB_STRIDE():Int
+	{
+		return GL.MAX_VERTEX_ATTRIB_STRIDE;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_2D_MULTISAMPLE():Int
+	{
+		return GL.TEXTURE_2D_MULTISAMPLE;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_2D_MULTISAMPLE_ARRAY():Int
+	{
+		return GL.TEXTURE_2D_MULTISAMPLE_ARRAY;
+	}
+
+	@:noCompletion private inline function get_SAMPLE_POSITION():Int
+	{
+		return GL.SAMPLE_POSITION;
+	}
+
+	@:noCompletion private inline function get_SAMPLE_MASK():Int
+	{
+		return GL.SAMPLE_MASK;
+	}
+
+	@:noCompletion private inline function get_MAX_SAMPLE_MASK_WORDS():Int
+	{
+		return GL.MAX_SAMPLE_MASK_WORDS;
+	}
+
+	@:noCompletion private inline function get_MAX_COLOR_TEXTURE_SAMPLES():Int
+	{
+		return GL.MAX_COLOR_TEXTURE_SAMPLES;
+	}
+
+	@:noCompletion private inline function get_MAX_DEPTH_TEXTURE_SAMPLES():Int
+	{
+		return GL.MAX_DEPTH_TEXTURE_SAMPLES;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_DEFAULT_WIDTH():Int
+	{
+		return GL.FRAMEBUFFER_DEFAULT_WIDTH;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_DEFAULT_HEIGHT():Int
+	{
+		return GL.FRAMEBUFFER_DEFAULT_HEIGHT;
+	}
+
+	@:noCompletion private inline function get_FRAMEBUFFER_DEFAULT_SAMPLES():Int
+	{
+		return GL.FRAMEBUFFER_DEFAULT_SAMPLES;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_BUFFER():Int
+	{
+		return GL.TEXTURE_BUFFER;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_BUFFER_BINDING():Int
+	{
+		return GL.TEXTURE_BUFFER_BINDING;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_BUFFER_OFFSET():Int
+	{
+		return GL.TEXTURE_BUFFER_OFFSET;
+	}
+
+	@:noCompletion private inline function get_TEXTURE_BUFFER_SIZE():Int
+	{
+		return GL.TEXTURE_BUFFER_SIZE;
+	}
+
+	@:noCompletion private inline function get_PATCHES():Int
+	{
+		return GL.PATCHES;
+	}
+
+	@:noCompletion private inline function get_PATCH_VERTICES():Int
+	{
+		return GL.PATCH_VERTICES;
+	}
+
+	@:noCompletion private inline function get_MIN_SAMPLE_SHADING_VALUE():Int
+	{
+		return GL.MIN_SAMPLE_SHADING_VALUE;
+	}
+
+	@:noCompletion private inline function get_SAMPLE_SHADING():Int
+	{
+		return GL.SAMPLE_SHADING;
+	}
+
+	@:noCompletion private inline function get_DEBUG_OUTPUT():Int
+	{
+		return GL.DEBUG_OUTPUT;
+	}
+
+	@:noCompletion private inline function get_DEBUG_OUTPUT_SYNCHRONOUS():Int
+	{
+		return GL.DEBUG_OUTPUT_SYNCHRONOUS;
+	}
+
+	@:noCompletion private inline function get_DEBUG_SOURCE_APPLICATION():Int
+	{
+		return GL.DEBUG_SOURCE_APPLICATION;
+	}
+
+	@:noCompletion private inline function get_DEBUG_SOURCE_THIRD_PARTY():Int
+	{
+		return GL.DEBUG_SOURCE_THIRD_PARTY;
+	}
+
+	@:noCompletion private inline function get_DEBUG_TYPE_ERROR():Int
+	{
+		return GL.DEBUG_TYPE_ERROR;
+	}
+
+	@:noCompletion private inline function get_DEBUG_TYPE_PERFORMANCE():Int
+	{
+		return GL.DEBUG_TYPE_PERFORMANCE;
+	}
+
+	@:noCompletion private inline function get_DEBUG_TYPE_MARKER():Int
+	{
+		return GL.DEBUG_TYPE_MARKER;
+	}
+
+	@:noCompletion private inline function get_DEBUG_TYPE_PUSH_GROUP():Int
+	{
+		return GL.DEBUG_TYPE_PUSH_GROUP;
+	}
+
+	@:noCompletion private inline function get_DEBUG_TYPE_POP_GROUP():Int
+	{
+		return GL.DEBUG_TYPE_POP_GROUP;
+	}
+
+	@:noCompletion private inline function get_DEBUG_SEVERITY_HIGH():Int
+	{
+		return GL.DEBUG_SEVERITY_HIGH;
+	}
+
+	@:noCompletion private inline function get_DEBUG_SEVERITY_MEDIUM():Int
+	{
+		return GL.DEBUG_SEVERITY_MEDIUM;
+	}
+
+	@:noCompletion private inline function get_DEBUG_SEVERITY_LOW():Int
+	{
+		return GL.DEBUG_SEVERITY_LOW;
+	}
+
+	@:noCompletion private inline function get_DEBUG_SEVERITY_NOTIFICATION():Int
+	{
+		return GL.DEBUG_SEVERITY_NOTIFICATION;
+	}
+
+	@:noCompletion private inline function get_MAX_DEBUG_MESSAGE_LENGTH():Int
+	{
+		return GL.MAX_DEBUG_MESSAGE_LENGTH;
+	}
+
+	@:noCompletion private inline function get_MAX_LABEL_LENGTH():Int
+	{
+		return GL.MAX_LABEL_LENGTH;
+	}
+
+	@:noCompletion private inline function get_BUFFER_OBJECT():Int
+	{
+		return GL.BUFFER_OBJECT;
+	}
+
+	@:noCompletion private inline function get_SHADER_OBJECT():Int
+	{
+		return GL.SHADER_OBJECT;
+	}
+
+	@:noCompletion private inline function get_PROGRAM_OBJECT():Int
+	{
+		return GL.PROGRAM_OBJECT;
+	}
+
+	@:noCompletion private inline function get_QUERY_OBJECT():Int
+	{
+		return GL.QUERY_OBJECT;
+	}
+
+	@:noCompletion private inline function get_MAP_PERSISTENT_BIT():Int
+	{
+		return GL.MAP_PERSISTENT_BIT;
+	}
+
+	@:noCompletion private inline function get_MAP_COHERENT_BIT():Int
+	{
+		return GL.MAP_COHERENT_BIT;
+	}
+
+	@:noCompletion private inline function get_DYNAMIC_STORAGE_BIT():Int
+	{
+		return GL.DYNAMIC_STORAGE_BIT;
+	}
+
+	@:noCompletion private inline function get_CLIENT_STORAGE_BIT():Int
+	{
+		return GL.CLIENT_STORAGE_BIT;
+	}
+
+	@:noCompletion private inline function get_LOWER_LEFT():Int
+	{
+		return GL.LOWER_LEFT;
+	}
+
+	@:noCompletion private inline function get_UPPER_LEFT():Int
+	{
+		return GL.UPPER_LEFT;
+	}
+
+	@:noCompletion private inline function get_NEGATIVE_ONE_TO_ONE():Int
+	{
+		return GL.NEGATIVE_ONE_TO_ONE;
+	}
+
+	@:noCompletion private inline function get_ZERO_TO_ONE():Int
+	{
+		return GL.ZERO_TO_ONE;
+	}
+
+	@:noCompletion private inline function get_FILL():Int
+	{
+		return GL.FILL;
+	}
+
+	@:noCompletion private inline function get_LINE():Int
+	{
+		return GL.LINE;
+	}
+
+	@:noCompletion private inline function get_POINT():Int
+	{
+		return GL.POINT;
+	}
+
+	private function __pushSupportedExtension(extension:String):Void
+	{
+		__supportedExtensions.push(StringTools.startsWith(extension, "GL_") ? extension.substr(3) : extension);
+	}
+
+	private static function __newTextureUnitBindings():haxe.ds.Vector<Int>
+	{
+		var bindings = new haxe.ds.Vector<Int>(__TEXTURE_UNIT_CACHE_SIZE * 2);
+
+		for (i in 0...bindings.length)
+		{
+			bindings[i] = -1;
+		}
+
+		return bindings;
+	}
+
+	private function __resetTextureUnitBindings():Void
+	{
+		for (i in 0...__textureUnitBindings.length)
+		{
+			__textureUnitBindings[i] = -1;
+		}
+	}
+
+	/**
+		Cache index for `target` bound to the current texture unit, or -1 when the
+		binding is not cached (an uncached target, or a unit beyond the cache size).
+	**/
+	private function __textureCacheIndex(target:Int):Int
+	{
+		var slot = switch (target)
+		{
+			case 0x0DE1: 0; // TEXTURE_2D
+			case 0x8513: 1; // TEXTURE_CUBE_MAP
+			default: -1;
+		}
+
+		if (slot == -1)
+			return -1;
+
+		var unit = __activeTextureUnit - 0x84C0; // GL_TEXTURE0
+
+		if (unit < 0 || unit >= __TEXTURE_UNIT_CACHE_SIZE)
+			return -1;
+
+		return unit * 2 + slot;
+	}
+
+	/**
+		Bit for `cap` within `__capEnabledMask` / `__capKnownMask`, or 0 when the cap
+		is not cached and `enable`/`disable` should always pass through to the driver.
+	**/
+	private function __capCacheBit(cap:Int):Int
+	{
+		return switch (cap)
+		{
+			case 0x0BE2: 1 << 0; // BLEND
+			case 0x0B44: 1 << 1; // CULL_FACE
+			case 0x0B71: 1 << 2; // DEPTH_TEST
+			case 0x0BD0: 1 << 3; // DITHER
+			case 0x8037: 1 << 4; // POLYGON_OFFSET_FILL
+			case 0x809E: 1 << 5; // SAMPLE_ALPHA_TO_COVERAGE
+			case 0x80A0: 1 << 6; // SAMPLE_COVERAGE
+			case 0x0C11: 1 << 7; // SCISSOR_TEST
+			case 0x0B90: 1 << 8; // STENCIL_TEST
+			case 0x8C89: 1 << 9; // RASTERIZER_DISCARD
+			case 0x8D69: 1 << 10; // PRIMITIVE_RESTART_FIXED_INDEX
+			default: 0;
+		}
 	}
 
 	private function __createObject(id:Int):GLObject
