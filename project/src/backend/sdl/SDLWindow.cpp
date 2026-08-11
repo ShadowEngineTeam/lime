@@ -279,14 +279,12 @@ namespace lime
 	{
 		if (context)
 		{
-			#if defined(LIME_OPENGL)
-			// glad leaves the entry point null below GLES 3.0 / GL 4.3. iOS builds without glad,
-			// where it is a real function and testing its address warns under -Waddress.
-			#if defined(LIME_GLAD)
+#if defined(LIME_OPENGL)
+#if defined(LIME_GLAD)
 			const bool canInvalidate = glInvalidateFramebuffer != NULL;
-			#else
+#else
 			const bool canInvalidate = true;
-			#endif
+#endif
 
 			if (canInvalidate)
 			{
