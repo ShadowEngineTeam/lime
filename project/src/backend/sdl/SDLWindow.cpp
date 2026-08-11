@@ -279,16 +279,7 @@ namespace lime
 	{
 		if (context)
 		{
-#if defined(LIME_OPENGL)
-			// The depth and stencil attachments of the default framebuffer do not survive the
-			// swap, so their contents never need resolving out of tile memory. Saying so lets a
-			// tile-based GPU skip the store, which is most of the win on mobile. Color is left
-			// alone deliberately -- that is what gets presented.
-			//
-			// GL_DEPTH and GL_STENCIL name default-framebuffer attachments only, so this has to
-			// be skipped when the app left a framebuffer object bound; passing them against an
-			// FBO is GL_INVALID_ENUM. glInvalidateFramebuffer is GLES 3.0 / GL 4.3, and glad
-			// leaves the pointer null below that.
+			#if defined(LIME_OPENGL)
 			if (glInvalidateFramebuffer)
 			{
 				GLint boundFramebuffer = 0;
@@ -300,7 +291,7 @@ namespace lime
 					glInvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
 				}
 			}
-#endif
+			#endif
 
 			SDL_GL_SwapWindow(sdlWindow);
 		}
