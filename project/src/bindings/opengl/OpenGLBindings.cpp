@@ -2120,99 +2120,122 @@ namespace lime
 
 	void lime_gl_dispatch_compute(int x, int y, int z)
 	{
+#if defined(LIME_GLAD)
 		if (glDispatchCompute)
 		{
 			glDispatchCompute(x, y, z);
 		}
+#endif
 	}
 
 	void lime_gl_dispatch_compute_indirect(double indirect)
 	{
+#if defined(LIME_GLAD)
 		if (glDispatchComputeIndirect)
 		{
 			glDispatchComputeIndirect((GLintptr)(uintptr_t)indirect);
 		}
+#endif
 	}
 
 	void lime_gl_memory_barrier(int barriers)
 	{
+#if defined(LIME_GLAD)
 		if (glMemoryBarrier)
 		{
 			glMemoryBarrier(barriers);
 		}
+#endif
 	}
 
 	void lime_gl_memory_barrier_by_region(int barriers)
 	{
+#if defined(LIME_GLAD)
 		if (glMemoryBarrierByRegion)
 		{
 			glMemoryBarrierByRegion(barriers);
 		}
+#endif
 	}
 
 	void lime_gl_bind_image_texture(int unit, int texture, int level, bool layered, int layer, int access, int format)
 	{
+#if defined(LIME_GLAD)
 		if (glBindImageTexture)
 		{
 			glBindImageTexture(unit, texture, level, layered, layer, access, format);
 		}
+#endif
 	}
 
 	void lime_gl_draw_arrays_indirect(int mode, double indirect)
 	{
+#if defined(LIME_GLAD)
 		if (glDrawArraysIndirect)
 		{
 			glDrawArraysIndirect(mode, (const void *)(uintptr_t)indirect);
 		}
+#endif
 	}
 
 	void lime_gl_draw_elements_indirect(int mode, int type, double indirect)
 	{
+#if defined(LIME_GLAD)
 		if (glDrawElementsIndirect)
 		{
 			glDrawElementsIndirect(mode, type, (const void *)(uintptr_t)indirect);
 		}
+#endif
 	}
 
 	int lime_gl_get_program_interfacei(int program, int programInterface, int pname)
 	{
+#if defined(LIME_GLAD)
 		if (glGetProgramInterfaceiv)
 		{
 			GLint value = 0;
 			glGetProgramInterfaceiv(program, programInterface, pname, &value);
 			return value;
 		}
+#endif
 		return 0;
 	}
 
 	void lime_gl_get_program_interfaceiv(int program, int programInterface, int pname, double params)
 	{
+#if defined(LIME_GLAD)
 		if (glGetProgramInterfaceiv)
 		{
 			glGetProgramInterfaceiv(program, programInterface, pname, (GLint *)(uintptr_t)params);
 		}
+#endif
 	}
 
 	int lime_gl_get_program_resource_index(int program, int programInterface, HxString name)
 	{
+#if defined(LIME_GLAD)
 		if (glGetProgramResourceIndex)
 		{
 			return glGetProgramResourceIndex(program, programInterface, name.__s);
 		}
+#endif
 		return 0;
 	}
 
 	int lime_gl_get_program_resource_location(int program, int programInterface, HxString name)
 	{
+#if defined(LIME_GLAD)
 		if (glGetProgramResourceLocation)
 		{
 			return glGetProgramResourceLocation(program, programInterface, name.__s);
 		}
+#endif
 		return 0;
 	}
 
 	value lime_gl_get_program_resource_name(int program, int programInterface, int index)
 	{
+#if defined(LIME_GLAD)
 		if (glGetProgramResourceName)
 		{
 			GLint length = 0;
@@ -2222,101 +2245,123 @@ namespace lime
 			glGetProgramResourceName(program, programInterface, index, length, 0, &buffer[0]);
 			return alloc_string(buffer.c_str());
 		}
+#endif
 		return alloc_null();
 	}
 
 	void lime_gl_get_program_resourceiv(int program, int programInterface, int index, int propCount, double props, int bufSize, double params)
 	{
+#if defined(LIME_GLAD)
 		if (glGetProgramResourceiv)
 		{
 			glGetProgramResourceiv(program, programInterface, index, propCount, (const GLenum *)(uintptr_t)props, bufSize, 0, (GLint *)(uintptr_t)params);
 		}
+#endif
 	}
 
 	int lime_gl_create_program_pipeline()
 	{
+#if defined(LIME_GLAD)
 		if (glGenProgramPipelines)
 		{
 			GLuint id = 0;
 			glGenProgramPipelines(1, &id);
 			return id;
 		}
+#endif
 		return 0;
 	}
 
 	void lime_gl_delete_program_pipeline(int pipeline)
 	{
+#if defined(LIME_GLAD)
 		if (glDeleteProgramPipelines)
 		{
 			GLuint id = pipeline;
 			glDeleteProgramPipelines(1, &id);
 		}
+#endif
 	}
 
 	void lime_gl_bind_program_pipeline(int pipeline)
 	{
+#if defined(LIME_GLAD)
 		if (glBindProgramPipeline)
 		{
 			glBindProgramPipeline(pipeline);
 		}
+#endif
 	}
 
 	bool lime_gl_is_program_pipeline(int pipeline)
 	{
+#if defined(LIME_GLAD)
 		if (glIsProgramPipeline)
 		{
 			return glIsProgramPipeline(pipeline);
 		}
+#endif
 		return false;
 	}
 
 	void lime_gl_use_program_stages(int pipeline, int stages, int program)
 	{
+#if defined(LIME_GLAD)
 		if (glUseProgramStages)
 		{
 			glUseProgramStages(pipeline, stages, program);
 		}
+#endif
 	}
 
 	void lime_gl_active_shader_program(int pipeline, int program)
 	{
+#if defined(LIME_GLAD)
 		if (glActiveShaderProgram)
 		{
 			glActiveShaderProgram(pipeline, program);
 		}
+#endif
 	}
 
 	int lime_gl_create_shader_programv(int type, HxString source)
 	{
+#if defined(LIME_GLAD)
 		if (glCreateShaderProgramv)
 		{
 			const char *strings[1] = {source.__s};
 			return glCreateShaderProgramv(type, 1, strings);
 		}
+#endif
 		return 0;
 	}
 
 	void lime_gl_validate_program_pipeline(int pipeline)
 	{
+#if defined(LIME_GLAD)
 		if (glValidateProgramPipeline)
 		{
 			glValidateProgramPipeline(pipeline);
 		}
+#endif
 	}
 
 	int lime_gl_get_program_pipelinei(int pipeline, int pname)
 	{
+#if defined(LIME_GLAD)
 		if (glGetProgramPipelineiv)
 		{
 			GLint value = 0;
 			glGetProgramPipelineiv(pipeline, pname, &value);
 			return value;
 		}
+#endif
 		return 0;
 	}
 
 	value lime_gl_get_program_pipeline_info_log(int pipeline)
 	{
+#if defined(LIME_GLAD)
 		if (glGetProgramPipelineInfoLog)
 		{
 			GLint length = 0;
@@ -2326,344 +2371,426 @@ namespace lime
 			glGetProgramPipelineInfoLog(pipeline, length, 0, &buffer[0]);
 			return alloc_string(buffer.c_str());
 		}
+#endif
 		return alloc_null();
 	}
 
 	void lime_gl_program_uniform1i(int program, int location, int v0)
 	{
+#if defined(LIME_GLAD)
 		if (glProgramUniform1i)
 		{
 			glProgramUniform1i(program, location, v0);
 		}
+#endif
 	}
 
 	void lime_gl_program_uniform1f(int program, int location, float v0)
 	{
+#if defined(LIME_GLAD)
 		if (glProgramUniform1f)
 		{
 			glProgramUniform1f(program, location, v0);
 		}
+#endif
 	}
 
 	void lime_gl_program_uniform2f(int program, int location, float v0, float v1)
 	{
+#if defined(LIME_GLAD)
 		if (glProgramUniform2f)
 		{
 			glProgramUniform2f(program, location, v0, v1);
 		}
+#endif
 	}
 
 	void lime_gl_program_uniform3f(int program, int location, float v0, float v1, float v2)
 	{
+#if defined(LIME_GLAD)
 		if (glProgramUniform3f)
 		{
 			glProgramUniform3f(program, location, v0, v1, v2);
 		}
+#endif
 	}
 
 	void lime_gl_program_uniform4f(int program, int location, float v0, float v1, float v2, float v3)
 	{
+#if defined(LIME_GLAD)
 		if (glProgramUniform4f)
 		{
 			glProgramUniform4f(program, location, v0, v1, v2, v3);
 		}
+#endif
 	}
 
 	void lime_gl_program_uniform_matrix4fv(int program, int location, int count, bool transpose, double value)
 	{
+#if defined(LIME_GLAD)
 		if (glProgramUniformMatrix4fv)
 		{
 			glProgramUniformMatrix4fv(program, location, count, transpose, (const GLfloat *)(uintptr_t)value);
 		}
+#endif
 	}
 
 	void lime_gl_bind_vertex_buffer(int bindingIndex, int buffer, double offset, int stride)
 	{
+#if defined(LIME_GLAD)
 		if (glBindVertexBuffer)
 		{
 			glBindVertexBuffer(bindingIndex, buffer, (GLintptr)(uintptr_t)offset, stride);
 		}
+#endif
 	}
 
 	void lime_gl_vertex_attrib_format(int attribIndex, int size, int type, bool normalized, int relativeOffset)
 	{
+#if defined(LIME_GLAD)
 		if (glVertexAttribFormat)
 		{
 			glVertexAttribFormat(attribIndex, size, type, normalized, relativeOffset);
 		}
+#endif
 	}
 
 	void lime_gl_vertex_attrib_iformat(int attribIndex, int size, int type, int relativeOffset)
 	{
+#if defined(LIME_GLAD)
 		if (glVertexAttribIFormat)
 		{
 			glVertexAttribIFormat(attribIndex, size, type, relativeOffset);
 		}
+#endif
 	}
 
 	void lime_gl_vertex_attrib_binding(int attribIndex, int bindingIndex)
 	{
+#if defined(LIME_GLAD)
 		if (glVertexAttribBinding)
 		{
 			glVertexAttribBinding(attribIndex, bindingIndex);
 		}
+#endif
 	}
 
 	void lime_gl_vertex_binding_divisor(int bindingIndex, int divisor)
 	{
+#if defined(LIME_GLAD)
 		if (glVertexBindingDivisor)
 		{
 			glVertexBindingDivisor(bindingIndex, divisor);
 		}
+#endif
 	}
 
 	void lime_gl_tex_storage_2d_multisample(int target, int samples, int internalformat, int width, int height, bool fixedSampleLocations)
 	{
+#if defined(LIME_GLAD)
 		if (glTexStorage2DMultisample)
 		{
 			glTexStorage2DMultisample(target, samples, internalformat, width, height, fixedSampleLocations);
 		}
+#endif
 	}
 
 	void lime_gl_get_multisamplefv(int pname, int index, double val)
 	{
+#if defined(LIME_GLAD)
 		if (glGetMultisamplefv)
 		{
 			glGetMultisamplefv(pname, index, (GLfloat *)(uintptr_t)val);
 		}
+#endif
 	}
 
 	void lime_gl_sample_maski(int maskNumber, int mask)
 	{
+#if defined(LIME_GLAD)
 		if (glSampleMaski)
 		{
 			glSampleMaski(maskNumber, mask);
 		}
+#endif
 	}
 
 	int lime_gl_get_tex_level_parameteri(int target, int level, int pname)
 	{
+#if defined(LIME_GLAD)
 		if (glGetTexLevelParameteriv)
 		{
 			GLint value = 0;
 			glGetTexLevelParameteriv(target, level, pname, &value);
 			return value;
 		}
+#endif
 		return 0;
 	}
 
 	float lime_gl_get_tex_level_parameterf(int target, int level, int pname)
 	{
+#if defined(LIME_GLAD)
 		if (glGetTexLevelParameterfv)
 		{
 			GLfloat value = 0;
 			glGetTexLevelParameterfv(target, level, pname, &value);
 			return value;
 		}
+#endif
 		return 0;
 	}
 
 	bool lime_gl_get_booleani(int target, int index)
 	{
+#if defined(LIME_GLAD)
 		if (glGetBooleani_v)
 		{
 			GLboolean value = 0;
 			glGetBooleani_v(target, index, &value);
 			return value != 0;
 		}
+#endif
 		return false;
 	}
 
 	void lime_gl_framebuffer_parameteri(int target, int pname, int param)
 	{
+#if defined(LIME_GLAD)
 		if (glFramebufferParameteri)
 		{
 			glFramebufferParameteri(target, pname, param);
 		}
+#endif
 	}
 
 	int lime_gl_get_framebuffer_parameteri(int target, int pname)
 	{
+#if defined(LIME_GLAD)
 		if (glGetFramebufferParameteriv)
 		{
 			GLint value = 0;
 			glGetFramebufferParameteriv(target, pname, &value);
 			return value;
 		}
+#endif
 		return 0;
 	}
 
 	void lime_gl_copy_image_sub_data(int srcName, int srcTarget, int srcLevel, int srcX, int srcY, int srcZ, int dstName, int dstTarget, int dstLevel, int dstX, int dstY, int dstZ, int srcWidth, int srcHeight, int srcDepth)
 	{
+#if defined(LIME_GLAD)
 		if (glCopyImageSubData)
 		{
 			glCopyImageSubData(srcName, srcTarget, srcLevel, srcX, srcY, srcZ, dstName, dstTarget, dstLevel, dstX, dstY, dstZ, srcWidth, srcHeight, srcDepth);
 		}
+#endif
 	}
 
 	void lime_gl_draw_elements_base_vertex(int mode, int count, int type, double indices, int baseVertex)
 	{
+#if defined(LIME_GLAD)
 		if (glDrawElementsBaseVertex)
 		{
 			glDrawElementsBaseVertex(mode, count, type, (const void *)(uintptr_t)indices, baseVertex);
 		}
+#endif
 	}
 
 	void lime_gl_draw_range_elements_base_vertex(int mode, int start, int end, int count, int type, double indices, int baseVertex)
 	{
+#if defined(LIME_GLAD)
 		if (glDrawRangeElementsBaseVertex)
 		{
 			glDrawRangeElementsBaseVertex(mode, start, end, count, type, (const void *)(uintptr_t)indices, baseVertex);
 		}
+#endif
 	}
 
 	void lime_gl_draw_elements_instanced_base_vertex(int mode, int count, int type, double indices, int instanceCount, int baseVertex)
 	{
+#if defined(LIME_GLAD)
 		if (glDrawElementsInstancedBaseVertex)
 		{
 			glDrawElementsInstancedBaseVertex(mode, count, type, (const void *)(uintptr_t)indices, instanceCount, baseVertex);
 		}
+#endif
 	}
 
 	void lime_gl_framebuffer_texture(int target, int attachment, int texture, int level)
 	{
+#if defined(LIME_GLAD)
 		if (glFramebufferTexture)
 		{
 			glFramebufferTexture(target, attachment, texture, level);
 		}
+#endif
 	}
 
 	void lime_gl_tex_buffer(int target, int internalformat, int buffer)
 	{
+#if defined(LIME_GLAD)
 		if (glTexBuffer)
 		{
 			glTexBuffer(target, internalformat, buffer);
 		}
+#endif
 	}
 
 	void lime_gl_tex_buffer_range(int target, int internalformat, int buffer, double offset, int size)
 	{
+#if defined(LIME_GLAD)
 		if (glTexBufferRange)
 		{
 			glTexBufferRange(target, internalformat, buffer, (GLintptr)(uintptr_t)offset, size);
 		}
+#endif
 	}
 
 	void lime_gl_patch_parameteri(int pname, int value)
 	{
+#if defined(LIME_GLAD)
 		if (glPatchParameteri)
 		{
 			glPatchParameteri(pname, value);
 		}
+#endif
 	}
 
 	void lime_gl_min_sample_shading(float value)
 	{
+#if defined(LIME_GLAD)
 		if (glMinSampleShading)
 		{
 			glMinSampleShading(value);
 		}
+#endif
 	}
 
 	void lime_gl_blend_equationi(int buf, int mode)
 	{
+#if defined(LIME_GLAD)
 		if (glBlendEquationi)
 		{
 			glBlendEquationi(buf, mode);
 		}
+#endif
 	}
 
 	void lime_gl_blend_equation_separatei(int buf, int modeRGB, int modeAlpha)
 	{
+#if defined(LIME_GLAD)
 		if (glBlendEquationSeparatei)
 		{
 			glBlendEquationSeparatei(buf, modeRGB, modeAlpha);
 		}
+#endif
 	}
 
 	void lime_gl_blend_funci(int buf, int src, int dst)
 	{
+#if defined(LIME_GLAD)
 		if (glBlendFunci)
 		{
 			glBlendFunci(buf, src, dst);
 		}
+#endif
 	}
 
 	void lime_gl_blend_func_separatei(int buf, int srcRGB, int dstRGB, int srcAlpha, int dstAlpha)
 	{
+#if defined(LIME_GLAD)
 		if (glBlendFuncSeparatei)
 		{
 			glBlendFuncSeparatei(buf, srcRGB, dstRGB, srcAlpha, dstAlpha);
 		}
+#endif
 	}
 
 	void lime_gl_color_maski(int index, bool r, bool g, bool b, bool a)
 	{
+#if defined(LIME_GLAD)
 		if (glColorMaski)
 		{
 			glColorMaski(index, r, g, b, a);
 		}
+#endif
 	}
 
 	void lime_gl_enablei(int target, int index)
 	{
+#if defined(LIME_GLAD)
 		if (glEnablei)
 		{
 			glEnablei(target, index);
 		}
+#endif
 	}
 
 	void lime_gl_disablei(int target, int index)
 	{
+#if defined(LIME_GLAD)
 		if (glDisablei)
 		{
 			glDisablei(target, index);
 		}
+#endif
 	}
 
 	bool lime_gl_is_enabledi(int target, int index)
 	{
+#if defined(LIME_GLAD)
 		if (glIsEnabledi)
 		{
 			return glIsEnabledi(target, index);
 		}
+#endif
 		return false;
 	}
 
 	void lime_gl_tex_storage_3d_multisample(int target, int samples, int internalformat, int width, int height, int depth, bool fixedSampleLocations)
 	{
+#if defined(LIME_GLAD)
 		if (glTexStorage3DMultisample)
 		{
 			glTexStorage3DMultisample(target, samples, internalformat, width, height, depth, fixedSampleLocations);
 		}
+#endif
 	}
 
 	void lime_gl_push_debug_group(int source, int id, HxString message)
 	{
+#if defined(LIME_GLAD)
 		if (glPushDebugGroup)
 		{
 			glPushDebugGroup(source, id, -1, message.__s);
 		}
+#endif
 	}
 
 	void lime_gl_pop_debug_group()
 	{
+#if defined(LIME_GLAD)
 		if (glPopDebugGroup)
 		{
 			glPopDebugGroup();
 		}
+#endif
 	}
 
 	void lime_gl_object_label(int identifier, int name, HxString label)
 	{
+#if defined(LIME_GLAD)
 		if (glObjectLabel)
 		{
 			glObjectLabel(identifier, name, -1, label.__s);
 		}
+#endif
 	}
 
 	value lime_gl_get_object_label(int identifier, int name)
 	{
+#if defined(LIME_GLAD)
 		if (glGetObjectLabel)
 		{
 			GLsizei length = 0;
@@ -2671,28 +2798,33 @@ namespace lime
 			glGetObjectLabel(identifier, name, 512, &length, &buffer[0]);
 			return alloc_string(buffer.c_str());
 		}
+#endif
 		return alloc_null();
 	}
 
 	void lime_gl_debug_message_insert(int source, int type, int id, int severity, HxString buf)
 	{
+#if defined(LIME_GLAD)
 		if (glDebugMessageInsert)
 		{
 			glDebugMessageInsert(source, type, id, severity, -1, buf.__s);
 		}
+#endif
 	}
 
 	void lime_gl_debug_message_control(int source, int type, int severity, int count, double ids, bool enabled)
 	{
+#if defined(LIME_GLAD)
 		if (glDebugMessageControl)
 		{
 			glDebugMessageControl(source, type, severity, count, (const GLuint *)(uintptr_t)ids, enabled);
 		}
+#endif
 	}
 
 	int lime_gl_create_buffer_dsa()
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glCreateBuffers)
 		{
 			GLuint id = 0;
@@ -2705,7 +2837,7 @@ namespace lime
 
 	void lime_gl_named_buffer_data(int buffer, int size, double data, int usage)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glNamedBufferData)
 		{
 			glNamedBufferData(buffer, size, (const void *)(uintptr_t)data, usage);
@@ -2715,7 +2847,7 @@ namespace lime
 
 	void lime_gl_named_buffer_sub_data(int buffer, double offset, int size, double data)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glNamedBufferSubData)
 		{
 			glNamedBufferSubData(buffer, (GLintptr)(uintptr_t)offset, size, (const void *)(uintptr_t)data);
@@ -2725,7 +2857,7 @@ namespace lime
 
 	void lime_gl_named_buffer_storage(int buffer, int size, double data, int flags)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glNamedBufferStorage)
 		{
 			glNamedBufferStorage(buffer, size, (const void *)(uintptr_t)data, flags);
@@ -2735,7 +2867,7 @@ namespace lime
 
 	double lime_gl_map_named_buffer_range(int buffer, double offset, int length, int access)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glMapNamedBufferRange)
 		{
 			return (double)(uintptr_t)glMapNamedBufferRange(buffer, (GLintptr)(uintptr_t)offset, length, access);
@@ -2746,7 +2878,7 @@ namespace lime
 
 	bool lime_gl_unmap_named_buffer(int buffer)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glUnmapNamedBuffer)
 		{
 			return glUnmapNamedBuffer(buffer);
@@ -2757,7 +2889,7 @@ namespace lime
 
 	void lime_gl_flush_mapped_named_buffer_range(int buffer, double offset, int length)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glFlushMappedNamedBufferRange)
 		{
 			glFlushMappedNamedBufferRange(buffer, (GLintptr)(uintptr_t)offset, length);
@@ -2767,7 +2899,7 @@ namespace lime
 
 	void lime_gl_buffer_storage(int target, int size, double data, int flags)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glBufferStorage)
 		{
 			glBufferStorage(target, size, (const void *)(uintptr_t)data, flags);
@@ -2777,7 +2909,7 @@ namespace lime
 
 	int lime_gl_create_texture_dsa(int target)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glCreateTextures)
 		{
 			GLuint id = 0;
@@ -2790,7 +2922,7 @@ namespace lime
 
 	void lime_gl_texture_storage_2d(int texture, int levels, int internalformat, int width, int height)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glTextureStorage2D)
 		{
 			glTextureStorage2D(texture, levels, internalformat, width, height);
@@ -2800,7 +2932,7 @@ namespace lime
 
 	void lime_gl_texture_storage_3d(int texture, int levels, int internalformat, int width, int height, int depth)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glTextureStorage3D)
 		{
 			glTextureStorage3D(texture, levels, internalformat, width, height, depth);
@@ -2810,7 +2942,7 @@ namespace lime
 
 	void lime_gl_texture_sub_image_2d(int texture, int level, int xoffset, int yoffset, int width, int height, int format, int type, double pixels)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glTextureSubImage2D)
 		{
 			glTextureSubImage2D(texture, level, xoffset, yoffset, width, height, format, type, (const void *)(uintptr_t)pixels);
@@ -2820,7 +2952,7 @@ namespace lime
 
 	void lime_gl_texture_parameteri(int texture, int pname, int param)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glTextureParameteri)
 		{
 			glTextureParameteri(texture, pname, param);
@@ -2830,7 +2962,7 @@ namespace lime
 
 	void lime_gl_texture_parameterf(int texture, int pname, float param)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glTextureParameterf)
 		{
 			glTextureParameterf(texture, pname, param);
@@ -2840,7 +2972,7 @@ namespace lime
 
 	void lime_gl_generate_texture_mipmap(int texture)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glGenerateTextureMipmap)
 		{
 			glGenerateTextureMipmap(texture);
@@ -2850,7 +2982,7 @@ namespace lime
 
 	void lime_gl_bind_texture_unit(int unit, int texture)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glBindTextureUnit)
 		{
 			glBindTextureUnit(unit, texture);
@@ -2860,7 +2992,7 @@ namespace lime
 
 	int lime_gl_create_framebuffer_dsa()
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glCreateFramebuffers)
 		{
 			GLuint id = 0;
@@ -2873,7 +3005,7 @@ namespace lime
 
 	void lime_gl_named_framebuffer_texture(int framebuffer, int attachment, int texture, int level)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glNamedFramebufferTexture)
 		{
 			glNamedFramebufferTexture(framebuffer, attachment, texture, level);
@@ -2883,7 +3015,7 @@ namespace lime
 
 	void lime_gl_named_framebuffer_renderbuffer(int framebuffer, int attachment, int renderbufferTarget, int renderbuffer)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glNamedFramebufferRenderbuffer)
 		{
 			glNamedFramebufferRenderbuffer(framebuffer, attachment, renderbufferTarget, renderbuffer);
@@ -2893,7 +3025,7 @@ namespace lime
 
 	int lime_gl_check_named_framebuffer_status(int framebuffer, int target)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glCheckNamedFramebufferStatus)
 		{
 			return glCheckNamedFramebufferStatus(framebuffer, target);
@@ -2904,7 +3036,7 @@ namespace lime
 
 	void lime_gl_clear_named_framebufferfv(int framebuffer, int buffer, int drawbuffer, double value)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glClearNamedFramebufferfv)
 		{
 			glClearNamedFramebufferfv(framebuffer, buffer, drawbuffer, (const GLfloat *)(uintptr_t)value);
@@ -2914,7 +3046,7 @@ namespace lime
 
 	void lime_gl_blit_named_framebuffer(int readFramebuffer, int drawFramebuffer, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, int mask, int filter)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glBlitNamedFramebuffer)
 		{
 			glBlitNamedFramebuffer(readFramebuffer, drawFramebuffer, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
@@ -2924,7 +3056,7 @@ namespace lime
 
 	int lime_gl_create_renderbuffer_dsa()
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glCreateRenderbuffers)
 		{
 			GLuint id = 0;
@@ -2937,7 +3069,7 @@ namespace lime
 
 	void lime_gl_named_renderbuffer_storage(int renderbuffer, int internalformat, int width, int height)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glNamedRenderbufferStorage)
 		{
 			glNamedRenderbufferStorage(renderbuffer, internalformat, width, height);
@@ -2947,7 +3079,7 @@ namespace lime
 
 	int lime_gl_create_vertex_array_dsa()
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glCreateVertexArrays)
 		{
 			GLuint id = 0;
@@ -2960,7 +3092,7 @@ namespace lime
 
 	void lime_gl_vertex_array_vertex_buffer(int vaobj, int bindingIndex, int buffer, double offset, int stride)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glVertexArrayVertexBuffer)
 		{
 			glVertexArrayVertexBuffer(vaobj, bindingIndex, buffer, (GLintptr)(uintptr_t)offset, stride);
@@ -2970,7 +3102,7 @@ namespace lime
 
 	void lime_gl_vertex_array_attrib_format(int vaobj, int attribIndex, int size, int type, bool normalized, int relativeOffset)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glVertexArrayAttribFormat)
 		{
 			glVertexArrayAttribFormat(vaobj, attribIndex, size, type, normalized, relativeOffset);
@@ -2980,7 +3112,7 @@ namespace lime
 
 	void lime_gl_vertex_array_attrib_binding(int vaobj, int attribIndex, int bindingIndex)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glVertexArrayAttribBinding)
 		{
 			glVertexArrayAttribBinding(vaobj, attribIndex, bindingIndex);
@@ -2990,7 +3122,7 @@ namespace lime
 
 	void lime_gl_vertex_array_element_buffer(int vaobj, int buffer)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glVertexArrayElementBuffer)
 		{
 			glVertexArrayElementBuffer(vaobj, buffer);
@@ -3000,7 +3132,7 @@ namespace lime
 
 	void lime_gl_enable_vertex_array_attrib(int vaobj, int index)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glEnableVertexArrayAttrib)
 		{
 			glEnableVertexArrayAttrib(vaobj, index);
@@ -3010,7 +3142,7 @@ namespace lime
 
 	void lime_gl_multi_draw_arrays_indirect(int mode, double indirect, int drawCount, int stride)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glMultiDrawArraysIndirect)
 		{
 			glMultiDrawArraysIndirect(mode, (const void *)(uintptr_t)indirect, drawCount, stride);
@@ -3020,7 +3152,7 @@ namespace lime
 
 	void lime_gl_multi_draw_elements_indirect(int mode, int type, double indirect, int drawCount, int stride)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glMultiDrawElementsIndirect)
 		{
 			glMultiDrawElementsIndirect(mode, type, (const void *)(uintptr_t)indirect, drawCount, stride);
@@ -3030,7 +3162,7 @@ namespace lime
 
 	void lime_gl_clip_control(int origin, int depth)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glClipControl)
 		{
 			glClipControl(origin, depth);
@@ -3040,7 +3172,7 @@ namespace lime
 
 	void lime_gl_texture_barrier()
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glTextureBarrier)
 		{
 			glTextureBarrier();
@@ -3050,7 +3182,7 @@ namespace lime
 
 	void lime_gl_polygon_mode(int face, int mode)
 	{
-#ifdef LIME_OPENGL_GL
+#if defined(LIME_GLAD) && defined(LIME_OPENGL_GL)
 		if (glPolygonMode)
 		{
 			glPolygonMode(face, mode);

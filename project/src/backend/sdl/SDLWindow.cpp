@@ -280,7 +280,15 @@ namespace lime
 		if (context)
 		{
 			#if defined(LIME_OPENGL)
-			if (glInvalidateFramebuffer)
+			// glad leaves the entry point null below GLES 3.0 / GL 4.3. iOS builds without glad,
+			// where it is a real function and testing its address warns under -Waddress.
+			#if defined(LIME_GLAD)
+			const bool canInvalidate = glInvalidateFramebuffer != NULL;
+			#else
+			const bool canInvalidate = true;
+			#endif
+
+			if (canInvalidate)
 			{
 				GLint boundFramebuffer = 0;
 				glGetIntegerv(GL_FRAMEBUFFER_BINDING, &boundFramebuffer);
