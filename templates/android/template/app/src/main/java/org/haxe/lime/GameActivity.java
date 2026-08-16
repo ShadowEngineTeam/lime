@@ -11,10 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.view.DisplayCutout;
-import android.os.VibratorManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyCharacterMap;
@@ -60,7 +57,6 @@ public class GameActivity extends SDLActivity {
 	private static List<Extension> extensions;
 	private static DisplayMetrics metrics;
 	private static DisplayCutout displayCutout;
-	private static Vibrator vibrator;
 
 	public Handler handler;
 
@@ -133,12 +129,6 @@ public class GameActivity extends SDLActivity {
 		requestAudioFocus();
 
 		assetManager = getAssets ();
-
-		if (checkSelfPermission(Manifest.permission.VIBRATE) == PackageManager.PERMISSION_GRANTED) {
-
-			vibrator = (Vibrator)mSingleton.getSystemService (Context.VIBRATOR_SERVICE);
-
-		}
 
 		handler = new Handler (Looper.getMainLooper ());
 
@@ -234,12 +224,6 @@ public class GameActivity extends SDLActivity {
 
 
 	@Override protected void onPause () {
-
-		if (vibrator != null) {
-
-			vibrator.cancel ();
-
-		}
 
 		super.onPause ();
 
@@ -387,56 +371,6 @@ public class GameActivity extends SDLActivity {
 			}
 
 		});
-
-	}
-
-
-	@SuppressWarnings("deprecation")
-	public static void vibrate (int period, int duration) {
-
-		if (vibrator == null || !vibrator.hasVibrator () || period < 0 || duration <= 0) {
-
-			return;
-
-		}
-
-		if (period == 0) {
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-				vibrator.vibrate (VibrationEffect.createOneShot (duration, VibrationEffect.DEFAULT_AMPLITUDE));
-
-			} else {
-
-				vibrator.vibrate (duration);
-
-			}
-
-		} else {
-
-			// each period has two halves (vibrator off/vibrator on), and each half requires a separate entry in the array
-			int periodMS = (int)Math.ceil (period / 2.0);
-			int count = (int)Math.ceil (duration / (double) periodMS);
-			long[] pattern = new long[count];
-
-			// the first entry is the delay before vibration starts, so leave it as 0
-			for (int i = 1; i < count; i++) {
-
-				pattern[i] = periodMS;
-
-			}
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-				vibrator.vibrate (VibrationEffect.createWaveform (pattern, -1));
-
-			} else {
-
-				vibrator.vibrate (pattern, -1);
-
-			}
-
-		}
 
 	}
 
