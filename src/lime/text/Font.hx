@@ -9,10 +9,7 @@ import lime.graphics.Image;
 import lime.graphics.ImageBuffer;
 import lime.math.Vector2;
 import lime.net.HTTPRequest;
-import lime.system.CFFI;
-import lime.system.System;
 import lime.utils.Assets;
-import lime.utils.Log;
 import lime.utils.UInt8Array;
 
 #if (lime_cffi && !macro)
@@ -142,26 +139,6 @@ class Font
 	}
 
 	/**
-	 * Decomposes the font into outline data.
-	 *
-	 * @param forceAutoHint When `true`, force auto-hinting for outline decomposition, When `false`, preserve the unhinted glyph outlines.
-	 * @return An instance of `NativeFontData` that contains decomposed font outline information.
-	 */
-	public function decompose(forceAutoHint:Bool = true):NativeFontData
-	{
-		#if (lime_cffi && !macro)
-		if (src == null)
-		{
-			throw "Uninitialized font handle.";
-		}
-
-		return NativeCFFI.lime_font_outline_decompose(src, 1024 * 20, forceAutoHint);
-		#else
-		return null;
-		#end
-	}
-
-	/**
 	 * Creates a Font instance from byte data.
 	 *
 	 * @param bytes The byte data containing the font.
@@ -287,13 +264,12 @@ class Font
 	{
 		#if (lime_cffi && !macro)
 		var value:Dynamic = NativeCFFI.lime_font_get_glyph_metrics(src, glyph);
-		var metrics = new GlyphMetrics();
 
+		var metrics = new GlyphMetrics();
 		metrics.advance = new Vector2(value.horizontalAdvance, value.verticalAdvance);
 		metrics.height = value.height;
 		metrics.horizontalBearing = new Vector2(value.horizontalBearingX, value.horizontalBearingY);
 		metrics.verticalBearing = new Vector2(value.verticalBearingX, value.verticalBearingY);
-
 		return metrics;
 		#else
 		return null;
@@ -301,21 +277,50 @@ class Font
 	}
 
 	/**
-	 	 	* Renders a specific glyph to an image.
-	 	 	*
-	 	 	* @param glyph The glyph to render.
-	 	 	* @param fontSize The size to render the glyph at.
-	 	 	* @param dpi The DPI used to size the glyph before rasterization.
-	 * @param flags Additional FreeType load flags to apply when rasterizing.
-	 	 	* @return An `Image` instance representing the rendered glyph.
+	 * Retrieves kerning vector between two glyphs.
+	 *
+	 * @param leftGlyph The left glyph in the kern pair.
+	 * @param rightGlyph The right glyph in the kern pair.
+	 * @return A `GlyphKerning` instance containing the kerning vector between the given glyphs.
 	 */
-	public function renderGlyph(glyph:Glyph, fontSize:Int, dpi:Int = 96, ?flags:Int = 0):Image
+	public function getGlyphKerning(leftGlyph:Glyph, rightGlyph:Glyph):GlyphKerning
 	{
 		#if (lime_cffi && !macro)
-		__setSize(fontSize, dpi);
+		var value:Dynamic = NativeCFFI.lime_font_get_glyph_kerning(src, leftGlyph, rightGlyph);
 
-		// Allocate an estimated buffer size - adjust if necessary
-		var bytes:Bytes = Bytes.alloc(0); // Allocate some reasonable initial size
+		var kerning = new GlyphKerning();
+		kerning.x = value.x;
+		kerning.y = value.y;
+		return kerning;
+		#else
+		return null;
+		#end
+	}
+
+	/**
+	 * Sets the font size.
+	 *
+	 * @param size The size to set the font to.
+	 */
+	public function setSize(size:Int):Void
+	{
+		#if (lime_cffi && !macro)
+		NativeCFFI.lime_font_set_size(src, size);
+		#end
+	}
+
+	/**
+	 * Renders a specific glyph to an image.
+	 *
+	 * @param glyph The glyph to render.
+	 * @param flags Additional FreeType load flags to apply when rasterizing.
+	 * @return An `Image` instance representing the rendered glyph.
+	 */
+	public function renderGlyph(glyph:Glyph, ?flags:Int = 0):Image
+	{
+		#if (lime_cffi && !macro)
+		// Allocate an estimated buffer size
+		var bytes:Bytes = Bytes.alloc(0);
 
 		// Call native function to render glyph and get byte data
 		bytes = NativeCFFI.lime_font_render_glyph(src, glyph, bytes, flags);
@@ -347,7 +352,7 @@ class Font
 			}
 
 			// Extract pixel data from the byte array, accounting for 32-bit RGBA data
-			var pitch = width * 4; // 32-bit color data
+			var pitch = width * 4;
 
 			// Create a new Bytes array to store the extracted bitmap data without padding
 			var dataBytes = Bytes.alloc(width * height * 4);
@@ -372,15 +377,13 @@ class Font
 	}
 
 	/**
-	 	 	* Renders a set of glyphs to images.
-	 	 	*
-	 	 	* @param glyphs The glyphs to render.
-	 	 	* @param fontSize The size to render the glyphs at.
-	 	 	* @param dpi The DPI used to size the glyphs before rasterization.
+	 * Renders a set of glyphs to images.
+	 *
+	 * @param glyphs The glyphs to render.
 	 * @param flags Additional FreeType load flags to apply when rasterizing.
-	 	 	* @return A `Map` containing glyphs mapped to their corresponding images.
+	 * @return A `Map` containing glyphs mapped to their corresponding images.
 	 */
-	public function renderGlyphs(glyphs:Array<Glyph>, fontSize:Int, dpi:Int = 96, ?flags:Int = 0):Map<Glyph, Image>
+	public function renderGlyphs(glyphs:Array<Glyph>, ?flags:Int = 0):Map<Glyph, Image>
 	{
 		#if (lime_cffi && !macro)
 		var uniqueGlyphs = new Map<Int, Bool>();
@@ -397,10 +400,8 @@ class Font
 			glyphList.push(key);
 		}
 
-		__setSize(fontSize, dpi);
-
-		// Allocate an estimated buffer size - adjust if necessary
-		var bytes:Bytes = Bytes.alloc(0); // Allocate some reasonable initial size
+		// Allocate an estimated buffer size
+		var bytes:Bytes = Bytes.alloc(0);
 
 		// Call native function to render glyphs and get byte data
 		bytes = NativeCFFI.lime_font_render_glyphs(src, glyphList, bytes, flags);
@@ -452,9 +453,6 @@ class Font
 					offsetX = 0;
 					offsetY = 0;
 					maxRows = 0;
-
-					// TODO: make this better
-
 					bytesPosition = 4;
 					i = 0;
 					continue;
@@ -617,57 +615,4 @@ class Font
 		promise.error("");
 		return promise.future;
 	}
-
-	@:noCompletion private function __setSize(size:Int, dpi:Int = 72):Void
-	{
-		#if (lime_cffi && !macro)
-		NativeCFFI.lime_font_set_size(src, size, dpi);
-		#end
-	}
-}
-
-/**
- * Represents decomposed font data, containing kerning information, glyphs, and other properties.
- */
-typedef NativeFontData =
-{
-	var has_kerning:Bool;
-	var is_fixed_width:Bool;
-	var has_glyph_names:Bool;
-	var is_italic:Bool;
-	var is_bold:Bool;
-	var num_glyphs:Int;
-	var family_name:String;
-	var style_name:String;
-	var em_size:Int;
-	var ascend:Int;
-	var descend:Int;
-	var height:Int;
-	var glyphs:Array<NativeGlyphData>;
-	var kerning:Array<NativeKerningData>;
-}
-
-/**
- * Represents data for an individual glyph, including dimensions and control points.
- */
-typedef NativeGlyphData =
-{
-	var char_code:Int;
-	var advance:Int;
-	var min_x:Int;
-	var max_x:Int;
-	var min_y:Int;
-	var max_y:Int;
-	var points:Array<Int>;
-}
-
-/**
- * Represents kerning information between two glyphs.
- */
-typedef NativeKerningData =
-{
-	var left_glyph:Int;
-	var right_glyph:Int;
-	var x:Int;
-	var y:Int;
 }
