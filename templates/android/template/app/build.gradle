@@ -96,7 +96,7 @@ android {
 
 dependencies {
 	::if (ANDROID_USE_ANDROIDX)::
-	implementation "androidx.core:core:1.18.0"
+	implementation "androidx.core:core:1.19.0"
 	implementation "androidx.documentfile:documentfile:1.1.0"
 	::end::
 	implementation fileTree(dir: 'libs', include: ['*.jar'])
