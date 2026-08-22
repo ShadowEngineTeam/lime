@@ -453,7 +453,7 @@ class AndroidPlatform extends PlatformTarget
 		}
 
 		context.ANDROID_MINIMUM_SDK_VERSION = project.config.getInt("android.minimum-sdk-version", 26);
-		context.ANDROID_TARGET_SDK_VERSION = project.config.getInt("android.target-sdk-version", 36);
+		context.ANDROID_TARGET_SDK_VERSION = project.config.getInt("android.target-sdk-version", 37);
 		context.ANDROID_EXTENSIONS = project.config.getArrayString("android.extension");
 		context.ANDROID_PERMISSIONS = project.config.getArrayString("android.permission", []);
 		context.ANDROID_GRADLE_VERSION = project.config.getString("android.gradle-version", "9.5.0");
