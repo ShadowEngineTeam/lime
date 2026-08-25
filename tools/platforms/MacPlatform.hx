@@ -284,7 +284,7 @@ class MacPlatform extends PlatformTarget
 					"--app-icon", "icon",
 					"--include-all-app-icons",
 					"--output-partial-info-plist", "/dev/null",
-					"--minimum-deployment-target", "11.0",
+					"--minimum-deployment-target", "12.0",
 					"--platform", "macosx",
 					"--target-device", "mac",
 				], false, false);
