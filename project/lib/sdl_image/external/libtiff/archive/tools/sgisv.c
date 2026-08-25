@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
                 else if (strneq(optarg, "jpeg", 4))
                 {
                     char *cp = strchr(optarg, ':');
-                    if (cp && isdigit(cp[1]))
+                    if (cp && isdigit((unsigned char)cp[1]))
                         quality = atoi(cp + 1);
                     if (cp && strchr(cp, 'r'))
                         jpegcolormode = JPEGCOLORMODE_RAW;
@@ -233,7 +233,7 @@ static void svRGBContig(TIFF *tif, uint32_t *ss, int xsize, int ysize)
 #undef RED
 #undef GREEN
 #undef BLUE
-#define CVT(x) (((x)*255) / 100)
+#define CVT(x) (((x) * 255) / 100)
 #define RED CVT(28)   /* 28% */
 #define GREEN CVT(59) /* 59% */
 #define BLUE CVT(11)  /* 11% */
@@ -317,6 +317,6 @@ static void tiffsv(char *name, int x1, int x2, int y1, int y2)
     }
     else
         svGrey(tif, scrbuf, xsize, ysize);
-    (void)TIFFClose(tif);
+    TIFFClose(tif);
     _TIFFfree((char *)scrbuf);
 }

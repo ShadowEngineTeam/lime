@@ -204,7 +204,7 @@ static bool ParseANIHeader(IMG_AnimationParseContext *parse, Uint32 size)
     }
 
     for (Uint32 i = 0; i < ctx->frame_count; ++i) {
-        ctx->frame_sequence[i] = i;
+        ctx->frame_sequence[i] = (i % anih->frames);
         ctx->frame_durations[i] = anih->jifRate;
     }
     return true;
@@ -252,6 +252,12 @@ static bool ParseInfoList(IMG_AnimationParseContext *parse, Uint32 list_size)
                 return false;
             }
         }
+        if (size & 1) {
+            ++size;
+            if (SDL_SeekIO(src, 1, SDL_IO_SEEK_CUR) < 0) {
+                return false;
+            }
+        }
         offset += size;
     }
     return true;
@@ -292,6 +298,12 @@ static bool ParseFrameList(IMG_AnimationParseContext *parse, Uint32 list_size)
         if (SDL_SeekIO(src, size, SDL_IO_SEEK_CUR) < 0) {
             return false;
         }
+        if (size & 1) {
+            ++size;
+            if (SDL_SeekIO(src, 1, SDL_IO_SEEK_CUR) < 0) {
+                return false;
+            }
+        }
         offset += size;
     }
     if (frame_count < anih->frames) {
@@ -316,6 +328,9 @@ static bool ParseList(IMG_AnimationParseContext *parse, Uint32 size)
         return ParseFrameList(parse, size);
     } else {
         // Unknown list chunk, ignore it
+        if (SDL_SeekIO(src, size, SDL_IO_SEEK_CUR) < 0) {
+            return false;
+        }
         return true;
     }
 }
@@ -332,6 +347,9 @@ static bool ParseSequenceChunk(IMG_AnimationParseContext *parse, Uint32 size)
 
     if (!(anih->fl & ANI_FLAG_SEQUENCE)) {
         // The header says we don't use sequence data, ignore it
+        if (SDL_SeekIO(src, size, SDL_IO_SEEK_CUR) < 0) {
+            return false;
+        }
         return true;
     }
 
@@ -405,7 +423,7 @@ bool IMG_CreateANIAnimationDecoder(IMG_AnimationDecoder *decoder, SDL_Properties
         Uint32 size;
         if (!SDL_ReadU32LE(decoder->src, &chunk) ||
             !SDL_ReadU32LE(decoder->src, &size)) {
-            goto done;
+            break;
         }
         offset += 8;
 
@@ -435,7 +453,19 @@ bool IMG_CreateANIAnimationDecoder(IMG_AnimationDecoder *decoder, SDL_Properties
                 goto done;
             }
         }
+        if (size & 1) {
+            ++size;
+            if (SDL_SeekIO(decoder->src, 1, SDL_IO_SEEK_CUR) < 0) {
+                goto done;
+            }
+        }
         offset += size;
+    }
+
+    // Make sure we have a valid animation
+    if (!parse.has_anih) {
+        SDL_SetError("Incomplete ANI data");
+        goto done;
     }
 
     decoder->GetNextFrame = IMG_AnimationDecoderGetNextFrame_Internal;
@@ -538,7 +568,15 @@ static bool SaveChunkSize(SDL_IOStream *dst, Sint64 offset)
     if (!SDL_WriteU32LE(dst, size)) {
         return false;
     }
-    return SDL_SeekIO(dst, here, SDL_IO_SEEK_SET);
+    if (!SDL_SeekIO(dst, here, SDL_IO_SEEK_SET)) {
+        return false;
+    }
+    if (size & 1) {
+        if (!SDL_WriteU8(dst, 0)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 static bool WriteIconFrame(SDL_Surface *surface, SDL_IOStream *dst)
@@ -569,6 +607,9 @@ static bool WriteAnimInfo(IMG_AnimationEncoderContext *ctx, SDL_IOStream *dst)
         result &= SDL_WriteU32LE(dst, RIFF_FOURCC('I', 'N', 'A', 'M'));
         result &= SDL_WriteU32LE(dst, size);
         result &= (SDL_WriteIO(dst, ctx->title, size) == size);
+        if (size & 1) {
+            result &= SDL_WriteU8(dst, 0);
+        }
     }
 
     if (ctx->author) {
@@ -576,6 +617,9 @@ static bool WriteAnimInfo(IMG_AnimationEncoderContext *ctx, SDL_IOStream *dst)
         result &= SDL_WriteU32LE(dst, RIFF_FOURCC('I', 'A', 'R', 'T'));
         result &= SDL_WriteU32LE(dst, size);
         result &= (SDL_WriteIO(dst, ctx->author, size) == size);
+        if (size & 1) {
+            result &= SDL_WriteU8(dst, 0);
+        }
     }
 
     result &= SaveChunkSize(dst, list_size_offset);

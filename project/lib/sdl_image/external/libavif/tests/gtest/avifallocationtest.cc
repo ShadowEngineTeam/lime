@@ -8,7 +8,7 @@
 #include "aviftest_helpers.h"
 #include "gtest/gtest.h"
 
-namespace libavif {
+namespace avif {
 namespace {
 
 void TestAllocation(uint32_t width, uint32_t height, uint32_t depth,
@@ -21,7 +21,7 @@ void TestAllocation(uint32_t width, uint32_t height, uint32_t depth,
         AVIF_PIXEL_FORMAT_YUV400}) {
     for (avifPlanesFlag planes :
          {AVIF_PLANES_YUV, AVIF_PLANES_A, AVIF_PLANES_ALL}) {
-      testutil::AvifImagePtr image(avifImageCreateEmpty(), avifImageDestroy);
+      ImagePtr image(avifImageCreateEmpty());
       ASSERT_NE(image, nullptr);
       image->width = width;
       image->height = height;
@@ -95,7 +95,7 @@ TEST(DISABLED_AllocationTest, OutOfMemory) {
 
 void TestEncoding(uint32_t width, uint32_t height, uint32_t depth,
                   avifResult expected_result) {
-  testutil::AvifImagePtr image(avifImageCreateEmpty(), avifImageDestroy);
+  ImagePtr image(avifImageCreateEmpty());
   ASSERT_NE(image, nullptr);
   image->width = width;
   image->height = height;
@@ -135,7 +135,7 @@ void TestEncoding(uint32_t width, uint32_t height, uint32_t depth,
   image->alphaPlane = bytes;
 
   // Try to encode.
-  testutil::AvifEncoderPtr encoder(avifEncoderCreate(), avifEncoderDestroy);
+  EncoderPtr encoder(avifEncoderCreate());
   ASSERT_NE(encoder, nullptr);
   encoder->speed = AVIF_SPEED_FASTEST;
   testutil::AvifRwData encoded_avif;
@@ -188,5 +188,35 @@ TEST(EncodingTest, MaximumInvalidDimensions) {
                AVIF_RESULT_UNSUPPORTED_DEPTH);
 }
 
+TEST(AvifAllocTest, Extremes) {
+  void* p1 = avifAlloc(1);
+  EXPECT_NE(p1, nullptr);
+  avifFree(p1);
+
+  EXPECT_EQ(avifAlloc(std::numeric_limits<size_t>::max()), nullptr);
+}
+
+TEST(AvifAllocTest, ZeroReturnsNull) {
+  // avifAlloc(0) must return NULL deterministically (rather than aborting via
+  // assert or relying on implementation-defined malloc(0) behavior). Callers
+  // rely on this contract to treat 0 as an allocation failure.
+  EXPECT_EQ(avifAlloc(0), nullptr);
+}
+
+TEST(AvifAllocTest, RWDataReallocShrinkToZeroSucceeds) {
+  // Shrinking an avifRWData to size 0 must release the buffer and return OK,
+  // not surface a phantom OOM from avifAlloc(0) returning NULL.
+  avifRWData raw = {};
+  ASSERT_EQ(avifRWDataRealloc(&raw, 16), AVIF_RESULT_OK);
+  ASSERT_NE(raw.data, nullptr);
+  ASSERT_EQ(raw.size, 16u);
+
+  EXPECT_EQ(avifRWDataRealloc(&raw, 0), AVIF_RESULT_OK);
+  EXPECT_EQ(raw.data, nullptr);
+  EXPECT_EQ(raw.size, 0u);
+
+  avifRWDataFree(&raw);
+}
+
 }  // namespace
-}  // namespace libavif
+}  // namespace avif
