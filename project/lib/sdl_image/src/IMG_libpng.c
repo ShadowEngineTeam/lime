@@ -1009,6 +1009,9 @@ static bool read_png_chunk(SDL_IOStream *stream, png_bytep *chunk, Uint32 *chunk
     SDL_memcpy(chunk_type, header+4, 4);
 
     // Allocate memory for chunk
+    if (*data_length > (SDL_MAX_UINT32 - (sizeof(header) + 4))) {
+        return SDL_SetError("Corrupt PNG");
+    }
     *chunk_size = sizeof(header) + *data_length + 4;
     *chunk = (png_bytep)SDL_malloc(*chunk_size);
     if (!*chunk) {
@@ -1271,7 +1274,7 @@ bool IMG_CreateAPNGAnimationDecoder(IMG_AnimationDecoder *decoder, SDL_Propertie
     while (!found_iend) {
         char chunk_type[5] = { 0 };
         png_bytep chunk = NULL;
-        Uint32 chunk_size;
+        Uint32 chunk_size = 0;
         png_bytep chunk_data = NULL;
         Uint32 chunk_length = 0;
         bool chunk_saved = false;
@@ -1499,8 +1502,8 @@ bool IMG_CreateAPNGAnimationDecoder(IMG_AnimationDecoder *decoder, SDL_Propertie
         }
     }
 
-    if (!ctx->is_apng || ctx->fctl_count == 0) {
-        SDL_SetError("Not an APNG file or no frame control chunks found");
+    if (!ctx->is_apng || ctx->fctl_count == 0 || ctx->actl.num_frames > (unsigned int)ctx->fctl_count) {
+        SDL_SetError("Not an APNG file or not enough frame control chunks found");
         IMG_AnimationDecoderClose_Internal(decoder);
         return false;
     }

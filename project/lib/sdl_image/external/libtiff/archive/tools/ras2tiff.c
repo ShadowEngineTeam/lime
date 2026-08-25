@@ -42,7 +42,7 @@
 #include "tiffio.h"
 
 #ifndef howmany
-#define howmany(x, y) (((x) + ((y)-1)) / (y))
+#define howmany(x, y) (((x) + ((y) - 1)) / (y))
 #endif
 #define streq(a, b) (strcmp(a, b) == 0)
 #define strneq(a, b, n) (strncmp(a, b, n) == 0)
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     }
     if (strcmp(h.ras_magic, RAS_MAGIC) == 0)
     {
-#ifndef WORDS_BIGENDIAN
+#if !WORDS_BIGENDIAN
         TIFFSwabLong((uint32_t *)&h.ras_width);
         TIFFSwabLong((uint32_t *)&h.ras_height);
         TIFFSwabLong((uint32_t *)&h.ras_depth);
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(h.ras_magic, RAS_MAGIC_INV) == 0)
     {
-#ifdef WORDS_BIGENDIAN
+#if WORDS_BIGENDIAN
         TIFFSwabLong((uint32_t *)&h.ras_width);
         TIFFSwabLong((uint32_t *)&h.ras_height);
         TIFFSwabLong((uint32_t *)&h.ras_depth);
@@ -172,14 +172,14 @@ int main(int argc, char *argv[])
         {
             fprintf(stderr, "No space to read in colormap.\n");
             fclose(in);
-            (void)TIFFClose(out);
+            TIFFClose(out);
             return (-5);
         }
         if (fread(buf, h.ras_maplength, 1, in) != 1)
         {
             fprintf(stderr, "%s: Read error on colormap.\n", argv[optind]);
             fclose(in);
-            (void)TIFFClose(out);
+            TIFFClose(out);
             return (-6);
         }
         mapsize = 1 << h.ras_depth;
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "%s: Huh, %d colormap entries, should be %d?\n",
                     argv[optind], h.ras_maplength, mapsize * 3);
             fclose(in);
-            (void)TIFFClose(out);
+            TIFFClose(out);
             return (-7);
         }
         red = (uint16_t *)_TIFFmalloc(mapsize * 3 * sizeof(uint16_t));
@@ -196,13 +196,13 @@ int main(int argc, char *argv[])
         {
             fprintf(stderr, "No space for colormap.\n");
             fclose(in);
-            (void)TIFFClose(out);
-            return (-8);
+            TIFFClose(out);
+            return -8;
         }
         map = red;
         for (j = 0; j < 3; j++)
         {
-#define SCALE(x) (((x) * ((1L << 16) - 1)) / 255)
+#define SCALE(x) (((x) * ((1 << 16) - 1)) / 255)
             for (i = h.ras_maplength / 3; i-- > 0;)
                 *map++ = SCALE(*buf++);
             if ((i = h.ras_maplength / 3) < mapsize)
@@ -283,9 +283,9 @@ int main(int argc, char *argv[])
         if (TIFFWriteScanline(out, buf, row, 0) < 0)
             break;
     }
-    (void)TIFFClose(out);
+    TIFFClose(out);
     fclose(in);
-    return (0);
+    return 0;
 }
 
 static int processCompressOptions(char *opt)
@@ -301,7 +301,7 @@ static int processCompressOptions(char *opt)
         compression = COMPRESSION_JPEG;
         while (cp)
         {
-            if (isdigit((int)cp[1]))
+            if (isdigit((unsigned char)cp[1]))
                 quality = atoi(cp + 1);
             else if (cp[1] == 'r')
                 jpegcolormode = JPEGCOLORMODE_RAW;

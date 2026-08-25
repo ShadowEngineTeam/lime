@@ -50,12 +50,20 @@ endif(LIBYUV_LIBRARY)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
-    libyuv
-    FOUND_VAR LIBYUV_FOUND
-    REQUIRED_VARS LIBYUV_LIBRARY LIBYUV_LIBRARIES LIBYUV_INCLUDE_DIR
-    VERSION_VAR _LIBYUV_VERSION
+    libyuv REQUIRED_VARS LIBYUV_LIBRARY LIBYUV_LIBRARIES LIBYUV_INCLUDE_DIR VERSION_VAR _LIBYUV_VERSION
 )
 
 # show the LIBYUV_INCLUDE_DIR, LIBYUV_LIBRARY and LIBYUV_LIBRARIES variables only
 # in the advanced view
 mark_as_advanced(LIBYUV_INCLUDE_DIR LIBYUV_LIBRARY LIBYUV_LIBRARIES)
+
+if(LIBYUV_LIBRARY)
+    if("${LIBYUV_LIBRARY}" MATCHES "\\${CMAKE_STATIC_LIBRARY_SUFFIX}$")
+        add_library(yuv::yuv STATIC IMPORTED GLOBAL)
+    else()
+        add_library(yuv::yuv SHARED IMPORTED GLOBAL)
+    endif()
+    set_target_properties(yuv::yuv PROPERTIES IMPORTED_LOCATION "${LIBYUV_LIBRARY}" IMPORTED_SONAME yuv)
+    target_include_directories(yuv::yuv INTERFACE "${LIBYUV_INCLUDE_DIR}")
+    set(libyuv_FOUND ON)
+endif()

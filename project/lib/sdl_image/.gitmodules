@@ -13,7 +13,7 @@
 [submodule "external/libtiff"]
 	path = external/libtiff
 	url = https://github.com/libsdl-org/libtiff.git
-	branch = v4.7.1-SDL
+	branch = v4.7.2-SDL
 [submodule "external/zlib"]
 	path = external/zlib
 	url = https://github.com/libsdl-org/zlib.git
@@ -25,7 +25,7 @@
 [submodule "external/libavif"]
 	path = external/libavif
 	url = https://github.com/libsdl-org/libavif.git
-	branch = v1.0.4-SDL
+	branch = v1.1.1-SDL
 [submodule "external/dav1d"]
 	path = external/dav1d
 	url = https://github.com/libsdl-org/dav1d.git
@@ -33,4 +33,4 @@
 [submodule "external/aom"]
 	path = external/aom
 	url = https://github.com/libsdl-org/aom.git
-	branch = v3.6.1-SDL
+	branch = v3.6.x-SDL

@@ -13,6 +13,7 @@ LOCAL_SRC_FILES :=  \
     src/avif.c      \
     src/codec_dav1d.c \
     src/colr.c      \
+    src/colrconvert.c \
     src/diag.c      \
     src/exif.c      \
     src/io.c        \
@@ -27,6 +28,11 @@ LOCAL_SRC_FILES :=  \
     src/stream.c    \
     src/utils.c     \
     src/write.c     \
+    third_party/libyuv/source/scale.c \
+    third_party/libyuv/source/scale_common.c \
+    third_party/libyuv/source/scale_any.c \
+    third_party/libyuv/source/row_common.c \
+    third_party/libyuv/source/planar_functions.c
 
 LOCAL_CFLAGS := -DAVIF_CODEC_DAV1D
 

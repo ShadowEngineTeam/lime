@@ -7,12 +7,14 @@
 
 void * avifAlloc(size_t size)
 {
-    void * out = malloc(size);
-    if (out == NULL) {
-        // TODO(issue #820): Remove once all calling sites propagate the error as AVIF_RESULT_OUT_OF_MEMORY.
-        abort();
+    // malloc(0) is implementation-defined (see
+    // https://en.cppreference.com/w/cpp/memory/c/malloc), so collapse the
+    // zero-size case to a deterministic NULL return. Callers must either treat
+    // 0 as an allocation failure or guard against it before calling.
+    if (size == 0) {
+        return NULL;
     }
-    return out;
+    return malloc(size);
 }
 
 void avifFree(void * p)
