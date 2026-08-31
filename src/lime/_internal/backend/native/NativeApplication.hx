@@ -693,7 +693,7 @@ class NativeApplication
 	}
 }
 
-@:keep /*private*/ class ApplicationEventInfo
+@:keep private class ApplicationEventInfo
 {
 	public var deltaTime:Float;
 	public var type:ApplicationEventType;
@@ -717,7 +717,7 @@ private enum abstract ApplicationEventType(Int)
 	var EXIT = 2;
 }
 
-@:keep /*private*/ class ClipboardEventInfo
+@:keep private class ClipboardEventInfo
 {
 	public var type:ClipboardEventType;
 
@@ -737,7 +737,7 @@ private enum abstract ClipboardEventType(Int)
 	var UPDATE = 0;
 }
 
-@:keep /*private*/ class DropEventInfo
+@:keep private class DropEventInfo
 {
 	public var data:String;
 	public var source:String;
@@ -771,7 +771,7 @@ private enum abstract DropEventType(Int)
 	var DROP_POSITION = 4;
 }
 
-@:keep /*private*/ class GamepadEventInfo
+@:keep private class GamepadEventInfo
 {
 	public var axis:Int;
 	public var button:Int;
@@ -805,7 +805,7 @@ private enum abstract GamepadEventType(Int)
 	var DISCONNECT = 4;
 }
 
-@:keep /*private*/ class JoystickEventInfo
+@:keep private class JoystickEventInfo
 {
 	public var id:Int;
 	public var index:Int;
@@ -840,7 +840,7 @@ private enum abstract JoystickEventType(Int)
 	var DISCONNECT = 6;
 }
 
-@:keep /*private*/ class KeyEventInfo
+@:keep private class KeyEventInfo
 {
 	public var keyCode:Float;
 	public var modifier:Int;
@@ -869,7 +869,7 @@ private enum abstract KeyEventType(Int)
 	var KEY_UP = 1;
 }
 
-@:keep /*private*/ class MouseEventInfo
+@:keep private class MouseEventInfo
 {
 	public var button:Int;
 	public var movementX:Float;
@@ -907,7 +907,7 @@ private enum abstract MouseEventType(Int)
 	var MOUSE_WHEEL = 3;
 }
 
-@:keep /*private*/ class RenderEventInfo
+@:keep private class RenderEventInfo
 {
 	public var type:RenderEventType;
 
@@ -929,7 +929,7 @@ private enum abstract RenderEventType(Int)
 	var RENDER_CONTEXT_RESTORED = 2;
 }
 
-@:keep /*private*/ class SensorEventInfo
+@:keep private class SensorEventInfo
 {
 	public var id:Int;
 	public var x:Float;
@@ -958,7 +958,7 @@ private enum abstract SensorEventType(Int)
 	var GYROSCOPE = 1;
 }
 
-@:keep /*private*/ class TextEventInfo
+@:keep private class TextEventInfo
 {
 	public var id:Int;
 	public var length:Int;
@@ -988,7 +988,7 @@ private enum abstract TextEventType(Int)
 	var TEXT_EDIT = 1;
 }
 
-@:keep /*private*/ class TouchEventInfo
+@:keep private class TouchEventInfo
 {
 	public var device:Int;
 	public var dx:Float;
@@ -1024,7 +1024,7 @@ private enum abstract TouchEventType(Int)
 	var TOUCH_MOVE = 2;
 }
 
-@:keep /*private*/ class GestureEventInfo
+@:keep private class GestureEventInfo
 {
 	public var x:Float;
 	public var y:Float;
@@ -1073,7 +1073,7 @@ private enum abstract GestureEventType(Int)
 	var GESTURE_CANCEL = 3;
 }
 
-@:keep /*private*/ class WindowEventInfo
+@:keep private class WindowEventInfo
 {
 	public var height:Int;
 	public var type:WindowEventType;
@@ -1117,7 +1117,7 @@ private enum abstract WindowEventType(Int)
 	var WINDOW_HIDE = 14;
 }
 
-@:keep /*private*/ class OrientationEventInfo
+@:keep private class OrientationEventInfo
 {
 	public var orientation:Int;
 	public var display:Int;
