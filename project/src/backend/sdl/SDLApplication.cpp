@@ -869,7 +869,6 @@ namespace lime
 			switch (event->type)
 			{
 				case SDL_EVENT_WINDOW_EXPOSED:
-				case SDL_EVENT_WINDOW_MOVED:
 				case SDL_EVENT_WINDOW_RESIZED:
 
 					currentApplication->ProcessWindowEvent(event);
