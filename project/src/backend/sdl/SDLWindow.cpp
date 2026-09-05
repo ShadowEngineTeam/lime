@@ -398,7 +398,11 @@ namespace lime
 		int width;
 		int height;
 
+#ifndef IPHONE
+		SDL_GetWindowSize(sdlWindow, &width, &height);
+#else
 		SDL_GetWindowSizeInPixels(sdlWindow, &width, &height);
+#endif
 
 		return height;
 	}
@@ -420,7 +424,11 @@ namespace lime
 
 	double SDLWindow::GetScale()
 	{
-		return 1 /* SDL_GetWindowDisplayScale (sdlWindow) */;
+#ifndef IPHONE
+		return SDL_GetWindowPixelDensity(sdlWindow);
+#else
+		return 1;
+#endif
 	}
 
 	bool SDLWindow::GetTextInputEnabled()
@@ -433,7 +441,11 @@ namespace lime
 		int width;
 		int height;
 
+#ifndef IPHONE
+		SDL_GetWindowSize(sdlWindow, &width, &height);
+#else
 		SDL_GetWindowSizeInPixels(sdlWindow, &width, &height);
+#endif
 
 		return width;
 	}
