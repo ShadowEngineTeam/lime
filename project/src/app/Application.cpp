@@ -410,7 +410,7 @@ namespace lime
 					{
 						GamepadEvent gamepadEvent;
 						gamepadEvent.type = GAMEPAD_CONNECT;
-						gamepadEvent.id = Gamepad::GetInstanceID(event->gdevice.which);
+						gamepadEvent.id = event->gdevice.which;
 						gamepadEvent.timestamp = event->gdevice.timestamp;
 						GamepadEvent::Dispatch(&gamepadEvent);
 					}
@@ -486,7 +486,7 @@ namespace lime
 					{
 						JoystickEvent joystickEvent;
 						joystickEvent.type = JOYSTICK_CONNECT;
-						joystickEvent.id = Joystick::GetInstanceID(event->jdevice.which);
+						joystickEvent.id = event->jdevice.which;
 						JoystickEvent::Dispatch(&joystickEvent);
 					}
 					break;
