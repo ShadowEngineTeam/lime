@@ -745,7 +745,7 @@ namespace lime
 		return 0;
 	}
 
-	void SDLApplication::RegisterWindow(SDLWindow *window)
+	void SDLApplication::RegisterWindow(Window *window)
 	{
 #ifdef HX_MACOS
 		Gesture::Register(window);
