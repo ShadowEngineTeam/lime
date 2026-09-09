@@ -674,19 +674,19 @@ class HXProject extends Script
 
 	private function getTargetFlagArchitecture():Architecture
 	{
-		if (targetFlags.exists("arm64") || targetFlags.exists("ONLY_ARM64"))
+		if (targetFlags.exists("arm64"))
 		{
 			return Architecture.ARM64;
 		}
-		else if (targetFlags.exists("armv7") || targetFlags.exists("ONLY_ARMV7"))
+		else if (targetFlags.exists("armv7"))
 		{
 			return Architecture.ARMV7;
 		}
-		else if (targetFlags.exists("64") || targetFlags.exists("x86_64") || targetFlags.exists("ONLY_X86_64"))
+		else if (targetFlags.exists("64") || targetFlags.exists("x86_64"))
 		{
 			return Architecture.X64;
 		}
-		else if (targetFlags.exists("32") || targetFlags.exists("x86_32") || targetFlags.exists("ONLY_X86"))
+		else if (targetFlags.exists("32") || targetFlags.exists("x86_32"))
 		{
 			return Architecture.X86;
 		}
