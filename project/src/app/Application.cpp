@@ -847,11 +847,6 @@ namespace lime
 		frameTime.target = frameRate < 1 ? 0 : (Uint64)std::llround(1e9 / frameRate);
 	}
 
-	bool Application::isInBackground()
-	{
-		return background;
-	}
-
 	void Application::RenderFrame()
 	{
 		ApplicationEvent applicationEvent;
