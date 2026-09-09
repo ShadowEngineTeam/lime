@@ -1,23 +1,21 @@
-#include "SDLWindow.h"
-
+#include "../backend/sdl/SDLApplication.h"
 #include "bindings/opengl/OpenGLBindings.h"
-#include "SDLApplication.h"
 #include "system/System.h"
 #ifdef ANDROID
 #include <android/native_window.h>
 #endif
 
 #include <cstring>
+#include <ui/Window.h>
 #include <vector>
 
 namespace lime
 {
-
 	static SystemCursor currentCursor = DEFAULT;
 
 	double drawScale = 1.0;
 
-	SDLWindow::SDLWindow(Application *application, int width, int height, int flags, const char *title)
+	Window::Window(Application *application, int width, int height, int flags, const char *title)
 	{
 		context = 0;
 
@@ -169,7 +167,7 @@ namespace lime
 		}
 	}
 
-	SDLWindow::~SDLWindow()
+	Window::~Window()
 	{
 		if (sdlWindow)
 		{
@@ -184,7 +182,7 @@ namespace lime
 		}
 	}
 
-	int SDLWindow::Alert(int type, const char *message, const char *title, const char **buttons, int count)
+	int Window::Alert(int type, const char *message, const char *title, const char **buttons, int count)
 	{
 		SDL_MessageBoxFlags flags = SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
 
@@ -247,12 +245,12 @@ namespace lime
 		return buttonID;
 	}
 
-	bool SDLWindow::SetVSyncMode(int mode)
+	bool Window::SetVSyncMode(int mode)
 	{
 		return SDL_GL_SetSwapInterval(mode);
 	}
 
-	void SDLWindow::Close()
+	void Window::Close()
 	{
 		if (sdlWindow)
 		{
@@ -261,7 +259,7 @@ namespace lime
 		}
 	}
 
-	bool SDLWindow::SetVisible(bool visible)
+	bool Window::SetVisible(bool visible)
 	{
 		if (visible)
 		{
@@ -275,7 +273,7 @@ namespace lime
 		return !(SDL_GetWindowFlags(sdlWindow) & SDL_WINDOW_HIDDEN);
 	}
 
-	void SDLWindow::ContextFlip()
+	void Window::ContextFlip()
 	{
 		if (context)
 		{
@@ -303,7 +301,7 @@ namespace lime
 		}
 	}
 
-	void SDLWindow::ContextMakeCurrent()
+	void Window::ContextMakeCurrent()
 	{
 		if (sdlWindow && context)
 		{
@@ -311,12 +309,12 @@ namespace lime
 		}
 	}
 
-	void SDLWindow::Focus()
+	void Window::Focus()
 	{
 		SDL_RaiseWindow(sdlWindow);
 	}
 
-	void *SDLWindow::GetHandle()
+	void *Window::GetHandle()
 	{
 		SDL_PropertiesID props = SDL_GetWindowProperties(sdlWindow);
 
@@ -345,12 +343,12 @@ namespace lime
 #endif
 	}
 
-	void *SDLWindow::GetContext()
+	void *Window::GetContext()
 	{
 		return context;
 	}
 
-	const char *SDLWindow::GetContextType()
+	const char *Window::GetContextType()
 	{
 		if (context)
 		{
@@ -360,12 +358,12 @@ namespace lime
 		return "none";
 	}
 
-	int SDLWindow::GetDisplay()
+	int Window::GetDisplay()
 	{
 		return SDL_GetDisplayForWindow(sdlWindow);
 	}
 
-	void SDLWindow::GetDisplayMode(DisplayMode *displayMode)
+	void Window::GetDisplayMode(DisplayMode *displayMode)
 	{
 		const SDL_DisplayMode *mode = SDL_GetDesktopDisplayMode(SDL_GetDisplayForWindow(sdlWindow));
 
@@ -393,7 +391,7 @@ namespace lime
 		displayMode->refreshRate = mode->refresh_rate;
 	}
 
-	int SDLWindow::GetHeight()
+	int Window::GetHeight()
 	{
 		int width;
 		int height;
@@ -407,22 +405,22 @@ namespace lime
 		return height;
 	}
 
-	uint32_t SDLWindow::GetID()
+	uint32_t Window::GetID()
 	{
 		return SDL_GetWindowID(sdlWindow);
 	}
 
-	bool SDLWindow::GetMouseLock()
+	bool Window::GetMouseLock()
 	{
 		return SDL_GetWindowRelativeMouseMode(sdlWindow);
 	}
 
-	float SDLWindow::GetOpacity()
+	float Window::GetOpacity()
 	{
 		return SDL_GetWindowOpacity(sdlWindow);
 	}
 
-	double SDLWindow::GetScale()
+	double Window::GetScale()
 	{
 #ifndef IPHONE
 		return SDL_GetWindowPixelDensity(sdlWindow);
@@ -431,12 +429,12 @@ namespace lime
 #endif
 	}
 
-	bool SDLWindow::GetTextInputEnabled()
+	bool Window::GetTextInputEnabled()
 	{
 		return SDL_TextInputActive(sdlWindow);
 	}
 
-	int SDLWindow::GetWidth()
+	int Window::GetWidth()
 	{
 		int width;
 		int height;
@@ -450,7 +448,7 @@ namespace lime
 		return width;
 	}
 
-	int SDLWindow::GetX()
+	int Window::GetX()
 	{
 		int x;
 		int y;
@@ -460,7 +458,7 @@ namespace lime
 		return x;
 	}
 
-	int SDLWindow::GetY()
+	int Window::GetY()
 	{
 		int x;
 		int y;
@@ -470,12 +468,12 @@ namespace lime
 		return y;
 	}
 
-	void SDLWindow::Move(int x, int y)
+	void Window::Move(int x, int y)
 	{
 		SDL_SetWindowPosition(sdlWindow, x, y);
 	}
 
-	void SDLWindow::ReadPixels(ImageBuffer *buffer, Rectangle *rect)
+	void Window::ReadPixels(ImageBuffer *buffer, Rectangle *rect)
 	{
 		if (context)
 		{
@@ -483,28 +481,28 @@ namespace lime
 		}
 	}
 
-	void SDLWindow::Resize(int width, int height)
+	void Window::Resize(int width, int height)
 	{
 		SDL_SetWindowSize(sdlWindow, width, height);
 	}
 
-	void SDLWindow::SetMinimumSize(int width, int height)
+	void Window::SetMinimumSize(int width, int height)
 	{
 		SDL_SetWindowMinimumSize(sdlWindow, width, height);
 	}
 
-	void SDLWindow::SetMaximumSize(int width, int height)
+	void Window::SetMaximumSize(int width, int height)
 	{
 		SDL_SetWindowMaximumSize(sdlWindow, width, height);
 	}
 
-	bool SDLWindow::SetBorderless(bool borderless)
+	bool Window::SetBorderless(bool borderless)
 	{
 		SDL_SetWindowBordered(sdlWindow, !borderless);
 		return borderless;
 	}
 
-	void SDLWindow::SetCursor(SystemCursor cursor)
+	void Window::SetCursor(SystemCursor cursor)
 	{
 		if (cursor != currentCursor)
 		{
@@ -530,7 +528,7 @@ namespace lime
 		}
 	}
 
-	void SDLWindow::SetDisplayMode(DisplayMode *displayMode)
+	void Window::SetDisplayMode(DisplayMode *displayMode)
 	{
 		SDL_PixelFormat pixelFormat;
 
@@ -562,13 +560,13 @@ namespace lime
 		}
 	}
 
-	bool SDLWindow::SetFullscreen(bool fullscreen)
+	bool Window::SetFullscreen(bool fullscreen)
 	{
 		SDL_SetWindowFullscreen(sdlWindow, fullscreen);
 		return fullscreen;
 	}
 
-	void SDLWindow::SetIcon(ImageBuffer *imageBuffer)
+	void Window::SetIcon(ImageBuffer *imageBuffer)
 	{
 		SDL_PixelFormat format = SDL_GetPixelFormatForMasks(imageBuffer->bitsPerPixel, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
@@ -581,7 +579,7 @@ namespace lime
 		}
 	}
 
-	bool SDLWindow::SetMaximized(bool maximized)
+	bool Window::SetMaximized(bool maximized)
 	{
 		if (maximized)
 		{
@@ -595,7 +593,7 @@ namespace lime
 		return maximized;
 	}
 
-	bool SDLWindow::SetMinimized(bool minimized)
+	bool Window::SetMinimized(bool minimized)
 	{
 		if (minimized)
 		{
@@ -609,7 +607,7 @@ namespace lime
 		return minimized;
 	}
 
-	void SDLWindow::SetMouseLock(bool mouseLock)
+	void Window::SetMouseLock(bool mouseLock)
 	{
 		if (mouseLock)
 		{
@@ -621,12 +619,12 @@ namespace lime
 		}
 	}
 
-	void SDLWindow::SetOpacity(float opacity)
+	void Window::SetOpacity(float opacity)
 	{
 		SDL_SetWindowOpacity(sdlWindow, opacity);
 	}
 
-	bool SDLWindow::SetResizable(bool resizable)
+	bool Window::SetResizable(bool resizable)
 	{
 		if (resizable)
 		{
@@ -640,7 +638,7 @@ namespace lime
 		return (SDL_GetWindowFlags(sdlWindow) & SDL_WINDOW_RESIZABLE);
 	}
 
-	void SDLWindow::SetTextInputEnabled(bool enabled)
+	void Window::SetTextInputEnabled(bool enabled)
 	{
 		if (enabled)
 		{
@@ -652,7 +650,7 @@ namespace lime
 		}
 	}
 
-	void SDLWindow::SetTextInputRect(Rectangle *rect)
+	void Window::SetTextInputRect(Rectangle *rect)
 	{
 		SDL_Rect bounds = {0, 0, 0, 0};
 
@@ -667,26 +665,26 @@ namespace lime
 		SDL_SetTextInputArea(sdlWindow, &bounds, 0);
 	}
 
-	const char *SDLWindow::SetTitle(const char *title)
+	const char *Window::SetTitle(const char *title)
 	{
 		SDL_SetWindowTitle(sdlWindow, title);
 
 		return title;
 	}
 
-	bool SDLWindow::SetAlwaysOnTop(bool alwaysOnTop)
+	bool Window::SetAlwaysOnTop(bool alwaysOnTop)
 	{
 		SDL_SetWindowAlwaysOnTop(sdlWindow, alwaysOnTop);
 
 		return alwaysOnTop;
 	}
 
-	void SDLWindow::WarpMouse(int x, int y)
+	void Window::WarpMouse(int x, int y)
 	{
 		SDL_WarpMouseInWindow(sdlWindow, x, y);
 	}
 
-	double SDLWindow::GetDrawScale()
+	double Window::GetDrawScale()
 	{
 		const int nativeWidth = GetNativeWidth();
 
@@ -698,7 +696,7 @@ namespace lime
 		return (double)GetWidth() / (double)nativeWidth;
 	}
 
-	int SDLWindow::GetNativeWidth()
+	int Window::GetNativeWidth()
 	{
 #if defined(ANDROID)
 		return ANativeWindow_getWidth((ANativeWindow *)GetHandle());
@@ -712,7 +710,7 @@ namespace lime
 #endif
 	}
 
-	int SDLWindow::GetNativeHeight()
+	int Window::GetNativeHeight()
 	{
 #if defined(ANDROID)
 		return ANativeWindow_getHeight((ANativeWindow *)GetHandle());
@@ -724,11 +722,6 @@ namespace lime
 
 		return height;
 #endif
-	}
-
-	Window *MakeWindow(Application *application, int width, int height, int flags, const char *title)
-	{
-		return new SDLWindow(application, width, height, flags, title);
 	}
 
 } // namespace lime

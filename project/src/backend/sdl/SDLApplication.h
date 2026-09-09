@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SDLWindow.h"
-
 #include <app/Application.h>
 #include <events/ApplicationEvent.h>
 #include <events/ClipboardEvent.h>
@@ -18,6 +16,7 @@
 #include <events/WindowEvent.h>
 #include <SDL3/SDL.h>
 #include <ui/Gesture.h>
+#include <ui/Window.h>
 
 namespace lime
 {
@@ -43,7 +42,7 @@ namespace lime
 		static bool isInBackground();
 		virtual bool Update();
 
-		void RegisterWindow(SDLWindow *window);
+		void RegisterWindow(Window *window);
 
 	  private:
 		void InitializeSensors();
