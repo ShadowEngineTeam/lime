@@ -40,13 +40,11 @@ namespace lime
 		WINDOW_FLAG_COLOR_DEPTH_32_BIT = 0x00010000
 	};
 
-	class Application;
-
 	class Window
 	{
 	  public:
 		Window(Application *application, int width, int height, int flags, const char *title);
-		~Window();
+		virtual ~Window();
 
 		int Alert(int type, const char *message, const char *title, const char **buttons, int count);
 		bool SetVSyncMode(int mode);
@@ -56,6 +54,7 @@ namespace lime
 		void Focus();
 		void *GetHandle();
 		void *GetContext();
+		const char *GetContextType();
 		int GetDisplay();
 		void GetDisplayMode(DisplayMode *displayMode);
 		int GetHeight();
@@ -88,6 +87,9 @@ namespace lime
 		bool SetVisible(bool visible);
 		bool SetAlwaysOnTop(bool alwaysOnTop);
 		void WarpMouse(int x, int y);
+		double GetDrawScale();
+		int GetNativeWidth();
+		int GetNativeHeight();
 
 		Application *currentApplication;
 		int flags;
@@ -95,6 +97,8 @@ namespace lime
 
 	  private:
 		SDL_GLContext context;
+		int contextWidth;
+		int contextHeight;
 	};
 
 } // namespace lime
