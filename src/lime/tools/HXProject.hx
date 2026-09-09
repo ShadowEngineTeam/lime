@@ -672,6 +672,28 @@ class HXProject extends Script
 		merge(projectXML);
 	}
 
+	private function getTargetFlagArchitecture():Architecture
+	{
+		if (targetFlags.exists("arm64") || targetFlags.exists("ONLY_ARM64"))
+		{
+			return Architecture.ARM64;
+		}
+		else if (targetFlags.exists("armv7") || targetFlags.exists("ONLY_ARMV7"))
+		{
+			return Architecture.ARMV7;
+		}
+		else if (targetFlags.exists("64") || targetFlags.exists("x86_64") || targetFlags.exists("ONLY_X86_64"))
+		{
+			return Architecture.X64;
+		}
+		else if (targetFlags.exists("32") || targetFlags.exists("x86_32") || targetFlags.exists("ONLY_X86"))
+		{
+			return Architecture.X86;
+		}
+
+		return null;
+	}
+
 	private function initializeDefines():Void
 	{
 		switch (platformType)
@@ -737,29 +759,48 @@ class HXProject extends Script
 
 		if (architectures.length == 0)
 		{
-			switch (target)
+			var architecture = getTargetFlagArchitecture();
+
+			if (architecture != null)
 			{
-				case IOS:
-					if (targetFlags.exists("simulator"))
-					{
-						architectures = [new Architecture(Std.string(System.hostArchitecture))];
-					}
-					else
-					{
-						architectures = [Architecture.ARM64];
-					}
-				case ANDROID:
-					if (targetFlags.exists("emulator"))
-					{
-						architectures = [Architecture.X64, Architecture.ARM64];
-					}
-					else
-					{
-						architectures = [Architecture.ARM64, Architecture.ARMV7];
-					}
-				case WINDOWS, MAC, LINUX:
-					architectures = [new Architecture(Std.string(System.hostArchitecture))];
-				default:
+				architectures = [architecture];
+			}
+			else
+			{
+				switch (target)
+				{
+					case IOS:
+						if (targetFlags.exists("simulator"))
+						{
+							architectures = [new Architecture(Std.string(System.hostArchitecture))];
+						}
+						else
+						{
+							architectures = [Architecture.ARM64];
+						}
+					case ANDROID:
+						if (targetFlags.exists("emulator"))
+						{
+							architectures = [Architecture.X64, Architecture.ARM64];
+						}
+						else
+						{
+							architectures = [Architecture.ARM64, Architecture.ARMV7];
+						}
+					case WINDOWS, MAC, LINUX:
+						architecture = new Architecture(Std.string(System.hostArchitecture));
+
+						architectures = architecture != null ? [architecture] : [];
+					default:
+				}
+			}
+		}
+
+		for (architecture in architectures)
+		{
+			if (architecture != null)
+			{
+				defines.set(architecture.getConditionName(), "1");
 			}
 		}
 

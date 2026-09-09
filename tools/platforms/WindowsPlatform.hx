@@ -59,19 +59,15 @@ class WindowsPlatform extends PlatformTarget
 
 		for (architecture in project.architectures)
 		{
-			if (architecture == Architecture.X64 || architecture == Architecture.ARM64)
+			if (!targetFlags.exists("32") && !targetFlags.exists("x86_32") && architecture == Architecture.X64)
 			{
 				is64 = true;
 			}
-			if (project.flags.exists("arm64") || architecture == Architecture.ARM64)
+			else if (targetFlags.exists("arm64") || architecture == Architecture.ARM64)
 			{
 				isArm = true;
+				is64 = true;
 			}
-		}
-
-		if (project.flags.exists("32") || project.flags.exists("x86_32"))
-		{
-			is64 = false;
 		}
 
 		targetDirectory = Path.combine(project.app.path, project.config.getString("windows.output-directory", "windows"));
