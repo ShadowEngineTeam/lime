@@ -62,7 +62,16 @@ class AudioBuffer
 
 	public function new() {}
 
-	public function dispose():Void {}
+	public function dispose():Void
+	{
+		#if (lime_cffi && !macro)
+		if (__srcBuffer != null)
+		{
+			AL.deleteBuffer(__srcBuffer);
+			__srcBuffer = null;
+		}
+		#end
+	}
 
 	public static function fromBase64(base64String:String):AudioBuffer
 	{
