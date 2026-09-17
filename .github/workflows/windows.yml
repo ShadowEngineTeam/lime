@@ -29,9 +29,9 @@ jobs:
         run: haxelib dev lime ${{ github.workspace }}
       - name: Rebuild Lime
         run: |
-          haxelib run lime rebuild windows -32 -release -nocffi
-          haxelib run lime rebuild windows -64 -release -nocffi
-          haxelib run lime rebuild windows -arm64 -release -D HXCPP_ARM64
+          haxelib run lime rebuild windows -32 -release -nocffi -D HXCPP_OPTIMIZE_LINK
+          haxelib run lime rebuild windows -64 -release -nocffi -D HXCPP_OPTIMIZE_LINK
+          haxelib run lime rebuild windows -arm64 -release -D HXCPP_ARM64 -D HXCPP_OPTIMIZE_LINK
       - name: Upload Artifact (x86)
         uses: actions/upload-artifact@main
         with:

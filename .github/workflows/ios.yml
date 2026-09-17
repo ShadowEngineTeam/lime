@@ -29,9 +29,9 @@ jobs:
         run: haxelib dev lime ${{ github.workspace }}
       - name: Rebuild Lime
         run: |
-          haxelib run lime rebuild ios -arm64 -release -D HXCPP_ARM64
-          haxelib run lime rebuild ios -arm64 -simulator -release -D HXCPP_ARM64
-          haxelib run lime rebuild ios -64 -simulator -release -D HXCPP_M64
+          haxelib run lime rebuild ios -arm64 -release -D HXCPP_ARM64 -D HXCPP_LTO_THIN
+          haxelib run lime rebuild ios -arm64 -simulator -release -D HXCPP_ARM64 -D HXCPP_LTO_THIN
+          haxelib run lime rebuild ios -64 -simulator -release -D HXCPP_M64 -D HXCPP_LTO_THIN
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
