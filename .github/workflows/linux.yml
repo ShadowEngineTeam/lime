@@ -85,7 +85,7 @@ jobs:
       - name: Rebuild Lime
         run: |
           CC="clang-23 --target=arm-linux-gnueabihf" CXX="clang++-23 --target=arm-linux-gnueabihf" HXCPP_USE_LD=lld-23 linux32 haxelib run lime rebuild linux -armv7 -release -D HXCPP_ARMV7 -D HXCPP_LTO_THIN
-          HXCPP_USE_LD=lld-23 CC=clang-23 CXX=clang++-23 HXCPP_USE_LD="lld-23" haxelib run lime rebuild linux -arm64 -release -D HXCPP_ARM64 -D HXCPP_LTO_THIN
+          CC=clang-23 CXX=clang++-23 HXCPP_USE_LD="lld-23" haxelib run lime rebuild linux -arm64 -release -D HXCPP_ARM64 -D HXCPP_LTO_THIN
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
