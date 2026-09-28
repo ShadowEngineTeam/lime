@@ -6,7 +6,7 @@ import haxe.Unserializer;
 
 import hxp.*;
 
-import lime._internal.format.Base64;
+import haxe.crypto.Base64;
 import lime.tools.AssetType;
 import lime.tools.Asset;
 import lime.tools.HXProject;
