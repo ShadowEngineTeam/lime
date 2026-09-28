@@ -299,6 +299,31 @@ class System
 		}
 	}
 
+	/**
+		Report the user's preferred locale.
+	**/
+	public static function getPreferredLocales():Array<Locale>
+	{
+		var preferredLocales:Array<Locale> = [];
+
+		#if (lime_cffi && !macro)
+		var locales:Array<Dynamic> = NativeCFFI.lime_system_get_preferred_locales();
+
+		if (locales != null && locales.length > 0)
+		{
+			for (locale in locales)
+			{
+				var preferredLocale:Locale = new Locale();
+				preferredLocale.language = locale.language;
+				preferredLocale.country = locale.country;
+				preferredLocales.push(preferredLocale);
+			}
+		}
+		#end
+
+		return preferredLocales;
+	}
+
 	@:noCompletion private static function __copyMissingFields(target:Dynamic, source:Dynamic):Void
 	{
 		if (source == null || target == null)
