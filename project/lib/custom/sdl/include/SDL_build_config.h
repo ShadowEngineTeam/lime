@@ -188,10 +188,8 @@
 # define HAVE_SETENV 1       /**< Set environment variable */
 # define HAVE_SETJMP 1       /**< Non-local jump support */
 # define HAVE_SIGACTION 1    /**< Signal handling (POSIX) */
-#if !defined(SDL_PLATFORM_LINUX)
 # define HAVE_STRLCAT 1      /**< Safe string concatenation (BSD) */
 # define HAVE_STRLCPY 1      /**< Safe string copy (BSD) */
-#endif
 # define HAVE_STRTOK_R 1     /**< Tokenize string (reentrant) */
 # define HAVE_SYSCONF 1      /**< Get system configuration */
 # define HAVE_UNSETENV 1     /**< Remove environment variable */
@@ -240,7 +238,7 @@
  * @name Android API Level-Dependent Features
  * @{
  */
-# if __ANDROID_API__ >= 28
+# if __ANDROID_API__ >= 24
 #  define HAVE_ICONV 1      /**< Character set conversion (API 24+) */
 #  define HAVE_ICONV_H 1    /**< iconv.h header (API 24+) */
 # endif
@@ -308,8 +306,8 @@
  * @{
  */
 # define HAVE_WCSCMP 1    /**< Compare wide strings */
-//# define HAVE_WCSLCAT 1   /**< Safe wide string concatenation */
-//# define HAVE_WCSLCPY 1   /**< Safe wide string copy */
+# define HAVE_WCSLCAT 1   /**< Safe wide string concatenation */
+# define HAVE_WCSLCPY 1   /**< Safe wide string copy */
 # define HAVE_WCSLEN 1    /**< Get wide string length */
 # define HAVE_WCSNCMP 1   /**< Compare wide strings (n chars) */
 # define HAVE_WCSNLEN 1   /**< Get wide string length (bounded) */
@@ -412,6 +410,7 @@
  * @brief SDL subsystems that are disabled in this build configuration.
  * @{
  */
+#define SDL_AUDIO_DISABLED 1   /**< Audio subsystem is disabled */
 #define SDL_CAMERA_DISABLED 1   /**< Camera subsystem is disabled */
 #define SDL_GPU_DISABLED 1      /**< GPU/Graphics subsystem is disabled */
 #define SDL_RENDER_DISABLED 1   /**< Render subsystem is disabled */
@@ -441,8 +440,6 @@
  * @brief Drivers and subsystems enabled for Windows platforms.
  * @{
  */
-# define SDL_AUDIO_DRIVER_WASAPI 1            /**< WASAPI (modern low-latency) audio driver */
-# define SDL_AUDIO_DRIVER_DSOUND 1            /**< DirectSound legacy audio driver */
 # define SDL_CAMERA_DRIVER_MEDIAFOUNDATION 1  /**< Media Foundation camera driver */
 # define SDL_FILESYSTEM_WINDOWS 1             /**< Windows filesystem operations */
 # define SDL_HAPTIC_DINPUT 1                  /**< DirectInput haptic (force feedback) support */
@@ -467,7 +464,6 @@
  * @brief Drivers and subsystems enabled for macOS platforms.
  * @{
  */
-# define SDL_AUDIO_DRIVER_COREAUDIO 1    /**< Core Audio sound system driver */
 # define SDL_CAMERA_DRIVER_COREMEDIA 1   /**< Core Media camera driver */
 # define SDL_FILESYSTEM_COCOA 1          /**< Cocoa filesystem operations */
 # define SDL_HAPTIC_IOKIT 1              /**< IOKit haptic (force feedback) support */
@@ -476,7 +472,6 @@
 # define SDL_POWER_MACOSX 1              /**< macOS power management */
 # define SDL_SENSOR_DUMMY 1              /**< Dummy sensor driver (no native support) */
 # define SDL_VIDEO_DRIVER_COCOA 1        /**< Cocoa video driver */
-# define SDL_VIDEO_METAL 1               /**< Metal support */
 # define SDL_VIDEO_OPENGL 1              /**< OpenGL support */
 # define SDL_VIDEO_OPENGL_CGL 1          /**< Core Graphics Layer (CGL) OpenGL support */
 /** @} */
@@ -488,8 +483,6 @@
  * @brief Drivers and subsystems enabled for iOS, tvOS, and visionOS platforms.
  * @{
  */
-# define SDL_AUDIO_DRIVER_COREAUDIO 1    /**< Core Audio sound system driver */
-
 # if !defined(SDL_PLATFORM_TVOS) && !defined(SDL_PLATFORM_VISIONOS)
 #  define SDL_CAMERA_DRIVER_COREMEDIA 1  /**< Core Media camera driver (not on tvOS/visionOS) */
 # endif
@@ -508,7 +501,6 @@
 # endif
 
 # define SDL_VIDEO_DRIVER_UIKIT 1    /**< UIKit video driver */
-# define SDL_VIDEO_METAL 1           /**< Metal support */
 # define SDL_VIDEO_OPENGL_ES2 1      /**< OpenGL ES 2.0 support */
 /** @} */
 
@@ -519,8 +511,6 @@
  * @brief Drivers and subsystems enabled for Android platforms.
  * @{
  */
-# define SDL_AUDIO_DRIVER_OPENSLES 1   /**< OpenSL ES audio driver */
-# define SDL_AUDIO_DRIVER_AAUDIO 1     /**< AAudio low-latency audio driver (Android 8.0+) */
 # define SDL_CAMERA_DRIVER_ANDROID 1   /**< Android camera driver */
 # define SDL_FILESYSTEM_ANDROID 1      /**< Android filesystem operations */
 # define SDL_HAPTIC_ANDROID 1          /**< Android haptic (vibration) support */
@@ -540,14 +530,6 @@
  * @brief Drivers and subsystems enabled for Linux platforms.
  * @{
  */
-#define SDL_AUDIO_DRIVER_ALSA 1                                  /**< ALSA (Advanced Linux Sound Architecture) audio driver */
-#define SDL_AUDIO_DRIVER_ALSA_DYNAMIC "libasound.so.2"           /**< Dynamically loaded ALSA shared library */
-#define SDL_AUDIO_DRIVER_JACK 1                                  /**< JACK Audio Connection Kit audio driver */
-#define SDL_AUDIO_DRIVER_JACK_DYNAMIC "libjack.so.0"             /**< Dynamically loaded JACK client library */
-#define SDL_AUDIO_DRIVER_PIPEWIRE 1                              /**< PipeWire (modern multimedia server for audio/video on Linux) */
-#define SDL_AUDIO_DRIVER_PIPEWIRE_DYNAMIC "libpipewire-0.3.so.0" /**< Dynamically loaded PipeWire client library */
-#define SDL_AUDIO_DRIVER_PULSEAUDIO 1                            /**< PulseAudio sound server audio driver */
-#define SDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC "libpulse.so.0"      /**< Dynamically loaded PulseAudio shared library */
 #define SDL_CAMERA_DRIVER_V4L2 1                                 /**< Video4Linux2 camera driver */
 #define SDL_FILESYSTEM_UNIX 1                                    /**< Unix filesystem operations */
 #define SDL_HAPTIC_LINUX 1                                       /**< Linux haptic (force feedback) support */

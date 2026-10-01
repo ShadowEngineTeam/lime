@@ -17,7 +17,6 @@
 #include <ui/Gamepad.h>
 #include <ui/Gesture.h>
 #include <ui/Joystick.h>
-#include <atomic>
 #include <vector>
 
 namespace lime
@@ -34,8 +33,8 @@ namespace lime
 	Application *Application::currentApplication = 0;
 
 	FrameTime frameTime;
-	std::atomic<bool> active = false;
-	std::atomic<bool> background = false;
+	bool active = false;
+	bool background = false;
 
 	SDL_SensorID accelerometerSensorID = -1;
 	SDL_Sensor *accelerometerSensor = nullptr;
@@ -45,22 +44,7 @@ namespace lime
 
 	Application::Application()
 	{
-		SDL_SetHint(SDL_HINT_AUDIO_CHANNELS, "2");
-		SDL_SetHint(SDL_HINT_AUDIO_FORMAT, "F32");
-		SDL_SetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES, "480");
-
-#ifdef IPHONE
-		SDL_SetHint(SDL_HINT_AUDIO_CATEGORY, "playback");
-#endif
-
-		SDL_SetHint(SDL_HINT_AUDIO_DEVICE_STREAM_ROLE, "Game");
-
 		SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "1");
-
-#ifdef __ANDROID__
-		SDL_SetHint(SDL_HINT_ANDROID_LOW_LATENCY_AUDIO, "1");
-		SDL_SetHint(SDL_HINT_ANDROID_BLOCK_ON_PAUSE, "1");
-#endif
 
 #ifdef IPHONE
 		SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "3");
@@ -77,13 +61,10 @@ namespace lime
 #endif
 
 		Uint32 initFlags = SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK | SDL_INIT_SENSOR;
-		// #ifndef IPHONE
-		initFlags |= SDL_INIT_AUDIO;
-		// #endif
 
 		if (!SDL_Init(initFlags))
 		{
-			SDL_Log("Could not initialize SDL: %s.\n", SDL_GetError());
+			printf("Could not initialize SDL: %s.\n", SDL_GetError());
 		}
 
 		SDL_SetEventFilter(HandleAppLifecycleEvent, NULL);
@@ -835,7 +816,7 @@ namespace lime
 	{
 		ApplicationEvent applicationEvent;
 		applicationEvent.type = UPDATE;
-		applicationEvent.deltaTime = std::fmin((double)frameTime.frame / 1e6, 250.0);
+		applicationEvent.deltaTime = std::fmax(0.0, (double)frameTime.frame / 1e6);
 		ApplicationEvent::Dispatch(&applicationEvent);
 
 		RenderEvent renderEvent;
@@ -899,7 +880,6 @@ namespace lime
 
 			case SDL_EVENT_WILL_ENTER_BACKGROUND:
 
-				background = true;
 				return false;
 
 			case SDL_EVENT_DID_ENTER_BACKGROUND:
