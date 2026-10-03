@@ -38,6 +38,7 @@ class DefineMacro
 			{
 				Compiler.define("lime-cairo");
 				Compiler.define("lime-harfbuzz");
+				Compiler.define("lime-miniaudio");
 
 				Compiler.define("lime-cffi");
 			}
