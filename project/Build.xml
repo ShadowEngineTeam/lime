@@ -282,7 +282,6 @@
 	<include name="lib/ogg-files.xml" />
 	<include name="lib/opusfile-files.xml" />
 	<include name="lib/opus-files.xml" />
-	<include name="lib/dr_libs-files.xml" />
 	<include name="lib/oboe-files.xml" />
 	<include name="lib/openal-files.xml" />
 	<include name="lib/pixman-files.xml" />
@@ -308,7 +307,6 @@
 		<files id="native-toolkit-ogg" if="LIME_OGG" />
 		<files id="native-toolkit-opusfile" if="LIME_OPUS" />
 		<files id="native-toolkit-opus" if="LIME_OPUS" />
-		<files id="native-toolkit-dr_libs" if="LIME_DR_LIBS" />
 		<files id="native-toolkit-oboe" if="LIME_OBOE" />
 		<files id="native-toolkit-openal" if="LIME_OPENAL" />
 		<files id="native-toolkit-pixman" if="LIME_PIXMAN" />
