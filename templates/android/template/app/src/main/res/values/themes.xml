@@ -7,11 +7,6 @@
 		<!-- Prevent swipe-to-dismiss behavior -->
 		<item name="android:windowSwipeToDismiss">false</item>
 
-		::if (ANDROID_DISPLAY_CUTOUT!="")::
-		<!-- Enable drawing under the display cutout -->
-		<item name="android:windowLayoutInDisplayCutoutMode">::ANDROID_DISPLAY_CUTOUT::</item>
-		::end::
-
 		<!-- Make the status bar transparent -->
 		<item name="android:statusBarColor">@android:color/transparent</item>
 	</style>
@@ -22,11 +17,6 @@
 
 		<!-- Prevent swipe-to-dismiss behavior -->
 		<item name="android:windowSwipeToDismiss">false</item>
-
-		::if (ANDROID_DISPLAY_CUTOUT!="")::
-		<!-- Enable drawing under the display cutout -->
-		<item name="android:windowLayoutInDisplayCutoutMode">::ANDROID_DISPLAY_CUTOUT::</item>
-		::end::
 
 		<!-- Make the status bar transparent -->
 		<item name="android:statusBarColor">@android:color/transparent</item>
