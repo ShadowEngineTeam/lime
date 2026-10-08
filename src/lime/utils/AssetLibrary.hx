@@ -546,12 +546,12 @@ class AssetLibrary
 		}
 	}
 
-	public function unloadAsset(id:String, type:String = null):Void
+	public function unloadAsset(id:String, type:AssetType = null):Void
 	{
 		if (id == null)
 			return;
 
-		var assetType:AssetType = type != null ? cast(type, AssetType) : null;
+		var assetType:AssetType = type;
 
 		if (assetType == null || assetType == SOUND || assetType == MUSIC)
 		{
@@ -596,7 +596,6 @@ class AssetLibrary
 		if (assetType == null || assetType == FONT)
 		{
 			cachedFonts.remove(id);
-			loadingFonts.remove(id);
 		}
 
 		if (assetType == null || assetType == BINARY)
