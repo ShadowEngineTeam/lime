@@ -497,7 +497,7 @@ class Window
 	}
 
 	@:noCompletion private inline function get_displayScale():Float
-+	{
+	{
 		return __displayScale;
 	}
 
