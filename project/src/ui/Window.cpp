@@ -434,6 +434,11 @@ namespace lime
 #endif
 	}
 
+	double Window::GetDisplayScale()
+	{
+		return SDL_GetWindowDisplayScale(sdlWindow);
+	}
+
 	bool Window::GetTextInputEnabled()
 	{
 		return SDL_TextInputActive(sdlWindow);
