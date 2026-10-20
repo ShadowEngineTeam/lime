@@ -553,18 +553,12 @@ class AssetLibrary
 		}
 		else if (cachedBytes.exists(id) || classTypes.exists(id))
 		{
-			var bytes = getBytes(id);
-
-			if (bytes == null)
-			{
-				return cast Future.withValue(null);
-			}
-			else
+			return Bytes.loadFromFile(getPath(id)).then(function(bytes)
 			{
 				var text = bytes.getString(0, bytes.length);
 				cachedText.set(id, text);
 				return Future.withValue(text);
-			}
+			});
 		}
 		else
 		{
