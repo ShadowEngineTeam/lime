@@ -1,13 +1,9 @@
 package lime.utils;
 
-import haxe.macro.Compiler;
 import haxe.Constraints.IMap;
 
 import lime.media.AudioBuffer;
 import lime.graphics.Image;
-#if !macro
-import lime._internal.macros.AssetsMacro;
-#end
 
 class AssetCache
 {
@@ -26,9 +22,9 @@ class AssetCache
 		#if (macro || lime_disable_assets_version)
 		version = 0;
 		#elseif lime_assets_version
-		version = Std.parseInt(Compiler.getDefine("lime-assets-version"));
+		version = Std.parseInt(haxe.macro.Compiler.getDefine("lime-assets-version"));
 		#else
-		version = AssetsMacro.cacheVersion();
+		version = lime._internal.macros.AssetsMacro.cacheVersion();
 		#end
 	}
 

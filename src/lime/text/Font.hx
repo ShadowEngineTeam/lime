@@ -188,6 +188,9 @@ class Font
 	 */
 	public static function loadFromBytes(bytes:Bytes):Future<Font>
 	{
+		if (bytes == null)
+			return cast Future.withError("Could not load font from empty data");
+
 		return Future.withValue(fromBytes(bytes));
 	}
 

@@ -9,6 +9,9 @@
 
 		<!-- Make the status bar transparent -->
 		<item name="android:statusBarColor">@android:color/transparent</item>
+
+		<!-- Make the navigation bar transparent -->
+		<item name="android:navigationBarColor">@android:color/transparent</item>
 	</style>
 
 	<style name="LimeAppMainTheme" parent="@android:style/Theme.DeviceDefault.NoActionBar">
@@ -20,6 +23,9 @@
 
 		<!-- Make the status bar transparent -->
 		<item name="android:statusBarColor">@android:color/transparent</item>
+
+		<!-- Make the navigation bar transparent -->
+		<item name="android:navigationBarColor">@android:color/transparent</item>
 	</style>
 
 	<style name="LimeAppDialogTheme" parent="@android:style/Theme.DeviceDefault.Dialog.Alert" />

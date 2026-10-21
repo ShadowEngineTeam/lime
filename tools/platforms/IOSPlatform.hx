@@ -560,7 +560,8 @@ class IOSPlatform extends PlatformTarget
 			var ictoolPath:Null<String> = null;
 			for (p in ICTOOL_SEARCH_PATHS)
 			{
-				if (p == null) continue;
+				if (p == null)
+					continue;
 				if (FileSystem.exists(p))
 				{
 					ictoolPath = p;
@@ -577,12 +578,18 @@ class IOSPlatform extends PlatformTarget
 						System.runProcess("", ictoolPath, [
 							project.adaptiveIcon.path,
 							"--export-image",
-							"--output-file", Path.combine(iconPath, icn.name),
-							"--platform", "iOS",
-							"--rendition", "Default",
-							"--width", Std.string(icn.size),
-							"--height", Std.string(icn.size),
-							"--scale", Std.string(icn.scale),
+							"--output-file",
+							Path.combine(iconPath, icn.name),
+							"--platform",
+							"iOS",
+							"--rendition",
+							"Default",
+							"--width",
+							Std.string(icn.size),
+							"--height",
+							Std.string(icn.size),
+							"--scale",
+							Std.string(icn.scale),
 						], false, false);
 					}
 					catch (e:Dynamic)
@@ -590,10 +597,14 @@ class IOSPlatform extends PlatformTarget
 						Log.warn('Failed to generate "${icn.name}" (${icn.size}@${icn.scale}) via ictool');
 					}
 				}
-			} else {
+			}
+			else
+			{
 				Log.warn('Could not generate via ictool as it cannot be found');
 			}
-		} else {
+		}
+		else
+		{
 			var icons = project.icons;
 
 			if (icons.length == 0)

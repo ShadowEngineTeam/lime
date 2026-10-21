@@ -1,6 +1,10 @@
 package lime.tools;
 
-import hxp.*;
+import hxp.NDLL;
+import hxp.Haxelib;
+import hxp.Log;
+import hxp.Path;
+import hxp.System;
 
 import sys.io.File;
 import sys.FileSystem;
@@ -203,6 +207,7 @@ class ProjectHelper
 					fields.shift();
 
 				var object:Dynamic = project;
+
 				while (object != null && fields.length > 0)
 				{
 					object = Reflect.getProperty(object, fields.shift());

@@ -2,15 +2,14 @@ package lime.tools;
 
 import haxe.Unserializer;
 
-import hxp.*;
+import hxp.Haxelib;
+import hxp.Log;
+import hxp.Path;
 
-import lime.tools.Architecture;
 import lime.tools.HXProject;
-import lime.tools.Platform;
 
-import sys.io.File;
-import sys.io.Process;
 import sys.FileSystem;
+import sys.io.File;
 
 class PlatformTargetMain
 {

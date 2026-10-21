@@ -1,11 +1,13 @@
 package lime.tools;
 
-import hxp.*;
+import hxp.Haxelib;
+import hxp.Log;
+import hxp.MapTools;
+import hxp.Path;
+import hxp.System;
 
 import lime.tools.HXProject;
-import lime.tools.Platform;
 
-import sys.io.File;
 import sys.FileSystem;
 
 class CPPHelper
