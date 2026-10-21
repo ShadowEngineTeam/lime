@@ -586,6 +586,10 @@ class PlatformSetup
 				{
 					return Path.combine(aliasDirectory, "Windows64/lime.exe");
 				}
+				else if (System.hostArchitecture == ARM64)
+				{
+					return Path.combine(aliasDirectory, "WindowsArm64/lime.exe");
+				}
 				else
 				{
 					return Path.combine(aliasDirectory, "Windows/lime.exe");

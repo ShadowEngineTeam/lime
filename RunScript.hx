@@ -54,6 +54,10 @@ class RunScript
 				{
 					rebuildAliasExecutable('Windows64', 'HXCPP_M64', 'exe');
 				}
+				else if (System.hostArchitecture == ARM64)
+				{
+					rebuildAliasExecutable('WindowsArm64', 'HXCPP_ARM64', 'exe');
+				}
 				else if (System.hostArchitecture == X86)
 				{
 					rebuildAliasExecutable('Windows', 'HXCPP_M32', 'exe');
@@ -79,6 +83,10 @@ class RunScript
 				else if (System.hostArchitecture == X64)
 				{
 					rebuildAliasExecutable('Linux64', 'HXCPP_M64');
+				}
+				else if (System.hostArchitecture == X86)
+				{
+					rebuildAliasExecutable('Linux', 'HXCPP_M32');
 				}
 		}
 	}
