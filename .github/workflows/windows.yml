@@ -32,12 +32,15 @@ jobs:
           haxelib run lime rebuild windows -32 -release -nocffi -D HXCPP_OPTIMIZE_LINK
           haxelib run lime rebuild windows -64 -release -nocffi -D HXCPP_OPTIMIZE_LINK
           haxelib run lime rebuild windows -arm64 -release -D HXCPP_ARM64 -D HXCPP_OPTIMIZE_LINK
-          haxelib run lime rebuild alias
+          haxelib run lime rebuild alias -32
+          haxelib run lime rebuild alias -64
+          haxelib run lime rebuild alias -arm64
       - name: Upload Artifact (x86)
         uses: actions/upload-artifact@main
         with:
           name: Windows-NDLL
           path: |
+            templates/bin/alias/Windows/
             ndll/Windows/
             !**/.gitignore
             lime.png
@@ -57,6 +60,7 @@ jobs:
         with:
           name: WindowsArm64-NDLL
           path: |
+            templates/bin/alias/WindowsArm64/
             ndll/WindowsArm64/
             !**/.gitignore
             lime.png
