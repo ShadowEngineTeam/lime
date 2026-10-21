@@ -32,6 +32,7 @@ jobs:
           # haxelib run lime rebuild mac -32 -release -D HXCPP_M32 -D HXCPP_LTO_THIN
           haxelib run lime rebuild mac -64 -release -D HXCPP_M64 -D HXCPP_LTO_THIN
           haxelib run lime rebuild mac -arm64 -release -D HXCPP_ARM64 -D HXCPP_LTO_THIN
+          haxelib run lime rebuild alias
       # - name: Upload Artifact (x86)
         # uses: actions/upload-artifact@main
         # with:
@@ -55,6 +56,7 @@ jobs:
         with:
           name: MacArm64-NDLL
           path: |
+            templates/bin/alias/MacArm64/
             ndll/MacArm64/
             !**/.gitignore
             lime.png

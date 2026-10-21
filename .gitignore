@@ -2,6 +2,7 @@
 .DS_Store
 .DS_Store?
 Export/
+templates/bin/alias/*
 #ndll/*/lime*
 #ndll/*/liblime*
 #ndll/*/*.hash
@@ -19,6 +20,7 @@ project/vc*.pdb
 #tools/*.n
 #tools/*.exe
 tools/obj
+tools/alias/obj
 haxedoc.xml
 docs/*.xml
 docs/xml
