@@ -29,7 +29,6 @@ class AssetLibrary
 	@:noCompletion private var cachedText = new Map<String, String>();
 	@:noCompletion private var classTypes = new Map<String, Class<Dynamic>>();
 	@:noCompletion private var loaded:Bool;
-	@:noCompletion private var pathGroups = new Map<String, Array<String>>();
 	@:noCompletion private var paths = new Map<String, String>();
 	@:noCompletion private var preload = new Map<String, Bool>();
 	@:noCompletion private var promise:Promise<AssetLibrary>;
@@ -237,10 +236,6 @@ class AssetLibrary
 		{
 			return paths.get(id);
 		}
-		else if (pathGroups.exists(id))
-		{
-			return pathGroups.get(id)[0];
-		}
 		else
 		{
 			return null;
@@ -418,14 +413,7 @@ class AssetLibrary
 		}
 		else
 		{
-			if (pathGroups.exists(id))
-			{
-				return AudioBuffer.loadFromFiles(pathGroups.get(id));
-			}
-			else
-			{
-				return AudioBuffer.loadFromFile(paths.get(id));
-			}
+			return AudioBuffer.loadFromFile(getPath(id));
 		}
 	}
 
@@ -739,18 +727,6 @@ class AssetLibrary
 				paths.set(id, __cacheBreak(__resolvePath(basePath + Reflect.field(asset, "path"))));
 			}
 
-			if (Reflect.hasField(asset, "pathGroup"))
-			{
-				pathGroup = Reflect.field(asset, "pathGroup");
-
-				for (i in 0...pathGroup.length)
-				{
-					pathGroup[i] = __cacheBreak(__resolvePath(basePath + pathGroup[i]));
-				}
-
-				pathGroups.set(id, pathGroup);
-			}
-
 			sizes.set(id, size);
 			types.set(id, asset.type);
 
@@ -842,27 +818,6 @@ class AssetLibrary
 	@:noCompletion private function loadAudioBuffer_onComplete(id:String, audioBuffer:AudioBuffer):Void
 	{
 		cachedAudioBuffers.set(id, audioBuffer);
-
-		if (pathGroups.exists(id))
-		{
-			var pathGroup = pathGroups.get(id);
-
-			for (otherID in pathGroups.keys())
-			{
-				if (otherID == id)
-					continue;
-
-				for (path in pathGroup)
-				{
-					if (pathGroups.get(otherID).indexOf(path) > -1)
-					{
-						cachedAudioBuffers.set(otherID, audioBuffer);
-						break;
-					}
-				}
-			}
-		}
-
 		__assetLoaded(id);
 	}
 
