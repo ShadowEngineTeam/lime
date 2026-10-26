@@ -1342,8 +1342,8 @@ namespace lime
 		config.deviceConfig.aaudio.performanceMode = ma_aaudio_performance_mode_low_latency;
 
 		// CoreAudio Device Context Config
-		config.deviceConfig.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_playback;
-		config.deviceConfig.contextConfig.coreaudio.sessionCategoryOptions = ma_ios_session_category_option_allow_bluetooth_a2dp;
+		// config.deviceConfig.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_playback;
+		// config.deviceConfig.contextConfig.coreaudio.sessionCategoryOptions = ma_ios_session_category_option_allow_bluetooth_a2dp;
 
 		config.pLog = (ma_log *)val_data(val_field(pConfig, val_id("pLog")));
 		config.listenerCount = val_int(val_field(pConfig, val_id("listenerCount")));
