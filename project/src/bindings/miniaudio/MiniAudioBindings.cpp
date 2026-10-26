@@ -1446,6 +1446,18 @@ namespace lime
 		return ma_engine_get_sample_rate((ma_engine *)val_data(pEngine));
 	}
 
+	double lime_ma_engine_get_latency(value pEngine)
+	{
+		ma_device *device = ma_engine_get_device((ma_engine *)val_data(pEngine));
+
+		if (device == NULL || device->playback.internalSampleRate == 0)
+		{
+			return 0;
+		}
+
+		return (double)device->playback.internalPeriodSizeInFrames * device->playback.internalPeriods * 1000.0 / device->playback.internalSampleRate;
+	}
+
 	int lime_ma_engine_start(value pEngine)
 	{
 		return ma_engine_start((ma_engine *)val_data(pEngine));
@@ -2284,6 +2296,7 @@ namespace lime
 	DEFINE_PRIME2(lime_ma_engine_set_time_in_milliseconds);
 	DEFINE_PRIME1(lime_ma_engine_get_channels);
 	DEFINE_PRIME1(lime_ma_engine_get_sample_rate);
+	DEFINE_PRIME1(lime_ma_engine_get_latency);
 	DEFINE_PRIME1(lime_ma_engine_start);
 	DEFINE_PRIME1(lime_ma_engine_stop);
 	DEFINE_PRIME2(lime_ma_engine_set_volume);

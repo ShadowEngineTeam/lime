@@ -126,6 +126,15 @@ abstract MAEngine(CFFIPointer) from CFFIPointer to CFFIPointer
 		#end
 	}
 
+	public function get_latency():Float
+	{
+		#if (lime_cffi && lime_miniaudio && !macro)
+		return NativeCFFI.lime_ma_engine_get_latency(this);
+		#else
+		return 0;
+		#end
+	}
+
 	public function start():MAResult
 	{
 		#if (lime_cffi && lime_miniaudio && !macro)

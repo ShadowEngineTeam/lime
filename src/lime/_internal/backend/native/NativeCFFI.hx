@@ -1687,6 +1687,7 @@ class NativeCFFI
 	private static var lime_ma_engine_set_time_in_milliseconds = new cpp.Callable<cpp.Object->cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_engine_set_time_in_milliseconds", "ooi", false));
 	private static var lime_ma_engine_get_channels = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_engine_get_channels", "oi", false));
 	private static var lime_ma_engine_get_sample_rate = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_engine_get_sample_rate", "oi", false));
+	private static var lime_ma_engine_get_latency = new cpp.Callable<cpp.Object->Float>(cpp.Prime._loadPrime("lime", "lime_ma_engine_get_latency", "od", false));
 	private static var lime_ma_engine_start = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_engine_start", "oi", false));
 	private static var lime_ma_engine_stop = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_engine_stop", "oi", false));
 	private static var lime_ma_engine_set_volume = new cpp.Callable<cpp.Object->Float->Int>(cpp.Prime._loadPrime("lime", "lime_ma_engine_set_volume", "odi", false));
@@ -1865,6 +1866,7 @@ class NativeCFFI
 	private static var lime_ma_engine_set_time_in_milliseconds:Dynamic->Dynamic->Int = CFFI.load("lime", "lime_ma_engine_set_time_in_milliseconds", 2);
 	private static var lime_ma_engine_get_channels:Dynamic->Int = CFFI.load("lime", "lime_ma_engine_get_channels", 1);
 	private static var lime_ma_engine_get_sample_rate:Dynamic->Int = CFFI.load("lime", "lime_ma_engine_get_sample_rate", 1);
+	private static var lime_ma_engine_get_latency:Dynamic->Float = CFFI.load("lime", "lime_ma_engine_get_latency", 1);
 	private static var lime_ma_engine_start:Dynamic->Int = CFFI.load("lime", "lime_ma_engine_start", 1);
 	private static var lime_ma_engine_stop:Dynamic->Int = CFFI.load("lime", "lime_ma_engine_stop", 1);
 	private static var lime_ma_engine_set_volume:Dynamic->Float->Int = CFFI.load("lime", "lime_ma_engine_set_volume", 2);
