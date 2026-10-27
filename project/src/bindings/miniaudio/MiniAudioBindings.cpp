@@ -19,6 +19,7 @@
 #define MA_IMPLEMENTATION
 #include <miniaudio.h>
 #include <extras/resamplers/bsinc/miniaudio_bsinc.h>
+#include <extras/limiters/mastering/miniaudio_mastering.h>
 
 // Opus and Vorbis decoders
 #include <extras/decoders/libopus/miniaudio_libopus.c>
@@ -1306,6 +1307,29 @@ namespace lime
 		return ma_delay_node_get_decay((ma_delay_node *)val_data(pDelayNode));
 	}
 
+	struct lime_ma_engine_process_data
+	{
+		AutoGCRoot *onProcess = NULL;
+		ma_mastering_limiter *limiter = NULL;
+	};
+
+	static void lime_ma_engine_free_process_data(ma_engine *engine)
+	{
+		lime_ma_engine_process_data *data = (lime_ma_engine_process_data *)engine->pProcessUserData;
+
+		if (data)
+		{
+			engine->pProcessUserData = NULL;
+
+			if (data->onProcess)
+				delete data->onProcess;
+
+			ma_mastering_limiter_destroy(data->limiter);
+
+			delete data;
+		}
+	}
+
 	void gc_ma_engine(value handle)
 	{
 		ma_engine *engine = (ma_engine *)val_data(handle);
@@ -1314,24 +1338,33 @@ namespace lime
 		{
 			ma_engine_uninit(engine);
 
+			lime_ma_engine_free_process_data(engine);
+
 			delete engine;
 		}
 	}
 
 	void lime_ma_engine_process_proc(void *pUserData, float *pFramesOut, ma_uint64 frameCount)
 	{
-		AutoGCRoot *root = (AutoGCRoot *)pUserData;
+		lime_ma_engine_process_data *data = (lime_ma_engine_process_data *)pUserData;
 
-		if (root)
+		if (!data)
+			return;
+
+		if (data->onProcess)
 		{
 			int base = 0;
 
 			gc_set_top_of_stack(&base, true);
 
-			val_call2(root->get(), CFFIPointer(pFramesOut, NULL), alloc_Int64(frameCount));
+			val_call2(data->onProcess->get(), CFFIPointer(pFramesOut, NULL), alloc_Int64(frameCount));
 
 			gc_set_top_of_stack(0, true);
 		}
+
+		// output-limiter=true, applied last like OpenAL Soft
+		if (data->limiter)
+			ma_mastering_limiter_process(data->limiter, pFramesOut, frameCount);
 	}
 
 
@@ -1412,13 +1445,17 @@ namespace lime
 		// alsa/mmap=true  -> miniaudio enables MMap unless told otherwise.
 		device.alsa.noMMap = MA_FALSE;
 
-		// Intentionally NOT ported (OpenAL Soft features with no miniaudio counterpart):
-		//   stereo-encoding, cf_level, front-stablizer, volume-adjust, dither,
-		//   decoder/{hq-mode,distance-comp,nfc}  -> HRTF/ambisonic/mixer settings
+		// rt-prio=15
+		device.contextConfig.threadPriority = ma_thread_priority_realtime;
+
+		// output-limiter=true -> ma_mastering_limiter, set up in lime_ma_engine_init
+
+		// Already miniaudio's behaviour:
+		//   stereo-encoding=basic, cf_level=0, front-stablizer=false, volume-adjust=0, dither=false
+		// No miniaudio counterpart:
+		//   decoder/{hq-mode,distance-comp,nfc}  -> ambisonic decoder options, output is plain stereo
 		//   sources=256, sends=2                 -> miniaudio has no fixed source/aux-send limits
-		//   output-limiter=true                  -> engine clipping is already on (engine noClip=false)
-		//   rt-prio=15, rt-time-limit            -> contextConfig.threadPriority already defaults to highest
-		//   pipewire/rt-mix, pulse/{allow-moves,fix-rate,adjust-latency} -> no equivalents
+		//   rt-time-limit, pipewire/rt-mix, pulse/{allow-moves,fix-rate,adjust-latency}
 	}
 
 	value lime_ma_engine_init(value pConfig)
@@ -1442,20 +1479,40 @@ namespace lime
 
 		value onProcess = val_field(pConfig, val_id("onProcess"));
 
+		lime_ma_engine_process_data *processData = new lime_ma_engine_process_data();
+
 		if (!val_is_null(onProcess))
-		{
-			config.pProcessUserData = new AutoGCRoot(onProcess);
-			config.onProcess = lime_ma_engine_process_proc;
-		}
+			processData->onProcess = new AutoGCRoot(onProcess);
+
+		// the limiter needs the device's final format, so hold off starting until it exists
+		const ma_bool32 autoStart = !config.noAutoStart;
+		config.noAutoStart = MA_TRUE;
+
+		config.pProcessUserData = processData;
+		config.onProcess = lime_ma_engine_process_proc;
 
 		ma_engine *engine = new ma_engine();
 
 		if (ma_engine_init(&config, engine) != MA_SUCCESS)
 		{
+			if (processData->onProcess)
+				delete processData->onProcess;
+
+			ma_mastering_limiter_destroy(processData->limiter);
+
+			delete processData;
+
 			delete engine;
 
 			return alloc_null();
 		}
+
+		// output-limiter=true (noClip leaves the output unclamped on purpose, so it stays off with it)
+		if (!config.noClip)
+			processData->limiter = ma_mastering_limiter_create(ma_engine_get_channels(engine), ma_engine_get_sample_rate(engine), 0.0f);
+
+		if (autoStart)
+			ma_engine_start(engine);
 
 		return CFFIPointer(engine, gc_ma_engine);
 	}
@@ -1467,6 +1524,8 @@ namespace lime
 		if (engine)
 		{
 			ma_engine_uninit(engine);
+
+			lime_ma_engine_free_process_data(engine);
 
 			free_abstract(pEngine);
 
