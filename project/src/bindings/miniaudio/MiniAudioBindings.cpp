@@ -4,7 +4,7 @@
 #include <atomic>
 #include <cmath>
 #ifdef IPHONE
-#include <media/AudioSession.h>
+#include <media/ios_audio_session.h>
 #endif
 
 // MiniAudio Implementation
@@ -1453,6 +1453,11 @@ namespace lime
 		return meter->peaks[channel].load(std::memory_order_relaxed);
 	}
 
+#ifdef IPHONE
+	// the engine the iOS audio session starts and stops with the app's scene
+	static std::atomic<ma_engine *> lime_ma_ios_engine{nullptr};
+#endif
+
 	struct lime_ma_engine_process_data
 	{
 		AutoGCRoot *onProcess = NULL;
@@ -1461,6 +1466,11 @@ namespace lime
 
 	static void lime_ma_engine_free_process_data(ma_engine *engine)
 	{
+#ifdef IPHONE
+		ma_engine *expected = engine;
+		lime_ma_ios_engine.compare_exchange_strong(expected, nullptr);
+#endif
+
 		lime_ma_engine_process_data *data = (lime_ma_engine_process_data *)engine->pProcessUserData;
 
 		if (data)
@@ -1584,7 +1594,7 @@ namespace lime
 
 		// SDL_HINT_AUDIO_CATEGORY = "playback" (Application.cpp, iOS only)
 #if defined(IPHONE)
-		// AudioSession_Initialize sets the category, mode and options, so miniaudio leaves them alone
+		// Lime_IOSAudioSessionInitialize sets the category, mode and options, so miniaudio leaves them alone
 		device.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_none;
 #endif
 
@@ -1609,7 +1619,7 @@ namespace lime
 		ma_engine_config config = ma_engine_config_init();
 
 #ifdef IPHONE
-		AudioSession_Initialize();
+		Lime_IOSAudioSessionInitialize();
 #endif
 
 		lime_ma_apply_default_config(config);
@@ -1663,6 +1673,10 @@ namespace lime
 
 		if (autoStart)
 			ma_engine_start(engine);
+
+#ifdef IPHONE
+		lime_ma_ios_engine.store(engine);
+#endif
 
 		return CFFIPointer(engine, gc_ma_engine);
 	}
@@ -1751,22 +1765,12 @@ namespace lime
 
 	int lime_ma_engine_start(value pEngine)
 	{
-#ifdef IPHONE
-		AudioSession_SetActive(true);
-#endif
-
 		return ma_engine_start((ma_engine *)val_data(pEngine));
 	}
 
 	int lime_ma_engine_stop(value pEngine)
 	{
-		ma_result result = ma_engine_stop((ma_engine *)val_data(pEngine));
-
-#ifdef IPHONE
-		AudioSession_SetActive(false);
-#endif
-
-		return result;
+		return ma_engine_stop((ma_engine *)val_data(pEngine));
 	}
 
 	int lime_ma_engine_set_volume(value pEngine, double volume)
@@ -2709,3 +2713,18 @@ extern "C" int lime_ma_register_prims()
 {
 	return 0;
 }
+
+#ifdef IPHONE
+extern "C" void Lime_SetIOSAudioDeviceActive(bool active)
+{
+	ma_engine *engine = lime::lime_ma_ios_engine.load();
+
+	if (!engine)
+		return;
+
+	if (active)
+		ma_engine_start(engine);
+	else
+		ma_engine_stop(engine);
+}
+#endif
