@@ -12,12 +12,14 @@ import lime.media.miniaudio.MAAudioBuffer;
 import lime.media.miniaudio.MAAudioBufferConfig;
 import lime.media.miniaudio.MASound;
 import lime.media.miniaudio.MASoundConfig;
+import lime.media.miniaudio.nodes.MAPeakMeterNode;
 
 @:access(lime.media.AudioBuffer)
 class NativeAudioSource
 {
 	private var buffer:MAAudioBuffer;
 	private var handle:MASound;
+	private var meter:MAPeakMeterNode;
 	private var loops:Int = 0;
 	private var parent:AudioSource;
 
@@ -33,6 +35,13 @@ class NativeAudioSource
 			handle.stop();
 			handle.uninit();
 			handle = null;
+		}
+
+		// after the sound, which is attached to it
+		if (meter != null)
+		{
+			meter.uninit();
+			meter = null;
 		}
 
 		if (buffer != null)
@@ -51,6 +60,7 @@ class NativeAudioSource
 				final config:MASoundConfig = MASoundConfig.init();
 
 				config.flags = MASound.FLAG_NO_SPATIALIZATION;
+				config.pInitialAttachment = initMeter();
 				config.pDataSource = parent.buffer.__srcMADecoder;
 				config.pNotifications.onAtEnd = sound_atEnd;
 
@@ -67,12 +77,21 @@ class NativeAudioSource
 				final config:MASoundConfig = MASoundConfig.init();
 
 				config.flags = MASound.FLAG_NO_SPATIALIZATION;
+				config.pInitialAttachment = initMeter();
 				config.pDataSource = buffer;
 				config.pNotifications.onAtEnd = sound_atEnd;
 
 				handle = MASound.init(AudioManager.engine, config);
 			}
 		}
+	}
+
+	private function initMeter():MAPeakMeterNode
+	{
+		if (meter == null)
+			meter = MAPeakMeterNode.init(AudioManager.engine);
+
+		return meter;
 	}
 
 	public function play():Void
@@ -120,6 +139,11 @@ class NativeAudioSource
 	}
 
 	// Get & Set Methods
+	public function getPeak(channel:Int):Float
+	{
+		return meter != null ? meter.get_peak(channel) : 0;
+	}
+
 	public function getLength():Float
 	{
 		return handle != null ? handle.get_length_in_seconds() * 1000.0 : 0;

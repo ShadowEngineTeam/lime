@@ -118,6 +118,17 @@ class AudioSource
 		__backend.stop();
 	}
 
+	/**
+		Returns the current peak level (0 to 1 for unclipped audio) this source outputs on `channel`,
+		after its gain, pan and pitch. It covers the last block the audio device mixed, about 10ms.
+
+		@param channel The channel to measure, 0 for left and 1 for right. Mono output returns the same value for both.
+	**/
+	public function getPeak(channel:Int):Float
+	{
+		return __backend.getPeak(channel);
+	}
+
 	// Get & Set Methods
 	@:noCompletion private function get_length():Float
 	{
