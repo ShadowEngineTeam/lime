@@ -1,6 +1,9 @@
 #include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
 #include <utils/File.h>
+#ifdef IPHONE
+#include <media/AudioSession.h>
+#endif
 
 // MiniAudio Implementation
 #if defined(ANDROID)
@@ -1461,8 +1464,8 @@ namespace lime
 
 		// SDL_HINT_AUDIO_CATEGORY = "playback" (Application.cpp, iOS only)
 #if defined(IPHONE)
-		// device.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_playback;
-		// device.contextConfig.coreaudio.sessionCategoryOptions = ma_ios_session_category_option_allow_bluetooth_a2dp;
+		// AudioSession_Initialize sets the category, mode and options, so miniaudio leaves them alone
+		device.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_none;
 #endif
 
 		// alsa/mmap=true  -> miniaudio enables MMap unless told otherwise.
@@ -1484,6 +1487,10 @@ namespace lime
 	value lime_ma_engine_init(value pConfig)
 	{
 		ma_engine_config config = ma_engine_config_init();
+
+#ifdef IPHONE
+		AudioSession_Initialize();
+#endif
 
 		lime_ma_apply_default_config(config);
 
@@ -1624,12 +1631,22 @@ namespace lime
 
 	int lime_ma_engine_start(value pEngine)
 	{
+#ifdef IPHONE
+		AudioSession_SetActive(true);
+#endif
+
 		return ma_engine_start((ma_engine *)val_data(pEngine));
 	}
 
 	int lime_ma_engine_stop(value pEngine)
 	{
-		return ma_engine_stop((ma_engine *)val_data(pEngine));
+		ma_result result = ma_engine_stop((ma_engine *)val_data(pEngine));
+
+#ifdef IPHONE
+		AudioSession_SetActive(false);
+#endif
+
+		return result;
 	}
 
 	int lime_ma_engine_set_volume(value pEngine, double volume)
