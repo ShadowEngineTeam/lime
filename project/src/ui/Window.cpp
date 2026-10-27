@@ -152,6 +152,14 @@ namespace lime
 
 			OpenGLBindings::Init();
 
+			SDL_Log("GL_VERSION: %s", (const char*)glGetString(GL_VERSION));
+			SDL_Log("GLSL: %s", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+			SDL_Log("RENDERER: %s", (const char*)glGetString(GL_RENDERER));
+			
+			int pw = 0, ph = 0;
+			SDL_GetWindowSizeInPixels(sdlWindow, &pw, &ph);
+			SDL_Log("window %dx%d, pixels %dx%d, glError 0x%x", width, height, pw, ph, glGetError());
+
 #if defined(IPHONE)
 			SDL_PropertiesID props = SDL_GetWindowProperties(sdlWindow);
 			OpenGLBindings::defaultFramebuffer = (int)SDL_GetNumberProperty(props, SDL_PROP_WINDOW_UIKIT_OPENGL_FRAMEBUFFER_NUMBER, 0);
