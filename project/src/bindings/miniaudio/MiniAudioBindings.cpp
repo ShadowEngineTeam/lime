@@ -16,7 +16,7 @@
 #endif
 #define MA_IMPLEMENTATION
 #include <miniaudio.h>
-#include "BSincResampler.h"
+#include <extras/resamplers/bsinc/miniaudio_bsinc.h>
 
 // Opus and Vorbis decoders
 #include <extras/decoders/libopus/miniaudio_libopus.c>
@@ -283,7 +283,7 @@ namespace lime
 		}
 
 		ma_decoder_config decoderConfig = ma_decoder_config_init_default();
-		decoderConfig.resampling = lime::bsinc::config(); // resampler=bsinc24 (see BSincResampler.h)
+		decoderConfig.resampling = ma_bsinc24_resampler_config_init(ma_format_unknown, 0, 0, 0); // resampler=bsinc24
 
 		if (!val_is_null(pConfig))
 		{
@@ -330,7 +330,7 @@ namespace lime
 		}
 
 		ma_decoder_config decoderConfig = ma_decoder_config_init_default();
-		decoderConfig.resampling = lime::bsinc::config(); // resampler=bsinc24 (see BSincResampler.h)
+		decoderConfig.resampling = ma_bsinc24_resampler_config_init(ma_format_unknown, 0, 0, 0); // resampler=bsinc24
 
 		if (!val_is_null(pConfig))
 		{
@@ -1388,8 +1388,11 @@ namespace lime
 		device.contextConfig.pBackends = backends;
 		device.contextConfig.backendCount = backendCount;
 
-		// resampler=bsinc24 (device rate conversion; decoders are set where they are created)
-		device.resampling = lime::bsinc::config();
+		// resampler=bsinc24, backported from OpenAL Soft (extras/resamplers/bsinc).
+		// Device rate conversion + per-sound pitch/doppler; decoders are set where they are created.
+		// Revert pitchResampling to stock linear if per-sound pitch CPU cost matters more than quality.
+		device.resampling = ma_bsinc24_resampler_config_init(ma_format_unknown, 0, 0, 0);
+		config.pitchResampling = ma_bsinc24_resampler_config_init(ma_format_unknown, 0, 0, 0);
 
 		// sample-type=float32
 		device.playback.format = ma_format_f32;
