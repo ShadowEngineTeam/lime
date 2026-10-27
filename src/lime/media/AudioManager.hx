@@ -62,6 +62,13 @@ class AudioManager
 			config.pLog = log;
 			#end
 
+			#if (ios && simulator)
+			// For some reason, if we don't request a sample rate,
+			// Core Audio will decide to use 8000 Hz on simulator, so to prevent this,
+			// force sample rate to 48000 Hz to match `MA_DEFAULT_SAMPLE_RATE` for better playback quality.
+			config.sampleRate = 48000;
+			#end
+
 			engine = MAEngine.init(config);
 
 			if (engine == null)
