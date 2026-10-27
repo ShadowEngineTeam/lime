@@ -16,6 +16,7 @@
 #endif
 #define MA_IMPLEMENTATION
 #include <miniaudio.h>
+#include "BSincResampler.h"
 
 // Opus and Vorbis decoders
 #include <extras/decoders/libopus/miniaudio_libopus.c>
@@ -282,6 +283,7 @@ namespace lime
 		}
 
 		ma_decoder_config decoderConfig = ma_decoder_config_init_default();
+		decoderConfig.resampling = lime::bsinc::config(); // resampler=bsinc24 (see BSincResampler.h)
 
 		if (!val_is_null(pConfig))
 		{
@@ -328,6 +330,7 @@ namespace lime
 		}
 
 		ma_decoder_config decoderConfig = ma_decoder_config_init_default();
+		decoderConfig.resampling = lime::bsinc::config(); // resampler=bsinc24 (see BSincResampler.h)
 
 		if (!val_is_null(pConfig))
 		{
@@ -1385,6 +1388,9 @@ namespace lime
 		device.contextConfig.pBackends = backends;
 		device.contextConfig.backendCount = backendCount;
 
+		// resampler=bsinc24 (device rate conversion; decoders are set where they are created)
+		device.resampling = lime::bsinc::config();
+
 		// sample-type=float32
 		device.playback.format = ma_format_f32;
 
@@ -1414,7 +1420,7 @@ namespace lime
 		device.alsa.noMMap = MA_FALSE;
 
 		// Intentionally NOT ported (OpenAL Soft features with no miniaudio counterpart):
-		//   stereo-encoding, cf_level, front-stablizer, volume-adjust, dither, resampler=bsinc24,
+		//   stereo-encoding, cf_level, front-stablizer, volume-adjust, dither,
 		//   decoder/{hq-mode,distance-comp,nfc}  -> HRTF/ambisonic/mixer settings
 		//   sources=256, sends=2                 -> miniaudio has no fixed source/aux-send limits
 		//   output-limiter=true                  -> engine clipping is already on (engine noClip=false)
