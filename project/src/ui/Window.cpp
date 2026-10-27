@@ -152,6 +152,12 @@ namespace lime
 
 			OpenGLBindings::Init();
 
+#if defined(__APPLE__) && !defined(IPHONE) && defined(LIME_OPENGL_GL)
+			GLuint defaultVAO = 0;
+			glGenVertexArrays(1, &defaultVAO);
+			glBindVertexArray(defaultVAO);
+#endif
+
 			SDL_Log("GL_VERSION: %s", (const char*)glGetString(GL_VERSION));
 			SDL_Log("GLSL: %s", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
 			SDL_Log("RENDERER: %s", (const char*)glGetString(GL_RENDERER));
