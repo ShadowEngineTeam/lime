@@ -3,15 +3,17 @@
 #include <utils/File.h>
 
 // MiniAudio Implementation
+#if defined(ANDROID)
+#define MA_NO_AAUDIO
+#endif
 #define MA_NO_ENCODING
 #define MA_NO_RESOURCE_MANAGER
 #define MA_NO_GENERATION
 #if defined(IPHONE) || defined(HX_MACOS)
 #define MA_NO_RUNTIME_LINKING
 #endif
-#if defined(ANDROID)
-// Ported from alconfig.cpp: "sdk < 30 -> opensl, otherwise aaudio".
-// miniaudio checks this at runtime and falls through to OpenSL|ES when the device is older.
+#if defined(ANDROID) && !defined(MA_NO_AAUDIO)
+// alconfig.cpp used "sdk < 30 -> opensl, otherwise aaudio"; miniaudio falls back to OpenSL|ES below this.
 #define MA_AAUDIO_MIN_ANDROID_SDK_VERSION 30
 #endif
 #define MA_IMPLEMENTATION
@@ -1358,6 +1360,7 @@ namespace lime
 				ma_device_backend_winmm,
 #elif defined(ANDROID)
 				// "aaudio,null" on sdk >= 30, "opensl,null" below (see MA_AAUDIO_MIN_ANDROID_SDK_VERSION).
+				// AAudio is compiled out for now (MA_NO_AAUDIO), so this resolves to OpenSL|ES.
 				ma_device_backend_aaudio,
 				ma_device_backend_opensl,
 #elif defined(IPHONE) || defined(HX_MACOS)
@@ -1415,7 +1418,7 @@ namespace lime
 
 		// SDL_HINT_AUDIO_CATEGORY = "playback" (Application.cpp, iOS only)
 #if defined(IPHONE)
-		device.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_playback;
+		// device.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_playback;
 		// device.contextConfig.coreaudio.sessionCategoryOptions = ma_ios_session_category_option_allow_bluetooth_a2dp;
 #endif
 

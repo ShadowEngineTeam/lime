@@ -9,8 +9,6 @@ import lime.media.miniaudio.MAHelpers;
 import lime.media.miniaudio.MALog;
 import lime.media.miniaudio.MALogLevel;
 #end
-#elseif (js && html5 && lime_howlerjs)
-import lime.media.howlerjs.Howler;
 #end
 
 @:allow(lime._internal.backend.native.NativeApplication)
@@ -35,8 +33,6 @@ class AudioManager
 	public static var log:MALog;
 	#end
 	public static var engine:MAEngine;
-	#elseif (js && html5)
-	public static var audioContext:js.html.audio.AudioContext;
 	#end
 
 	public static function init():Void
@@ -71,44 +67,6 @@ class AudioManager
 			if (engine == null)
 			{
 				Log.error("Unable to create MiniAudio engine for Native!");
-			}
-		}
-		#elseif (js && html5 && lime_howlerjs)
-		if (audioContext == null)
-		{
-			if (Howler.usingWebAudio)
-			{
-				audioContext = Howler.ctx;
-			}
-			else
-			{
-				#if (!lime_doc_gen && !display)
-				Howler._setupAudioContext();
-				#end
-
-				if (Howler.usingWebAudio)
-				{
-					audioContext = Howler.ctx;
-				}
-				else
-				{
-					Log.error("Unable to create HowlerJS context for Web!");
-				}
-			}
-		}
-		#elseif (js && html5)
-		if (audioContext == null)
-		{
-			audioContext = cast untyped js.Syntax.code("new window.AudioContext ()");
-
-			if (audioContext == null)
-			{
-				audioContext = cast untyped js.Syntax.code("new window.webkitAudioContext ()");
-
-				if (audioContext == null)
-				{
-					Log.error("Unable to create AudioContext for Web!");
-				}
 			}
 		}
 		#end
