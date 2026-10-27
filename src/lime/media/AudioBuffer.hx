@@ -118,7 +118,7 @@ class AudioBuffer
 		// if base64String contains codec data, strip it then decode it.
 		var base64StringSplit = base64String.split(",");
 		var base64StringNoEncoding = base64StringSplit[base64StringSplit.length - 1];
-		return __createFromMADecoder(MADecoder.init_memory(Base64.decode(base64StringNoEncoding), MADecoderConfig.init(S16, 0, 0)), stream);
+		return __createFromMADecoder(MADecoder.init_memory(Base64.decode(base64StringNoEncoding), MADecoderConfig.init(F32, 0, 0)), stream);
 		#else
 		return null;
 		#end
@@ -139,7 +139,7 @@ class AudioBuffer
 		}
 
 		#if (lime_cffi && lime_miniaudio && !macro)
-		return __createFromMADecoder(MADecoder.init_memory(bytes, MADecoderConfig.init(S16, 0, 0)), stream);
+		return __createFromMADecoder(MADecoder.init_memory(bytes, MADecoderConfig.init(F32, 0, 0)), stream);
 		#else
 		return null;
 		#end
@@ -160,7 +160,7 @@ class AudioBuffer
 		}
 
 		#if (lime_cffi && lime_miniaudio && !macro)
-		return __createFromMADecoder(MADecoder.init_file(path, MADecoderConfig.init(S16, 0, 0)), stream);
+		return __createFromMADecoder(MADecoder.init_file(path, MADecoderConfig.init(F32, 0, 0)), stream);
 		#else
 		return null;
 		#end
@@ -347,11 +347,11 @@ class AudioBuffer
 
 		if (state.path != null)
 		{
-			decoder = MADecoder.init_file(state.path, MADecoderConfig.init(S16, 0, 0));
+			decoder = MADecoder.init_file(state.path, MADecoderConfig.init(F32, 0, 0));
 		}
 		else if (state.bytes != null)
 		{
-			decoder = MADecoder.init_memory(state.bytes, MADecoderConfig.init(S16, 0, 0));
+			decoder = MADecoder.init_memory(state.bytes, MADecoderConfig.init(F32, 0, 0));
 		}
 
 		if (decoder != null)
