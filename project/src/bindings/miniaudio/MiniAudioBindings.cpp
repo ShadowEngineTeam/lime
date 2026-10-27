@@ -13,7 +13,7 @@
 #define MA_NO_RUNTIME_LINKING
 #endif
 #if defined(ANDROID) && !defined(MA_NO_AAUDIO)
-// alconfig.cpp used "sdk < 30 -> opensl, otherwise aaudio"; miniaudio falls back to OpenSL|ES below this.
+// sdk < 30 -> opensl, otherwise aaudio
 #define MA_AAUDIO_MIN_ANDROID_SDK_VERSION 30
 #endif
 #define MA_IMPLEMENTATION
@@ -1335,13 +1335,7 @@ namespace lime
 	}
 
 
-	// ---------------------------------------------------------------------------------------------
 	// Default audio configuration.
-	//
-	// Ported from the old OpenAL Soft `alconfig.cpp` (LoadSEALDefaultConfig). Every option that has
-	// a miniaudio equivalent is mapped here; options that only made sense for OpenAL Soft are listed
-	// at the bottom so it is clear they were dropped on purpose.
-	// ---------------------------------------------------------------------------------------------
 	static void lime_ma_apply_default_config(ma_engine_config &config)
 	{
 		ma_device_config &device = config.deviceConfig;
@@ -1354,21 +1348,19 @@ namespace lime
 		{
 			ma_device_backend_vtable *order[] = {
 #if defined(_WIN32)
-				// "wasapi,dsound,winmm,null"
+				// "wasapi,dsound,winmm"
 				ma_device_backend_wasapi,
 				ma_device_backend_dsound,
 				ma_device_backend_winmm,
 #elif defined(ANDROID)
-				// "aaudio,null" on sdk >= 30, "opensl,null" below (see MA_AAUDIO_MIN_ANDROID_SDK_VERSION).
-				// AAudio is compiled out for now (MA_NO_AAUDIO), so this resolves to OpenSL|ES.
+				// "aaudio" on sdk >= 30 otherwise "opensl"
 				ma_device_backend_aaudio,
 				ma_device_backend_opensl,
 #elif defined(IPHONE) || defined(HX_MACOS)
-				// "sdl3,null" in alconfig. SDL3 audio only existed as an OpenAL workaround for CoreAudio;
-				// miniaudio talks to CoreAudio natively, so that is the backend to use here.
+				// "sdl3,null" in alconfig (SDL3 uses coreaudio)
 				ma_device_backend_coreaudio,
 #elif defined(__linux__)
-				// "pipewire,pulse,alsa,jack,oss,null"
+				// "pipewire,pulse,alsa,jack,oss"
 				ma_device_backend_pipewire,
 				ma_device_backend_pulseaudio,
 				ma_device_backend_alsa,
@@ -1378,7 +1370,7 @@ namespace lime
 				ma_device_backend_null
 			};
 
-			// Skip backends compiled out of this build (their vtable pointer is NULL).
+			// skipping backends compiled out of this build
 			for (size_t i = 0; i < sizeof(order) / sizeof(order[0]); ++i)
 			{
 				if (order[i] != NULL && backendCount < 8)
@@ -1391,9 +1383,7 @@ namespace lime
 		device.contextConfig.pBackends = backends;
 		device.contextConfig.backendCount = backendCount;
 
-		// resampler=bsinc24, backported from OpenAL Soft (extras/resamplers/bsinc).
-		// Device rate conversion + per-sound pitch/doppler; decoders are set where they are created.
-		// Revert pitchResampling to stock linear if per-sound pitch CPU cost matters more than quality.
+		// resampler=bsinc24, backported from OpenAL Soft
 		device.resampling = ma_bsinc24_resampler_config_init(ma_format_unknown, 0, 0, 0);
 		config.pitchResampling = ma_bsinc24_resampler_config_init(ma_format_unknown, 0, 0, 0);
 
@@ -1404,11 +1394,8 @@ namespace lime
 		device.playback.channels = 2;
 
 		// period_size=480, periods=2
-		// (an explicit `processingSizeInFrames` from Haxe still wins, see ma_engine_init)
 		device.periodSizeInFrames = 480;
 		device.periods = 2;
-
-		// Per-backend settings -------------------------------------------------------------------
 
 		// SDL_HINT_AUDIO_DEVICE_STREAM_ROLE = "Game" (Application.cpp, removed with SDL audio)
 		device.wasapi.usage = ma_wasapi_usage_games;
