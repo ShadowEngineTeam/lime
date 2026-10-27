@@ -68,6 +68,15 @@ abstract MAAudioRingBuffer(MADataSource) from MADataSource to MADataSource
 		#end
 	}
 
+	public function write_pcm_frames_from_bytes(bytes:haxe.io.Bytes, offset:Int, frameCount:Int):Int
+	{
+		#if (lime_cffi && lime_miniaudio && !macro)
+		return NativeCFFI.lime_ma_audio_ring_buffer_write_pcm_frames_from_bytes(this, bytes, offset, frameCount);
+		#else
+		return 0;
+		#end
+	}
+
 	public function read_pcm_frames(pFrames:CFFIPointer, frameCount:Int):Int
 	{
 		#if (lime_cffi && lime_miniaudio && !macro)
