@@ -1642,7 +1642,6 @@ class NativeCFFI
 	private static var lime_ma_audio_ring_buffer_map_consume = new cpp.Callable<cpp.Object->Int->cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_audio_ring_buffer_map_consume", "oioi", false));
 	private static var lime_ma_audio_ring_buffer_unmap_consume = new cpp.Callable<cpp.Object->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_ma_audio_ring_buffer_unmap_consume", "oiv", false));
 	private static var lime_ma_audio_ring_buffer_write_pcm_frames = new cpp.Callable<cpp.Object->cpp.Object->Int->Int>(cpp.Prime._loadPrime("lime", "lime_ma_audio_ring_buffer_write_pcm_frames", "ooii", false));
-	private static var lime_ma_audio_ring_buffer_write_pcm_frames_from_bytes = new cpp.Callable<cpp.Object->cpp.Object->Int->Int->Int>(cpp.Prime._loadPrime("lime", "lime_ma_audio_ring_buffer_write_pcm_frames_from_bytes", "ooiii", false));
 	private static var lime_ma_audio_ring_buffer_read_pcm_frames = new cpp.Callable<cpp.Object->cpp.Object->Int->Int>(cpp.Prime._loadPrime("lime", "lime_ma_audio_ring_buffer_read_pcm_frames", "ooii", false));
 	private static var lime_ma_audio_ring_buffer_get_length_in_pcm_frames = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_audio_ring_buffer_get_length_in_pcm_frames", "oi", false));
 	private static var lime_ma_node_attach_output_bus = new cpp.Callable<cpp.Object->Int->cpp.Object->Int->Int>(cpp.Prime._loadPrime("lime", "lime_ma_node_attach_output_bus", "oioii", false));
@@ -1825,7 +1824,6 @@ class NativeCFFI
 	private static var lime_ma_audio_ring_buffer_map_consume:Dynamic->Int->Dynamic->Int = CFFI.load("lime", "lime_ma_audio_ring_buffer_map_consume", 3);
 	private static var lime_ma_audio_ring_buffer_unmap_consume:Dynamic->Int->Void = CFFI.load("lime", "lime_ma_audio_ring_buffer_unmap_consume", 2);
 	private static var lime_ma_audio_ring_buffer_write_pcm_frames:Dynamic->Dynamic->Int->Int = CFFI.load("lime", "lime_ma_audio_ring_buffer_write_pcm_frames", 3);
-	private static var lime_ma_audio_ring_buffer_write_pcm_frames_from_bytes:Dynamic->Dynamic->Int->Int->Int = CFFI.load("lime", "lime_ma_audio_ring_buffer_write_pcm_frames_from_bytes", 4);
 	private static var lime_ma_audio_ring_buffer_read_pcm_frames:Dynamic->Dynamic->Int->Int = CFFI.load("lime", "lime_ma_audio_ring_buffer_read_pcm_frames", 3);
 	private static var lime_ma_audio_ring_buffer_get_length_in_pcm_frames:Dynamic->Int = CFFI.load("lime", "lime_ma_audio_ring_buffer_get_length_in_pcm_frames", 1);
 	private static var lime_ma_node_attach_output_bus:Dynamic->Int->Dynamic->Int->Int = CFFI.load("lime", "lime_ma_engine_init", 1);

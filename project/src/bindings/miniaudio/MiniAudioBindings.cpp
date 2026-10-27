@@ -677,29 +677,6 @@ namespace lime
 		return framesWritten;
 	}
 
-	int lime_ma_audio_ring_buffer_write_pcm_frames_from_bytes(value pRingBuffer, value pBytes, int offset, int frameCount)
-	{
-		ma_audio_ring_buffer *ringBuffer = (ma_audio_ring_buffer *)val_data(pRingBuffer);
-
-		if (!ringBuffer || offset < 0 || frameCount <= 0)
-			return 0;
-
-		Bytes bytes(pBytes);
-
-		const ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ringBuffer->format, ringBuffer->channels);
-
-		if (bytesPerFrame == 0 || offset >= bytes.length)
-			return 0;
-
-		const ma_uint32 maxFrames = (ma_uint32)((bytes.length - offset) / bytesPerFrame);
-
-		ma_uint32 framesWritten = 0;
-
-		ma_audio_ring_buffer_write_pcm_frames(ringBuffer, bytes.b + offset, (ma_uint32)frameCount < maxFrames ? (ma_uint32)frameCount : maxFrames, &framesWritten);
-
-		return framesWritten;
-	}
-
 	int lime_ma_audio_ring_buffer_read_pcm_frames(value pRingBuffer, value pFrames, int frameCount)
 	{
 		ma_uint32 framesRead = 0;
@@ -2556,7 +2533,6 @@ namespace lime
 	DEFINE_PRIME3(lime_ma_audio_ring_buffer_map_consume);
 	DEFINE_PRIME2v(lime_ma_audio_ring_buffer_unmap_consume);
 	DEFINE_PRIME3(lime_ma_audio_ring_buffer_write_pcm_frames);
-	DEFINE_PRIME4(lime_ma_audio_ring_buffer_write_pcm_frames_from_bytes);
 	DEFINE_PRIME3(lime_ma_audio_ring_buffer_read_pcm_frames);
 	DEFINE_PRIME1(lime_ma_audio_ring_buffer_get_length_in_pcm_frames);
 	DEFINE_PRIME4(lime_ma_node_attach_output_bus);
