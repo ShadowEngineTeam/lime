@@ -3,17 +3,16 @@
 #include <utils/File.h>
 
 // MiniAudio Implementation
-#if defined(ANDROID)
-#define MA_NO_AAUDIO
-#endif
 #define MA_NO_ENCODING
 #define MA_NO_RESOURCE_MANAGER
 #define MA_NO_GENERATION
 #if defined(IPHONE) || defined(HX_MACOS)
 #define MA_NO_RUNTIME_LINKING
 #endif
-#if defined(ANDROID) && !defined(MA_NO_AAUDIO)
-#define MA_AAUDIO_MIN_ANDROID_SDK_VERSION 31
+#if defined(ANDROID)
+// Ported from alconfig.cpp: "sdk < 30 -> opensl, otherwise aaudio".
+// miniaudio checks this at runtime and falls through to OpenSL|ES when the device is older.
+#define MA_AAUDIO_MIN_ANDROID_SDK_VERSION 30
 #endif
 #define MA_IMPLEMENTATION
 #include <miniaudio.h>
@@ -1330,20 +1329,104 @@ namespace lime
 		}
 	}
 
+
+	// ---------------------------------------------------------------------------------------------
+	// Default audio configuration.
+	//
+	// Ported from the old OpenAL Soft `alconfig.cpp` (LoadSEALDefaultConfig). Every option that has
+	// a miniaudio equivalent is mapped here; options that only made sense for OpenAL Soft are listed
+	// at the bottom so it is clear they were dropped on purpose.
+	// ---------------------------------------------------------------------------------------------
+	static void lime_ma_apply_default_config(ma_engine_config &config)
+	{
+		ma_device_config &device = config.deviceConfig;
+
+		// drivers=... (priority order, per platform)
+		static ma_device_backend_config backends[8];
+		static ma_uint32 backendCount = 0;
+
+		if (backendCount == 0)
+		{
+			ma_device_backend_vtable *order[] = {
+#if defined(_WIN32)
+				// "wasapi,dsound,winmm,null"
+				ma_device_backend_wasapi,
+				ma_device_backend_dsound,
+				ma_device_backend_winmm,
+#elif defined(ANDROID)
+				// "aaudio,null" on sdk >= 30, "opensl,null" below (see MA_AAUDIO_MIN_ANDROID_SDK_VERSION).
+				ma_device_backend_aaudio,
+				ma_device_backend_opensl,
+#elif defined(IPHONE) || defined(HX_MACOS)
+				// "sdl3,null" in alconfig. SDL3 audio only existed as an OpenAL workaround for CoreAudio;
+				// miniaudio talks to CoreAudio natively, so that is the backend to use here.
+				ma_device_backend_coreaudio,
+#elif defined(__linux__)
+				// "pipewire,pulse,alsa,jack,oss,null"
+				ma_device_backend_pipewire,
+				ma_device_backend_pulseaudio,
+				ma_device_backend_alsa,
+				ma_device_backend_jack,
+				ma_device_backend_oss,
+#endif
+				ma_device_backend_null
+			};
+
+			// Skip backends compiled out of this build (their vtable pointer is NULL).
+			for (size_t i = 0; i < sizeof(order) / sizeof(order[0]); ++i)
+			{
+				if (order[i] != NULL && backendCount < 8)
+				{
+					backends[backendCount++] = ma_device_backend_config_init(order[i], NULL);
+				}
+			}
+		}
+
+		device.contextConfig.pBackends = backends;
+		device.contextConfig.backendCount = backendCount;
+
+		// sample-type=float32
+		device.playback.format = ma_format_f32;
+
+		// channels=stereo
+		device.playback.channels = 2;
+
+		// period_size=480, periods=2
+		// (an explicit `processingSizeInFrames` from Haxe still wins, see ma_engine_init)
+		device.periodSizeInFrames = 480;
+		device.periods = 2;
+
+		// Per-backend settings -------------------------------------------------------------------
+
+		// SDL_HINT_AUDIO_DEVICE_STREAM_ROLE = "Game" (Application.cpp, removed with SDL audio)
+		device.wasapi.usage = ma_wasapi_usage_games;
+		device.aaudio.usage = ma_aaudio_usage_game;
+		device.aaudio.performanceMode = ma_aaudio_performance_mode_low_latency;
+		device.pipewire.pMediaRole = "Game";
+
+		// SDL_HINT_AUDIO_CATEGORY = "playback" (Application.cpp, iOS only)
+#if defined(IPHONE)
+		device.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_playback;
+		// device.contextConfig.coreaudio.sessionCategoryOptions = ma_ios_session_category_option_allow_bluetooth_a2dp;
+#endif
+
+		// alsa/mmap=true  -> miniaudio enables MMap unless told otherwise.
+		device.alsa.noMMap = MA_FALSE;
+
+		// Intentionally NOT ported (OpenAL Soft features with no miniaudio counterpart):
+		//   stereo-encoding, cf_level, front-stablizer, volume-adjust, dither, resampler=bsinc24,
+		//   decoder/{hq-mode,distance-comp,nfc}  -> HRTF/ambisonic/mixer settings
+		//   sources=256, sends=2                 -> miniaudio has no fixed source/aux-send limits
+		//   output-limiter=true                  -> engine clipping is already on (engine noClip=false)
+		//   rt-prio=15, rt-time-limit            -> contextConfig.threadPriority already defaults to highest
+		//   pipewire/rt-mix, pulse/{allow-moves,fix-rate,adjust-latency} -> no equivalents
+	}
+
 	value lime_ma_engine_init(value pConfig)
 	{
 		ma_engine_config config = ma_engine_config_init();
 
-		// WASAPI Device Config
-		config.deviceConfig.wasapi.usage = ma_wasapi_usage_games;
-
-		// AAudio Device Config
-		config.deviceConfig.aaudio.usage = ma_aaudio_usage_game;
-		config.deviceConfig.aaudio.performanceMode = ma_aaudio_performance_mode_low_latency;
-
-		// CoreAudio Device Context Config
-		// config.deviceConfig.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_playback;
-		// config.deviceConfig.contextConfig.coreaudio.sessionCategoryOptions = ma_ios_session_category_option_allow_bluetooth_a2dp;
+		lime_ma_apply_default_config(config);
 
 		config.pLog = (ma_log *)val_data(val_field(pConfig, val_id("pLog")));
 		config.listenerCount = val_int(val_field(pConfig, val_id("listenerCount")));
