@@ -11,9 +11,7 @@ import lime.utils.Int16Array;
 import lime.utils.Int32Array;
 import lime.utils.Log;
 import lime.utils.UInt8Array;
-#if lime_howlerjs
-import lime.media.howlerjs.Howl;
-#elseif lime_miniaudio
+#if lime_miniaudio
 import lime.media.miniaudio.MADataFormat;
 import lime.media.miniaudio.MADecoder;
 import lime.media.miniaudio.MADecoderConfig;
@@ -72,7 +70,7 @@ class AudioBuffer
 	public var data:ArrayBufferView;
 
 	/**
-		The source of the audio data. This can be an `Howl` or `MADecoder`.
+		The source of the audio data. This can be an `MADecoder`.
 	**/
 	public var src(get, set):Dynamic;
 
@@ -81,8 +79,6 @@ class AudioBuffer
 	#end
 
 	@:noCompletion private var __srcCustom:Dynamic;
-	@:noCompletion private var __srcHowl:#if lime_howlerjs Howl #else Dynamic #end;
-	@:noCompletion private var __srcHowlerDefaultSprite:String;
 	@:noCompletion private var __srcMADecoder:#if lime_miniaudio MADecoder #else Dynamic #end;
 
 	/**
@@ -95,13 +91,7 @@ class AudioBuffer
 	**/
 	public function dispose():Void
 	{
-		#if (js && html5 && lime_howlerjs)
-		if (__srcHowl != null)
-		{
-			__srcHowl.unload();
-			__srcHowl = null;
-		}
-		#elseif (lime_cffi && lime_miniaudio && !macro)
+		#if (lime_cffi && lime_miniaudio && !macro)
 		if (__srcMADecoder != null)
 		{
 			__srcMADecoder.uninit();
@@ -124,17 +114,7 @@ class AudioBuffer
 			return null;
 		}
 
-		#if (js && html5 && lime_howlerjs)
-		// if base64String doesn't contain codec data, add it.
-		if (base64String.indexOf(",") == -1)
-		{
-			base64String = "data:" + __getCodec(Base64.decode(base64String)) + ";base64," + base64String;
-		}
-
-		var audioBuffer = new AudioBuffer();
-		audioBuffer.__srcHowl = new Howl({src: [base64String], preload: true});
-		return audioBuffer;
-		#elseif (lime_cffi && lime_miniaudio && !macro)
+		#if (lime_cffi && lime_miniaudio && !macro)
 		// if base64String contains codec data, strip it then decode it.
 		var base64StringSplit = base64String.split(",");
 		var base64StringNoEncoding = base64StringSplit[base64StringSplit.length - 1];
@@ -158,11 +138,7 @@ class AudioBuffer
 			return null;
 		}
 
-		#if (js && html5 && lime_howlerjs)
-		var audioBuffer = new AudioBuffer();
-		audioBuffer.__srcHowl = new Howl({src: ["data:" + __getCodec(bytes) + ";base64," + Base64.encode(bytes)], preload: true});
-		return audioBuffer;
-		#elseif (lime_cffi && lime_miniaudio && !macro)
+		#if (lime_cffi && lime_miniaudio && !macro)
 		return __createFromMADecoder(MADecoder.init_memory(bytes, MADecoderConfig.init(S16, 0, 0)), stream);
 		#else
 		return null;
@@ -183,11 +159,7 @@ class AudioBuffer
 			return null;
 		}
 
-		#if (js && html5 && lime_howlerjs)
-		var audioBuffer = new AudioBuffer();
-		audioBuffer.__srcHowl = new Howl({src: [path], preload: false});
-		return audioBuffer;
-		#elseif (lime_cffi && lime_miniaudio && !macro)
+		#if (lime_cffi && lime_miniaudio && !macro)
 		return __createFromMADecoder(MADecoder.init_file(path, MADecoderConfig.init(S16, 0, 0)), stream);
 		#else
 		return null;
@@ -208,34 +180,7 @@ class AudioBuffer
 			return Future.withValue(null);
 		}
 
-		#if (js && html5 && lime_howlerjs)
-		var promise = new lime.app.Promise<AudioBuffer>();
-
-		var audioBuffer = new AudioBuffer();
-
-		audioBuffer.__srcHowl = new Howl({src: ["data:" + __getCodec(bytes) + ";base64," + Base64.encode(bytes)], preload: false});
-
-		if (audioBuffer.__srcHowl != null)
-		{
-			audioBuffer.__srcHowl.on("load", function()
-			{
-				promise.complete(audioBuffer);
-			});
-
-			audioBuffer.__srcHowl.on("loaderror", function(id, msg)
-			{
-				promise.error(msg);
-			});
-
-			audioBuffer.__srcHowl.load();
-		}
-		else
-		{
-			promise.error(null);
-		}
-
-		return promise.future;
-		#elseif (lime_cffi && lime_miniaudio && !macro)
+		#if (lime_cffi && lime_miniaudio && !macro)
 		if (__localThreadPool == null)
 		{
 			__localThreadPool = new ThreadPool(0, 2);
@@ -267,32 +212,7 @@ class AudioBuffer
 			return Future.withValue(null);
 		}
 
-		#if (js && html5 && lime_howlerjs)
-		var promise = new lime.app.Promise<AudioBuffer>();
-
-		var audioBuffer = AudioBuffer.fromFile(path);
-
-		if (audioBuffer != null)
-		{
-			audioBuffer.__srcHowl.on("load", function()
-			{
-				promise.complete(audioBuffer);
-			});
-
-			audioBuffer.__srcHowl.on("loaderror", function(id, msg)
-			{
-				promise.error(msg);
-			});
-
-			audioBuffer.__srcHowl.load();
-		}
-		else
-		{
-			promise.error(null);
-		}
-
-		return promise.future;
-		#elseif (lime_cffi && lime_miniaudio && !macro)
+		#if (lime_cffi && lime_miniaudio && !macro)
 		if (__localThreadPool == null)
 		{
 			__localThreadPool = new ThreadPool(0, 2);
@@ -484,9 +404,7 @@ class AudioBuffer
 
 	@:noCompletion private function get_src():Dynamic
 	{
-		#if (js && html5 && lime_howlerjs)
-		return __srcHowl;
-		#elseif (lime_cffi && lime_miniaudio && !macro)
+		#if (lime_cffi && lime_miniaudio && !macro)
 		return __srcMADecoder;
 		#else
 		return __srcCustom;
@@ -495,9 +413,7 @@ class AudioBuffer
 
 	@:noCompletion private function set_src(value:Dynamic):Dynamic
 	{
-		#if (js && html5 && lime_howlerjs)
-		return __srcHowl = value;
-		#elseif (lime_cffi && lime_miniaudio && !macro)
+		#if (lime_cffi && lime_miniaudio && !macro)
 		return __srcMADecoder = value;
 		#else
 		return __srcCustom = value;
