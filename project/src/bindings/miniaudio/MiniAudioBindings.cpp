@@ -1,6 +1,8 @@
 #include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
 #include <utils/File.h>
+#include <atomic>
+#include <cmath>
 #ifdef IPHONE
 #include <media/AudioSession.h>
 #endif
@@ -1333,6 +1335,124 @@ namespace lime
 		return ma_delay_node_get_decay((ma_delay_node *)val_data(pDelayNode));
 	}
 
+	// Passes audio straight through and keeps the highest absolute sample per channel of the last processed block
+	struct lime_ma_peak_meter_node
+	{
+		ma_node_base base;
+		std::atomic<float> peaks[MA_MAX_CHANNELS];
+	};
+
+	static void lime_ma_peak_meter_node_process(ma_node *pNode, const float **ppFramesIn, ma_uint32 *pFrameCountIn, float **ppFramesOut, ma_uint32 *pFrameCountOut)
+	{
+		lime_ma_peak_meter_node *meter = (lime_ma_peak_meter_node *)pNode;
+
+		const ma_uint32 channels = ma_node_get_output_channels(pNode, 0);
+		const ma_uint32 frameCount = *pFrameCountIn < *pFrameCountOut ? *pFrameCountIn : *pFrameCountOut;
+
+		const float *pIn = ppFramesIn[0];
+		float *pOut = ppFramesOut[0];
+
+		float local[MA_MAX_CHANNELS] = {0};
+
+		for (ma_uint32 frame = 0; frame < frameCount; frame++)
+		{
+			for (ma_uint32 channel = 0; channel < channels; channel++)
+			{
+				const float sample = pIn[frame * channels + channel];
+
+				pOut[frame * channels + channel] = sample;
+
+				const float level = fabsf(sample);
+
+				if (level > local[channel])
+					local[channel] = level;
+			}
+		}
+
+		for (ma_uint32 channel = 0; channel < channels; channel++)
+			meter->peaks[channel].store(local[channel], std::memory_order_relaxed);
+
+		*pFrameCountIn = frameCount;
+		*pFrameCountOut = frameCount;
+	}
+
+	static ma_node_vtable lime_ma_peak_meter_node_vtable = {lime_ma_peak_meter_node_process, NULL, 1, 1, 0};
+
+	void gc_ma_peak_meter_node(value handle)
+	{
+		lime_ma_peak_meter_node *meter = (lime_ma_peak_meter_node *)val_data(handle);
+
+		if (meter)
+		{
+			ma_node_uninit(meter, NULL);
+
+			delete meter;
+		}
+	}
+
+	value lime_ma_peak_meter_node_init(value pEngine)
+	{
+		ma_engine *engine = (ma_engine *)val_data(pEngine);
+
+		if (!engine)
+			return alloc_null();
+
+		ma_uint32 channels = ma_engine_get_channels(engine);
+
+		ma_node_config nodeConfig = ma_node_config_init();
+		nodeConfig.pVTable = &lime_ma_peak_meter_node_vtable;
+		nodeConfig.pInputChannels = &channels;
+		nodeConfig.pOutputChannels = &channels;
+
+		lime_ma_peak_meter_node *meter = new lime_ma_peak_meter_node();
+
+		for (ma_uint32 channel = 0; channel < MA_MAX_CHANNELS; channel++)
+			meter->peaks[channel].store(0.0f);
+
+		if (ma_node_init(ma_engine_get_node_graph(engine), &nodeConfig, NULL, &meter->base) != MA_SUCCESS)
+		{
+			delete meter;
+
+			return alloc_null();
+		}
+
+		ma_node_attach_output_bus(meter, 0, ma_engine_get_endpoint(engine), 0);
+
+		return CFFIPointer(meter, gc_ma_peak_meter_node);
+	}
+
+	void lime_ma_peak_meter_node_uninit(value pNode)
+	{
+		lime_ma_peak_meter_node *meter = (lime_ma_peak_meter_node *)val_data(pNode);
+
+		if (meter)
+		{
+			ma_node_uninit(meter, NULL);
+
+			free_abstract(pNode);
+
+			delete meter;
+		}
+	}
+
+	double lime_ma_peak_meter_node_get_peak(value pNode, int channel)
+	{
+		lime_ma_peak_meter_node *meter = (lime_ma_peak_meter_node *)val_data(pNode);
+
+		if (!meter)
+			return 0.0;
+
+		const ma_uint32 channels = ma_node_get_output_channels(meter, 0);
+
+		if (channels == 1)
+			channel = 0;
+
+		if (channel < 0 || (ma_uint32)channel >= channels)
+			return 0.0;
+
+		return meter->peaks[channel].load(std::memory_order_relaxed);
+	}
+
 	struct lime_ma_engine_process_data
 	{
 		AutoGCRoot *onProcess = NULL;
@@ -2464,6 +2584,9 @@ namespace lime
 	DEFINE_PRIME1v(lime_ma_hishelf_node_uninit);
 	DEFINE_PRIME2(lime_ma_delay_node_init);
 	DEFINE_PRIME1v(lime_ma_delay_node_uninit);
+	DEFINE_PRIME1(lime_ma_peak_meter_node_init);
+	DEFINE_PRIME1v(lime_ma_peak_meter_node_uninit);
+	DEFINE_PRIME2(lime_ma_peak_meter_node_get_peak);
 	DEFINE_PRIME2v(lime_ma_delay_node_set_decay);
 	DEFINE_PRIME1(lime_ma_delay_node_get_decay);
 	DEFINE_PRIME1(lime_ma_engine_init);
