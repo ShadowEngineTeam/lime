@@ -48080,7 +48080,11 @@ static void ma_buffer_queue_callback_capture__opensl_android(SLAndroidSimpleBuff
     periodSizeInBytes = pDevice->capture.internalPeriodSizeInFrames * ma_get_bytes_per_frame(pDevice->capture.internalFormat, pDevice->capture.internalChannels);
     pBuffer = pDeviceStateOpenSL->pBufferCapture + (pDeviceStateOpenSL->currentBufferIndexCapture * periodSizeInBytes);
 
-    ma_device_state_async_process(&pDeviceStateOpenSL->async, pDevice, NULL, pBuffer, pDevice->capture.internalPeriodSizeInFrames);
+    if (ma_device_get_threading_mode(pDevice) == MA_THREADING_MODE_SINGLE_THREADED) {
+        ma_device_state_async_process(&pDeviceStateOpenSL->async, pDevice, NULL, pBuffer, pDevice->capture.internalPeriodSizeInFrames);
+    } else {
+        ma_device_handle_backend_data_callback(pDevice, NULL, pBuffer, pDevice->capture.internalPeriodSizeInFrames);
+    }
 
     if (!pDeviceStateOpenSL->isDrainingCapture) {
         resultSL = MA_OPENSL_BUFFERQUEUE(pDeviceStateOpenSL->pBufferQueueCapture)->Enqueue(pDeviceStateOpenSL->pBufferQueueCapture, pBuffer, periodSizeInBytes);
@@ -48107,7 +48111,16 @@ static void ma_buffer_queue_callback_playback__opensl_android(SLAndroidSimpleBuf
     periodSizeInBytes = pDevice->playback.internalPeriodSizeInFrames * ma_get_bytes_per_frame(pDevice->playback.internalFormat, pDevice->playback.internalChannels);
     pBuffer = pDeviceStateOpenSL->pBufferPlayback + (pDeviceStateOpenSL->currentBufferIndexPlayback * periodSizeInBytes);
 
-    ma_device_state_async_process(&pDeviceStateOpenSL->async, pDevice, pBuffer, NULL, pDevice->playback.internalPeriodSizeInFrames);
+    /*
+    The async state only holds one period, but non-fast AudioTracks (Bluetooth A2DP, for example) drain several
+    buffers back to back, so every buffer after the first would come out as silence. Process on OpenSL's thread
+    instead, like AAudio does in multi-threaded mode.
+    */
+    if (ma_device_get_threading_mode(pDevice) == MA_THREADING_MODE_SINGLE_THREADED) {
+        ma_device_state_async_process(&pDeviceStateOpenSL->async, pDevice, pBuffer, NULL, pDevice->playback.internalPeriodSizeInFrames);
+    } else if (!pDeviceStateOpenSL->isDrainingPlayback) {
+        ma_device_handle_backend_data_callback(pDevice, pBuffer, NULL, pDevice->playback.internalPeriodSizeInFrames);
+    }
 
     if (!pDeviceStateOpenSL->isDrainingPlayback) {
         resultSL = MA_OPENSL_BUFFERQUEUE(pDeviceStateOpenSL->pBufferQueuePlayback)->Enqueue(pDeviceStateOpenSL->pBufferQueuePlayback, pBuffer, periodSizeInBytes);
@@ -48714,7 +48727,30 @@ static ma_result ma_device_stop__opensl(ma_device* pDevice)
 static ma_result ma_device_step__opensl(ma_device* pDevice, ma_blocking_mode blockingMode)
 {
     ma_device_state_opensl* pDeviceStateOpenSL = ma_device_get_backend_state__opensl(pDevice);
-    return ma_device_state_async_step(&pDeviceStateOpenSL->async, pDevice, blockingMode, NULL);
+
+    if (ma_device_get_threading_mode(pDevice) == MA_THREADING_MODE_SINGLE_THREADED) {
+        return ma_device_state_async_step(&pDeviceStateOpenSL->async, pDevice, blockingMode, NULL);
+    } else {
+        /* Audio is processed by OpenSL's callback. Wait here for a stop or uninit request. */
+        if (blockingMode == MA_BLOCKING_MODE_BLOCKING) {
+            ma_device_state_async_wait(&pDeviceStateOpenSL->async);
+        }
+
+        if (!ma_device_is_started(pDevice)) {
+            return MA_DEVICE_NOT_STARTED;
+        }
+
+        return MA_SUCCESS;
+    }
+}
+
+static void ma_device_wakeup__opensl(ma_device* pDevice)
+{
+    ma_device_state_opensl* pDeviceStateOpenSL = ma_device_get_backend_state__opensl(pDevice);
+
+    if (ma_device_get_threading_mode(pDevice) != MA_THREADING_MODE_SINGLE_THREADED) {
+        ma_device_state_async_release(&pDeviceStateOpenSL->async);
+    }
 }
 
 static ma_device_backend_vtable ma_gDeviceBackendVTable_OpenSL =
@@ -48728,7 +48764,7 @@ static ma_device_backend_vtable ma_gDeviceBackendVTable_OpenSL =
     ma_device_start__opensl,
     ma_device_stop__opensl,
     ma_device_step__opensl,
-    NULL    /* onDeviceWakeup */
+    ma_device_wakeup__opensl
 };
 
 ma_device_backend_vtable* ma_device_backend_opensl = &ma_gDeviceBackendVTable_OpenSL;
