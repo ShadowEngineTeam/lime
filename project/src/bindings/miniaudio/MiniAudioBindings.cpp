@@ -8,9 +8,6 @@
 #endif
 
 // MiniAudio Implementation
-#if defined(ANDROID)
-#define MA_NO_AAUDIO
-#endif
 #define MA_NO_ENCODING
 #define MA_NO_RESOURCE_MANAGER
 #define MA_NO_GENERATION
@@ -1567,6 +1564,9 @@ namespace lime
 		device.wasapi.usage = ma_wasapi_usage_games;
 		device.aaudio.usage = ma_aaudio_usage_game;
 		device.aaudio.performanceMode = ma_aaudio_performance_mode_low_latency;
+
+		// let AAudio pick its burst size, forcing 480 frames per callback crackles once it falls back to the legacy path (Bluetooth A2DP)
+		device.aaudio.noSetBufferCapacity = MA_TRUE;
 		device.pipewire.pMediaRole = "Game";
 
 		// SDL_HINT_AUDIO_CATEGORY = "playback" (Application.cpp, iOS only)
