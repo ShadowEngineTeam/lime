@@ -69,12 +69,25 @@ class AudioManager
 			config.sampleRate = 48000;
 			#end
 
+			#if ios
+			// Since we are doing our own modification to the `AVAudioSession` shared instance,
+			// we should automatically start the `ma_engine` instance, only after it's initialized,
+			// so the options take proper effect.
+			config.noAutoStart = true;
+			#end
+
 			engine = MAEngine.init(config);
 
 			if (engine == null)
 			{
 				Log.error("Unable to create MiniAudio engine for Native!");
+				return;
 			}
+
+			#if ios
+			// Now we are starting the engine as usual after the `AVAudioSession` options have been set.
+			engine.start();
+			#end
 		}
 		#end
 	}
