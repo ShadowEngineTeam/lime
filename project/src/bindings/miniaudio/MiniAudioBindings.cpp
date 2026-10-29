@@ -1644,6 +1644,10 @@ namespace lime
 			return alloc_null();
 		}
 
+#ifdef IPHONE
+		Lime_IOSAudioSessionApplyInterruptionPreferences();
+#endif
+
 		// output-limiter=true (noClip leaves the output unclamped on purpose, so it stays off with it)
 		if (!config.noClip)
 			processData->limiter = ma_mastering_limiter_create(ma_engine_get_channels(engine), ma_engine_get_sample_rate(engine), 0.0f);

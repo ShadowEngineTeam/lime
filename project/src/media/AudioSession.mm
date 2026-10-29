@@ -20,11 +20,6 @@ void Lime_IOSAudioSessionInitialize(void)
     [session setPreferredIOBufferDuration:480.0/48000.0 error:&error];
     if (error) { NSLog(@"Lime iOS session: setPreferredIOBufferDuration failed: %@", error); error = nil; }
 
-    if (@available(iOS 17.0, *))
-        [session setPrefersInterruptionOnRouteDisconnect:NO error:nil];
-    if (@available(iOS 14.5, *))
-        [session setPrefersNoInterruptionsFromSystemAlerts:YES error:nil];
-
     [session setActive:YES error:&error];
     if (error) { NSLog(@"Lime iOS session: setActive failed: %@", error); }
 
@@ -48,6 +43,24 @@ void Lime_IOSAudioSessionInitialize(void)
                     Lime_IOSAudioSessionSetActive(true);
             }
         }];
+    }
+}
+
+// Runs after miniaudio has set up its Core Audio context, so these stick (FunkinCrew/lime bb5223a11)
+void Lime_IOSAudioSessionApplyInterruptionPreferences(void)
+{
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    NSError *error = nil;
+
+    if (@available(iOS 17.0, *)) {
+        if (![session setPrefersInterruptionOnRouteDisconnect:NO error:&error])
+            NSLog(@"Lime iOS session: setPrefersInterruptionOnRouteDisconnect(NO) failed: %@", error);
+    }
+
+    if (@available(iOS 14.5, *)) {
+        error = nil;
+        if (![session setPrefersNoInterruptionsFromSystemAlerts:YES error:&error])
+            NSLog(@"Lime iOS session: setPrefersNoInterruptionsFromSystemAlerts(YES) failed: %@", error);
     }
 }
 
