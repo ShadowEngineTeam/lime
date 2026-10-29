@@ -146,10 +146,9 @@ class AudioBuffer
 		Asynchronously loads an `AudioBuffer` from a `Bytes` object.
 
 		@param bytes The `Bytes` object containing the audio data.
-		@param stream Whether to use streaming instead of directly decoding all the audio data.
 		@return A `Future` that resolves to the loaded `AudioBuffer`.
 	**/
-	public static function loadFromBytes(bytes:Bytes, ?stream:Bool = false):Future<AudioBuffer>
+	public static function loadFromBytes(bytes:Bytes):Future<AudioBuffer>
 	{
 		if (bytes == null)
 		{
@@ -166,7 +165,7 @@ class AudioBuffer
 
 		var promise = new lime.app.Promise<AudioBuffer>();
 
-		__localThreadPool.run(localThreadPool_doWork, {promise: promise, bytes: bytes, stream: stream});
+		__localThreadPool.run(localThreadPool_doWork, {promise: promise, bytes: bytes});
 
 		return promise.future;
 		#else
@@ -178,10 +177,9 @@ class AudioBuffer
 		Asynchronously loads an `AudioBuffer` from a file.
 
 		@param path The file path to the audio data.
-		@param stream Whether to use streaming instead of directly decoding all the audio data.
 		@return A `Future` that resolves to the loaded `AudioBuffer`.
 	**/
-	public static function loadFromFile(path:String, ?stream:Bool = false):Future<AudioBuffer>
+	public static function loadFromFile(path:String):Future<AudioBuffer>
 	{
 		if (path == null)
 		{
@@ -198,7 +196,7 @@ class AudioBuffer
 
 		var promise = new lime.app.Promise<AudioBuffer>();
 
-		__localThreadPool.run(localThreadPool_doWork, {promise: promise, path: path, stream: stream});
+		__localThreadPool.run(localThreadPool_doWork, {promise: promise, path: path});
 
 		return promise.future;
 		#else
@@ -252,7 +250,7 @@ class AudioBuffer
 	}
 
 	#if (lime_cffi && lime_miniaudio && !macro)
-	@:noCompletion private static function __createFromMADecoder(decoder:MADecoder, stream:Bool):AudioBuffer
+	@:noCompletion private static function __createFromMADecoder(decoder:MADecoder, ?stream:Bool = false):AudioBuffer
 	{
 		if (decoder != null)
 		{
@@ -332,7 +330,7 @@ class AudioBuffer
 
 		if (decoder != null)
 		{
-			var audioBuffer:AudioBuffer = __createFromMADecoder(decoder, state.stream);
+			var audioBuffer:AudioBuffer = __createFromMADecoder(decoder);
 
 			if (audioBuffer != null)
 			{
