@@ -101,30 +101,6 @@ class AudioBuffer
 	}
 
 	/**
-		Creates an `AudioBuffer` from a Base64-encoded string.
-
-		@param base64String The Base64-encoded audio data.
-		@param stream Whether to use streaming instead of directly decoding all the audio data.
-		@return An `AudioBuffer` instance with the decoded audio data.
-	**/
-	public static function fromBase64(base64String:String, ?stream:Bool = false):AudioBuffer
-	{
-		if (base64String == null)
-		{
-			return null;
-		}
-
-		#if (lime_cffi && lime_miniaudio && !macro)
-		// if base64String contains codec data, strip it then decode it.
-		var base64StringSplit = base64String.split(",");
-		var base64StringNoEncoding = base64StringSplit[base64StringSplit.length - 1];
-		return __createFromMADecoder(MADecoder.init_memory(Base64.decode(base64StringNoEncoding), MADecoderConfig.init(F32, 0, 0)), stream);
-		#else
-		return null;
-		#end
-	}
-
-	/**
 		Creates an `AudioBuffer` from a `Bytes` object.
 
 		@param bytes The `Bytes` object containing the audio data.
