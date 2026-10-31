@@ -1,7 +1,6 @@
 package lime.media;
 
 import haxe.Int64;
-import haxe.crypto.Base64;
 import haxe.io.Bytes;
 
 import lime.app.Future;
@@ -254,22 +253,29 @@ class AudioBuffer
 	{
 		if (decoder != null)
 		{
-			if (stream)
-			{
-				var audioBuffer = new AudioBuffer();
-				audioBuffer.__srcMADecoder = decoder;
-				return audioBuffer;
-			}
-			else
-			{
-				var totalFrames:Int = Int64.toInt(decoder.get_length_in_pcm_frames());
+			var frames:Int64 = decoder.get_length_in_pcm_frames();
 
-				if (totalFrames > 0)
+			if (frames > 0)
+			{
+				var dataFormat:MADataFormat = decoder.get_data_format();
+
+				if (stream)
 				{
+					var buffer:AudioBuffer = new AudioBuffer();
+					buffer.frames = frames;
+					buffer.sampleRate = dataFormat.sampleRate;
+					buffer.channels = dataFormat.channels;
+					buffer.format = dataFormat.format;
+					buffer.__srcMADecoder = decoder;
+					return buffer;
+				}
+				else
+				{
+					#if cpp
 					// When we are not streaming and we are required to put these frames inside an buffer,
 					// We cant use Int64 as the buffer's length as per Haxe's limitation,
 					// And even if youd wanna go beyound the limit, at that point youd use streaming which doesnt have this issue anyway.
-					var dataFormat:MADataFormat = decoder.get_data_format();
+					var totalFrames:Int = Int64.toInt(frames);
 
 					var bytesPerSample:Int = MAHelpers.get_bytes_per_sample(dataFormat.format);
 
@@ -289,22 +295,20 @@ class AudioBuffer
 							Log.error('Unsupported audio buffer format: ${MAHelpers.get_format_name(dataFormat.format)}');
 					}
 
-					if (dataBuffer != null)
+					if (dataBuffer != null && decoder.read_pcm_frames(cpp.Pointer.ofArray(dataBuffer.buffer.getData()), totalFrames) > 0)
 					{
-						if (decoder.read_pcm_frames(#if cpp cpp.Pointer.ofArray(dataBuffer.buffer.getData()) #else null #end, totalFrames) > 0)
-						{
-							decoder.uninit();
-							decoder = null;
+						decoder.uninit();
+						decoder = null;
 
-							var buffer = new AudioBuffer();
-							buffer.sampleRate = dataFormat.sampleRate;
-							buffer.channels = dataFormat.channels;
-							buffer.format = dataFormat.format;
-							buffer.frames = totalFrames;
-							buffer.data = dataBuffer;
-							return buffer;
-						}
+						var buffer:AudioBuffer = new AudioBuffer();
+						buffer.frames = frames;
+						buffer.sampleRate = dataFormat.sampleRate;
+						buffer.channels = dataFormat.channels;
+						buffer.format = dataFormat.format;
+						buffer.data = dataBuffer;
+						return buffer;
 					}
+					#end
 				}
 			}
 
