@@ -1,7 +1,9 @@
 package lime.media;
 
+#if lime_miniaudio
+import lime.media.miniaudio.MAAudioRingBuffer;
+#end
 import lime.app.Event;
-import lime.math.Vector4;
 
 /**
 	The `AudioSource` class provides a way to control audio playback in a Lime application.
@@ -128,6 +130,18 @@ class AudioSource
 	{
 		return __backend.getPeak(channel);
 	}
+
+	#if lime_miniaudio
+	public function addRingBuffer(rb:MAAudioRingBuffer):Void
+	{
+		__backend.addRingBuffer(rb);
+	}
+
+	public function removeRingBuffer(rb:MAAudioRingBuffer):Void
+	{
+		__backend.removeRingBuffer(rb);
+	}
+	#end
 
 	// Get & Set Methods
 	@:noCompletion private function get_length():Float
