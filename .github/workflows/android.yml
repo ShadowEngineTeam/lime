@@ -31,7 +31,7 @@ jobs:
           set -euo pipefail
 
           detect_host() {
-            local os arch
+            local os arch libc="${NDK_LIBC:-gnu}"
 
             case "$(uname -m | tr '[:upper:]' '[:lower:]')" in
               x86_64|amd64)              arch=x86_64 ;;
@@ -44,41 +44,46 @@ jobs:
             case "$(uname -s)" in
               Linux)
                 if [ "$(uname -o 2>/dev/null)" = "Android" ]; then os=android; else os=linux; fi ;;
-              Darwin)
-                os=macos
-                if [ "$arch" = i686 ] || [ "$arch" = armv7 ]; then
-                  echo "macOS supports only x86_64/aarch64" >&2; return 1
-                fi ;;
+              Darwin) os=macos ;;
               MINGW*|MSYS*|CYGWIN*) os=windows ;;
               *) echo "Unsupported OS: $(uname -s)" >&2; return 1 ;;
             esac
 
             case "$os-$arch" in
-              linux-x86_64)    echo "x86_64-linux-musl" ;;
-              linux-i686)      echo "x86-linux-musl" ;;
-              linux-aarch64)   echo "aarch64-linux-musl" ;;
-              linux-armv7)     echo "arm-linux-musleabihf" ;;
+              linux-x86_64)    echo "x86_64-linux-$libc" ;;
+              linux-i686)      echo "x86-linux-$libc" ;;
+              linux-aarch64)   echo "aarch64-linux-$libc" ;;
+              linux-armv7)     echo "arm-linux-${libc}eabihf" ;;
               android-x86_64)  echo "x86_64-linux-android" ;;
-              android-i686)    echo "x86-linux-android" ;;
+              android-i686)    echo "i686-linux-android" ;;
               android-aarch64) echo "aarch64-linux-android" ;;
-              android-armv7)   echo "armv7-linux-android" ;;
-              macos-x86_64)    echo "x86_64-macos" ;;
-              macos-aarch64)   echo "arm64e-macos" ;;
-              windows-x86_64)  echo "x86_64-windows" ;;
-              windows-i686)    echo "x86-windows" ;;
-              windows-aarch64) echo "aarch64-windows" ;;
+              android-armv7)   echo "armv7a-linux-androideabi" ;;
+              macos-x86_64)    echo "x86_64-apple-darwin" ;;
+              macos-aarch64)   echo "arm64e-apple-darwin" ;;
+              windows-x86_64)  echo "x86_64-w64-mingw32" ;;
+              windows-i686)    echo "i686-w64-mingw32" ;;
+              windows-aarch64) echo "aarch64-w64-mingw32" ;;
               *) echo "NDK variant not found for $os-$arch" >&2; return 1 ;;
             esac
           }
 
           HOST="${ANDROID_HOST:-$(detect_host)}"
+          case "$HOST" in *w64-mingw32) EXT=7z ;; *) EXT=tar.xz ;; esac
 
           BASE=https://github.com/HomuHomu833
-          NDK_URL="$BASE/android-ndk-custom/releases/download/${NDK_TAG}/android-ndk-${NDK_TAG}${NDK_VERSION}-${HOST}.tar.xz"
+          NDK_URL="$BASE/android-ndk-custom/releases/download/${NDK_TAG}/android-ndk-${NDK_TAG}${NDK_VERSION}-${HOST}.${EXT}"
 
           ROOT="$HOME/android"
           mkdir -p "$ROOT/ndk"
-          curl -fsSL --retry 3 "$NDK_URL" | tar -xJ -C "$ROOT/ndk" --strip-components=1
+
+          if [ "$EXT" = "7z" ]; then
+            curl -fsSL --retry 3 -o "$RUNNER_TEMP/ndk.7z" "$NDK_URL"
+            7z x -y -o"$RUNNER_TEMP/ndk-extract" "$RUNNER_TEMP/ndk.7z" > /dev/null
+            shopt -s dotglob
+            mv "$RUNNER_TEMP"/ndk-extract/*/* "$ROOT/ndk/"
+          else
+            curl -fsSL --retry 3 "$NDK_URL" | tar -xJ -C "$ROOT/ndk" --strip-components=1
+          fi
 
           # windows runners need native-style paths
           if command -v cygpath >/dev/null 2>&1; then ROOT="$(cygpath -m "$ROOT")"; fi
