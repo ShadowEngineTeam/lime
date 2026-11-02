@@ -5,10 +5,12 @@ on:
 
 env:
   HAXE_VERSION: 4.3.7
+  NDK_TAG: "r30"
+  NDK_VERSION: ""
 
 jobs:
   android:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@main
@@ -23,12 +25,72 @@ jobs:
           haxelib git hxcpp https://github.com/ShadowEngineTeam/libhxcpp --quiet
           haxelib git format https://github.com/HaxeFoundation/format 9d69fb342d030fa120d2deafafbbffad248332b8 --quiet
           haxelib git hxp https://github.com/openfl/hxp 47ef5ae6569cb0961761a2fbb416694df067124c --quiet
-      - name: Enable HXCPP compile cache
-        run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
+      - name: Setup Android NDK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          detect_host() {
+            local os arch
+
+            case "$(uname -m | tr '[:upper:]' '[:lower:]')" in
+              x86_64|amd64)              arch=x86_64 ;;
+              i386|i486|i586|i686|x86)   arch=i686 ;;
+              aarch64|arm64)             arch=aarch64 ;;
+              armv7*|armv8l|armhf)       arch=armv7 ;;
+              *) echo "Unsupported arch: $(uname -m)" >&2; return 1 ;;
+            esac
+
+            case "$(uname -s)" in
+              Linux)
+                if [ "$(uname -o 2>/dev/null)" = "Android" ]; then os=android; else os=linux; fi ;;
+              Darwin)
+                os=macos
+                if [ "$arch" = i686 ] || [ "$arch" = armv7 ]; then
+                  echo "macOS supports only x86_64/aarch64" >&2; return 1
+                fi ;;
+              MINGW*|MSYS*|CYGWIN*) os=windows ;;
+              *) echo "Unsupported OS: $(uname -s)" >&2; return 1 ;;
+            esac
+
+            case "$os-$arch" in
+              linux-x86_64)    echo "x86_64-linux-musl" ;;
+              linux-i686)      echo "x86-linux-musl" ;;
+              linux-aarch64)   echo "aarch64-linux-musl" ;;
+              linux-armv7)     echo "arm-linux-musleabihf" ;;
+              android-x86_64)  echo "x86_64-linux-android" ;;
+              android-i686)    echo "x86-linux-android" ;;
+              android-aarch64) echo "aarch64-linux-android" ;;
+              android-armv7)   echo "armv7-linux-android" ;;
+              macos-x86_64)    echo "x86_64-macos" ;;
+              macos-aarch64)   echo "aarch64-macos" ;;
+              windows-x86_64)  echo "x86_64-windows" ;;
+              windows-i686)    echo "x86-windows" ;;
+              windows-aarch64) echo "aarch64-windows" ;;
+              windows-armv7)   echo "armv7-windows" ;;
+            esac
+          }
+
+          HOST="${ANDROID_HOST:-$(detect_host)}"
+
+          BASE=https://github.com/HomuHomu833
+          NDK_URL="$BASE/android-ndk-custom/releases/download/${NDK_TAG}/android-ndk-${NDK_TAG}${NDK_VERSION}-${HOST}.tar.xz"
+
+          ROOT="$HOME/android"
+          mkdir -p "$ROOT/ndk"
+          curl -fsSL --retry 3 "$NDK_URL" | tar -xJ -C "$ROOT/ndk" --strip-components=1
+
+          # windows runners need native-style paths
+          if command -v cygpath >/dev/null 2>&1; then ROOT="$(cygpath -m "$ROOT")"; fi
+
+          {
+            echo "ANDROID_NDK_ROOT=$ROOT/ndk"
+            echo "ANDROID_NDK_HOME=$ROOT/ndk"
+          } >> "$GITHUB_ENV"
       - name: Configure Lime
         run: |
           haxelib dev lime ${{ github.workspace }}
-          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_LATEST_HOME -nocffi
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_HOME -nocffi
           haxelib run lime config ANDROID_SETUP true -nocffi
       - name: Rebuild Lime
         run: |
