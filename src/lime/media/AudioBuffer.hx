@@ -5,11 +5,7 @@ import haxe.io.Bytes;
 
 import lime.app.Future;
 import lime.utils.ArrayBufferView;
-import lime.utils.Float32Array;
-import lime.utils.Int16Array;
-import lime.utils.Int32Array;
 import lime.utils.Log;
-import lime.utils.UInt8Array;
 #if lime_miniaudio
 import lime.media.miniaudio.MADataFormat;
 import lime.media.miniaudio.MADecoder;
