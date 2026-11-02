@@ -14,7 +14,7 @@ import lime.media.miniaudio.MALogLevel;
 @:allow(lime._internal.backend.native.NativeApplication)
 class AudioManager
 {
-	#if lime_miniaudio_debug_output
+	#if (lime_miniaudio && lime_miniaudio_debug_output)
 	@:noCompletion
 	private static function onLog(level:MALogLevel, pMessage:String):Void
 	{
