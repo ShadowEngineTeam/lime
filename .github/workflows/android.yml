@@ -59,7 +59,7 @@ jobs:
               android-aarch64) echo "aarch64-linux-android" ;;
               android-armv7)   echo "armv7a-linux-androideabi" ;;
               macos-x86_64)    echo "x86_64-apple-darwin" ;;
-              macos-aarch64)   echo "arm64e-apple-darwin" ;;
+              macos-aarch64)   echo "arm64-apple-darwin" ;;
               windows-x86_64)  echo "x86_64-w64-mingw32" ;;
               windows-i686)    echo "i686-w64-mingw32" ;;
               windows-aarch64) echo "aarch64-w64-mingw32" ;;
