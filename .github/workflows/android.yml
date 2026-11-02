@@ -63,11 +63,11 @@ jobs:
               android-aarch64) echo "aarch64-linux-android" ;;
               android-armv7)   echo "armv7-linux-android" ;;
               macos-x86_64)    echo "x86_64-macos" ;;
-              macos-aarch64)   echo "aarch64-macos" ;;
+              macos-aarch64)   echo "arm64e-macos" ;;
               windows-x86_64)  echo "x86_64-windows" ;;
               windows-i686)    echo "x86-windows" ;;
               windows-aarch64) echo "aarch64-windows" ;;
-              windows-armv7)   echo "armv7-windows" ;;
+              *) echo "NDK variant not found for $os-$arch" >&2; return 1 ;;
             esac
           }
 
