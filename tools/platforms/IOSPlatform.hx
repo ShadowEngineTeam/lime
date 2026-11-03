@@ -187,7 +187,7 @@ class IOSPlatform extends PlatformTarget
 			architectures = [Architecture.ARM64];
 		}
 
-		for (architecture in project.architectures)
+		for (architecture in architectures)
 		{
 			switch (architecture)
 			{
