@@ -14,6 +14,10 @@ import lime.media.miniaudio.MAFormat;
 import lime.media.miniaudio.MAHelpers;
 import lime.system.ThreadPool;
 import lime.system.WorkOutput;
+import lime.utils.Float32Array;
+import lime.utils.Int16Array;
+import lime.utils.Int32Array;
+import lime.utils.UInt8Array;
 #end
 
 /**
