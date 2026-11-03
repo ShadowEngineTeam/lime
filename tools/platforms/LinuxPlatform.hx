@@ -63,7 +63,7 @@ class LinuxPlatform extends PlatformTarget
 			isArm = true;
 			is64 = false;
 		}
-		else if (!(targetFlags.exists("32") || targetFlags.exists("x86_32"))) && project.architectures.indexOf(Architecture.X64) != -1)
+		else if (!(targetFlags.exists("32") || targetFlags.exists("x86_32")) && project.architectures.indexOf(Architecture.X64) != -1)
 		{
 			is64 = true;
 		}
