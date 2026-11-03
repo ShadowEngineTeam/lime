@@ -53,22 +53,19 @@ class LinuxPlatform extends PlatformTarget
 			project.architectures.remove(excludeArchitecture);
 		}
 
-		for (architecture in project.architectures)
+		if (targetFlags.exists("arm64") || (!targetFlags.exists("armv7") && project.architectures.indexOf(Architecture.ARM64) != -1))
 		{
-			if (!targetFlags.exists("32") && !targetFlags.exists("x86_32") && architecture == Architecture.X64)
-			{
-				is64 = true;
-			}
-			else if (targetFlags.exists("arm64") || architecture == Architecture.ARM64)
-			{
-				isArm = true;
-				is64 = true;
-			}
-			else if (targetFlags.exists("armv7") || architecture == Architecture.ARMV7)
-			{
-				isArm = true;
-				is64 = false;
-			}
+			isArm = true;
+			is64 = true;
+		}
+		else if (targetFlags.exists("armv7") || (!targetFlags.exists("arm64") && project.architectures.indexOf(Architecture.ARMV7) != -1))
+		{
+			isArm = true;
+			is64 = false;
+		}
+		else if (!(targetFlags.exists("32") || targetFlags.exists("x86_32"))) && project.architectures.indexOf(Architecture.X64) != -1)
+		{
+			is64 = true;
 		}
 
 		targetDirectory = Path.combine(project.app.path, project.config.getString("linux.output-directory", "linux"));
@@ -107,7 +104,7 @@ class LinuxPlatform extends PlatformTarget
 		for (ndll in project.ndlls)
 		{
 			ProjectHelper.copyLibrary(project, ndll,
-				"Linux" + ((System.hostArchitecture == ARMV7 || System.hostArchitecture == ARM64) ? "Arm" : "") + (is64 ? "64" : ""), "", ".ndll",
+				"Linux" + (isArm ? "Arm" : "") + (is64 ? "64" : ""), "", ".ndll",
 				applicationDirectory, project.debug);
 		}
 
@@ -230,12 +227,12 @@ class LinuxPlatform extends PlatformTarget
 			commands.push(["-Dlinux", "-DHXCPP_ARMV7"]);
 		}
 
-		if (!targetFlags.exists("32") && project.architectures.indexOf(Architecture.X64) != -1)
+		if (!targetFlags.exists("32") && !targetFlags.exists("x86_32") && project.architectures.indexOf(Architecture.X64) != -1)
 		{
 			commands.push(["-Dlinux", "-DHXCPP_M64"]);
 		}
 
-		if (!targetFlags.exists("64") && (command == "rebuild" || project.architectures.indexOf(Architecture.X86) != -1))
+		if (!targetFlags.exists("64") && !targetFlags.exists("x86_64") && (command == "rebuild" || project.architectures.indexOf(Architecture.X86) != -1))
 		{
 			commands.push(["-Dlinux", "-DHXCPP_M32"]);
 		}

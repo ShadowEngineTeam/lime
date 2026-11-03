@@ -122,6 +122,12 @@ class MacPlatform extends PlatformTarget
 			haxeArgs.push("HXCPP_ARM64");
 			flags.push("-DHXCPP_ARM64");
 		}
+		/*else if (targetArchitecture == X86)
+		{
+			haxeArgs.push("-D");
+			haxeArgs.push("HXCPP_M32");
+			flags.push("-DHXCPP_M32");
+		}*/
 
 		System.runCommand("", "haxe", haxeArgs);
 

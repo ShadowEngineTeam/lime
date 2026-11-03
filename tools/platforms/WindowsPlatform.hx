@@ -267,25 +267,34 @@ class WindowsPlatform extends PlatformTarget
 	{
 		var commands:Array<Array<String>> = [];
 
-		var args:Array<String> = ["-Dwindows"];
-
-		if (is64)
-		{
-			args.push(isArm ? "-DHXCPP_ARM64" : "-DHXCPP_M64");
-		}
-		else
-		{
-			args.push("-DHXCPP_M32");
-		}
+		var extraArgs:Array<String> = [];
 
 		if (project.targetFlags.exists("mingw"))
 		{
-			args.push("-Dmingw");
+			extraArgs.push("-Dmingw");
 			// For some reason `MinGW` uses the shared deps by default, which we don't really want, do we?
-			args.push("-Dno_shared_libs");
+			extraArgs.push("-Dno_shared_libs");
 		}
 
-		commands.push(args);
+		if (project.architectures.indexOf(Architecture.ARM64) != -1)
+		{
+			commands.push(["-Dwindows", "-DHXCPP_ARM64"].concat(extraArgs));
+		}
+
+		if (project.architectures.indexOf(Architecture.X64) != -1)
+		{
+			commands.push(["-Dwindows", "-DHXCPP_M64"].concat(extraArgs));
+		}
+
+		if (project.architectures.indexOf(Architecture.X86) != -1)
+		{
+			commands.push(["-Dwindows", "-DHXCPP_M32"].concat(extraArgs));
+		}
+
+		if (commands.length == 0)
+		{
+			commands.push(["-Dwindows", is64 ? (isArm ? "-DHXCPP_ARM64" : "-DHXCPP_M64") : "-DHXCPP_M32"].concat(extraArgs));
+		}
 
 		CPPHelper.rebuild(project, commands);
 	}
