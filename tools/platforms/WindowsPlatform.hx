@@ -57,17 +57,50 @@ class WindowsPlatform extends PlatformTarget
 			project.architectures.remove(excludeArchitecture);
 		}
 
+		if (targetFlags.exists("32") || targetFlags.exists("x86_32"))
+		{
+			var architectures:Array<Architecture> = [];
+
+			for (architecture in project.architectures)
+			{
+				var mapped = (architecture == Architecture.X64) ? Architecture.X86 : architecture;
+
+				if (architectures.indexOf(mapped) == -1)
+				{
+					architectures.push(mapped);
+				}
+			}
+
+			if (architectures.length == 0)
+			{
+				architectures.push(Architecture.X86);
+			}
+
+			project.architectures = architectures;
+		}
+
 		for (architecture in project.architectures)
 		{
-			if (!targetFlags.exists("32") && !targetFlags.exists("x86_32") && architecture == Architecture.X64)
-			{
-				is64 = true;
-			}
-			else if (targetFlags.exists("arm64") || architecture == Architecture.ARM64)
+			if (architecture == Architecture.ARM64)
 			{
 				isArm = true;
 				is64 = true;
 			}
+			else if (!(targetFlags.exists("32") || targetFlags.exists("x86_32")) && architecture == Architecture.X64)
+			{
+				is64 = true;
+			}
+		}
+
+		if (targetFlags.exists("arm64") && !(targetFlags.exists("32") || targetFlags.exists("x86_32")))
+		{
+			isArm = true;
+			is64 = true;
+		}
+
+		if (isArm)
+		{
+			is64 = true;
 		}
 
 		targetDirectory = Path.combine(project.app.path, project.config.getString("windows.output-directory", "windows"));
@@ -162,7 +195,7 @@ class WindowsPlatform extends PlatformTarget
 
 	public override function deploy():Void
 	{
-		DeploymentHelper.deploy(project, targetFlags, targetDirectory, "Windows" + (is64 ? "64" : ""));
+		DeploymentHelper.deploy(project, targetFlags, targetDirectory, "Windows" + (isArm ? "Arm" : "") + (is64 ? "64" : ""));
 	}
 
 	public override function display():Void
@@ -235,6 +268,15 @@ class WindowsPlatform extends PlatformTarget
 		var commands:Array<Array<String>> = [];
 
 		var args:Array<String> = ["-Dwindows"];
+
+		if (is64)
+		{
+			args.push(isArm ? "-DHXCPP_ARM64" : "-DHXCPP_M64");
+		}
+		else
+		{
+			args.push("-DHXCPP_M32");
+		}
 
 		if (project.targetFlags.exists("mingw"))
 		{
