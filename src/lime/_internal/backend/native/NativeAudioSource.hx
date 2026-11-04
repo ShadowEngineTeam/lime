@@ -70,9 +70,7 @@ class NativeAudioSource
 				config.flags = MASound.FLAG_NO_SPATIALIZATION;
 				config.pInitialAttachment = initMeter();
 				config.pDataSource = parent.buffer.__srcMADecoder;
-				config.pNotifications.onAtEnd = sound_atEnd;
-				config.pNotifications.onPreProcess = sound_onPreProcess;
-				config.pNotifications.onProcess = sound_onProcess;
+				setupNotifications(config);
 
 				handle = MASound.init(AudioManager.engine, config);
 			}
@@ -82,9 +80,7 @@ class NativeAudioSource
 
 				config.flags = MASound.FLAG_NO_SPATIALIZATION;
 				config.pDataSource = parent.buffer.__srcMAAudioBuffer;
-				config.pNotifications.onAtEnd = sound_atEnd;
-				config.pNotifications.onPreProcess = sound_onPreProcess;
-				config.pNotifications.onProcess = sound_onProcess;
+				setupNotifications(config);
 
 				handle = MASound.init(AudioManager.engine, config);
 			}
@@ -94,9 +90,7 @@ class NativeAudioSource
 
 				config.flags = MASound.FLAG_NO_SPATIALIZATION;
 				config.pDataSource = parent.buffer.__srcMAAudioRingBuffer;
-				config.pNotifications.onAtEnd = sound_atEnd;
-				config.pNotifications.onPreProcess = sound_onPreProcess;
-				config.pNotifications.onProcess = sound_onProcess;
+				setupNotifications(config);
 
 				handle = MASound.init(AudioManager.engine, config);
 			}
@@ -113,13 +107,20 @@ class NativeAudioSource
 				config.flags = MASound.FLAG_NO_SPATIALIZATION;
 				config.pInitialAttachment = initMeter();
 				config.pDataSource = buffer;
-				config.pNotifications.onAtEnd = sound_atEnd;
-				config.pNotifications.onPreProcess = sound_onPreProcess;
-				config.pNotifications.onProcess = sound_onProcess;
+				setupNotifications(config);
 
 				handle = MASound.init(AudioManager.engine, config);
 			}
 		}
+	}
+
+	private function setupNotifications(config:MASoundConfig):Void
+	{
+		config.pNotifications.onAtEnd = sound_atEnd;
+		#if lime_miniaudio_audio_taps
+		config.pNotifications.onPreProcess = sound_onPreProcess;
+		config.pNotifications.onProcess = sound_onProcess;
+		#end
 	}
 
 	private function initMeter():MAPeakMeterNode
