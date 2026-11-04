@@ -491,6 +491,7 @@ class NativeApplication
 	private function handleTouchEvent():Void
 	{
 		var timestamp:Int64 = Int64.fromFloat(touchEventInfo.timestamp);
+
 		switch (touchEventInfo.type)
 		{
 			case TOUCH_START:
@@ -499,7 +500,7 @@ class NativeApplication
 				if (touch == null)
 				{
 					touch = new Touch(touchEventInfo.x, touchEventInfo.y, touchEventInfo.id, touchEventInfo.dx, touchEventInfo.dy, touchEventInfo.pressure,
-						touchEventInfo.device, touchEventInfo.timestamp);
+						touchEventInfo.device, timestamp);
 				}
 				else
 				{
