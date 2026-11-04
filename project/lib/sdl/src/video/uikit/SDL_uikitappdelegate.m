@@ -28,8 +28,6 @@
 #import "SDL_uikitmodes.h"
 #import "SDL_uikitwindow.h"
 
-#import <media/ios_audio_session.h>
-
 #include "../../events/SDL_events_c.h"
 #include "../../main/SDL_main_callbacks.h"
 
@@ -441,29 +439,21 @@ API_AVAILABLE(ios(13.0))
 
 - (void)sceneDidBecomeActive:(UIScene *)scene
 {
-    Lime_IOSAudioSessionSetActive(true);
-
     SDL_OnApplicationDidEnterForeground();
 }
 
 - (void)sceneWillResignActive:(UIScene *)scene
 {
-    Lime_IOSAudioSessionSetActive(false);
-
     SDL_OnApplicationWillEnterBackground();
 }
 
 - (void)sceneWillEnterForeground:(UIScene *)scene
 {
-    Lime_IOSAudioSessionSetActive(true);
-
     SDL_OnApplicationWillEnterForeground();
 }
 
 - (void)sceneDidEnterBackground:(UIScene *)scene
 {
-    Lime_IOSAudioSessionSetActive(false);
-
     SDL_OnApplicationDidEnterBackground();
 }
 

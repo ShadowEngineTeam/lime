@@ -1,7 +1,9 @@
 #import <AVFAudio/AVFAudio.h>
+#import <UIKit/UIKit.h>
 #include <media/ios_audio_session.h>
 
 static id sInterruptionObserver = nil;
+static NSArray *sSceneObservers = nil;
 
 void Lime_IOSAudioSessionInitialize(void)
 {
@@ -22,6 +24,28 @@ void Lime_IOSAudioSessionInitialize(void)
 
     [session setActive:YES error:&error];
     if (error) { NSLog(@"Lime iOS session: setActive failed: %@", error); }
+
+    // Starts/stops the audio session and device with the app's scene, so SDL's UIKit delegate stays unpatched.
+    // Not queued, so they run synchronously inside the scene transition like the old delegate hooks did.
+    if (sSceneObservers == nil) {
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+
+        id (^observe)(NSNotificationName, bool) = ^id(NSNotificationName name, bool active) {
+            return [center addObserverForName:name
+                                       object:nil
+                                        queue:nil
+                                   usingBlock:^(NSNotification *notification) {
+                Lime_IOSAudioSessionSetActive(active);
+            }];
+        };
+
+        sSceneObservers = @[
+            observe(UISceneDidActivateNotification, true),         // sceneDidBecomeActive
+            observe(UISceneWillDeactivateNotification, false),     // sceneWillResignActive
+            observe(UISceneWillEnterForegroundNotification, true), // sceneWillEnterForeground
+            observe(UISceneDidEnterBackgroundNotification, false)  // sceneDidEnterBackground
+        ];
+    }
 
     if (sInterruptionObserver == nil) {
         sInterruptionObserver = [[NSNotificationCenter defaultCenter]
