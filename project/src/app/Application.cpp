@@ -721,6 +721,7 @@ namespace lime
 			touchEvent.dy = event->tfinger.dy;
 			touchEvent.pressure = event->tfinger.pressure;
 			touchEvent.device = event->tfinger.touchID;
+			touchEvent.timestamp = event->tfinger.timestamp;
 
 			TouchEvent::Dispatch(&touchEvent);
 		}
