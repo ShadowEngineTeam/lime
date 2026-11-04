@@ -73,11 +73,6 @@ class AudioBuffer
 	**/
 	public var data:ArrayBufferView;
 
-	/**
-		The source of the audio data. This can be an `MADecoder`.
-	**/
-	public var src(get, set):Dynamic;
-
 	#if lime_miniaudio
 	@:noCompletion private static var __localThreadPool:ThreadPool;
 	#end
@@ -389,22 +384,4 @@ class AudioBuffer
 		}
 	}
 	#end
-
-	@:noCompletion private function get_src():Dynamic
-	{
-		#if (lime_cffi && lime_miniaudio && !macro)
-		return __srcMADecoder;
-		#else
-		return __srcCustom;
-		#end
-	}
-
-	@:noCompletion private function set_src(value:Dynamic):Dynamic
-	{
-		#if (lime_cffi && lime_miniaudio && !macro)
-		return __srcMADecoder = value;
-		#else
-		return __srcCustom = value;
-		#end
-	}
 }
