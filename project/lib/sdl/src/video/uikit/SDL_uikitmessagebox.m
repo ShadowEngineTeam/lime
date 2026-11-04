@@ -197,7 +197,6 @@ static void SDLCALL UIKit_ShowMessageBoxAsyncMainThreadCallback(void *userdata)
                 [UIAlertAction actionWithTitle:@(sdlButton->text)
                                          style:style
                                        handler:^(UIAlertAction *alertAction) {
-                                         // Resume the game loop and drop the alert window.
                                          s_showingMessageBox = false;
                                          s_asyncAlertWindow.hidden = YES;
                                          s_asyncAlertWindow = nil;
@@ -223,8 +222,6 @@ static void SDLCALL UIKit_ShowMessageBoxAsyncMainThreadCallback(void *userdata)
         alertwindow.rootViewController = [UIViewController new];
         alertwindow.windowLevel = UIWindowLevelAlert;
         s_asyncAlertWindow = alertwindow;
-
-        // Pause the animation callback; the button handler (or a failed present) resumes it.
         s_showingMessageBox = true;
 
         dispatch_async(dispatch_get_main_queue(), ^{
