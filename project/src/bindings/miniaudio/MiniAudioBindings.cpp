@@ -1575,6 +1575,12 @@ namespace lime
 		device.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_none;
 #endif
 
+		// OpenAL Soft's WASAPI/AAudio backends never used hardware offload, AAudio asked for an exclusive stream first (the system may still grant shared)
+		device.wasapi.noHardwareOffloading = MA_TRUE;
+#if defined(ANDROID)
+		device.playback.shareMode = ma_share_mode_exclusive;
+#endif
+
 		// alsa/mmap=true  -> miniaudio enables MMap unless told otherwise.
 		device.alsa.noMMap = MA_FALSE;
 
