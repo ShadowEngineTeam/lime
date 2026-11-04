@@ -7,6 +7,8 @@ import lime.app.Future;
 import lime.utils.ArrayBufferView;
 import lime.utils.Log;
 #if lime_miniaudio
+import lime.media.miniaudio.MAAudioBuffer;
+import lime.media.miniaudio.MAAudioRingBuffer;
 import lime.media.miniaudio.MADataFormat;
 import lime.media.miniaudio.MADecoder;
 import lime.media.miniaudio.MADecoderConfig;
@@ -75,6 +77,10 @@ class AudioBuffer
 
 	#if lime_miniaudio
 	@:noCompletion private static var __localThreadPool:ThreadPool;
+
+	@:noCompletion private var __srcMADecoder:MADecoder;
+	@:noCompletion private var __srcMAAudioBuffer:MAAudioBuffer;
+	@:noCompletion private var __srcMAAudioRingBuffer:MAAudioRingBuffer;
 	#end
 
 	@:noCompletion private var __srcCustom:Dynamic;
@@ -95,6 +101,16 @@ class AudioBuffer
 		{
 			__srcMADecoder.uninit();
 			__srcMADecoder = null;
+		}
+		else if (__srcMAAudioBuffer != null)
+		{
+			__srcMAAudioBuffer.uninit();
+			__srcMAAudioBuffer = null;
+		}
+		else if (__srcMAAudioRingBuffer != null)
+		{
+			__srcMAAudioRingBuffer.uninit();
+			__srcMAAudioRingBuffer = null;
 		}
 		else if (data != null && data.length > 0)
 		{
