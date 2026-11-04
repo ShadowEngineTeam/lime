@@ -949,25 +949,6 @@ static Uint32 SDLCALL HashAudioDeviceID(void *userdata, const void *key)
     return ((Uint32) ((uintptr_t) key)) >> 2;
 }
 
-static bool AudioDriverAllowedOnPlatform(const AudioBootStrap *driver)
-{
-#if defined(SDL_AUDIO_DRIVER_AAUDIO) || defined(SDL_AUDIO_DRIVER_OPENSLES)
-    // Runtime check: prefer AAudio on Android 12+ (API 31), OpenSL ES on 11 and below.
-    const int sdk = SDL_GetAndroidSDKVersion();
-    if (sdk > 0) {
-        if (SDL_strcmp(driver->name, "AAudio") == 0 && sdk <= 30) {
-            return false; // API 30-: OpenSL ES is preferred; skip AAudio.
-        }
-        if (SDL_strcmp(driver->name, "openslES") == 0 && sdk >= 31) {
-            return false; // API 31+: AAudio is preferred; skip OpenSL ES.
-        }
-    }
-#else
-    (void)driver;
-#endif
-    return true;
-}
-
 // !!! FIXME: the video subsystem does SDL_VideoInit, not SDL_InitVideo. Make this match.
 bool SDL_InitAudio(const char *driver_name)
 {
@@ -1055,10 +1036,6 @@ bool SDL_InitAudio(const char *driver_name)
     } else {
         for (int i = 0; (!initialized) && (bootstrap[i]); ++i) {
             if (bootstrap[i]->demand_only) {
-                continue;
-            }
-
-            if (!AudioDriverAllowedOnPlatform(bootstrap[i])) {
                 continue;
             }
 

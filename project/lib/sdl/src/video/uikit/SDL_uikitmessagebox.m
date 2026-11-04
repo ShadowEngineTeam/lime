@@ -148,113 +148,11 @@ static void SDLCALL UIKit_ShowMessageBoxMainThreadCallback(void *userdata)
 }
 
 #ifdef SDL_PLATFORM_IOS
-// On iOS the game loop is driven by a CADisplayLink (SDL_SetiOSAnimationCallback), and the
-// message box is requested from inside that callback. Presenting an alert + spinning a nested
-// run loop (UIKit_WaitUntilMessageBoxClosed) from that context does NOT deliver the alert's
-// touch events on iOS < 26 -- the box appears but its buttons are frozen, locking the app.
-//
-// So on iOS < 26 we present WITHOUT blocking: build the alert now (copying everything out of
-// messageboxdata, which the caller may free once we return), pause the game loop via
-// s_showingMessageBox (doLoop honors UIKit_ShowingMessageBox()), and present on a later main
-// run-loop iteration -- outside the display-link call stack -- so the alert receives touches
-// normally. The result is reported as the default action since we cannot wait for the choice.
-static bool UIKit_ShowMessageBoxAsync(const SDL_MessageBoxData *messageboxdata, int *buttonID)
-{
-    if (![UIAlertController class]) {
-        return false;
-    }
-
-    // Report the default action up front; messageboxdata may be gone after we return.
-    if (buttonID) {
-        *buttonID = (messageboxdata->numbuttons > 0) ? messageboxdata->buttons[0].buttonID : 0;
-        for (int i = 0; i < messageboxdata->numbuttons; i++) {
-            if (messageboxdata->buttons[i].flags & (SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT)) {
-                *buttonID = messageboxdata->buttons[i].buttonID;
-                break;
-            }
-        }
-    }
-
-    // Resolve (or create) the presenting window now, while messageboxdata is still valid.
-    UIWindow *window = nil;
-    if (messageboxdata->window) {
-        SDL_UIKitWindowData *data = (__bridge SDL_UIKitWindowData *)messageboxdata->window->internal;
-        window = data.uiwindow;
-    }
-
-    __block UIWindow *alertwindow = nil;
-    if (window == nil || window.rootViewController == nil) {
-        if (@available(iOS 13.0, *)) {
-            UIWindowScene *scene = UIKit_GetActiveWindowScene();
-            if (scene) {
-                alertwindow = [[UIWindow alloc] initWithWindowScene:scene];
-            }
-        }
-        if (!alertwindow) {
-            alertwindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        }
-        alertwindow.rootViewController = [UIViewController new];
-        alertwindow.windowLevel = UIWindowLevelAlert;
-        window = alertwindow;
-        [alertwindow makeKeyAndVisible];
-    }
-
-    // Build the alert, copying all strings/values out of messageboxdata.
-    UIAlertController *alert =
-        [UIAlertController alertControllerWithTitle:@(messageboxdata->title)
-                                            message:@(messageboxdata->message)
-                                     preferredStyle:UIAlertControllerStyleAlert];
-
-    for (int i = 0; i < messageboxdata->numbuttons; i++) {
-        const SDL_MessageBoxButtonData *sdlButton;
-        UIAlertActionStyle style = UIAlertActionStyleDefault;
-
-        if (messageboxdata->flags & SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT) {
-            sdlButton = &messageboxdata->buttons[messageboxdata->numbuttons - 1 - i];
-        } else {
-            sdlButton = &messageboxdata->buttons[i];
-        }
-
-        if (sdlButton->flags & SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT) {
-            style = UIAlertActionStyleCancel;
-        }
-
-        UIAlertAction *action =
-            [UIAlertAction actionWithTitle:@(sdlButton->text)
-                                     style:style
-                                   handler:^(UIAlertAction *alertAction) {
-                                     // The alert dismisses itself; resume the game loop and
-                                     // drop the temporary alert window if we created one.
-                                     s_showingMessageBox = false;
-                                     if (alertwindow) {
-                                         alertwindow.hidden = YES;
-                                         alertwindow = nil;
-                                     }
-                                   }];
-        [alert addAction:action];
-
-        if (sdlButton->flags & SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT) {
-            alert.preferredAction = action;
-        }
-    }
-
-    UIViewController *presenter = window.rootViewController;
-
-    // Only pause the loop if the alert can actually be dismissed (a button clears the flag).
-    if (messageboxdata->numbuttons > 0) {
-        s_showingMessageBox = true;
-    }
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [presenter presentViewController:alert animated:NO completion:nil];
-    });
-
-    return true;
-}
-
 bool UIKit_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonID)
 {
-    // iOS 26's run loop tolerates the blocking nested-run-loop path; older iOS freezes on it.
+    // Message boxes dont seem to work on iOS 18.5 or lower
+    // Only iOS 26 seems to work just fine
+    // This is to be fixed later
     if (@available(iOS 26.0, *)) {
         UIKit_ShowMessageBoxData data = { messageboxdata, buttonID, false };
         if (!SDL_RunOnMainThread(UIKit_ShowMessageBoxMainThreadCallback, &data, true)) {
@@ -264,7 +162,7 @@ bool UIKit_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonI
         }
         return true;
     }
-    return UIKit_ShowMessageBoxAsync(messageboxdata, buttonID);
+    return false;
 }
 #else
 bool UIKit_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonID)
