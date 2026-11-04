@@ -84,7 +84,6 @@ class AudioBuffer
 	#end
 
 	@:noCompletion private var __srcCustom:Dynamic;
-	@:noCompletion private var __srcMADecoder:#if lime_miniaudio MADecoder #else Dynamic #end;
 
 	/**
 		Creates a new, empty `AudioBuffer` instance.
