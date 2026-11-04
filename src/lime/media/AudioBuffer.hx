@@ -92,6 +92,22 @@ class AudioBuffer
 	public function new() {}
 
 	/**
+		Returns whether this `AudioBuffer` is valid or not.
+	**/
+	public function isValid():Bool
+	{
+		#if (lime_cffi && lime_miniaudio && !macro)
+		final validMADataSource:Bool = __srcMADecoder != null || __srcMAAudioBuffer != null || __srcMAAudioRingBuffer != null;
+
+		final validData:Bool = data != null && data.length > 0;
+
+		return validMADataSource || validData;
+		#else
+		return __srcCustom != null;
+		#end
+	}
+
+	/**
 		Disposes of the resources used by this `AudioBuffer`, such as unloading any associated audio data.
 	**/
 	public function dispose():Void
