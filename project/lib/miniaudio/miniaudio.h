@@ -22715,7 +22715,8 @@ typedef enum
 
 typedef enum
 {
-    MA_AudioCategory_Other = 0  /* <-- miniaudio is only caring about Other. */
+    MA_AudioCategory_Other = 0,
+    MA_AudioCategory_Media = 11  /* match OpenAL Soft's WASAPI backend (AudioCategory_Media). */
 } MA_AUDIO_STREAM_CATEGORY;
 
 typedef enum
@@ -24584,23 +24585,26 @@ static ma_result ma_device_init_internal__wasapi(ma_context* pContext, ma_device
 
     MA_ZERO_OBJECT(&wf);
 
-    /* Try enabling hardware offloading. */
-    if (!pData->noHardwareOffloading) {
-        hr = ma_IAudioClient_QueryInterface(pData->pAudioClient, &MA_IID_IAudioClient2, (void**)&pAudioClient2);
-        if (SUCCEEDED(hr)) {
-            BOOL isHardwareOffloadingSupported = 0;
-            hr = ma_IAudioClient2_IsOffloadCapable(pAudioClient2, MA_AudioCategory_Other, &isHardwareOffloadingSupported);
-            if (SUCCEEDED(hr) && isHardwareOffloadingSupported) {
-                ma_AudioClientProperties clientProperties;
-                MA_ZERO_OBJECT(&clientProperties);
-                clientProperties.cbSize = sizeof(clientProperties);
-                clientProperties.bIsOffload = 1;
-                clientProperties.eCategory = MA_AudioCategory_Other;
-                ma_IAudioClient2_SetClientProperties(pAudioClient2, &clientProperties);
-            }
+    /* Always set the stream category to Media (what OpenAL Soft's WASAPI backend does), and only enable hardware offloading if allowed. */
+    hr = ma_IAudioClient_QueryInterface(pData->pAudioClient, &MA_IID_IAudioClient2, (void**)&pAudioClient2);
+    if (SUCCEEDED(hr)) {
+        BOOL isHardwareOffloadingSupported = 0;
+        ma_AudioClientProperties clientProperties;
 
-            pAudioClient2->lpVtbl->Release(pAudioClient2);
+        if (!pData->noHardwareOffloading) {
+            hr = ma_IAudioClient2_IsOffloadCapable(pAudioClient2, MA_AudioCategory_Media, &isHardwareOffloadingSupported);
+            if (FAILED(hr)) {
+                isHardwareOffloadingSupported = 0;
+            }
         }
+
+        MA_ZERO_OBJECT(&clientProperties);
+        clientProperties.cbSize = sizeof(clientProperties);
+        clientProperties.bIsOffload = isHardwareOffloadingSupported ? 1 : 0;
+        clientProperties.eCategory = MA_AudioCategory_Media;
+        ma_IAudioClient2_SetClientProperties(pAudioClient2, &clientProperties);
+
+        pAudioClient2->lpVtbl->Release(pAudioClient2);
     }
 
     /* Here is where we try to determine the best format to use with the device. If the client if wanting exclusive mode, first try finding the best format for that. If this fails, fall back to shared mode. */
