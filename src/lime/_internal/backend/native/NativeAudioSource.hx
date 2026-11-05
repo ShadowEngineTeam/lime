@@ -19,6 +19,10 @@ import lime.media.miniaudio.nodes.MAPeakMeterNode;
 @:access(lime.media.AudioBuffer)
 class NativeAudioSource
 {
+	// Sources with a sound, polled on the main thread for sounds that reached their end.
+	private static var activeSources:Array<NativeAudioSource> = [];
+	private static var atEndPoller:Null<haxe.MainLoop.MainEvent>;
+
 	private var preRingBuffers:Array<MAAudioRingBuffer> = [];
 	private var postRingBuffers:Array<MAAudioRingBuffer> = [];
 	private var buffer:MAAudioBuffer;
@@ -34,6 +38,8 @@ class NativeAudioSource
 
 	public function dispose():Void
 	{
+		activeSources.remove(this);
+
 		if (handle != null)
 		{
 			handle.stop();
@@ -70,9 +76,6 @@ class NativeAudioSource
 				config.flags = MASound.FLAG_NO_SPATIALIZATION;
 				config.pInitialAttachment = initMeter();
 				config.pDataSource = parent.buffer.__srcMADecoder;
-				config.pNotifications.onAtEnd = sound_atEnd;
-				config.pNotifications.onPreProcess = sound_onPreProcess;
-				config.pNotifications.onProcess = sound_onProcess;
 
 				handle = MASound.init(AudioManager.engine, config);
 			}
@@ -81,10 +84,8 @@ class NativeAudioSource
 				final config:MASoundConfig = MASoundConfig.init();
 
 				config.flags = MASound.FLAG_NO_SPATIALIZATION;
+				config.pInitialAttachment = initMeter();
 				config.pDataSource = parent.buffer.__srcMAAudioBuffer;
-				config.pNotifications.onAtEnd = sound_atEnd;
-				config.pNotifications.onPreProcess = sound_onPreProcess;
-				config.pNotifications.onProcess = sound_onProcess;
 
 				handle = MASound.init(AudioManager.engine, config);
 			}
@@ -93,10 +94,8 @@ class NativeAudioSource
 				final config:MASoundConfig = MASoundConfig.init();
 
 				config.flags = MASound.FLAG_NO_SPATIALIZATION;
+				config.pInitialAttachment = initMeter();
 				config.pDataSource = parent.buffer.__srcMAAudioRingBuffer;
-				config.pNotifications.onAtEnd = sound_atEnd;
-				config.pNotifications.onPreProcess = sound_onPreProcess;
-				config.pNotifications.onProcess = sound_onProcess;
 
 				handle = MASound.init(AudioManager.engine, config);
 			}
@@ -113,11 +112,23 @@ class NativeAudioSource
 				config.flags = MASound.FLAG_NO_SPATIALIZATION;
 				config.pInitialAttachment = initMeter();
 				config.pDataSource = buffer;
-				config.pNotifications.onAtEnd = sound_atEnd;
-				config.pNotifications.onPreProcess = sound_onPreProcess;
-				config.pNotifications.onProcess = sound_onProcess;
 
 				handle = MASound.init(AudioManager.engine, config);
+			}
+
+			if (handle != null)
+			{
+				for (rb in preRingBuffers)
+					handle.add_ring_buffer(rb, false);
+
+				for (rb in postRingBuffers)
+					handle.add_ring_buffer(rb, true);
+
+				if (!activeSources.contains(this))
+					activeSources.push(this);
+
+				if (atEndPoller == null)
+					atEndPoller = MainLoop.add(pollAtEnd);
 			}
 		}
 	}
@@ -162,6 +173,9 @@ class NativeAudioSource
 			return;
 
 		preRingBuffers.push(rb);
+
+		if (handle != null)
+			handle.add_ring_buffer(rb, false);
 	}
 
 	public function removePreRingBuffer(rb:MAAudioRingBuffer):Void
@@ -170,6 +184,9 @@ class NativeAudioSource
 			return;
 
 		preRingBuffers.remove(rb);
+
+		if (handle != null)
+			handle.remove_ring_buffer(rb, false);
 	}
 
 	public function addPostRingBuffer(rb:MAAudioRingBuffer):Void
@@ -178,6 +195,9 @@ class NativeAudioSource
 			return;
 
 		postRingBuffers.push(rb);
+
+		if (handle != null)
+			handle.add_ring_buffer(rb, true);
 	}
 
 	public function removePostRingBuffer(rb:MAAudioRingBuffer):Void
@@ -186,11 +206,23 @@ class NativeAudioSource
 			return;
 
 		postRingBuffers.remove(rb);
+
+		if (handle != null)
+			handle.remove_ring_buffer(rb, true);
 	}
 
 	// Event Handlers
 
-	private function sound_atEnd(_):Void
+	private static function pollAtEnd():Void
+	{
+		for (source in activeSources.copy())
+		{
+			if (source.handle != null && source.handle.take_at_end() > 0)
+				source.sound_atEnd();
+		}
+	}
+
+	private function sound_atEnd():Void
 	{
 		if (loops > 0)
 		{
@@ -200,36 +232,7 @@ class NativeAudioSource
 			return;
 		}
 
-		MainLoop.runInMainThread(function():Void
-		{
-			parent.onComplete.dispatch();
-		});
-	}
-
-	private function sound_onPreProcess(_, pFrames:lime.system.CFFIPointer, frameCount:Dynamic):Void
-	{
-		if (preRingBuffers != null && preRingBuffers.length > 0)
-		{
-			final frameCount:Int = Int64.toInt(Int64.make(frameCount.high, frameCount.low));
-
-			for (ringBuffer in preRingBuffers)
-			{
-				ringBuffer.write_pcm_frames(pFrames, frameCount);
-			}
-		}
-	}
-
-	private function sound_onProcess(_, pFrames:lime.system.CFFIPointer, frameCount:Dynamic):Void
-	{
-		if (postRingBuffers != null && postRingBuffers.length > 0)
-		{
-			final frameCount:Int = Int64.toInt(Int64.make(frameCount.high, frameCount.low));
-
-			for (ringBuffer in postRingBuffers)
-			{
-				ringBuffer.write_pcm_frames(pFrames, frameCount);
-			}
-		}
+		parent.onComplete.dispatch();
 	}
 
 	// Get & Set Methods

@@ -522,6 +522,37 @@ abstract MASound(MANode) from MANode to MANode
 		#end
 	}
 
+	/**
+		Copies this sound's frames into `ringBuffer` on the audio thread, before (`post == false`) or
+		after (`post == true`) its volume, pan and pitch. No Haxe code runs on the audio thread.
+	**/
+	public function add_ring_buffer(ringBuffer:MAAudioRingBuffer, post:Bool):Void
+	{
+		#if (lime_cffi && lime_miniaudio && !macro)
+		NativeCFFI.lime_ma_sound_add_ring_buffer(this, ringBuffer, post);
+		#end
+	}
+
+	public function remove_ring_buffer(ringBuffer:MAAudioRingBuffer, post:Bool):Void
+	{
+		#if (lime_cffi && lime_miniaudio && !macro)
+		NativeCFFI.lime_ma_sound_remove_ring_buffer(this, ringBuffer, post);
+		#end
+	}
+
+	/**
+		Returns how many times this sound reached its end since the last call, and resets the count.
+		The audio thread only counts the end, so this is polled from the main thread.
+	**/
+	public function take_at_end():Int
+	{
+		#if (lime_cffi && lime_miniaudio && !macro)
+		return NativeCFFI.lime_ma_sound_take_at_end(this);
+		#else
+		return 0;
+		#end
+	}
+
 	public function is_playing():Bool
 	{
 		#if (lime_cffi && lime_miniaudio && !macro)
