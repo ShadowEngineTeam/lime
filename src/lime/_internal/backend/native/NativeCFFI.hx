@@ -1717,6 +1717,9 @@ class NativeCFFI
 	private static var lime_ma_sound_get_data_source = new cpp.Callable<cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_ma_sound_get_data_source", "oo", false));
 	private static var lime_ma_sound_start = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_sound_start", "oi", false));
 	private static var lime_ma_sound_stop = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_sound_stop", "oi", false));
+	private static var lime_ma_sound_add_ring_buffer = new cpp.Callable<cpp.Object->cpp.Object->Bool->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_ma_sound_add_ring_buffer", "oobv", false));
+	private static var lime_ma_sound_remove_ring_buffer = new cpp.Callable<cpp.Object->cpp.Object->Bool->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_ma_sound_remove_ring_buffer", "oobv", false));
+	private static var lime_ma_sound_take_at_end = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_sound_take_at_end", "oi", false));
 	private static var lime_ma_sound_stop_with_fade_in_pcm_frames = new cpp.Callable<cpp.Object->cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_sound_stop_with_fade_in_pcm_frames", "ooi", false));
 	private static var lime_ma_sound_stop_with_fade_in_milliseconds = new cpp.Callable<cpp.Object->cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_ma_sound_stop_with_fade_in_milliseconds", "ooi", false));
 	private static var lime_ma_sound_reset_start_time = new cpp.Callable<cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_ma_sound_reset_start_time", "ov", false));
@@ -1899,6 +1902,9 @@ class NativeCFFI
     private static var lime_ma_sound_get_data_source:Dynamic->Dynamic = CFFI.load("lime", "lime_ma_sound_get_data_source", 1);
     private static var lime_ma_sound_start:Dynamic->Int = CFFI.load("lime", "lime_ma_sound_start", 1);
     private static var lime_ma_sound_stop:Dynamic->Int = CFFI.load("lime", "lime_ma_sound_stop", 1);
+	private static var lime_ma_sound_add_ring_buffer:Dynamic->Dynamic->Bool->Void = CFFI.load("lime", "lime_ma_sound_add_ring_buffer", 3);
+	private static var lime_ma_sound_remove_ring_buffer:Dynamic->Dynamic->Bool->Void = CFFI.load("lime", "lime_ma_sound_remove_ring_buffer", 3);
+	private static var lime_ma_sound_take_at_end:Dynamic->Int = CFFI.load("lime", "lime_ma_sound_take_at_end", 1);
 	private static var lime_ma_sound_stop_with_fade_in_pcm_frames:Dynamic->Dynamic->Int = CFFI.load("lime", "lime_ma_sound_stop_with_fade_in_pcm_frames", 2);
     private static var lime_ma_sound_stop_with_fade_in_milliseconds:Dynamic->Dynamic->Int = CFFI.load("lime", "lime_ma_sound_stop_with_fade_in_milliseconds", 2);
     private static var lime_ma_sound_reset_start_time:Dynamic->Void = CFFI.load("lime", "lime_ma_sound_reset_start_time", 1);

@@ -2,6 +2,7 @@
 #include <utils/Bytes.h>
 #include <utils/File.h>
 #include <atomic>
+#include <vector>
 #include <cmath>
 #ifdef IPHONE
 #include <media/ios_audio_session.h>
@@ -1854,59 +1855,110 @@ namespace lime
 		return ma_engine_listener_is_enabled((ma_engine *)val_data(pEngine), listenerIndex);
 	}
 
+	// Per-sound state shared with the audio thread. The audio thread never calls into Haxe:
+	// taps are written here in C and the end of a sound is only counted, then picked up on
+	// the main thread with lime_ma_sound_take_at_end. Calling into Haxe from the audio
+	// thread made it wait on the GC, so audio stopped whenever the game lagged, popped
+	// during collections and could deadlock against the main thread.
 	struct ma_sound_notifications_gc_roots
 	{
-		AutoGCRoot *onAtEnd;
-		AutoGCRoot *onPreProcess;
-		AutoGCRoot *onProcess;
+		ma_spinlock tapLock;
+		std::vector<ma_audio_ring_buffer *> preTaps;
+		std::vector<ma_audio_ring_buffer *> postTaps;
+		std::atomic<int> atEndCount;
 	};
+
+	static void ma_sound_write_taps(ma_sound_notifications_gc_roots *state, std::vector<ma_audio_ring_buffer *> &taps, float *pFrames, ma_uint64 frameCount)
+	{
+		ma_spinlock_lock(&state->tapLock);
+
+		for (ma_audio_ring_buffer *ringBuffer : taps)
+		{
+			ma_uint32 framesWritten = 0;
+			ma_audio_ring_buffer_write_pcm_frames(ringBuffer, pFrames, (ma_uint32)frameCount, &framesWritten);
+		}
+
+		ma_spinlock_unlock(&state->tapLock);
+	}
 
 	void ma_sound_notifications_on_at_end(void *pUserData, ma_sound *pSound)
 	{
-		AutoGCRoot *root = (AutoGCRoot *)(((ma_sound_notifications_gc_roots *)pUserData)->onAtEnd);
-
-		if (root)
-		{
-			int base = 0;
-
-			gc_set_top_of_stack(&base, true);
-
-			val_call1(root->get(), CFFIPointer(pSound, NULL));
-
-			gc_set_top_of_stack(0, true);
-		}
+		((ma_sound_notifications_gc_roots *)pUserData)->atEndCount.fetch_add(1);
 	}
 
 	void ma_sound_notifications_on_pre_process(void *pUserData, ma_sound *pSound, float *pFrames, ma_uint64 frameCount)
 	{
-		AutoGCRoot *root = (AutoGCRoot *)(((ma_sound_notifications_gc_roots *)pUserData)->onPreProcess);
+		ma_sound_notifications_gc_roots *state = (ma_sound_notifications_gc_roots *)pUserData;
 
-		if (root)
-		{
-			int base = 0;
-
-			gc_set_top_of_stack(&base, true);
-
-			val_call3(root->get(), CFFIPointer(pSound, NULL), CFFIPointer(pFrames, NULL), alloc_Int64(frameCount));
-
-			gc_set_top_of_stack(0, true);
-		}
+		if (!state->preTaps.empty())
+			ma_sound_write_taps(state, state->preTaps, pFrames, frameCount);
 	}
 
 	void ma_sound_notifications_on_process(void *pUserData, ma_sound *pSound, float *pFrames, ma_uint64 frameCount)
 	{
-		AutoGCRoot *root = (AutoGCRoot *)(((ma_sound_notifications_gc_roots *)pUserData)->onProcess);
+		ma_sound_notifications_gc_roots *state = (ma_sound_notifications_gc_roots *)pUserData;
 
-		if (root)
+		if (!state->postTaps.empty())
+			ma_sound_write_taps(state, state->postTaps, pFrames, frameCount);
+	}
+
+	void lime_ma_sound_add_ring_buffer(value pSound, value pRingBuffer, bool post)
+	{
+		ma_sound *sound = (ma_sound *)val_data(pSound);
+		ma_audio_ring_buffer *ringBuffer = (ma_audio_ring_buffer *)val_data(pRingBuffer);
+
+		if (!sound || !ringBuffer || !sound->notifications.pUserData)
+			return;
+
+		ma_sound_notifications_gc_roots *state = (ma_sound_notifications_gc_roots *)sound->notifications.pUserData;
+		std::vector<ma_audio_ring_buffer *> &taps = post ? state->postTaps : state->preTaps;
+
+		ma_spinlock_lock(&state->tapLock);
+
+		bool found = false;
+
+		for (ma_audio_ring_buffer *tap : taps)
+			found = found || tap == ringBuffer;
+
+		if (!found)
+			taps.push_back(ringBuffer);
+
+		ma_spinlock_unlock(&state->tapLock);
+	}
+
+	void lime_ma_sound_remove_ring_buffer(value pSound, value pRingBuffer, bool post)
+	{
+		ma_sound *sound = (ma_sound *)val_data(pSound);
+		ma_audio_ring_buffer *ringBuffer = (ma_audio_ring_buffer *)val_data(pRingBuffer);
+
+		if (!sound || !ringBuffer || !sound->notifications.pUserData)
+			return;
+
+		ma_sound_notifications_gc_roots *state = (ma_sound_notifications_gc_roots *)sound->notifications.pUserData;
+		std::vector<ma_audio_ring_buffer *> &taps = post ? state->postTaps : state->preTaps;
+
+		ma_spinlock_lock(&state->tapLock);
+
+		for (size_t i = 0; i < taps.size(); i++)
 		{
-			int base = 0;
-
-			gc_set_top_of_stack(&base, true);
-
-			val_call3(root->get(), CFFIPointer(pSound, NULL), CFFIPointer(pFrames, NULL), alloc_Int64(frameCount));
-
-			gc_set_top_of_stack(0, true);
+			if (taps[i] == ringBuffer)
+			{
+				taps.erase(taps.begin() + i);
+				break;
+			}
 		}
+
+		ma_spinlock_unlock(&state->tapLock);
+	}
+
+	int lime_ma_sound_take_at_end(value pSound)
+	{
+		ma_sound *sound = (ma_sound *)val_data(pSound);
+
+		if (!sound || !sound->notifications.pUserData)
+			return 0;
+
+		return ((ma_sound_notifications_gc_roots *)sound->notifications.pUserData)->atEndCount.exchange(0);
 	}
 
 	void gc_ma_sound(value handle)
@@ -1921,21 +1973,6 @@ namespace lime
 
 			if (gc_roots)
 			{
-				if (gc_roots->onAtEnd)
-				{
-					delete gc_roots->onAtEnd;
-				}
-
-				if (gc_roots->onPreProcess)
-				{
-					delete gc_roots->onPreProcess;
-				}
-
-				if (gc_roots->onProcess)
-				{
-					delete gc_roots->onProcess;
-				}
-
 				delete gc_roots;
 			}
 
@@ -1971,50 +2008,19 @@ namespace lime
 		config.loopPointBegInPCMFrames = (ma_uint64)val_Int64(loopPointBegInPCMFrames);
 		config.loopPointEndInPCMFrames = val_is_null(loopPointEndInPCMFrames) ? ~((ma_uint64)0) : (ma_uint64)val_Int64(loopPointEndInPCMFrames);
 
-		value pNotifications = val_field(pConfig, val_id("pNotifications"));
+		ma_sound_notifications notifications = ma_sound_notifications_init();
 
-		ma_sound_notifications notifications;
+		ma_sound_notifications_gc_roots *gc_roots = new ma_sound_notifications_gc_roots();
 
-		ma_sound_notifications_gc_roots *gc_roots = nullptr;
+		ma_spinlock_unlock(&gc_roots->tapLock);
+		gc_roots->atEndCount.store(0);
 
-		if (!val_is_null(pNotifications))
-		{
-			value onAtEnd = val_field(pNotifications, val_id("onAtEnd"));
-			value onPreProcess = val_field(pNotifications, val_id("onPreProcess"));
-			value onProcess = val_field(pNotifications, val_id("onProcess"));
+		notifications.onAtEnd = ma_sound_notifications_on_at_end;
+		notifications.onPreProcess = ma_sound_notifications_on_pre_process;
+		notifications.onProcess = ma_sound_notifications_on_process;
+		notifications.pUserData = gc_roots;
 
-			if (!val_is_null(onAtEnd) || !val_is_null(onPreProcess) || !val_is_null(onProcess))
-			{
-				notifications = ma_sound_notifications_init();
-
-				gc_roots = new ma_sound_notifications_gc_roots{nullptr, nullptr};
-
-				if (!val_is_null(onAtEnd))
-				{
-					notifications.onAtEnd = ma_sound_notifications_on_at_end;
-
-					gc_roots->onAtEnd = new AutoGCRoot(onAtEnd);
-				}
-
-				if (!val_is_null(onPreProcess))
-				{
-					notifications.onPreProcess = ma_sound_notifications_on_pre_process;
-
-					gc_roots->onPreProcess = new AutoGCRoot(onPreProcess);
-				}
-
-				if (!val_is_null(onProcess))
-				{
-					notifications.onProcess = ma_sound_notifications_on_process;
-
-					gc_roots->onProcess = new AutoGCRoot(onProcess);
-				}
-
-				notifications.pUserData = gc_roots;
-
-				config.pNotifications = &notifications;
-			}
-		}
+		config.pNotifications = &notifications;
 
 		ma_sound *sound = new ma_sound();
 
@@ -2024,21 +2030,6 @@ namespace lime
 		{
 			if (gc_roots)
 			{
-				if (gc_roots->onAtEnd)
-				{
-					delete gc_roots->onAtEnd;
-				}
-
-				if (gc_roots->onPreProcess)
-				{
-					delete gc_roots->onPreProcess;
-				}
-
-				if (gc_roots->onProcess)
-				{
-					delete gc_roots->onProcess;
-				}
-
 				delete gc_roots;
 			}
 
@@ -2062,21 +2053,6 @@ namespace lime
 
 			if (gc_roots)
 			{
-				if (gc_roots->onAtEnd)
-				{
-					delete gc_roots->onAtEnd;
-				}
-
-				if (gc_roots->onPreProcess)
-				{
-					delete gc_roots->onPreProcess;
-				}
-
-				if (gc_roots->onProcess)
-				{
-					delete gc_roots->onProcess;
-				}
-
 				delete gc_roots;
 			}
 
@@ -2658,6 +2634,9 @@ namespace lime
 	DEFINE_PRIME1(lime_ma_sound_get_data_source);
 	DEFINE_PRIME1(lime_ma_sound_start);
 	DEFINE_PRIME1(lime_ma_sound_stop);
+	DEFINE_PRIME3v(lime_ma_sound_add_ring_buffer);
+	DEFINE_PRIME3v(lime_ma_sound_remove_ring_buffer);
+	DEFINE_PRIME1(lime_ma_sound_take_at_end);
 	DEFINE_PRIME2(lime_ma_sound_stop_with_fade_in_pcm_frames);
 	DEFINE_PRIME2(lime_ma_sound_stop_with_fade_in_milliseconds);
 	DEFINE_PRIME1v(lime_ma_sound_reset_start_time);
