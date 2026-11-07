@@ -92,6 +92,10 @@ class NativeApplication
 		Sys.setCwd(System.applicationDirectory);
 		#end
 
+		#if (cpp && !macro && (android || ios) && HXCPP_PGO == "generate")
+		NativePgo.start();
+		#end
+
 		Font.init();
 
 		AudioManager.init();
@@ -657,6 +661,10 @@ class NativeApplication
 					window.onDeactivate.dispatch();
 					AudioManager.onDeactivate();
 					pauseTimer = System.getTimer();
+
+					#if (cpp && !macro && (android || ios) && HXCPP_PGO == "generate")
+					NativePgo.write();
+					#end
 
 				case WINDOW_ENTER:
 					window.onEnter.dispatch();

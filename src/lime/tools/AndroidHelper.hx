@@ -357,6 +357,21 @@ class AndroidHelper
 		return deviceID;
 	}
 
+	/** Runs adb on the chosen device, or the only one, and returns whether it succeeded. **/
+	public static function adb(deviceID:String, args:Array<String>):Bool
+	{
+		if (adbPath == null || !FileSystem.exists(adbPath + adbName)) return false;
+		var full = (deviceID != null && deviceID != "") ? ["-s", deviceID].concat(args) : args;
+		try
+		{
+			return System.runCommand(adbPath, adbName, full, true, true) == 0;
+		}
+		catch (e:Dynamic)
+		{
+			return false;
+		}
+	}
+
 	public static function listAVDs():Array<String>
 	{
 		var avds = new Array<String>();
