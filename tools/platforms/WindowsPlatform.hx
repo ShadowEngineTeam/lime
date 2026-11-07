@@ -5,6 +5,7 @@ import hxp.Log;
 import hxp.Path;
 import hxp.System;
 
+import lime.tools.PgoHelper;
 import lime.tools.Architecture;
 import lime.tools.AssetHelper;
 import lime.tools.CPPHelper;
@@ -188,8 +189,7 @@ class WindowsPlatform extends PlatformTarget
 
 		IconHelper.createWindowsIcon(icons, Path.combine(targetDirectory + "/obj", "ApplicationMain.ico"));
 
-		var pgo:String = project.debug ? null : project.haxedefs.get("HXCPP_PGO");
-		if (pgo == null && !project.debug && project.environment.exists("HXCPP_PGO")) pgo = project.environment.get("HXCPP_PGO");
+		var pgo:String = PgoHelper.getMode(project);
 
 		// HXCPP_PGO with MSVC: the instrumented program writes its counts (*.pgc) beside itself, in bin/,
 		// while hxcpp gathers them from the folder it builds in, under the name of the program it linked

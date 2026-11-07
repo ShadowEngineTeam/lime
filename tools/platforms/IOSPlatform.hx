@@ -16,6 +16,7 @@ import lime.tools.AssetHelper;
 import lime.tools.CPPHelper;
 import lime.tools.HXProject;
 import lime.tools.IOSHelper;
+import lime.tools.PgoHelper;
 import lime.tools.Icon;
 import lime.tools.IconHelper;
 import lime.tools.ImageHelper;
@@ -59,6 +60,11 @@ class IOSPlatform extends PlatformTarget
 		}
 		else
 		{
+			if (PgoHelper.getMode(project) == "use" && !noOutput)
+			{
+				PgoHelper.pullIOS(project, targetDirectory);
+			}
+
 			IOSHelper.build(project, targetDirectory);
 
 			if (noOutput)
@@ -117,6 +123,9 @@ class IOSPlatform extends PlatformTarget
 		IOSHelper.getIOSVersion(project);
 
 		project.haxedefs.set("IPHONE_VER", project.environment.get("IPHONE_VER"));
+
+		// HXCPP_PGO: the simulator architecture that was not trained is built as usual
+		if (PgoHelper.getMode(project) != null) project.haxedefs.set("HXCPP_PGO_IF_COUNTS", "1");
 
 		if (project.config.getString("ios.compiler") == "llvm" || project.config.getString("ios.compiler", "clang") == "clang")
 		{
@@ -234,6 +243,12 @@ class IOSPlatform extends PlatformTarget
 		}
 
 		context.IOS_LINKER_FLAGS = project.config.getArrayString("ios.linker-flags");
+
+		if (PgoHelper.getMode(project) != null)
+		{
+			// Xcode links the program, so it must bring in the profile runtime itself
+			if (PgoHelper.getMode(project) == "generate") context.IOS_LINKER_FLAGS = context.IOS_LINKER_FLAGS.concat(["-fprofile-generate"]);
+		}
 
 		context.IOS_NON_EXEMPT_ENCRYPTION = project.config.getBool("ios.non-exempt-encryption", false);
 

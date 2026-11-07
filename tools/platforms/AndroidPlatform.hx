@@ -8,6 +8,7 @@ import hxp.Path;
 import hxp.System;
 
 import lime.tools.AndroidHelper;
+import lime.tools.PgoHelper;
 import lime.tools.Architecture;
 import lime.tools.AssetHelper;
 import lime.tools.AssetType;
@@ -104,6 +105,14 @@ class AndroidPlatform extends PlatformTarget
 			architectures.push(Architecture.ARM64);
 		}
 
+		var pgo:String = PgoHelper.getMode(project);
+		System.mkdir(targetDirectory + "/obj");
+		var objDirectory:String = FileSystem.fullPath(targetDirectory + "/obj");
+		if (pgo == "use" && !noOutput)
+		{
+			PgoHelper.pullAndroid(project, deviceID, objDirectory);
+		}
+
 		for (architecture in architectures)
 		{
 			var minSDKVer = project.config.getInt("android.minimum-sdk-version", 26);
@@ -160,6 +169,13 @@ class AndroidPlatform extends PlatformTarget
 			for (ndll in project.ndlls)
 			{
 				ProjectHelper.copyLibrary(project, ndll, "Android", "lib", suffix, path, project.debug, ".so");
+			}
+
+			if (pgo != null)
+			{
+				// One set of counts per architecture; one that was not trained is built as usual
+				cppParams.push("-DHXCPP_PGO_DIR=" + objDirectory + "/pgo/" + Path.withoutDirectory(path));
+				cppParams.push("-DHXCPP_PGO_IF_COUNTS");
 			}
 
 			System.runCommand("", "haxe", haxeParams);
@@ -337,6 +353,11 @@ class AndroidPlatform extends PlatformTarget
 		var packagePath = Path.combine(outputDirectory, project.app.file + "-" + build + '${targetFlags.exists("bundle") ? ".aab" : ".apk"}');
 
 		deviceID = AndroidHelper.install(project, packagePath, deviceID, targetFlags.exists("bundle"));
+
+		if (PgoHelper.getMode(project) == "generate")
+		{
+			PgoHelper.clearAndroid(project, deviceID);
+		}
 	}
 
 	public override function rebuild():Void

@@ -469,7 +469,7 @@ class IOSHelper
 		}
 	}
 
-	private static function findDeviceUUIDWithFilters(filters:Array<String>):String
+	public static function findDeviceUUIDWithFilters(filters:Array<String>):String
 	{
 		var listDevicesOutput = System.runProcess("", "xcrun", [
 			"devicectl",
