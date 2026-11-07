@@ -188,9 +188,50 @@ class WindowsPlatform extends PlatformTarget
 
 		IconHelper.createWindowsIcon(icons, Path.combine(targetDirectory + "/obj", "ApplicationMain.ico"));
 
+		var pgo:String = project.debug ? null : project.haxedefs.get("HXCPP_PGO");
+		if (pgo == null && !project.debug && project.environment.exists("HXCPP_PGO")) pgo = project.environment.get("HXCPP_PGO");
+
+		// HXCPP_PGO with MSVC: the instrumented program writes its counts (*.pgc) beside itself, in bin/,
+		// while hxcpp gathers them from the folder it builds in, under the name of the program it linked
+		if (pgo == "use" && FileSystem.exists(applicationDirectory))
+		{
+			var next:Int = 1;
+			for (file in FileSystem.readDirectory(applicationDirectory))
+			{
+				if (!StringTools.endsWith(file, ".pgc")) continue;
+				var dest:String;
+				do
+				{
+					dest = targetDirectory + "/obj/ApplicationMain!lime" + next + ".pgc";
+					next++;
+				}
+				while (FileSystem.exists(dest));
+				System.copyFile(applicationDirectory + "/" + file, dest);
+				FileSystem.deleteFile(applicationDirectory + "/" + file);
+			}
+		}
+
 		CPPHelper.compile(project, targetDirectory + "/obj", flags);
 
 		System.copyFile(targetDirectory + "/obj/ApplicationMain" + (project.debug ? "-debug" : "") + ".exe", executablePath);
+
+		if (pgo == "generate")
+		{
+			// Counts from an earlier build no longer fit the new program
+			if (FileSystem.exists(applicationDirectory))
+				for (file in FileSystem.readDirectory(applicationDirectory))
+					if (StringTools.endsWith(file, ".pgc"))
+						FileSystem.deleteFile(applicationDirectory + "/" + file);
+
+			// The instrumented program needs MSVC's profiling runtime beside it
+			var runtime:String = targetDirectory + "/obj/pgort140.dll";
+			if (FileSystem.exists(runtime))
+				System.copyFile(runtime, applicationDirectory + "/pgort140.dll");
+		}
+		else if (FileSystem.exists(applicationDirectory + "/pgort140.dll"))
+		{
+			FileSystem.deleteFile(applicationDirectory + "/pgort140.dll");
+		}
 	}
 
 	public override function deploy():Void
