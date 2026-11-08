@@ -144,7 +144,44 @@ namespace lime
 			}
 		}
 
+#if defined(LIME_OPENGL_GL) && !defined(__APPLE__)
+		{
+			struct GLContextRequest
+			{
+				SDL_GLProfile profile;
+				int major;
+				int minor;
+				SDL_GLContextFlag flags;
+			};
+
+			static const GLContextRequest contextRequests[] = {
+				{SDL_GL_CONTEXT_PROFILE_CORE, 4, 1, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG},
+				{SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG},
+				{SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 4, 0, (SDL_GLContextFlag)0},
+				{SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 2, 1, (SDL_GLContextFlag)0},
+			};
+
+			const char *forceCompat = SDL_getenv("LIME_GL_COMPAT");
+			const size_t first = (forceCompat != NULL && forceCompat[0] != '\0' && forceCompat[0] != '0') ? 2 : 0;
+
+			for (size_t i = first; i < sizeof(contextRequests) / sizeof(contextRequests[0]); ++i)
+			{
+				const GLContextRequest &request = contextRequests[i];
+
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, request.profile);
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, request.major);
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, request.minor);
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, request.flags);
+
+				context = SDL_GL_CreateContext(sdlWindow);
+
+				if (context)
+					break;
+			}
+		}
+#else
 		context = SDL_GL_CreateContext(sdlWindow);
+#endif
 
 		if (context && SDL_GL_MakeCurrent(sdlWindow, context))
 		{
@@ -152,10 +189,15 @@ namespace lime
 
 			OpenGLBindings::Init();
 
-#if defined(__APPLE__) && !defined(IPHONE) && defined(LIME_OPENGL_GL)
-			GLuint defaultVAO = 0;
-			glGenVertexArrays(1, &defaultVAO);
-			glBindVertexArray(defaultVAO);
+#if defined(LIME_OPENGL_GL)
+#if defined(LIME_GLAD)
+			if (glGenVertexArrays != NULL && glBindVertexArray != NULL)
+#endif
+			{
+				GLuint defaultVAO = 0;
+				glGenVertexArrays(1, &defaultVAO);
+				glBindVertexArray(defaultVAO);
+			}
 #endif
 
 #if defined(IPHONE)
@@ -298,7 +340,7 @@ namespace lime
 	{
 		if (context)
 		{
-#if defined(LIME_OPENGL)
+#if defined(LIME_OPENGL) && defined(LIME_OPENGL_GLES)
 #if defined(LIME_GLAD)
 			const bool canInvalidate = glInvalidateFramebuffer != NULL;
 #else
