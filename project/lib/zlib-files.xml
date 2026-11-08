@@ -133,6 +133,13 @@
 
 		<section if="HXCPP_ARM64 || HXCPP_ARMV7">
 
+			<section if="HXCPP_ARMV7">
+	
+				<compilerflag value="-mfpu=neon" />
+				<compilerflag value="-mfloat-abi=hard" />
+
+			</section>
+
 			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/arm_features.c" />
 			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/slide_hash_armv6.c" />
 			<file name="${NATIVE_TOOLKIT_PATH}/zlib/arch/arm/adler32_neon.c" />
