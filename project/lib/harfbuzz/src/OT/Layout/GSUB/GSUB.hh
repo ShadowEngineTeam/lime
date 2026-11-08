@@ -37,9 +37,6 @@ struct GSUB : GSUBGPOS
     return_trace (GSUBGPOS::sanitize<SubstLookup> (c));
   }
 
-  HB_INTERNAL bool is_blocklisted (hb_blob_t *blob,
-                                   hb_face_t *face) const;
-
   void closure_lookups (hb_face_t      *face,
                         const hb_set_t *glyphs,
                         hb_set_t       *lookup_indexes /* IN/OUT */) const
@@ -53,6 +50,7 @@ struct GSUB : GSUBGPOS
 
 struct GSUB_accelerator_t : Layout::GSUB::accelerator_t {
   GSUB_accelerator_t (hb_face_t *face) : Layout::GSUB::accelerator_t (face) {}
+  HB_INTERNAL void depend (hb_depend_data_builder_t *builder, hb_face_t *face) const;
 };
 
 

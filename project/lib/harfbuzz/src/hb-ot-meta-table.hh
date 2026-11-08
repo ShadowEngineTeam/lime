@@ -76,6 +76,8 @@ struct meta
     { table = hb_sanitize_context_t ().reference_table<meta> (face); }
     ~accelerator_t () { table.destroy (); }
 
+    hb_blob_ptr_t<meta> borrow_sanitized_table () const { return table; }
+
     hb_blob_t *reference_entry (hb_tag_t tag) const
     { return table->dataMaps.lsearch (tag).reference_entry (table.get_blob ()); }
 
@@ -83,7 +85,7 @@ struct meta
 			      unsigned int     *count,
 			      hb_ot_meta_tag_t *entries) const
     {
-      if (count)
+      if (count && entries)
       {
 	+ table->dataMaps.as_array ().sub_array (start_offset, count)
 	| hb_map (&DataMap::get_tag)

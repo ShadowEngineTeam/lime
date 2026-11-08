@@ -38,7 +38,6 @@ get_opus_sources(CELT_AM_SOURCES_ARM_ASM celt_sources.mk
                  celt_am_sources_arm_asm)
 get_opus_sources(CELT_SOURCES_ARM_NEON_INTR celt_sources.mk
                  celt_sources_arm_neon_intr)
-get_opus_sources(CELT_SOURCES_ARM_NE10 celt_sources.mk celt_sources_arm_ne10)
 
 get_opus_sources(DEEP_PLC_HEAD lpcnet_headers.mk deep_plc_headers)
 get_opus_sources(DRED_HEAD lpcnet_headers.mk dred_headers)
@@ -57,6 +56,7 @@ get_opus_sources(DNN_SOURCES_ARM_RTCD lpcnet_sources.mk dnn_sources_arm_rtcd)
 get_opus_sources(opus_demo_SOURCES Makefile.am opus_demo_sources)
 get_opus_sources(opus_custom_demo_SOURCES Makefile.am opus_custom_demo_sources)
 get_opus_sources(opus_compare_SOURCES Makefile.am opus_compare_sources)
+get_opus_sources(osce_compare_SOURCES Makefile.am osce_compare_sources)
 get_opus_sources(tests_test_opus_api_SOURCES Makefile.am test_opus_api_sources)
 get_opus_sources(tests_test_opus_encode_SOURCES Makefile.am
                  test_opus_encode_sources)

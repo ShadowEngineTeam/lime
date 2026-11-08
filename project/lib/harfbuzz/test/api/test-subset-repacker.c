@@ -26,7 +26,7 @@
 #include "hb-test.h"
 #include "hb-subset-test.h"
 
-#include "hb-subset-serialize.h"
+#include "hb-subset.h"
 
 char test_gsub_data[106] = "\x0\x1\x0\x0\x0\xa\x0\x1e\x0\x2c\x0\x1\x6c\x61\x74\x6e\x0\x8\x0\x4\x0\x0\x0\x0\xff\xff\x0\x1\x0\x0\x0\x1\x74\x65\x73\x74\x0\x8\x0\x0\x0\x1\x0\x1\x0\x2\x0\x2a\x0\x6\x0\x5\x0\x0\x0\x1\x0\x8\x0\x1\x0\x8\x0\x1\x0\xe\x0\x1\x0\x1\x0\x1\x0\x1\x0\x4\x0\x2\x0\x1\x0\x2\x0\x1\x0\x0\x0\x1\x0\x0\x0\x1\x0\x8\x0\x1\x0\x6\x0\x1\x0\x1\x0\x1\x0\x2";
 
@@ -187,7 +187,6 @@ test_hb_repack_with_cy_struct (void)
 
   hb_face_t *face_expected = hb_test_open_font_file ("fonts/repacker_expected.otf");
   hb_blob_t *expected_blob = hb_face_reference_table (face_expected, HB_TAG ('G','S','U','B'));
-  fprintf(stderr, "expected %d bytes, actual %d bytes\n", hb_blob_get_length(expected_blob), hb_blob_get_length (result));
 
   if (hb_blob_get_length (expected_blob) != 0 ||
       hb_blob_get_length (result) != 0)
@@ -206,6 +205,44 @@ test_hb_repack_with_cy_struct (void)
   free (hb_objs);
 }
 
+static void
+test_hb_repack_total_size_overflow (void)
+{
+  /* The objects add up to 4GiB + 16KiB while every offset still fits in
+   * 32 bits. All objects share the same storage to keep memory use low. */
+  const unsigned num_children = 4096;
+  const unsigned child_size = 1u << 20;
+
+  char *data = calloc (child_size, 1);
+  hb_subset_serialize_object_t *hb_objs = calloc (num_children + 1, sizeof (hb_subset_serialize_object_t));
+  hb_subset_serialize_link_t *links = calloc (num_children, sizeof (hb_subset_serialize_link_t));
+  g_assert_nonnull (data);
+  g_assert_nonnull (hb_objs);
+  g_assert_nonnull (links);
+
+  for (unsigned i = 0; i < num_children; i++)
+  {
+    hb_objs[i].head = data;
+    hb_objs[i].tail = data + child_size;
+
+    links[i].width = 4;
+    links[i].position = i * 4;
+    links[i].objidx = i + 1;
+  }
+
+  hb_objs[num_children].head = data;
+  hb_objs[num_children].tail = data + num_children * 4;
+  hb_objs[num_children].num_real_links = num_children;
+  hb_objs[num_children].real_links = links;
+
+  hb_blob_t *result = hb_subset_serialize_or_fail (HB_TAG_NONE, hb_objs, num_children + 1);
+  g_assert_null (result);
+
+  free (links);
+  free (hb_objs);
+  free (data);
+}
+
 
 int
 main (int argc, char **argv)
@@ -213,6 +250,7 @@ main (int argc, char **argv)
   hb_test_init (&argc, &argv);
 
   hb_test_add (test_hb_repack_with_cy_struct);
+  hb_test_add (test_hb_repack_total_size_overflow);
 
   return hb_test_run();
 }

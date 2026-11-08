@@ -34,7 +34,7 @@
 #include "hb.hh"
 #include "hb-blob.hh"
 #include "hb-map.hh"
-#include "hb-pool.hh"
+#include "hb-free-pool.hh"
 
 #include "hb-subset-serialize.h"
 
@@ -78,13 +78,18 @@ struct hb_serialize_context_t
       head = o.head;
       tail = o.tail;
       next = nullptr;
-      real_links.alloc (o.num_real_links, true);
+      real_links.alloc_exact (o.num_real_links);
       for (unsigned i = 0 ; i < o.num_real_links; i++)
         real_links.push (o.real_links[i]);
 
-      virtual_links.alloc (o.num_virtual_links, true);
+      virtual_links.alloc_exact (o.num_virtual_links);
       for (unsigned i = 0; i < o.num_virtual_links; i++)
         virtual_links.push (o.virtual_links[i]);
+    }
+
+    bool in_error () const
+    {
+      return real_links.in_error() || virtual_links.in_error();
     }
 
     bool add_virtual_link (objidx_t objidx)
@@ -172,7 +177,7 @@ struct hb_serialize_context_t
     auto all_links () const HB_AUTO_RETURN
         (( hb_concat (real_links, virtual_links) ));
     auto all_links_writer () HB_AUTO_RETURN
-        (( hb_concat (real_links.writer (), virtual_links.writer ()) ));           
+        (( hb_concat (real_links.writer (), virtual_links.writer ()) ));
   };
 
   struct snapshot_t
@@ -195,7 +200,7 @@ struct hb_serialize_context_t
      };
   }
 
-  hb_serialize_context_t (void *start_, unsigned int size) :
+  hb_serialize_context_t (void *start_, size_t size) :
     start ((char *) start_),
     end (start + size),
     current (nullptr)
@@ -230,7 +235,7 @@ struct hb_serialize_context_t
         || errors == HB_SERIALIZE_ERROR_ARRAY_OVERFLOW;
   }
 
-  void reset (void *start_, unsigned int size)
+  void reset (void *start_, size_t size)
   {
     start = (char*) start_;
     end = start + size;
@@ -327,11 +332,13 @@ struct hb_serialize_context_t
   __attribute__((returns_nonnull))
   Type *push ()
   {
-    if (unlikely (in_error ())) return start_embed<Type> ();
+    // Keep pushing when we've error'd out on int overflows, since pop_discard()
+    // and pop_pack() keep popping; otherwise they would pop the parent object.
+    if (unlikely (in_error () && !only_overflow ())) return start_embed<Type> ();
 
     object_t *obj = object_pool.alloc ();
     if (unlikely (!obj))
-      check_success (false);
+      err (HB_SERIALIZE_ERROR_OTHER);
     else
     {
       obj->head = head;
@@ -680,7 +687,7 @@ struct hb_serialize_context_t
   HB_NODISCARD
   Type *embed (const Type *obj)
   {
-    unsigned int size = obj->get_size ();
+    size_t size = obj->get_size ();
     Type *ret = this->allocate_size<Type> (size, false);
     if (unlikely (!ret)) return nullptr;
     hb_memcpy (ret, obj, size);
@@ -724,7 +731,7 @@ struct hb_serialize_context_t
 	   hb_requires (hb_is_iterator (Iterator)),
 	   typename ...Ts>
   void copy_all (Iterator it, Ts&&... ds)
-  { for (decltype (*it) _ : it) copy (_, std::forward<Ts> (ds)...); }
+  { for (decltype (*it) _ : it) copy (_, ds...); }
 
   template <typename Type>
   hb_serialize_context_t& operator << (const Type &obj) & { embed (obj); return *this; }
@@ -733,6 +740,7 @@ struct hb_serialize_context_t
   Type *extend_size (Type *obj, size_t size, bool clear = true)
   {
     if (unlikely (in_error ())) return nullptr;
+    if (unlikely (size >= INT_MAX)) { err (HB_SERIALIZE_ERROR_OTHER); return nullptr; }
 
     assert (this->start <= (char *) obj);
     assert ((char *) obj <= this->head);
@@ -794,7 +802,8 @@ struct hb_serialize_context_t
   template <typename T, unsigned Size = sizeof (T)>
   void assign_offset (const object_t* parent, const object_t::link_t &link, unsigned offset)
   {
-    auto &off = * ((BEInt<T, Size> *) (parent->head + link.position));
+    // XXX We should stop assuming big-endian!
+    auto &off = * ((HBInt<true, T, Size> *) (parent->head + link.position));
     assert (0 == off);
     check_assign (off, offset, HB_SERIALIZE_ERROR_OFFSET_OVERFLOW);
   }
@@ -814,7 +823,7 @@ struct hb_serialize_context_t
   }
 
   /* Object memory pool. */
-  hb_pool_t<object_t> object_pool;
+  hb_free_pool_t<object_t> object_pool;
 
   /* Stack of currently under construction objects. */
   object_t *current;

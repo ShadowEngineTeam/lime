@@ -105,10 +105,11 @@ test_ot_tag_script_degenerate (void)
 {
   hb_tag_t t[2];
   unsigned int count = 2;
+  hb_script_t hrkt = hb_script_from_string ("Hrkt", -1);
 
   g_assert_cmphex (HB_TAG_CHAR4 ("DFLT"), ==, HB_OT_TAG_DEFAULT_SCRIPT);
 
-  /* HIRAGANA and KATAKANA both map to 'kana' */
+  /* HIRAGANA, KATAKANA, and their collective ISO 15924 script all map to 'kana' */
   test_simple_tags ("kana", HB_SCRIPT_KATAKANA);
 
   hb_ot_tags_from_script_and_language (HB_SCRIPT_HIRAGANA,
@@ -117,6 +118,15 @@ test_ot_tag_script_degenerate (void)
 
   g_assert_cmpuint (count, ==, 1);
   g_assert_cmphex (t[0], ==, HB_TAG_CHAR4 ("kana"));
+
+  count = 2;
+  hb_ot_tags_from_script_and_language (hrkt,
+				       HB_LANGUAGE_INVALID,
+				       &count, t, NULL, NULL);
+
+  g_assert_cmpuint (count, ==, 1);
+  g_assert_cmphex (t[0], ==, HB_TAG_CHAR4 ("kana"));
+  g_assert_cmphex (hb_ot_tag_to_script (HB_TAG_CHAR4 ("kana")), ==, HB_SCRIPT_KATAKANA);
 
   test_simple_tags ("DFLT", HB_SCRIPT_INVALID);
 
@@ -223,7 +233,7 @@ test_language_two_way (const char *tag_s, const char *lang_s)
     g_assert_cmphex (tag, ==, tag2);
   else
     g_assert_cmphex (tag, ==, HB_TAG_CHAR4 ("dflt"));
-  g_assert (lang == hb_ot_tag_to_language (tag));
+  g_assert_true (lang == hb_ot_tag_to_language (tag));
 }
 
 static void
@@ -254,7 +264,7 @@ test_tag_to_language (const char *tag_s, const char *lang_s)
 
   g_test_message ("Testing tag %s -> language %s", tag_s, lang_s);
 
-  g_assert (lang == hb_ot_tag_to_language (tag));
+  g_assert_true (lang == hb_ot_tag_to_language (tag));
 }
 
 static void
@@ -281,6 +291,9 @@ test_ot_tags_to_script_and_language (void)
   test_tags_to_script_and_language ("dev2", "MAR", "Deva", "mr-x-hbsc-64657632");
   test_tags_to_script_and_language ("dev3", "MAR", "Deva", "mr");
   test_tags_to_script_and_language ("qaa", "QTZ0", "Qaaa", "x-hbot-51545a30-hbsc-71616120");
+  /* Default language tag maps to a NULL language; the script-suffix path
+   * must not dereference it. */
+  test_tags_to_script_and_language ("DFLT", "dflt", "", NULL);
 }
 
 static void
@@ -511,8 +524,8 @@ test_tags (hb_script_t  script,
   hb_tag_t *script_tags = malloc (script_count * sizeof (hb_tag_t));
   hb_tag_t *language_tags = malloc (language_count * sizeof (hb_tag_t));
   hb_language_t lang;
-  g_assert (script_tags);
-  g_assert (language_tags);
+  g_assert_true (script_tags);
+  g_assert_true (language_tags);
   lang = hb_language_from_string (lang_s, -1);
   va_start (expected_tags, expected_language_count);
 
@@ -539,6 +552,7 @@ test_ot_tag_full (void)
   test_tags (HB_SCRIPT_INVALID, "en", HB_OT_MAX_TAGS_PER_SCRIPT, HB_OT_MAX_TAGS_PER_LANGUAGE, 0, 1, "ENG");
   test_tags (HB_SCRIPT_INVALID, "en-x-hbscdflt", HB_OT_MAX_TAGS_PER_SCRIPT, HB_OT_MAX_TAGS_PER_LANGUAGE, 1, 1, "DFLT", "ENG");
   test_tags (HB_SCRIPT_LATIN, "en", HB_OT_MAX_TAGS_PER_SCRIPT, HB_OT_MAX_TAGS_PER_LANGUAGE, 1, 1, "latn", "ENG");
+  test_tags (hb_script_from_string ("Hrkt", -1), "und", HB_OT_MAX_TAGS_PER_SCRIPT, 0, 1, 0, "kana");
   test_tags (HB_SCRIPT_LATIN, "en", 0, 0, 0, 0);
   test_tags (HB_SCRIPT_INVALID, "und-fonnapa", HB_OT_MAX_TAGS_PER_SCRIPT, HB_OT_MAX_TAGS_PER_LANGUAGE, 0, 1, "APPH");
   test_tags (HB_SCRIPT_INVALID, "en-fonnapa", HB_OT_MAX_TAGS_PER_SCRIPT, HB_OT_MAX_TAGS_PER_LANGUAGE, 0, 1, "APPH");

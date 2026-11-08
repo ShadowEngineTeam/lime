@@ -479,9 +479,10 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
                                 st->arch );
         if( silk_ret ) {
            if (lost_flag) {
-              /* PLC failure should not be fatal */
-              silk_frame_size = frame_size;
-              for (i=0;i<frame_size*st->channels;i++)
+              /* PLC failure should not be fatal. Only fill what is left of
+                 the frame since pcm_ptr has already been advanced. */
+              silk_frame_size = frame_size - decoded_samples;
+              for (i=0;i<silk_frame_size*st->channels;i++)
                  pcm_ptr[i] = 0;
            } else {
              RESTORE_STACK;
@@ -495,6 +496,15 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
         OPUS_COPY(pcm, pcm_silk, frame_size*st->channels);
      }
    }
+#ifdef ENABLE_OSCE_BWE
+   else {
+      /* CELT-only frames never enter the SILK section above, so the extended
+         mode would otherwise retain a stale value (e.g. OSCE_MODE_SILK_BBWE
+         from a preceding WB SILK frame), which incorrectly skips the CELT
+         decode below and desyncs the range decoder. */
+      st->DecControl.osce_extended_mode = OSCE_MODE_CELT_ONLY;
+   }
+#endif
 
    start_band = 0;
    if (!decode_fec && mode != MODE_CELT_ONLY && data != NULL
@@ -624,7 +634,8 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
          MUST_SUCCEED(celt_decoder_ctl(celt_dec, CELT_SET_START_BAND(0)));
          celt_decode_with_ec(celt_dec, silence, 2, pcm, F2_5, NULL, celt_accum);
       }
-      st->rangeFinal = dec.rng;
+      /* The range decoder is not initialised when concealing (data == NULL). */
+      st->rangeFinal = data != NULL ? dec.rng : 0;
    }
 
    {
@@ -687,10 +698,12 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
          opus_val32 x;
 #ifdef ENABLE_RES24
          x = MULT32_32_Q16(pcm[i],gain);
+         /* Same headroom as the rest of the fixed-point pipeline. */
+         pcm[i] = SATURATE(x, SIG_SAT>>(SIG_SHIFT-RES_SHIFT));
 #else
          x = MULT16_32_P16(pcm[i],gain);
-#endif
          pcm[i] = SATURATE(x, 32767);
+#endif
       }
    }
 
@@ -733,6 +746,8 @@ int opus_decode_native(OpusDecoder *st, const unsigned char *data,
    if ((decode_fec || len==0 || data==NULL) && frame_size%(st->Fs/400)!=0)
       return OPUS_BAD_ARG;
 #ifdef ENABLE_DRED
+   if (dred != NULL && dred->process_stage != 2)
+      return OPUS_BAD_ARG;
    if (dred != NULL && dred->process_stage == 2) {
       int F10;
       int features_per_frame;
@@ -1116,6 +1131,10 @@ int opus_decoder_ctl(OpusDecoder *st, int request, ...)
       silk_ResetDecoder( silk_dec );
       st->stream_channels = st->channels;
       st->frame_size = st->Fs/400;
+#ifdef ENABLE_OSCE_BWE
+      /* DecControl is not part of the cleared area */
+      st->DecControl.prev_osce_extended_mode = OSCE_MODE_CELT_ONLY;
+#endif
 #ifdef ENABLE_DEEP_PLC
       lpcnet_plc_reset( &st->lpcnet );
 #endif
@@ -1224,7 +1243,8 @@ int opus_decoder_ctl(OpusDecoder *st, int request, ...)
           goto bad_arg;
        }
        ret = lpcnet_plc_load_model(&st->lpcnet, data, len);
-       ret = silk_LoadOSCEModels(silk_dec, data, len) || ret;
+       if (silk_LoadOSCEModels(silk_dec, data, len) != 0 || ret != 0)
+          ret = OPUS_BAD_ARG;
    }
    break;
 #endif
@@ -1370,7 +1390,7 @@ int dred_decoder_load_model(OpusDREDDecoder *dec, const unsigned char *data, int
 {
     WeightArray *list;
     int ret;
-    parse_weights(&list, data, len);
+    if (parse_weights(&list, data, len) < 0) return OPUS_BAD_ARG;
     ret = init_rdovaedec(&dec->model, list);
     opus_free(list);
     if (ret == 0) dec->loaded = 1;
@@ -1528,6 +1548,7 @@ OpusDRED *opus_dred_alloc(int *error)
       *error = OPUS_ALLOC_FAIL;
     return NULL;
   }
+  OPUS_CLEAR(dec, 1);
   return dec;
 #else
   if (error)
@@ -1559,11 +1580,9 @@ int opus_dred_parse(OpusDREDDecoder *dred_dec, OpusDRED *dred, const unsigned ch
       return payload_len;
    if (payload != NULL)
    {
-      int offset;
-      int min_feature_frames;
-      offset = 100*max_dred_samples/sampling_rate;
-      min_feature_frames = IMIN(2 + offset, 2*DRED_NUM_REDUNDANCY_FRAMES);
-      dred_ec_decode(dred, payload, payload_len, min_feature_frames, dred_frame_offset);
+      int max_dred_features;
+      max_dred_features = (100*max_dred_samples + sampling_rate - 1)/sampling_rate;
+      dred_ec_decode(dred, payload, payload_len, max_dred_features, dred_frame_offset);
       if (!defer_processing)
          opus_dred_process(dred_dec, dred, dred);
       if (dred_end) *dred_end = IMAX(0, -dred->dred_offset*sampling_rate/400);
@@ -1595,6 +1614,7 @@ int opus_dred_process(OpusDREDDecoder *dred_dec, const OpusDRED *src, OpusDRED *
       OPUS_COPY(dst, src, 1);
    if (dst->process_stage == 2)
       return OPUS_OK;
+   celt_assert(dst->nb_latents >= 0 && dst->nb_latents <= DRED_NUM_REDUNDANCY_FRAMES/2);
    DRED_rdovae_decode_all(&dred_dec->model, dst->fec_features, dst->state, dst->latents, dst->nb_latents, dred_dec->arch);
    dst->process_stage = 2;
    return OPUS_OK;
@@ -1612,7 +1632,6 @@ int opus_decoder_dred_decode(OpusDecoder *st, const OpusDRED *dred, opus_int32 d
    VARDECL(float, out);
    int ret, i;
    ALLOC_STACK;
-
    if(frame_size<=0)
    {
       RESTORE_STACK;

@@ -80,12 +80,14 @@ test_subset_name_overrides (void)
   char str6[] = "Roboto-Bold";
   char str12[] = "Non ascii test Ü";
   char str16[] = "Roboto-test-inserting";
- 
+
   hb_set_t *name_ids = hb_set_create();
   hb_face_t *face_subset;
   hb_set_add_range (name_ids, 0, 13);
 
   hb_subset_input_t *subset_input = hb_subset_test_create_input_from_nameids (name_ids);
+  /* Override the same record twice; only the last string must survive (and the first must not leak). */
+  hb_subset_input_override_name_table (subset_input, 1, 1, 0, 0, "Roboto Replaced", -1);
   hb_subset_input_override_name_table (subset_input, 1, 1, 0, 0, str1, -1);
   hb_subset_input_override_name_table (subset_input, 1, 3, 1, 0x409, str1_3, -1);
   hb_subset_input_override_name_table (subset_input, 2, 1, 0, 0, str2, 4);

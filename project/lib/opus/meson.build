@@ -75,9 +75,6 @@ opus_conf.set('PACKAGE_TARNAME', '"opus"')
 opus_conf.set('PACKAGE_URL', '""')
 opus_conf.set('PACKAGE_VERSION', '"@0@"'.format(opus_version))
 
-# FIXME: optional Ne10 dependency
-have_arm_ne10 = false
-
 libm = cc.find_library('m', required : false)
 
 opus_conf.set('HAVE_LRINTF', cc.has_function('lrintf', prefix: '#include <math.h>', dependencies: libm))
@@ -166,6 +163,7 @@ feat = [
   [ 'deep-plc', 'ENABLE_DEEP_PLC' ],
   [ 'dred', 'ENABLE_DRED' ],
   [ 'osce', 'ENABLE_OSCE' ],
+  [ 'pfa', 'ENABLE_PFA' ],
 ]
 
 foreach opt : feat

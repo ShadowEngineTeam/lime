@@ -29,6 +29,13 @@ struct AlternateSet
   void closure (hb_closure_context_t *c) const
   { c->output->add_array (alternates.arrayZ, alternates.len); }
 
+  void depend (hb_depend_context_t *c, hb_codepoint_t source) const
+  {
+    + hb_iter (alternates)
+    | hb_apply ([&] (const hb_codepoint_t &target) { c->depend_data->add_gsub_lookup (source, c->lookup_index, target); })
+    ;
+  }
+
   void collect_glyphs (hb_collect_glyphs_context_t *c) const
   { c->output->add_array (alternates.arrayZ, alternates.len); }
 
@@ -82,13 +89,25 @@ struct AlternateSet
                   unsigned       *alternate_count  /* IN/OUT.  May be NULL. */,
                   hb_codepoint_t *alternate_glyphs /* OUT.     May be NULL. */) const
   {
-    if (alternates.len && alternate_count)
+    if (alternates.len && alternate_count && alternate_glyphs)
     {
       + alternates.as_array ().sub_array (start_offset, alternate_count)
       | hb_sink (hb_array (alternate_glyphs, *alternate_count))
       ;
     }
     return alternates.len;
+  }
+
+  void
+  collect_alternates (hb_codepoint_t gid,
+		      hb_map_t  *alternate_count /* IN/OUT */,
+		      hb_map_t  *alternate_glyphs /* IN/OUT */) const
+  {
+    + hb_iter (alternates)
+    | hb_apply ([&] (hb_codepoint_t alternate) -> void
+		{ _hb_collect_glyph_alternates_add (gid, alternate,
+						    alternate_count, alternate_glyphs); })
+    ;
   }
 
   template <typename Iterator,

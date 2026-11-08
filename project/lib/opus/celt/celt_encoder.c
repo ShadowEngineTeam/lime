@@ -1549,11 +1549,11 @@ static int run_prefilter(CELTEncoder *st, celt_sig *in, celt_sig *prefilter_mem,
       if (offset)
          comb_filter(in+c*(N+overlap)+overlap, pre[c]+max_period,
                st->prefilter_period, st->prefilter_period, offset, -st->prefilter_gain, -st->prefilter_gain,
-               st->prefilter_tapset, st->prefilter_tapset, NULL, 0, st->arch);
+               st->prefilter_tapset, st->prefilter_tapset, NULL, 0, st->arch ARG_QEXT(qext_scale));
 
       comb_filter(in+c*(N+overlap)+overlap+offset, pre[c]+max_period+offset,
             st->prefilter_period, pitch_index, N-offset, -st->prefilter_gain, -gain1,
-            st->prefilter_tapset, prefilter_tapset, mode->window, overlap, st->arch);
+            st->prefilter_tapset, prefilter_tapset, mode->window, overlap, st->arch ARG_QEXT(qext_scale));
       for (i=0;i<N;i++) after[c] += ABS32(SHR32(in[c*(N+overlap)+overlap+i], 12));
    } while (++c<CC);
 
@@ -1576,7 +1576,7 @@ static int run_prefilter(CELTEncoder *st, celt_sig *in, celt_sig *prefilter_mem,
          OPUS_COPY(in+c*(N+overlap)+overlap, pre[c]+max_period, N);
          comb_filter(in+c*(N+overlap)+overlap+offset, pre[c]+max_period+offset,
                      st->prefilter_period, pitch_index, overlap, -st->prefilter_gain, -0,
-                     st->prefilter_tapset, prefilter_tapset, mode->window, overlap, st->arch);
+                     st->prefilter_tapset, prefilter_tapset, mode->window, overlap, st->arch ARG_QEXT(qext_scale));
       } while (++c<CC);
       gain1 = 0;
       pf_on = 0;
@@ -2588,6 +2588,8 @@ int celt_encode_with_ec(CELTEncoder * OPUS_RESTRICT st, const opus_res * pcm, in
       } else {
          ec_enc_init(&ext_enc, NULL, 0);
          qext_bytes = 0;
+         nbCompressedBytes = IMIN(nbCompressedBytes, 1275);
+         ec_enc_shrink(enc, nbCompressedBytes);
       }
    } else {
       ec_enc_init(&ext_enc, NULL, 0);
@@ -2656,7 +2658,7 @@ int celt_encode_with_ec(CELTEncoder * OPUS_RESTRICT st, const opus_res * pcm, in
    ALLOC(extra_pulses, nbEBands+NB_QEXT_BANDS, int);
    ALLOC(error_bak, C*nbEBands, celt_glog);
 
-   qext_bits = ((opus_int32)qext_bytes*8<<BITRES) - (opus_int32)ec_tell_frac(enc) - 1;
+   qext_bits = ((opus_int32)qext_bytes*8<<BITRES) - (opus_int32)ec_tell_frac(&ext_enc) - 1;
    clt_compute_extra_allocation(mode, qext_mode, start, end, qext_end, bandLogE, qext_bandLogE,
          qext_bits, extra_pulses, extra_quant, C, LM, &ext_enc, 1, tone_freq, toneishness);
    OPUS_COPY(error_bak, error, C*nbEBands);
@@ -2685,7 +2687,7 @@ int celt_encode_with_ec(CELTEncoder * OPUS_RESTRICT st, const opus_res * pcm, in
       ec_enc_init(&dummy_enc, NULL, 0);
       OPUS_CLEAR(zeros, end);
       ext_balance = qext_bytes*(8<<BITRES) - ec_tell_frac(&ext_enc);
-      for (i=0;i<qext_end;i++) ext_balance -= extra_pulses[nbEBands+i] + C*(extra_quant[nbEBands+1]<<BITRES);
+      for (i=0;i<qext_end;i++) ext_balance -= extra_pulses[nbEBands+i] + C*(extra_quant[nbEBands+i]<<BITRES);
       quant_fine_energy(qext_mode, 0, qext_end, qext_oldBandE, qext_error, NULL, &extra_quant[nbEBands], &ext_enc, C);
       quant_all_bands(1, qext_mode, 0, qext_end, X, C==2 ? X+N : NULL, qext_collapse_masks,
             qext_bandE, &extra_pulses[nbEBands], shortBlocks, st->spread_decision,
@@ -2748,15 +2750,15 @@ int celt_encode_with_ec(CELTEncoder * OPUS_RESTRICT st, const opus_res * pcm, in
          st->prefilter_period_old=IMAX(st->prefilter_period_old, COMBFILTER_MINPERIOD);
          comb_filter(out_mem[c], out_mem[c], st->prefilter_period_old, st->prefilter_period, mode->shortMdctSize,
                st->prefilter_gain_old, st->prefilter_gain, st->prefilter_tapset_old, st->prefilter_tapset,
-               mode->window, overlap, st->arch);
+               mode->window, overlap, st->arch ARG_QEXT(qext_scale));
          if (LM!=0)
             comb_filter(out_mem[c]+mode->shortMdctSize, out_mem[c]+mode->shortMdctSize, st->prefilter_period, pitch_index, N-mode->shortMdctSize,
                   st->prefilter_gain, gain1, st->prefilter_tapset, prefilter_tapset,
-                  mode->window, overlap, st->arch);
+                  mode->window, overlap, st->arch ARG_QEXT(qext_scale));
       } while (++c<CC);
 
       /* We reuse freq[] as scratch space for the de-emphasis */
-      deemphasis(out_mem, (opus_res*)pcm, N, CC, st->upsample, mode->preemph, st->preemph_memD, 0);
+      deemphasis(out_mem, (opus_res*)pcm, N, CC, st->upsample, mode->preemph, st->preemph_memD, 0, st->arch);
       st->prefilter_period_old = st->prefilter_period;
       st->prefilter_gain_old = st->prefilter_gain;
       st->prefilter_tapset_old = st->prefilter_tapset;

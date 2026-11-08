@@ -45,7 +45,6 @@ test_font (hb_font_t *font, hb_codepoint_t cp)
   char buf[5] = {0};
   unsigned int len = 0;
   hb_glyph_extents_t extents = {0, 0, 0, 0};
-  hb_ot_font_set_funcs (font);
 
   set = hb_set_create ();
   hb_face_collect_unicodes (face, set);
@@ -71,8 +70,10 @@ test_font (hb_font_t *font, hb_codepoint_t cp)
   hb_ot_color_palette_get_colors (face, cp, 0, NULL, NULL);
   hb_ot_color_has_layers (face);
   hb_ot_color_glyph_get_layers (face, cp, 0, NULL, NULL);
+#ifndef HB_NO_SVG
   hb_ot_color_has_svg (face);
   hb_blob_destroy (hb_ot_color_glyph_reference_svg (face, cp));
+#endif
   hb_ot_color_has_png (face);
   hb_blob_destroy (hb_ot_color_glyph_reference_png (font, cp));
 
@@ -210,9 +211,69 @@ static void
 test_ot_var_axis_on_zero_named_instance (void)
 {
   hb_face_t *face = hb_test_open_font_file ("fonts/Zycon.ttf");
-  g_assert (hb_ot_var_get_axis_count (face));
+  g_assert_true (hb_ot_var_get_axis_count (face));
   hb_face_destroy (face);
 }
+
+#ifndef HB_NO_VERTICAL
+static void
+test_ot_font_v_origin_extents_overflow (void)
+{
+  /* A COLRv1 glyph with a clip box from y=-32768 to y=32767. At the
+   * scale below, its height clamps to INT_MIN, exercising the overflow
+   * guard without relying on bounds manufactured from an empty outline. */
+  static const char data[] = {
+    0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00,
+    0x43, 0x4f, 0x4c, 0x52, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1c,
+    0x00, 0x00, 0x00, 0x46, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x22, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a,
+    0x02, (char) 0xff, (char) 0xff, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x0c, 0x01, 0x00, 0x00, (char) 0x80, 0x00, 0x00, 0x01,
+    0x7f, (char) 0xff
+  };
+  hb_blob_t *blob = hb_blob_create (data, sizeof (data), HB_MEMORY_MODE_READONLY,
+				    NULL, NULL);
+  hb_face_t *face = hb_face_create (blob, 0);
+  hb_face_set_upem (face, 1);
+  hb_font_t *font = hb_font_create (face);
+  hb_position_t x, y;
+
+  hb_font_set_scale (font, 65536, 65536);
+  hb_glyph_extents_t extents;
+  g_assert_true (hb_font_get_glyph_extents (font, 0, &extents));
+  g_assert_cmpint (extents.height, ==, G_MININT);
+  g_assert_true (hb_font_get_glyph_v_origin (font, 0, &x, &y));
+  g_assert_cmpint (y, ==, 1073709056);
+
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+  hb_blob_destroy (blob);
+}
+
+static void
+test_ot_font_v_origin_cache_invalidated_by_scale (void)
+{
+  hb_face_t *face = hb_test_open_font_file ("fonts/Mplus1p-Regular.660E.ttf");
+  hb_font_t *font = hb_font_create (face);
+  hb_codepoint_t glyph;
+  hb_position_t x, y1, y2;
+
+  g_assert_true (hb_font_get_nominal_glyph (font, 0x660E, &glyph));
+
+  hb_font_set_scale (font, 1000, 1000);
+  g_assert_true (hb_font_get_glyph_v_origin (font, glyph, &x, &y1));
+
+  hb_font_set_scale (font, 1000, 2000);
+  g_assert_true (hb_font_get_glyph_v_origin (font, glyph, &x, &y2));
+
+  g_assert_cmpint (y2, ==, y1 * 2);
+
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+}
+#endif
 
 int
 main (int argc, char **argv)
@@ -221,6 +282,10 @@ main (int argc, char **argv)
 
   hb_test_add (test_ot_face_empty);
   hb_test_add (test_ot_var_axis_on_zero_named_instance);
+#ifndef HB_NO_VERTICAL
+  hb_test_add (test_ot_font_v_origin_extents_overflow);
+  hb_test_add (test_ot_font_v_origin_cache_invalidated_by_scale);
+#endif
 
   return hb_test_run();
 }

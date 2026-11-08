@@ -29,28 +29,39 @@
 /* Unit tests for hb-ot-layout.h baseline */
 
 static void
+test_ot_layout_horizontal_baseline_tag (void)
+{
+  g_assert_cmphex (hb_ot_layout_get_horizontal_baseline_tag_for_script (HB_SCRIPT_JURCHEN), ==,
+		   HB_OT_LAYOUT_BASELINE_TAG_IDEO_FACE_BOTTOM_OR_LEFT);
+  g_assert_cmphex (hb_ot_layout_get_horizontal_baseline_tag_for_script (HB_SCRIPT_SEAL), ==,
+		   HB_OT_LAYOUT_BASELINE_TAG_IDEO_FACE_BOTTOM_OR_LEFT);
+  g_assert_cmphex (hb_ot_layout_get_horizontal_baseline_tag_for_script (HB_SCRIPT_PROTO_CUNEIFORM), ==,
+		   HB_OT_LAYOUT_BASELINE_TAG_ROMAN);
+}
+
+static void
 test_ot_layout_base (void)
 {
   hb_face_t *face = hb_test_open_font_file ("fonts/base.ttf");
   hb_font_t *font = hb_font_create (face);
 
   hb_position_t position;
-  g_assert (hb_ot_layout_get_baseline (font, HB_OT_LAYOUT_BASELINE_TAG_IDEO_FACE_BOTTOM_OR_LEFT, HB_DIRECTION_TTB,
-				       HB_TAG ('h','a','n','i'),
-				       HB_TAG ('E','N','G',' '),
-				       &position));
+  g_assert_true (hb_ot_layout_get_baseline (font, HB_OT_LAYOUT_BASELINE_TAG_IDEO_FACE_BOTTOM_OR_LEFT, HB_DIRECTION_TTB,
+					    HB_TAG ('h','a','n','i'),
+					    HB_TAG ('E','N','G',' '),
+					    &position));
   g_assert_cmpint (46, ==, position);
 
-  g_assert (hb_ot_layout_get_baseline2 (font, HB_OT_LAYOUT_BASELINE_TAG_IDEO_FACE_BOTTOM_OR_LEFT, HB_DIRECTION_TTB,
-					HB_SCRIPT_HAN,
-					hb_language_from_string ("en", -1),
-					&position));
+  g_assert_true (hb_ot_layout_get_baseline2 (font, HB_OT_LAYOUT_BASELINE_TAG_IDEO_FACE_BOTTOM_OR_LEFT, HB_DIRECTION_TTB,
+					     HB_SCRIPT_HAN,
+					     hb_language_from_string ("en", -1),
+					     &position));
   g_assert_cmpint (46, ==, position);
 
-  g_assert (!hb_ot_layout_get_baseline (font, HB_OT_LAYOUT_BASELINE_TAG_IDEO_EMBOX_TOP_OR_RIGHT, HB_DIRECTION_TTB,
-				        HB_TAG ('h','a','n','i'),
-				        HB_TAG ('E','N','G',' '),
-				        &position));
+  g_assert_true (!hb_ot_layout_get_baseline (font, HB_OT_LAYOUT_BASELINE_TAG_IDEO_EMBOX_TOP_OR_RIGHT, HB_DIRECTION_TTB,
+					     HB_TAG ('h','a','n','i'),
+					     HB_TAG ('E','N','G',' '),
+					     &position));
 
   hb_font_destroy (font);
   hb_face_destroy (face);
@@ -94,16 +105,65 @@ test_ot_layout_base_with_fallback (void)
   font = hb_font_create (face);
 
   hb_ot_layout_get_baseline_with_fallback (font, HB_OT_LAYOUT_BASELINE_TAG_HANGING, HB_DIRECTION_LTR,
-					   HB_SCRIPT_BENGALI,
+					   HB_TAG ('b','e','n','g'),
 					   HB_TAG ('E','N','G',' '),
 					   &position);
   g_assert_cmpint (622, ==, position);
 
   hb_ot_layout_get_baseline_with_fallback (font, HB_OT_LAYOUT_BASELINE_TAG_HANGING, HB_DIRECTION_LTR,
-					   HB_SCRIPT_TIBETAN,
+					   HB_TAG ('b','n','g','2'),
+					   HB_TAG ('E','N','G',' '),
+					   &position);
+  g_assert_cmpint (622, ==, position);
+
+  hb_ot_layout_get_baseline_with_fallback2 (font, HB_OT_LAYOUT_BASELINE_TAG_HANGING, HB_DIRECTION_LTR,
+					    HB_SCRIPT_BENGALI,
+					    hb_language_from_string ("bn", -1),
+					    &position);
+  g_assert_cmpint (622, ==, position);
+
+  hb_ot_layout_get_baseline_with_fallback (font, HB_OT_LAYOUT_BASELINE_TAG_HANGING, HB_DIRECTION_LTR,
+					   HB_TAG ('t','i','b','t'),
 					   HB_TAG ('E','N','G',' '),
 					   &position);
   g_assert_cmpint (600, ==, position);
+
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+}
+
+static void
+test_ot_layout_base_format4 (void)
+{
+  static const char BASE_data[] = {
+    0, 1, 0, 0,			/* version */
+    0, 8,				/* horizontal axis offset */
+    0, 0,				/* vertical axis offset */
+    0, 4,				/* base tag list offset */
+    0, 10,				/* base script list offset */
+    0, 1, 'r', 'o', 'm', 'n',		/* base tag list */
+    0, 1, 'l', 'a', 't', 'n', 0, 8,	/* base script list */
+    0, 6, 0, 0, 0, 0,			/* base script */
+    0, 0, 0, 1, 0, 6,			/* base values */
+    0, 4, 0, 123, 0, 0, 0, 0, 0,	/* BaseCoord format 4 */
+  };
+  hb_face_t *face = hb_face_builder_create ();
+  HB_FACE_ADD_TABLE (face, "BASE", BASE_data);
+  hb_font_t *font = hb_font_create (face);
+  hb_position_t position;
+
+#ifndef HB_NO_BEYOND_64K
+  g_assert_true (hb_ot_layout_get_baseline (font, HB_OT_LAYOUT_BASELINE_TAG_ROMAN,
+					    HB_DIRECTION_LTR,
+					    HB_TAG ('l','a','t','n'),
+					    HB_TAG_NONE, &position));
+  g_assert_cmpint (position, ==, 123);
+#else
+  g_assert_false (hb_ot_layout_get_baseline (font, HB_OT_LAYOUT_BASELINE_TAG_ROMAN,
+					     HB_DIRECTION_LTR,
+					     HB_TAG ('l','a','t','n'),
+					     HB_TAG_NONE, &position));
+#endif
 
   hb_font_destroy (font);
   hb_face_destroy (face);
@@ -114,8 +174,10 @@ main (int argc, char **argv)
 {
   hb_test_init (&argc, &argv);
 
+  hb_test_add (test_ot_layout_horizontal_baseline_tag);
   hb_test_add (test_ot_layout_base);
   hb_test_add (test_ot_layout_base_with_fallback);
+  hb_test_add (test_ot_layout_base_format4);
 
   return hb_test_run();
 }

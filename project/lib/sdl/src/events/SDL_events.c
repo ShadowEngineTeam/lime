@@ -162,11 +162,15 @@ static struct
 
 
 SDL_Mutex *SDL_event_lock = NULL; // This needs to support recursive locks
+SDL_Mutex *SDL_joystick_lock = NULL; // This needs to support recursive locks
 
 void SDL_CreateEventLock(void)
 {
     if (!SDL_event_lock) {
         SDL_event_lock = SDL_CreateMutex();
+    }
+    if (!SDL_joystick_lock) {
+        SDL_joystick_lock = SDL_CreateMutex();
     }
 }
 
@@ -175,6 +179,10 @@ void SDL_DestroyEventLock(void)
     if (SDL_event_lock) {
         SDL_DestroyMutex(SDL_event_lock);
         SDL_event_lock = NULL;
+    }
+    if (SDL_joystick_lock) {
+        SDL_DestroyMutex(SDL_joystick_lock);
+        SDL_joystick_lock = NULL;
     }
 }
 
@@ -1755,6 +1763,10 @@ bool SDL_WaitEventTimeoutNS(SDL_Event *event, Sint64 timeoutNS)
         }
     } else {
         // Has existing events
+        if (!event) {
+            // The application expects callbacks to run even if events are pending
+            SDL_RunMainThreadCallbacks();
+        }
         return true;
     }
     // We should have completely handled timeoutNS == 0 above

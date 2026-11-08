@@ -11,12 +11,14 @@ celt/kiss_fft.c \
 celt/laplace.c \
 celt/mathops.c \
 celt/mdct.c \
+celt/mdct_pfa.c \
 celt/modes.c \
 celt/pitch.c \
 celt/celt_lpc.c \
 celt/quant_bands.c \
 celt/rate.c \
-celt/vq.c
+celt/vq.c \
+celt/celt_tx_tables.c
 
 CELT_SOURCES_X86_RTCD = \
 celt/x86/x86cpu.c \
@@ -48,8 +50,7 @@ celt/arm/armopts.s.in
 
 CELT_SOURCES_ARM_NEON_INTR = \
 celt/arm/celt_neon_intr.c \
+celt/arm/celt_neon_aarch64.S \
+celt/arm/celt_mdct_tx.c \
+celt/arm/celt_tx_neon.S \
 celt/arm/pitch_neon_intr.c
-
-CELT_SOURCES_ARM_NE10 = \
-celt/arm/celt_fft_ne10.c \
-celt/arm/celt_mdct_ne10.c

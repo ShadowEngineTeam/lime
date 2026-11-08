@@ -11,10 +11,6 @@
 #endif
 
 #include "hb.h"
-#include "hb-ot.h"
-#ifdef HAVE_FREETYPE
-#include "hb-ft.h"
-#endif
 
 #define SUBSET_FONT_BASE_PATH "test/subset/data/fonts/"
 
@@ -27,31 +23,21 @@ struct test_input_t
 {
 
   {"perf/fonts/NotoNastaliqUrdu-Regular.ttf",
-   "perf/texts/fa-thelittleprince.txt",
-   false},
-
-  {"perf/fonts/Amiri-Regular.ttf",
-   "perf/texts/fa-thelittleprince.txt",
+   "perf/texts/fa-paragraph.txt",
    false},
 
   {"perf/fonts/Roboto-Regular.ttf",
-   "perf/texts/en-thelittleprince.txt",
-   false},
-
-  {"perf/fonts/Roboto-Regular.ttf",
-   "perf/texts/en-words.txt",
+   "perf/texts/en-paragraph.txt",
    false},
 
   {SUBSET_FONT_BASE_PATH "SourceSerifVariable-Roman.ttf",
-   "perf/texts/en-thelittleprince.txt",
+   "perf/texts/en-paragraph.txt",
    true},
 };
 
 
 static test_input_t *tests = default_tests;
 static unsigned num_tests = sizeof (default_tests) / sizeof (default_tests[0]);
-
-enum backend_t { HARFBUZZ, FREETYPE };
 
 // https://en.cppreference.com/w/cpp/thread/condition_variable/wait
 static std::condition_variable cv;
@@ -105,8 +91,7 @@ static void shape (const test_input_t &input,
   hb_blob_destroy (text_blob);
 }
 
-static void test_backend (backend_t backend,
-			  const char *backend_name,
+static void test_backend (const char *backend,
 			  bool variable,
 			  const test_input_t &test_input)
 {
@@ -120,7 +105,7 @@ static void test_backend (backend_t backend,
   strcat (name, p ? p + 1 : test_input.text_path);
   strcat (name, variable ? "/var" : "");
   strcat (name, "/");
-  strcat (name, backend_name);
+  strcat (name, backend);
 
   printf ("Testing %s\n", name);
 
@@ -140,17 +125,13 @@ static void test_backend (backend_t backend,
     hb_font_set_variations (font, &wght, 1);
   }
 
-  switch (backend)
-  {
-    case HARFBUZZ:
-      hb_ot_font_set_funcs (font);
-      break;
+  bool ret = hb_font_set_funcs_using (font, backend);
+  if (!ret)
+    abort ();
 
-    case FREETYPE:
-#ifdef HAVE_FREETYPE
-      hb_ft_font_set_funcs (font);
-#endif
-      break;
+  {
+    std::unique_lock<std::mutex> lk (cv_m);
+    ready = false;
   }
 
   std::vector<std::thread> threads;
@@ -200,10 +181,8 @@ int main(int argc, char** argv)
     {
       bool is_var = (bool) variable;
 
-      test_backend (HARFBUZZ, "hb", is_var, test_input);
-#ifdef HAVE_FREETYPE
-      test_backend (FREETYPE, "ft", is_var, test_input);
-#endif
+      for (const char **font_funcs = hb_font_list_funcs (); *font_funcs; font_funcs++)
+	test_backend (*font_funcs, is_var, test_input);
     }
   }
 

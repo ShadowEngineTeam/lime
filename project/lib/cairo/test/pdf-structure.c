@@ -33,6 +33,9 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h> /* __unix__ */
 #endif
+#if HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif
 
 #include <cairo.h>
 #include <cairo-pdf.h>

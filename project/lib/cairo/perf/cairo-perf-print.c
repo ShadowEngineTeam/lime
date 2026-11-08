@@ -43,6 +43,9 @@
 #if USE_TERMINAL_SIZE
 #include <unistd.h>
 #include <sys/ioctl.h>
+#if HAVE_TERMIOS_H
+#include <termios.h>
+#endif
 #endif
 
 static void

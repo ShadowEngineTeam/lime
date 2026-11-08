@@ -1,9 +1,13 @@
 # General target templates.
+spec:
+  inputs:
+    active_target_pattern:
+---
 
 .target:all:
   image:
-    name: $DOCKER_IMAGE_NAME-$TARGET
+    name: $DOCKER_NAME_FULL
   rules:
-    - if: "$TARGET =~ $ACTIVE_TARGET_PATTERN"
+    - if: "$TARGET =~ $[[ inputs.active_target_pattern ]]"
   before_script:
     - ${LOAD_TARGET_ENV}

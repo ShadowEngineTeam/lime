@@ -28,6 +28,7 @@
 #define OPTIONS_HH
 
 #include "hb.hh"
+#include "hb-map.hh"
 
 #include <stdlib.h>
 #include <stddef.h>
@@ -46,16 +47,52 @@
 #endif
 
 
+#ifndef HB_NO_FEATURES_H
 #include <hb-features.h>
+#endif
 #include <hb.h>
 #include <hb-ot.h>
 
 #include <glib.h>
 #include <glib/gprintf.h>
 
-
+enum return_value_t
+{
+  RETURN_VALUE_SUCCESS = 0,
+  RETURN_VALUE_OPTION_PARSING_FAILED = 1,
+  RETURN_VALUE_FACE_LOAD_FAILED = 2,
+  RETURN_VALUE_OPERATION_FAILED = 3,
+  RETURN_VALUE_FONT_FUNCS_FAILED = 4,
+} return_value = RETURN_VALUE_SUCCESS;
 
 static inline void fail (hb_bool_t suggest_help, const char *format, ...) G_GNUC_NORETURN G_GNUC_PRINTF (2, 3);
+
+struct argv_t
+{
+  argv_t (int argc_, char **argv_)
+  : argc (argc_), argv (argv_)
+  {
+#ifdef G_OS_WIN32
+    argv_utf8 = g_win32_get_command_line ();
+    argc = (int) g_strv_length (argv_utf8);
+    argv = argv_utf8;
+#endif
+  }
+
+  ~argv_t ()
+  {
+#ifdef G_OS_WIN32
+    g_strfreev (argv_utf8);
+#endif
+  }
+
+  int argc;
+  char **argv;
+
+#ifdef G_OS_WIN32
+  gchar **argv_utf8 = nullptr;
+#endif
+};
 
 static inline void
 fail (hb_bool_t suggest_help, const char *format, ...)
@@ -71,13 +108,18 @@ fail (hb_bool_t suggest_help, const char *format, ...)
   if (suggest_help)
     g_printerr ("Try `%s --help' for more information.\n", prgname);
 
-  exit (1);
+  if (return_value == RETURN_VALUE_SUCCESS)
+    return_value = RETURN_VALUE_OPTION_PARSING_FAILED;
+
+  exit (return_value);
 }
 
 struct option_parser_t
 {
   option_parser_t (const char *parameter_string = nullptr)
   : context (g_option_context_new (parameter_string)),
+    environs (g_ptr_array_new ()),
+    exit_codes (g_ptr_array_new ()),
     to_free (g_ptr_array_new ())
   {}
 
@@ -85,7 +127,11 @@ struct option_parser_t
 
   ~option_parser_t ()
   {
+    g_ptr_array_free (exit_codes, TRUE);
+    g_ptr_array_free (environs, TRUE);
+
     g_option_context_free (context);
+
     g_ptr_array_foreach (to_free, _g_free_g_func, nullptr);
     g_ptr_array_free (to_free, TRUE);
   }
@@ -141,9 +187,58 @@ struct option_parser_t
   {
     g_option_context_set_summary (context, summary);
   }
-  void set_description (const char *description)
+  void set_description (const char *description_)
   {
-    g_option_context_set_description (context, description);
+    description = description_;
+  }
+
+  void set_full_description ()
+  {
+    GString *s = g_string_new (description);
+
+    const char *env = getenv ("HB_UTIL_HELP_VERBOSE");
+    bool verbose = env && atoi (env);
+    if (verbose)
+    {
+      // Exit codes
+      assert (exit_codes->len);
+      g_string_append_printf (s, "\n\n*Exit Codes*\n");
+      for (unsigned i = 0; i < exit_codes->len; i++)
+	if (exit_codes->pdata[i])
+	  g_string_append_printf (s, "\n  %u: %s\n", i, (const char *) exit_codes->pdata[i]);
+
+      // Environment variables if any
+      if (environs->len)
+      {
+	g_string_append_printf (s, "\n\n*Environment*\n");
+	for (unsigned i = 0; i < environs->len; i++)
+	{
+	  g_string_append_printf (s, "\n  %s\n", (char *)environs->pdata[i]);
+	}
+      }
+
+      // See also
+      g_string_append_printf (s, "\n\n*See also*\n");
+      g_string_append_printf (s, "  hb-view(1), hb-shape(1), hb-raster(1), hb-vector(1), hb-subset(1), hb-info(1)");
+    }
+
+    // Footer
+    g_string_append_printf (s, "\n\nFind more information or report bugs at <https://github.com/harfbuzz/harfbuzz>\n");
+
+    g_option_context_set_description (context, s->str);
+    g_string_free (s, TRUE);
+  }
+
+  void add_environ (const char *environment)
+  {
+    g_ptr_array_add (environs, (void *) environment);
+  }
+
+  void add_exit_code (unsigned code, const char *description)
+  {
+    while (exit_codes->len <= code)
+      g_ptr_array_add (exit_codes, nullptr);
+    exit_codes->pdata[code] = (void *) description;
   }
 
   void free_later (char *p) {
@@ -154,24 +249,11 @@ struct option_parser_t
 
   GOptionContext *context;
   protected:
+  const char *description = nullptr;
+  GPtrArray *environs;
+  GPtrArray *exit_codes;
   GPtrArray *to_free;
 };
-
-
-static inline gchar *
-shapers_to_string ()
-{
-  GString *shapers = g_string_new (nullptr);
-  const char **shaper_list = hb_shape_list_shapers ();
-
-  for (; *shaper_list; shaper_list++) {
-    g_string_append (shapers, *shaper_list);
-    g_string_append_c (shapers, ',');
-  }
-  g_string_truncate (shapers, MAX (0, (gint)shapers->len - 1));
-
-  return g_string_free (shapers, false);
-}
 
 static G_GNUC_NORETURN gboolean
 show_version (const char *name G_GNUC_UNUSED,
@@ -179,11 +261,8 @@ show_version (const char *name G_GNUC_UNUSED,
 	      gpointer    data G_GNUC_UNUSED,
 	      GError    **error G_GNUC_UNUSED)
 {
-  g_printf ("%s (%s) %s\n", g_get_prgname (), PACKAGE_NAME, PACKAGE_VERSION);
+  g_printf ("%s (HarfBuzz) %s\n", g_get_prgname (), HB_VERSION_STRING);
 
-  char *shapers = shapers_to_string ();
-  g_printf ("Available shapers: %s\n", shapers);
-  g_free (shapers);
   if (strcmp (HB_VERSION_STRING, hb_version_string ()))
     g_printf ("Linked HarfBuzz library has a different version: %s\n", hb_version_string ());
 
@@ -206,9 +285,34 @@ inline bool
 option_parser_t::parse (int *argc, char ***argv, bool ignore_error)
 {
   setlocale (LC_ALL, "");
+  /* Parse numbers with a '.' radix regardless of the environment's
+   * LC_NUMERIC. Options like --font-size, --margin and --font-extents
+   * read floats with sscanf("%lf"), which otherwise mis-parses e.g.
+   * "10.5" as 10 under a comma-radix locale. This matches the ascii
+   * number handling already used for --width via g_ascii_strtod. */
+  setlocale (LC_NUMERIC, "C");
+
+  add_exit_code (RETURN_VALUE_SUCCESS, "Success.");
+  add_exit_code (RETURN_VALUE_OPTION_PARSING_FAILED, "Option parsing failed.");
+
+  set_full_description ();
 
   GError *parse_error = nullptr;
-  if (!g_option_context_parse (context, argc, argv, &parse_error))
+  bool parse_ok;
+#ifdef G_OS_WIN32
+  /* g_option_context_parse() on Windows converts argv from the ACP via
+   * g_locale_to_utf8(), but argv is already in UTF-8.
+   * Use g_option_context_parse_strv() to skip the locale conversion. */
+  gchar **win32_argv = g_new (gchar *, *argc + 1);
+  for (int i = 0; i < *argc; i++)
+    win32_argv[i] = g_strdup ((*argv)[i]);
+  win32_argv[*argc] = nullptr;
+  parse_ok = g_option_context_parse_strv (context, &win32_argv, &parse_error);
+  g_strfreev (win32_argv);
+#else
+  parse_ok = g_option_context_parse (context, argc, argv, &parse_error);
+#endif
+  if (!parse_ok)
   {
     if (parse_error)
     {
@@ -225,6 +329,27 @@ option_parser_t::parse (int *argc, char ***argv, bool ignore_error)
   }
   return true;
 }
+
+struct iteration_options_t
+{
+  void add_options (option_parser_t *parser)
+  {
+    GOptionEntry entries[] =
+    {
+      {"num-iterations",	'n', G_OPTION_FLAG_IN_MAIN,
+				G_OPTION_ARG_INT,	&this->num_iterations,	"Run N iterations (default: 1)",	"N"},
+      {nullptr}
+    };
+    parser->add_group (entries,
+		       "iterations",
+		       "Iteration options:",
+		       "Options controlling repeated execution",
+		       this,
+		       false);
+  }
+
+  unsigned int num_iterations = 1;
+};
 
 
 /* fallback implementation for scalbn()/scalbnf() for pre-2013 MSVC */
@@ -261,12 +386,14 @@ parse_color (const char *s,
   sa = 255;
   if (sscanf (s, "%2x%2x%2x%2x", &sr, &sg, &sb, &sa) <= 2)
   {
-    if (sscanf (s, "%1x%1x%1x%1x", &sr, &sg, &sb, &sa) >= 3)
+    int n = sscanf (s, "%1x%1x%1x%1x", &sr, &sg, &sb, &sa);
+    if (n >= 3)
     {
       sr *= 17;
       sg *= 17;
       sb *= 17;
-      sa *= 17;
+      if (n >= 4)
+	sa *= 17;
       ret = true;
     }
   }
@@ -282,6 +409,30 @@ parse_color (const char *s,
   }
 
   return ret;
+}
+
+static inline bool
+parse_1to4_doubles (const char *arg,
+                    double *t,
+                    double *r,
+                    double *b,
+                    double *l)
+{
+  double tt, rr, bb, ll;
+  switch (sscanf (arg, "%lf%*[ ,]%lf%*[ ,]%lf%*[ ,]%lf", &tt, &rr, &bb, &ll))
+  {
+    case 1: rr = tt; HB_FALLTHROUGH;
+    case 2: bb = tt; HB_FALLTHROUGH;
+    case 3: ll = rr; HB_FALLTHROUGH;
+    case 4:
+      if (t) *t = tt;
+      if (r) *r = rr;
+      if (b) *b = bb;
+      if (l) *l = ll;
+      return true;
+    default:
+      return false;
+  }
 }
 
 

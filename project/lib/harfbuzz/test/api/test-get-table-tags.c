@@ -27,6 +27,7 @@
 #include "hb-test.h"
 
 #include <hb.h>
+#include <string.h>
 #ifdef HAVE_FREETYPE
 #include <hb-ft.h>
 #endif
@@ -97,6 +98,75 @@ test_get_table_tags_builder (void)
   hb_face_destroy (face);
 }
 
+static void
+test_get_table_tags_builder_limit (void)
+{
+  /* A font file's table directory cannot hold more than 65535 tables. */
+  hb_face_t *face = hb_face_builder_create ();
+  hb_blob_t *blob = hb_blob_create ("test", 4, HB_MEMORY_MODE_READONLY, NULL, NULL);
+
+  for (unsigned i = 1; i <= 0xFFFFu; i++)
+    g_assert_true (hb_face_builder_add_table (face, i, blob));
+  g_assert_false (hb_face_builder_add_table (face, 0x10000u, blob));
+  /* Replacing a table is still fine. */
+  g_assert_true (hb_face_builder_add_table (face, 1, blob));
+  g_assert_cmpuint (0xFFFFu, ==, hb_face_get_table_tags (face, 0, NULL, NULL));
+
+  hb_blob_t *file = hb_face_reference_blob (face);
+  g_assert_cmpuint (12 + 0xFFFFu * (16 + 4), ==, hb_blob_get_length (file));
+
+  hb_blob_destroy (file);
+  hb_blob_destroy (blob);
+  hb_face_destroy (face);
+}
+
+static void
+test_get_table_tags_builder_unsorted (void)
+{
+  /* Tags added out of order, one of them twice; must come back
+   * sorted, each once, with any page size. */
+  static const hb_tag_t added[] = {
+    HB_TAG ('m','a','x','p'),
+    HB_TAG ('G','S','U','B'),
+    HB_TAG ('h','e','a','d'),
+    HB_TAG ('z','z','z','z'),
+    HB_TAG ('h','e','a','d'),
+    HB_TAG ('c','m','a','p'),
+    HB_TAG ('G','D','E','F'),
+  };
+  static const hb_tag_t expected[] = {
+    HB_TAG ('G','D','E','F'),
+    HB_TAG ('G','S','U','B'),
+    HB_TAG ('c','m','a','p'),
+    HB_TAG ('h','e','a','d'),
+    HB_TAG ('m','a','x','p'),
+    HB_TAG ('z','z','z','z'),
+  };
+  const unsigned num_expected = sizeof (expected) / sizeof (expected[0]);
+
+  hb_face_t *face = hb_face_builder_create ();
+  hb_blob_t *blob = hb_blob_create ("test", 4, HB_MEMORY_MODE_READONLY, NULL, NULL);
+  for (unsigned i = 0; i < sizeof (added) / sizeof (added[0]); i++)
+    g_assert_true (hb_face_builder_add_table (face, added[i], blob));
+  hb_blob_destroy (blob);
+
+  g_assert_cmpuint (num_expected, ==, hb_face_get_table_tags (face, 0, NULL, NULL));
+
+  hb_tag_t tags[4];
+  unsigned offset = 0, count = sizeof (tags) / sizeof (tags[0]);
+  while (((void) hb_face_get_table_tags (face, offset, &count, tags), count))
+  {
+    g_assert_cmpuint (offset + count, <=, num_expected);
+    for (unsigned i = 0; i < count; i++)
+      g_assert_cmpuint (tags[i], ==, expected[offset + i]);
+    offset += count;
+    count = sizeof (tags) / sizeof (tags[0]);
+  }
+  g_assert_cmpuint (offset, ==, num_expected);
+
+  hb_face_destroy (face);
+}
+
 #ifdef HAVE_FREETYPE
 static void
 test_get_table_tags_ft (void)
@@ -128,12 +198,77 @@ test_get_table_tags_ft (void)
   FT_Done_FreeType (ft_library);
   hb_blob_destroy (blob);
 }
+
+static unsigned long
+_ft_stream_read (FT_Stream       stream,
+		 unsigned long   offset,
+		 unsigned char  *buffer,
+		 unsigned long   count)
+{
+  hb_blob_t *blob = (hb_blob_t *) stream->descriptor.pointer;
+  unsigned int length;
+  const char *data = hb_blob_get_data (blob, &length);
+  if (offset > length)
+    return 0;
+  if (count == 0) /* Seek. */
+    return 0;
+  if (offset + count > length)
+    count = length - offset;
+  memcpy (buffer, data + offset, count);
+  return count;
+}
+
+static void
+_ft_stream_close (FT_Stream stream HB_UNUSED) {}
+
+static void
+test_get_table_tags_ft_stream (void)
+{
+  /* Exercise the streaming-face path, which (unlike an in-memory face) uses
+   * hb-ft's own _hb_ft_get_table_tags callback. */
+  hb_face_t *source = hb_test_open_font_file ("fonts/Roboto-Regular.abc.ttf");
+  hb_blob_t *blob = hb_face_reference_blob (source);
+  hb_face_destroy (source);
+
+  FT_Library ft_library;
+  g_assert_cmpint (0, ==, FT_Init_FreeType (&ft_library));
+
+  FT_StreamRec stream = {0};
+  stream.size = hb_blob_get_length (blob);
+  stream.descriptor.pointer = blob;
+  stream.read = _ft_stream_read;
+  stream.close = _ft_stream_close;
+
+  FT_Open_Args args = {0};
+  args.flags = FT_OPEN_STREAM;
+  args.stream = &stream;
+
+  FT_Face ft_face;
+  g_assert_cmpint (0, ==, FT_Open_Face (ft_library, &args, 0, &ft_face));
+
+  hb_face_t *face = hb_ft_face_create (ft_face, NULL);
+
+  _test_get_table_tags (face);
+
+  hb_face_destroy (face);
+  FT_Done_Face (ft_face);
+  FT_Done_FreeType (ft_library);
+  hb_blob_destroy (blob);
+}
 #endif
 
 #ifdef HAVE_CORETEXT
 static void
 test_get_table_tags_ct (void)
 {
+  hb_face_t *null_face = hb_coretext_face_create (NULL);
+  g_assert_true (null_face == hb_face_get_empty ());
+  hb_face_destroy (null_face);
+
+  hb_font_t *null_font = hb_coretext_font_create (NULL);
+  g_assert_true (null_font == hb_font_get_empty ());
+  hb_font_destroy (null_font);
+
   hb_face_t *source = hb_test_open_font_file ("fonts/Roboto-Regular.abc.ttf");
   hb_blob_t *blob = hb_face_reference_blob (source);
   hb_face_destroy (source);
@@ -142,10 +277,10 @@ test_get_table_tags_ct (void)
 							     hb_blob_get_data (blob, NULL),
 							     hb_blob_get_length (blob),
 							     NULL);
-  assert (provider);
+  g_assert_true (provider);
 
   CGFontRef cg_font = CGFontCreateWithDataProvider (provider);
-  assert (cg_font);
+  g_assert_true (cg_font);
   CGDataProviderRelease (provider);
 
   hb_face_t *face = hb_coretext_face_create (cg_font);
@@ -165,8 +300,11 @@ main (int argc, char **argv)
 
   hb_test_add (test_get_table_tags_default);
   hb_test_add (test_get_table_tags_builder);
+  hb_test_add (test_get_table_tags_builder_limit);
+  hb_test_add (test_get_table_tags_builder_unsorted);
 #ifdef HAVE_FREETYPE
   hb_test_add (test_get_table_tags_ft);
+  hb_test_add (test_get_table_tags_ft_stream);
 #endif
 #ifdef HAVE_CORETEXT
   hb_test_add (test_get_table_tags_ct);

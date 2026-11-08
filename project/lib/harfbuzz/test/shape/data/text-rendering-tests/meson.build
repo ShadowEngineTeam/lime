@@ -1,10 +1,12 @@
-text_rendering_tests = [
+text_rendering_tests_tests = [
   'AVAR-1.tests',
   'CFF-1.tests',
   'CFF-2.tests',
+  'CFF-3.tests',
   'CFF2-1.tests',
   'CMAP-1.tests',
   'CMAP-2.tests',
+  'CMAP-4.tests',
   'CVAR-1.tests',
   'CVAR-2.tests',
   'GLYF-1.tests',
@@ -29,6 +31,7 @@ text_rendering_tests = [
   'HVAR-2.tests',
   'KERN-1.tests',
   'KERN-2.tests',
+  'MORT-1.tests',
   'MORX-1.tests',
   'MORX-10.tests',
   'MORX-11.tests',
@@ -64,6 +67,7 @@ text_rendering_tests = [
   'MORX-4.tests',
   'MORX-40.tests',
   'MORX-41.tests',
+  'MORX-42.tests',
   'MORX-5.tests',
   'MORX-6.tests',
   'MORX-7.tests',
@@ -75,7 +79,7 @@ text_rendering_tests = [
   'SHKNDA-1.tests',
 ]
 
-disabled_text_rendering_tests = [
+disabled_text_rendering_tests_tests = [
   'CMAP-3.tests',
   'SHARAN-1.tests',
   'SHBALI-1.tests',

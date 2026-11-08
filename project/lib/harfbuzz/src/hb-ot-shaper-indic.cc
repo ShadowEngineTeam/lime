@@ -98,10 +98,14 @@ struct hb_indic_would_substitute_feature_t
 
   bool would_substitute (const hb_codepoint_t *glyphs,
 			 unsigned int          glyphs_count,
-			 hb_face_t            *face) const
+			 hb_face_t            *face,
+			 hb_buffer_t          *buffer) const
   {
+    if (unlikely (!buffer->successful)) return false;
     for (const auto &lookup : lookups)
-      if (hb_ot_layout_lookup_would_substitute (face, lookup.index, glyphs, glyphs_count, zero_context))
+      if (hb_ot_layout_lookup_would_substitute_with_buffer (face, lookup.index,
+							    glyphs, glyphs_count,
+							    zero_context, buffer))
 	return true;
     return false;
   }
@@ -296,12 +300,7 @@ struct indic_shape_plan_t
   const indic_config_t *config;
 
   bool is_old_spec;
-#ifndef HB_NO_UNISCRIBE_BUG_COMPATIBLE
-  bool uniscribe_bug_compatible;
-#else
-  static constexpr bool uniscribe_bug_compatible = false;
-#endif
-  mutable hb_atomic_int_t virama_glyph;
+  mutable hb_atomic_t<hb_codepoint_t> virama_glyph;
 
   hb_indic_would_substitute_feature_t rphf;
   hb_indic_would_substitute_feature_t pref;
@@ -327,9 +326,6 @@ data_create_indic (const hb_ot_shape_plan_t *plan)
     }
 
   indic_plan->is_old_spec = indic_plan->config->has_old_spec && ((plan->map.chosen_script[0] & 0x000000FFu) != '2');
-#ifndef HB_NO_UNISCRIBE_BUG_COMPATIBLE
-  indic_plan->uniscribe_bug_compatible = hb_options ().uniscribe_bug_compatible;
-#endif
   indic_plan->virama_glyph = -1;
 
   /* Use zero-context would_substitute() matching for new-spec of the main
@@ -365,7 +361,8 @@ static indic_position_t
 consonant_position_from_face (const indic_shape_plan_t *indic_plan,
 			      const hb_codepoint_t consonant,
 			      const hb_codepoint_t virama,
-			      hb_face_t *face)
+			      hb_face_t *face,
+			      hb_buffer_t *buffer)
 {
   /* For old-spec, the order of glyphs is Consonant,Virama,
    * whereas for new-spec, it's Virama,Consonant.  However,
@@ -382,16 +379,16 @@ consonant_position_from_face (const indic_shape_plan_t *indic_plan,
    * https://github.com/harfbuzz/harfbuzz/issues/1587
    */
   hb_codepoint_t glyphs[3] = {virama, consonant, virama};
-  if (indic_plan->blwf.would_substitute (glyphs  , 2, face) ||
-      indic_plan->blwf.would_substitute (glyphs+1, 2, face) ||
-      indic_plan->vatu.would_substitute (glyphs  , 2, face) ||
-      indic_plan->vatu.would_substitute (glyphs+1, 2, face))
+  if (indic_plan->blwf.would_substitute (glyphs  , 2, face, buffer) ||
+      indic_plan->blwf.would_substitute (glyphs+1, 2, face, buffer) ||
+      indic_plan->vatu.would_substitute (glyphs  , 2, face, buffer) ||
+      indic_plan->vatu.would_substitute (glyphs+1, 2, face, buffer))
     return POS_BELOW_C;
-  if (indic_plan->pstf.would_substitute (glyphs  , 2, face) ||
-      indic_plan->pstf.would_substitute (glyphs+1, 2, face))
+  if (indic_plan->pstf.would_substitute (glyphs  , 2, face, buffer) ||
+      indic_plan->pstf.would_substitute (glyphs+1, 2, face, buffer))
     return POS_POST_C;
-  if (indic_plan->pref.would_substitute (glyphs  , 2, face) ||
-      indic_plan->pref.would_substitute (glyphs+1, 2, face))
+  if (indic_plan->pref.would_substitute (glyphs  , 2, face, buffer) ||
+      indic_plan->pref.would_substitute (glyphs+1, 2, face, buffer))
     return POS_POST_C;
   return POS_BASE_C;
 }
@@ -453,7 +450,7 @@ update_consonant_positions_indic (const hb_ot_shape_plan_t *plan,
       if (info[i].indic_position() == POS_BASE_C)
       {
 	hb_codepoint_t consonant = info[i].codepoint;
-	info[i].indic_position() = consonant_position_from_face (indic_plan, consonant, virama, face);
+	info[i].indic_position() = consonant_position_from_face (indic_plan, consonant, virama, face, buffer);
       }
   }
 }
@@ -519,9 +516,9 @@ initial_reordering_consonant_syllable (const hb_ot_shape_plan_t *plan,
 				  info[start + 1].codepoint,
 				  indic_plan->config->reph_mode == REPH_MODE_EXPLICIT ?
 				    info[start + 2].codepoint : 0};
-      if (indic_plan->rphf.would_substitute (glyphs, 2, face) ||
+      if (indic_plan->rphf.would_substitute (glyphs, 2, face, buffer) ||
 	  (indic_plan->config->reph_mode == REPH_MODE_EXPLICIT &&
-	   indic_plan->rphf.would_substitute (glyphs, 3, face)))
+	   indic_plan->rphf.would_substitute (glyphs, 3, face, buffer)))
       {
 	limit += 2;
 	while (limit < end && is_joiner (info[limit]))
@@ -906,7 +903,7 @@ initial_reordering_consonant_syllable (const hb_ot_shape_plan_t *plan,
       hb_codepoint_t glyphs[2];
       for (unsigned int j = 0; j < pref_len; j++)
 	glyphs[j] = info[i + j].codepoint;
-      if (indic_plan->pref.would_substitute (glyphs, pref_len, face))
+      if (indic_plan->pref.would_substitute (glyphs, pref_len, face, buffer))
       {
 	for (unsigned int j = 0; j < pref_len; j++)
 	  info[i++].mask |= indic_plan->mask_array[INDIC_PREF];
@@ -943,17 +940,7 @@ initial_reordering_standalone_cluster (const hb_ot_shape_plan_t *plan,
 				       unsigned int start, unsigned int end)
 {
   /* We treat placeholder/dotted-circle as if they are consonants, so we
-   * should just chain.  Only if not in compatibility mode that is... */
-
-  const indic_shape_plan_t *indic_plan = (const indic_shape_plan_t *) plan->data;
-  if (indic_plan->uniscribe_bug_compatible)
-  {
-    /* For dotted-circle, this is what Uniscribe does:
-     * If dotted-circle is the last glyph, it just does nothing.
-     * Ie. It doesn't form Reph. */
-    if (buffer->info[end - 1].indic_category() == I_Cat(DOTTEDCIRCLE))
-      return;
-  }
+   * should just chain... */
 
   initial_reordering_consonant_syllable (plan, face, buffer, start, end);
 }
@@ -1347,8 +1334,7 @@ final_reordering_syllable_indic (const hb_ot_shape_plan_t *plan,
        * Uniscribe doesn't do this.
        * TEST: U+0930,U+094D,U+0915,U+094B,U+094D
        */
-      if (!indic_plan->uniscribe_bug_compatible &&
-	  unlikely (is_halant (info[new_reph_pos])))
+      if (unlikely (is_halant (info[new_reph_pos])))
       {
 	for (unsigned int i = base + 1; i < new_reph_pos; i++)
 	  if (FLAG_UNSAFE (info[i].indic_category()) & (FLAG (I_Cat(M)) | FLAG (I_Cat(MPst))))
@@ -1451,27 +1437,6 @@ final_reordering_syllable_indic (const hb_ot_shape_plan_t *plan,
     else
       buffer->unsafe_to_break (start - 1, start + 1);
   }
-
-
-  /*
-   * Finish off the clusters and go home!
-   */
-  if (indic_plan->uniscribe_bug_compatible)
-  {
-    switch ((hb_tag_t) plan->props.script)
-    {
-      case HB_SCRIPT_TAMIL:
-	break;
-
-      default:
-	/* Uniscribe merges the entire syllable into a single cluster... Except for Tamil.
-	 * This means, half forms are submerged into the main consonant's cluster.
-	 * This is unnecessary, and makes cursor positioning harder, but that's what
-	 * Uniscribe does. */
-	buffer->merge_clusters (start, end);
-	break;
-    }
-  }
 }
 
 
@@ -1501,9 +1466,7 @@ preprocess_text_indic (const hb_ot_shape_plan_t *plan,
 		       hb_buffer_t              *buffer,
 		       hb_font_t                *font)
 {
-  const indic_shape_plan_t *indic_plan = (const indic_shape_plan_t *) plan->data;
-  if (!indic_plan->uniscribe_bug_compatible)
-    _hb_preprocess_text_vowel_constraints (plan, buffer, font);
+  _hb_preprocess_text_vowel_constraints (plan, buffer, font);
 }
 
 static bool

@@ -1,42 +1,46 @@
 ARG BASE_IMAGE=docker.io/debian
-ARG BASE_IMAGE_TAG=bookworm-slim
-FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} AS base
+ARG BASE_IMAGE_TAG=trixie-slim
+FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} AS base-image
+
+ENV APT_UPDATE="apt-get update" \
+    APT_INSTALL="env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends" \
+    APT_CLEANUP="rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*"
+
+FROM base-image AS base
 
 LABEL org.opencontainers.image.title="Pixman build environment for platform coverage" \
       org.opencontainers.image.authors="Marek Pikuła <m.pikula@partner.samsung.com>"
 
-ARG DEBIAN_FRONTEND=noninteractive
-ENV APT_UPDATE="apt-get update" \
-    APT_INSTALL="apt-get install -y --no-install-recommends" \
-    APT_CLEANUP="rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*"
-
 ARG GCOVR_VERSION="~=7.2"
-ARG MESON_VERSION="~=1.6"
-RUN ${APT_UPDATE} \
+ARG MESON_VERSION="~=1.7"
+RUN . /etc/os-release \
+    && echo "deb http://deb.debian.org/debian ${VERSION_CODENAME}-backports main" > /etc/apt/sources.list.d/backports.list \
+    && ${APT_UPDATE} \
     && ${APT_INSTALL} \
         # Build dependencies.
         build-essential \
         ninja-build \
         pkg-config \
-        qemu-user \
         # pipx dependencies.
-        python3-argcomplete \
-        python3-packaging \
-        python3-pip \
-        python3-platformdirs \
-        python3-userpath \
         python3-venv \
         # gcovr dependencies.
-        libxml2-dev \
-        libxslt-dev \
-        python3-dev \
+        python3-lxml \
+    # User bookworm-backports for QEMU, as it has version 7 by default, which
+    # has some issues.
+    && ${APT_INSTALL} \
+        $(grep bookworm /etc/os-release >/dev/null && echo -t bookworm-backports) \
+        qemu-user \
     && ${APT_CLEANUP} \
     # Install pipx using pip to have a more recent version of pipx, which
-    # supports the `--global` flag.
-    && pip install pipx --break-system-packages \
+    # supports the `--global` flag. Use a dedicated venv, as recent pipx
+    # requires newer dependencies than Debian provides, and pip cannot
+    # replace Debian-installed packages.
+    && python3 -m venv /opt/pipx-venv \
+    && /opt/pipx-venv/bin/pip install pipx \
+    && ln -s /opt/pipx-venv/bin/pipx /usr/local/bin/pipx \
     # Install a recent version of meson and gcovr using pipx to have the same
     # version across all variants regardless of base.
-    && pipx install --global \
+    && pipx install --global --system-site-packages \
         gcovr${GCOVR_VERSION} \
         meson${MESON_VERSION} \
     && gcovr --version \
@@ -44,11 +48,13 @@ RUN ${APT_UPDATE} \
     && meson --version
 
 FROM base AS llvm-base
-# LLVM 16 is the highest available in Bookworm. Preferably, we should use the
-# same version for all platforms, but it's not possible at the moment.
-ARG LLVM_VERSION=16
+# Use the newest LLVM from backports. Preferably, we should use the same
+# version for all platforms, but it's not possible at the moment, as some
+# platforms are not supported by Trixie.
+ARG LLVM_VERSION=21
 RUN ${APT_UPDATE} \
     && ${APT_INSTALL} \
+        -t $(. /etc/os-release && echo ${VERSION_CODENAME}-backports) \
         clang-${LLVM_VERSION} \
         libclang-rt-${LLVM_VERSION}-dev \
         lld-${LLVM_VERSION} \
@@ -60,7 +66,7 @@ RUN ${APT_UPDATE} \
     && ln -f /usr/bin/llvm-strip-${LLVM_VERSION} /usr/bin/llvm-strip
 
 FROM llvm-base AS native-base
-ARG LLVM_VERSION=16
+ARG LLVM_VERSION=21
 RUN ${APT_UPDATE} \
     && ${APT_INSTALL} \
         # Runtime library dependencies.
@@ -70,7 +76,9 @@ RUN ${APT_UPDATE} \
     # Install libomp-dev if available (OpenMP support for LLVM). It's done only
     # for the native images, as OpenMP support in cross-build environment is
     # tricky for LLVM.
-    && (${APT_INSTALL} libomp-${LLVM_VERSION}-dev \
+    && (${APT_INSTALL} \
+            -t $(. /etc/os-release && echo ${VERSION_CODENAME}-backports) \
+            libomp-${LLVM_VERSION}-dev \
         || echo "OpenMP not available on this platform.") \
     && ${APT_CLEANUP}
 
@@ -101,50 +109,92 @@ RUN ${APT_UPDATE} \
     && ${APT_INSTALL} gcc-multilib-powerpc64-linux-gnu \
     && ${APT_CLEANUP}
 
-# We use a common image for Windows i686 and amd64, as it doesn't make sense to
-# make them separate in terms of build time and image size. After two runs they
-# should use the same cache layers, so in the end it makes the collective image
-# size smaller.
-FROM base AS windows-base
-ARG LLVM_MINGW_RELEASE=20240619
-ARG LLVM_MINGW_VARIANT=llvm-mingw-${LLVM_MINGW_RELEASE}-msvcrt-ubuntu-20.04-x86_64
+# Windows base image with a pre-built LLVM MinGW toolchain.
+FROM base-image AS windows-llvm-base-build
+ARG LLVM_MINGW_RELEASE=20250402
+ARG LLVM_MINGW_VARIANT=llvm-mingw-${LLVM_MINGW_RELEASE}-ucrt-ubuntu-20.04
 RUN ${APT_UPDATE} \
-    && ${APT_INSTALL} wget \
+    && ${APT_INSTALL} \
+        ca-certificates \
+        wget \
+        xz-utils \
     && ${APT_CLEANUP} \
-    && cd /opt \
-    && wget https://github.com/mstorsjo/llvm-mingw/releases/download/${LLVM_MINGW_RELEASE}/${LLVM_MINGW_VARIANT}.tar.xz \
-    && tar -xf ${LLVM_MINGW_VARIANT}.tar.xz \
-    && rm -f ${LLVM_MINGW_VARIANT}.tar.xz
-ENV PATH=${PATH}:/opt/${LLVM_MINGW_VARIANT}/bin
+    && wget https://github.com/mstorsjo/llvm-mingw/releases/download/${LLVM_MINGW_RELEASE}/${LLVM_MINGW_VARIANT}-`uname -m`.tar.xz \
+        -O - | tar -xJ -C /opt \
+    && mv /opt/llvm* /opt/llvm
 
-FROM windows-base AS windows-x86-base
+FROM base AS windows-llvm-base
+RUN ${APT_UPDATE} \
+    && ${APT_INSTALL} procps \
+    && ${APT_CLEANUP}
+COPY --from=windows-llvm-base-build /opt/llvm /opt/llvm
+ENV PATH=/opt/llvm/bin:${PATH} \
+    # Inspired by https://code.videolan.org/videolan/docker-images
+    WINE_BOOT='wine wineboot --init \
+        && while pgrep wineserver > /dev/null; do \
+            echo "waiting ..."; \
+            sleep 1; \
+        done \
+        && rm -rf /tmp/wine-*'
+
+FROM windows-llvm-base AS windows-686
+ENV WINEPATH=/opt/llvm/i686-w64-mingw32/bin \
+    WINEARCH=win32
 RUN dpkg --add-architecture i386 \
     && ${APT_UPDATE} \
     && ${APT_INSTALL} \
-        gcc-mingw-w64-i686 \
-        gcc-mingw-w64-x86-64 \
-        mingw-w64-tools \
-        procps \
+        libwine:i386 \
         wine \
         wine32 \
-        wine64 \
     && ${APT_CLEANUP} \
-    # Inspired by https://code.videolan.org/videolan/docker-images
-    && wine wineboot --init \
-    && while pgrep wineserver > /dev/null; do \
-        echo "waiting ..."; \
-        sleep 1; \
-    done \
-    && rm -rf /tmp/wine-*
+    && ${WINE_BOOT}
 
-FROM windows-x86-base AS windows-686
-FROM windows-x86-base AS windows-amd64
+# Dependencies needed both for Wine build and the final image.
+FROM windows-llvm-base AS windows-wine-build-base
+RUN ${APT_UPDATE} \
+    && ${APT_INSTALL} \
+        libfreetype-dev \
+        libgnutls28-dev \
+        libkrb5-dev \
+        libx11-dev \
+        libxcomposite-dev \
+        libxcursor-dev \
+        libxext-dev \
+        libxfixes-dev \
+        libxi-dev \
+        libxrandr-dev \
+        libxrender-dev \
+    && ${APT_CLEANUP}
 
-# aarch64 image requires linaro/wine-arm64 as a base.
-FROM windows-base AS windows-arm64-v8
-RUN wine-arm64 wineboot --init \
-    && while pgrep wineserver > /dev/null; do \
-        echo "waiting ..."; \
-        sleep 1; \
-    done \
-    && rm -rf /tmp/wine-*
+# Wine build intermediate target, not going into the final image.
+FROM windows-wine-build-base AS windows-wine-build
+RUN ${APT_UPDATE} \
+    && ${APT_INSTALL} \
+        bison \
+        ca-certificates \
+        clang \
+        flex \
+        git \
+        lld \
+        llvm \
+    && ${APT_CLEANUP}
+ARG WINE_VERSION=10.5
+RUN git clone https://gitlab.winehq.org/wine/wine.git \
+        -b wine-${WINE_VERSION} \
+        --depth 1
+RUN cd wine \
+    && ./configure --enable-win64 --disable-tests --without-unwind --prefix=/opt/wine \
+    && make -j`nproc` \
+    && make install
+
+FROM windows-llvm-base AS windows-amd64
+COPY --from=windows-wine-build /opt/wine /opt/wine
+ENV PATH=/opt/wine/bin:${PATH} \
+    WINEPATH=/opt/llvm/x86_64-w64-mingw32/bin
+RUN ${WINE_BOOT}
+
+FROM windows-wine-build-base AS windows-arm64-v8
+COPY --from=windows-wine-build /opt/wine /opt/wine
+ENV PATH=/opt/wine/bin:${PATH} \
+    WINEPATH=/opt/llvm/aarch64-w64-mingw32/bin
+RUN ${WINE_BOOT}

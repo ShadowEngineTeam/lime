@@ -66,6 +66,9 @@ struct info_t :
 {
   void add_options ()
   {
+    set_summary ("Query font information.");
+    set_description ("Queries font file for various information. If no query option is specified, --show-all is assumed.");
+
     font_options_t::add_options (this);
 
     GOptionEntry misc_entries[] =
@@ -140,7 +143,7 @@ struct info_t :
     GOptionEntry entries[] =
     {
       {"quiet",		'q', G_OPTION_FLAG_REVERSE, G_OPTION_ARG_NONE,	&this->verbose,	"Generate machine-readable output",	nullptr},
-      {G_OPTION_REMAINING,	0, G_OPTION_FLAG_IN_MAIN,
+      {G_OPTION_REMAINING,	0, G_OPTION_FLAG_IN_MAIN | G_OPTION_FLAG_FILENAME,
 				G_OPTION_ARG_CALLBACK,	(gpointer) &collect_rest,	nullptr,	"[FONT-FILE]"},
       {nullptr}
     };
@@ -243,9 +246,6 @@ struct info_t :
   {
     add_options ();
 
-    if (argc == 2)
-      show_all = true;
-
     parse (&argc, &argv);
 
     if (all)
@@ -255,6 +255,7 @@ struct info_t :
       true;
     }
 
+retry:
     if (show_all)
     {
       show_face_count =
@@ -294,42 +295,52 @@ struct info_t :
       true;
     }
 
-    if (show_face_count)  _show_face_count ();
-    if (show_family)	  _show_family ();
-    if (show_subfamily)	  _show_subfamily ();
-    if (show_unique_name) _show_unique_name ();
-    if (show_full_name)	  _show_full_name ();
-    if (show_postscript_name)_show_postscript_name ();
-    if (show_version)	  _show_version ();
-    if (show_technology)  _show_technology ();
-    if (show_unicode_count)_show_unicode_count ();
-    if (show_glyph_count) _show_glyph_count ();
-    if (show_upem)	  _show_upem ();
-    if (show_extents)	  _show_extents ();
+    bool done_something = false;
 
-    if (get_name)	  _get_name ();
-    if (get_style)	  _get_style ();
-    if (get_metric)	  _get_metric ();
-    if (get_baseline)	  _get_baseline ();
-    if (get_meta)	  _get_meta ();
-    if (get_table)	  _get_table ();
+#define process_item(item) HB_STMT_START { if (item) { done_something = true; _##item (); } } HB_STMT_END
 
-    if (list_names)	  _list_names ();
+    process_item (show_face_count);
+    process_item (show_family);
+    process_item (show_subfamily);
+    process_item (show_unique_name);
+    process_item (show_full_name);
+    process_item (show_postscript_name);
+    process_item (show_version);
+    process_item (show_technology);
+    process_item (show_unicode_count);
+    process_item (show_glyph_count);
+    process_item (show_upem);
+    process_item (show_extents);
+
+    process_item (get_name);
+    process_item (get_style);
+    process_item (get_metric);
+    process_item (get_baseline);
+    process_item (get_meta);
+    process_item (get_table);
+
+    process_item (list_names);
 #ifdef HB_HAS_GOBJECT
-    if (list_style)	  _list_style ();
-    if (list_metrics)	  _list_metrics ();
-    if (list_baselines)	  _list_baselines ();
+    process_item (list_style);
+    process_item (list_metrics);
+    process_item (list_baselines);
 #endif
-    if (list_tables)	  _list_tables ();
-    if (list_unicodes)	  _list_unicodes ();
-    if (list_glyphs)	  _list_glyphs ();
-    if (list_scripts)	  _list_scripts ();
-    if (list_features)	  _list_features ();
+    process_item (list_tables);
+    process_item (list_unicodes);
+    process_item (list_glyphs);
+    process_item (list_scripts);
+    process_item (list_features);
 #ifndef HB_NO_VAR
-    if (list_variations)  _list_variations ();
+    process_item (list_variations);
 #endif
-    if (list_palettes)	  _list_palettes ();
-    if (list_meta)	  _list_meta ();
+    process_item (list_palettes);
+    process_item (list_meta);
+
+    if (!done_something)
+    {
+      show_all = true;
+      goto retry;
+    }
 
     return 0;
   }
@@ -420,6 +431,8 @@ struct info_t :
       printf ("Has AAT layout\n");
     if (_has_blob (HB_TAG('S','i','l','f')))
       printf ("Has Graphite layout\n");
+    if (_has_blob (HB_TAG('W','a','s','m')))
+      printf ("Has WebAssembly layout\n");
     if (_has_blob (HB_TAG('k','e','r','n')))
       printf ("Has legacy kerning\n");
 
@@ -847,9 +860,12 @@ struct info_t :
       for (hb_codepoint_t u = HB_SET_VALUE_INVALID;
 	   hb_set_next (unicodes, &u);)
       {
+	/* A Default UVS range may list a codepoint that has no nominal
+	 * mapping, and a Non-Default UVS mapping may point to glyph 0;
+	 * both are collected above but do not resolve to a glyph. */
 	hb_codepoint_t gid = 0;
-	HB_UNUSED bool b = hb_font_get_variation_glyph (font, u, vs, &gid);
-	assert (b);
+	if (!hb_font_get_variation_glyph (font, u, vs, &gid))
+	  continue;
 
 	char glyphname[128];
 	hb_font_glyph_to_string (font, gid,
@@ -1109,6 +1125,14 @@ struct info_t :
 
 	for (unsigned feature_index = 0; feature_index < feature_count; feature_index++)
 	{
+	  hb_tag_t feature_tag = HB_TAG_NONE;
+	  unsigned f_count = 1;
+	  hb_ot_layout_table_get_feature_tags (face, table_tag,
+					       feature_array[feature_index],
+					       &f_count, &feature_tag);
+	  if (!f_count)
+	    continue; /* LangSys references a feature the FeatureList doesn't have. */
+
 	  hb_ot_name_id_t label_id;
 
 	  hb_ot_layout_feature_get_name_ids (face,
@@ -1129,11 +1153,6 @@ struct info_t :
 
 	  printf ("	");
 	  if (verbose) printf ("Feature: ");
-	  hb_tag_t feature_tag;
-	  unsigned f_count = 1;
-	  hb_ot_layout_table_get_feature_tags (face, table_tag,
-					       feature_array[feature_index],
-					       &f_count, &feature_tag);
 	  printf ("%c%c%c%c", HB_UNTAG (feature_tag));
 
 	  if (*name)
@@ -1419,34 +1438,11 @@ struct info_t :
       }
     }
   }
-
-};
-
-
-template <typename consumer_t,
-	  typename font_options_type>
-struct main_font_t :
-       option_parser_t,
-       font_options_type,
-       consumer_t
-{
-  int operator () (int argc, char **argv)
-  {
-    add_options ();
-
-    if (argc == 2)
-      consumer_t::show_all = true;
-
-    parse (&argc, &argv);
-
-    consumer_t::operator () (this);
-
-    return 0;
-  }
 };
 
 int
 main (int argc, char **argv)
 {
-  return batch_main<info_t> (argc, argv);
+  argv_t args (argc, argv);
+  return batch_main<info_t> (args.argc, args.argv);
 }

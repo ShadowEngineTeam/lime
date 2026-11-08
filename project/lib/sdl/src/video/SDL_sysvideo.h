@@ -226,6 +226,15 @@ struct SDL_VideoDevice
     bool (*VideoInit)(SDL_VideoDevice *_this);
 
     /*
+     * Called when Video subsystem is beginning to terminate. This allows for
+     * special case code that need to happen before internal SDL bits
+     * clean up that must happen before VideoQuit(). An example is stopping
+     * a hotplug thread that might add mice/keyboards after SDL has cleaned
+     * up its internal list. Most work is meant to happen in VideoQuit, though.
+     */
+    void (*VideoPreQuit)(SDL_VideoDevice *_this);
+
+    /*
      * Reverse the effects VideoInit() -- called if VideoInit() fails or
      * if the application is shutting down the video subsystem.
      */
@@ -412,6 +421,7 @@ struct SDL_VideoDevice
     SDL_Rect desktop_bounds;
     SDL_Window *windows;
     SDL_Window *grabbed_window;
+    SDL_WindowID background_focus_windowID;
     Uint32 clipboard_sequence;
     SDL_ClipboardDataCallback clipboard_callback;
     SDL_ClipboardCleanupCallback clipboard_cleanup;
@@ -529,6 +539,7 @@ extern VideoBootStrap WINDOWS_bootstrap;
 extern VideoBootStrap HAIKU_bootstrap;
 extern VideoBootStrap UIKIT_bootstrap;
 extern VideoBootStrap Android_bootstrap;
+extern VideoBootStrap OPENHARMONY_bootstrap;
 extern VideoBootStrap PS2_bootstrap;
 extern VideoBootStrap PSP_bootstrap;
 extern VideoBootStrap VITA_bootstrap;

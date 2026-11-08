@@ -81,6 +81,89 @@ test_subset_gpos_pairpos1_vf (void)
   hb_face_destroy (face_wa);
 }
 
+static void
+test_subset_gpos_device_only_pairpos (void)
+{
+  const char *filenames[] = {"fonts/device-only-pairpos1.ttf",
+                             "fonts/device-only-pairpos2.ttf"};
+  for (unsigned f = 0; f < G_N_ELEMENTS (filenames); f++)
+  {
+    hb_face_t *face = hb_test_open_font_file (filenames[f]);
+    hb_subset_input_t *input = hb_subset_input_create_or_fail ();
+    hb_subset_input_set_flags (input, HB_SUBSET_FLAGS_RETAIN_GIDS);
+    hb_set_add_range (hb_subset_input_unicode_set (input), 'A', 'D');
+    g_assert_true (hb_subset_input_pin_axis_location (
+        input, face, HB_TAG ('T', 'E', 'S', 'T'), .25f));
+    hb_face_t *subset = hb_subset_or_fail (face, input);
+    g_assert_nonnull (subset);
+    const int remaining[] = {0, 8192, 16384};
+    for (unsigned j = 0; j < G_N_ELEMENTS (remaining); j++)
+    {
+      hb_font_t *fonts[] = {hb_font_create (face), hb_font_create (subset)};
+      const int coords[] = {4096, remaining[j]};
+      hb_font_set_var_coords_normalized (fonts[0], coords, 2);
+      hb_font_set_var_coords_normalized (fonts[1], &remaining[j], 1);
+      hb_buffer_t *buffers[] = {hb_buffer_create (), hb_buffer_create ()};
+      for (unsigned i = 0; i < 2; i++)
+      {
+        hb_buffer_add_utf8 (buffers[i], "ABCD", -1, 0, -1);
+        hb_buffer_guess_segment_properties (buffers[i]);
+        hb_shape (fonts[i], buffers[i], NULL, 0);
+      }
+      unsigned length, subset_length;
+      const hb_glyph_position_t *pos = hb_buffer_get_glyph_positions (buffers[0], &length);
+      const hb_glyph_position_t *subset_pos = hb_buffer_get_glyph_positions (buffers[1], &subset_length);
+      g_assert_cmpuint (length, ==, 4);
+      g_assert_cmpuint (subset_length, ==, length);
+      for (unsigned i = 0; i < length; i++)
+      {
+        g_assert_cmpint (subset_pos[i].x_advance, ==, pos[i].x_advance);
+        g_assert_cmpint (subset_pos[i].x_offset, ==, pos[i].x_offset);
+      }
+      for (unsigned i = 0; i < 2; i++)
+      {
+        hb_buffer_destroy (buffers[i]);
+        hb_font_destroy (fonts[i]);
+      }
+    }
+    hb_face_destroy (subset);
+    hb_subset_input_destroy (input);
+    hb_face_destroy (face);
+  }
+}
+
+#ifndef HB_NO_OT_LAYOUT
+static void
+test_subset_gpos_full_sanitization (void)
+{
+  hb_face_t *source = hb_test_open_font_file ("fonts/device-only-pairpos1.ttf");
+  hb_face_t *face = hb_face_builder_create ();
+  hb_blob_t *gpos = hb_face_reference_table (source, HB_TAG ('G','P','O','S'));
+  /* Truncate the final Device table. Lazy shaping sanitization skips it. */
+  hb_blob_t *truncated = hb_blob_create_sub_blob (gpos, 0, hb_blob_get_length (gpos) - 1);
+  g_assert_true (hb_face_builder_add_table (face, HB_TAG ('G','P','O','S'), truncated));
+  hb_blob_t *maxp = hb_face_reference_table (source, HB_TAG ('m','a','x','p'));
+  g_assert_true (hb_face_builder_add_table (face, HB_TAG ('m','a','x','p'), maxp));
+  hb_blob_destroy (maxp);
+  hb_blob_destroy (truncated);
+  hb_blob_destroy (gpos);
+
+  g_assert_true (hb_ot_layout_has_positioning (face));
+  hb_subset_input_t *input = hb_subset_input_create_or_fail ();
+  hb_set_invert (hb_subset_input_glyph_set (input));
+  for (unsigned i = 0; i < 2; i++)
+  {
+    hb_face_t *subset = hb_subset_or_fail (face, input);
+    g_assert_null (subset);
+    g_assert_true (hb_ot_layout_has_positioning (face));
+  }
+
+  hb_subset_input_destroy (input);
+  hb_face_destroy (face);
+  hb_face_destroy (source);
+}
+#endif
+
 int
 main (int argc, char **argv)
 {
@@ -88,6 +171,10 @@ main (int argc, char **argv)
 
   hb_test_add (test_subset_gpos_lookup_subtable);
   hb_test_add (test_subset_gpos_pairpos1_vf);
+  hb_test_add (test_subset_gpos_device_only_pairpos);
+#ifndef HB_NO_OT_LAYOUT
+  hb_test_add (test_subset_gpos_full_sanitization);
+#endif
 
   return hb_test_run ();
 }

@@ -5,7 +5,7 @@
  *   Load the basic TrueType tables, i.e., tables that can be either in
  *   TTF or OTF fonts (body).
  *
- * Copyright (C) 1996-2022 by
+ * Copyright (C) 1996-2026 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -206,7 +206,7 @@
       if ( FT_STREAM_READ_FIELDS( table_dir_entry_fields, &table ) )
       {
         FT_TRACE2(( "check_table_dir:"
-                    " can read only %d table%s in font (instead of %d)\n",
+                    " can read only %hu table%s in font (instead of %hu)\n",
                     nn, nn == 1 ? "" : "s", sfnt->num_tables ));
         sfnt->num_tables = nn;
         break;
@@ -216,7 +216,7 @@
 
       if ( table.Offset > stream->size )
       {
-        FT_TRACE2(( "check_table_dir: table entry %d invalid\n", nn ));
+        FT_TRACE2(( "check_table_dir: table entry %hu invalid\n", nn ));
         continue;
       }
       else if ( table.Length > stream->size - table.Offset )
@@ -227,11 +227,13 @@
         /* ignore in general).                                            */
 
         if ( table.Tag == TTAG_hmtx ||
-             table.Tag == TTAG_vmtx )
+             table.Tag == TTAG_HMTX ||
+             table.Tag == TTAG_vmtx ||
+             table.Tag == TTAG_VMTX )
           valid_entries++;
         else
         {
-          FT_TRACE2(( "check_table_dir: table entry %d invalid\n", nn ));
+          FT_TRACE2(( "check_table_dir: table entry %hu invalid\n", nn ));
           continue;
         }
       }
@@ -380,7 +382,7 @@
 
     /* load the table directory */
 
-    FT_TRACE2(( "-- Number of tables: %10u\n",    sfnt.num_tables ));
+    FT_TRACE2(( "-- Number of tables: %10hu\n",   sfnt.num_tables ));
     FT_TRACE2(( "-- Format version:   0x%08lx\n", sfnt.format_tag ));
 
     if ( sfnt.format_tag != TTAG_OTTO )
@@ -439,7 +441,9 @@
       else if ( entry.Length > stream->size - entry.Offset )
       {
         if ( entry.Tag == TTAG_hmtx ||
-             entry.Tag == TTAG_vmtx )
+             entry.Tag == TTAG_HMTX ||
+             entry.Tag == TTAG_vmtx ||
+             entry.Tag == TTAG_VMTX )
         {
 #ifdef FT_DEBUG_LEVEL_TRACE
           FT_ULong  old_length = entry.Length;
@@ -504,6 +508,13 @@
 
     FT_FRAME_EXIT();
 
+    if ( !valid_entries )
+    {
+      FT_TRACE2(( "tt_face_load_font_dir: no valid tables found\n" ));
+      error = FT_THROW( Unknown_File_Format );
+      goto Exit;
+    }
+
     FT_TRACE2(( "table directory loaded\n" ));
     FT_TRACE2(( "\n" ));
 
@@ -528,7 +539,8 @@
    *     The tag of table to load.  Use the value 0 if you want
    *     to access the whole font file, else set this parameter
    *     to a valid TrueType table tag that you can forge with
-   *     the MAKE_TT_TAG macro.
+   *     the MAKE_TT_TAG macro.  Use value 1 to access the table
+   *     directory.
    *
    *   offset ::
    *     The starting offset in the table (or the file if
@@ -570,7 +582,29 @@
     FT_ULong   size;
 
 
-    if ( tag != 0 )
+    if ( tag == 0 )
+    {
+      /* The whole font file. */
+      size = face->root.stream->size;
+    }
+    else if ( tag == 1 )
+    {
+      /* The currently selected font's table directory.            */
+      /*                                                           */
+      /* Note that `face_index` is also used to enumerate elements */
+      /* of containers like a Mac Resource; this means we must     */
+      /* check whether we actually have a TTC (with multiple table */
+      /* directories).                                             */
+      FT_Long  idx = face->root.face_index & 0xFFFF;
+
+
+      if ( idx >= face->ttc_header.count )
+        idx = 0;
+
+      offset += face->ttc_header.offsets[idx];
+      size    = 4 + 8 + 16 * face->num_tables;
+    }
+    else
     {
       /* look for tag in font directory */
       table = tt_face_lookup_table( face, tag );
@@ -583,9 +617,6 @@
       offset += table->Offset;
       size    = table->Length;
     }
-    else
-      /* tag == 0 -- the user wants to access the font file directly */
-      size = face->root.stream->size;
 
     if ( length && *length == 0 )
     {
@@ -671,8 +702,8 @@
     if ( FT_STREAM_READ_FIELDS( header_fields, header ) )
       goto Exit;
 
-    FT_TRACE3(( "Units per EM: %4u\n", header->Units_Per_EM ));
-    FT_TRACE3(( "IndexToLoc:   %4d\n", header->Index_To_Loc_Format ));
+    FT_TRACE3(( "Units per EM: %4hu\n", header->Units_Per_EM ));
+    FT_TRACE3(( "IndexToLoc:   %4hd\n", header->Index_To_Loc_Format ));
 
   Exit:
     return error;
@@ -722,7 +753,8 @@
                      FT_Stream  stream )
   {
     FT_Error        error;
-    TT_MaxProfile*  maxProfile = &face->max_profile;
+    TT_MaxProfile*  maxProfile  = &face->max_profile;
+    FT_Bool         is_extended = FALSE;
 
     static const FT_Frame_Field  maxp_fields[] =
     {
@@ -755,12 +787,37 @@
     };
 
 
-    error = face->goto_table( face, TTAG_maxp, stream, 0 );
+    face->maxp_num_glyphs = 0;
+
+    error = face->goto_table( face, TTAG_MAXP, stream, 0 );
+    if ( !error )
+      is_extended = TRUE;
+    else if ( FT_ERR_EQ( error, Table_Missing ) )
+      error = face->goto_table( face, TTAG_maxp, stream, 0 );
+
     if ( error )
       goto Exit;
 
-    if ( FT_STREAM_READ_FIELDS( maxp_fields, maxProfile ) )
-      goto Exit;
+    if ( is_extended )
+    {
+      FT_UInt32  num_glyphs;
+
+
+      if ( FT_READ_LONG( maxProfile->version ) ||
+           FT_READ_UOFF3( num_glyphs )         )
+        goto Exit;
+
+      face->maxp_num_glyphs = num_glyphs;
+      maxProfile->numGlyphs = num_glyphs > 0xFFFFU ? 0xFFFFU
+                                                   : (FT_UShort)num_glyphs;
+    }
+    else
+    {
+      if ( FT_STREAM_READ_FIELDS( maxp_fields, maxProfile ) )
+        goto Exit;
+
+      face->maxp_num_glyphs = maxProfile->numGlyphs;
+    }
 
     maxProfile->maxPoints             = 0;
     maxProfile->maxContours           = 0;
@@ -802,7 +859,7 @@
       }
     }
 
-    FT_TRACE3(( "numGlyphs: %u\n", maxProfile->numGlyphs ));
+    FT_TRACE3(( "numGlyphs: %u\n", face->maxp_num_glyphs ));
 
   Exit:
     return error;
@@ -1039,7 +1096,7 @@
   FT_LOCAL_DEF( void )
   tt_face_free_name( TT_Face  face )
   {
-    FT_Memory     memory = face->root.driver->root.memory;
+    FT_Memory     memory = face->root.memory;
     TT_NameTable  table  = &face->name_table;
 
 
@@ -1107,6 +1164,21 @@
 
     if ( FT_FRAME_EXTRACT( face->cmap_size, face->cmap_table ) )
       face->cmap_size = 0;
+
+    if ( error )
+      goto Exit;
+
+    error = face->goto_table( face, TTAG_DMAP, stream, &face->dmap_size );
+    if ( error )
+    {
+      face->dmap_size = 0;
+      if ( FT_ERR_EQ( error, Table_Missing ) )
+        error = FT_Err_Ok;
+      goto Exit;
+    }
+
+    if ( FT_FRAME_EXTRACT( face->dmap_size, face->dmap_table ) )
+      face->dmap_size = 0;
 
   Exit:
     return error;
@@ -1265,11 +1337,11 @@
       }
     }
 
-    FT_TRACE3(( "sTypoAscender:  %4d\n",   os2->sTypoAscender ));
-    FT_TRACE3(( "sTypoDescender: %4d\n",   os2->sTypoDescender ));
-    FT_TRACE3(( "usWinAscent:    %4u\n",   os2->usWinAscent ));
-    FT_TRACE3(( "usWinDescent:   %4u\n",   os2->usWinDescent ));
-    FT_TRACE3(( "fsSelection:    0x%2x\n", os2->fsSelection ));
+    FT_TRACE3(( "sTypoAscender:  %4hd\n",   os2->sTypoAscender ));
+    FT_TRACE3(( "sTypoDescender: %4hd\n",   os2->sTypoDescender ));
+    FT_TRACE3(( "usWinAscent:    %4hu\n",   os2->usWinAscent ));
+    FT_TRACE3(( "usWinDescent:   %4hu\n",   os2->usWinDescent ));
+    FT_TRACE3(( "fsSelection:    0x%2hx\n", os2->fsSelection ));
 
   Exit:
     return error;
@@ -1468,7 +1540,7 @@
       gasp_ranges[j].maxPPEM  = FT_GET_USHORT();
       gasp_ranges[j].gaspFlag = FT_GET_USHORT();
 
-      FT_TRACE3(( "gaspRange %d: rangeMaxPPEM %5d, rangeGaspBehavior 0x%x\n",
+      FT_TRACE3(( "gaspRange %hu: rangeMaxPPEM %5hu, rangeGaspBehavior 0x%hx\n",
                   j,
                   gasp_ranges[j].maxPPEM,
                   gasp_ranges[j].gaspFlag ));

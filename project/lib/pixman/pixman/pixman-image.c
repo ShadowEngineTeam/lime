@@ -360,7 +360,8 @@ compute_image_info (pixman_image_t *image)
 		     t[0][0] | t[0][1] | t[0][2] |
 		     t[1][0] | t[1][1] | t[1][2]) == 0)			&&
 		(pixman_fixed_to_int (
-		    (t[0][0] + t[0][1]) & (t[1][0] + t[1][1])) % 2) == 1)
+		    (pixman_fixed_t) (((uint32_t)t[0][0] + (uint32_t)t[0][1]) &
+				      ((uint32_t)t[1][0] + (uint32_t)t[1][1]))) % 2) == 1)
 	    {
 		/* FIXME: there are some affine-test failures, showing that
 		 * handling of BILINEAR and NEAREST filter is not quite
@@ -599,6 +600,30 @@ pixman_image_set_clip_region (pixman_image_t *   image,
     if (region)
     {
 	if ((result = pixman_region32_copy_from_region16 (&common->clip_region, region)))
+	    image->common.have_clip_region = TRUE;
+    }
+    else
+    {
+	_pixman_image_reset_clip_region (image);
+
+	result = TRUE;
+    }
+
+    image_property_changed (image);
+
+    return result;
+}
+
+PIXMAN_EXPORT pixman_bool_t
+pixman_image_set_clip_region64f (pixman_image_t *   image,
+                                 const pixman_region64f_t *region)
+{
+    image_common_t *common = (image_common_t *)image;
+    pixman_bool_t result;
+
+    if (region)
+    {
+	if ((result = pixman_region32_copy_from_region64f (&common->clip_region, region)))
 	    image->common.have_clip_region = TRUE;
     }
     else
