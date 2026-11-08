@@ -136,7 +136,7 @@
 			<section if="HXCPP_ARMV7">
 	
 				<compilerflag value="-mfpu=neon" />
-				<compilerflag value="-mfloat-abi=hard" />
+				<compilerflag value="-mfloat-abi=hard" if="linux" />
 
 			</section>
 
