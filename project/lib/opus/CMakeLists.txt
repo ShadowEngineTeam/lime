@@ -6,6 +6,11 @@ get_package_version(PACKAGE_VERSION PROJECT_VERSION)
 
 project(Opus LANGUAGES C VERSION ${PROJECT_VERSION})
 
+# Enable the assembler for our aarch64 NEON kernels.
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "(aarch64|arm64)")
+  enable_language(ASM)
+endif()
+
 include(OpusFunctions)
 include(OpusBuildtype)
 include(OpusConfig)
@@ -98,6 +103,10 @@ add_feature_info(OPUS_DRED OPUS_DRED ${OPUS_DRED_HELP_STR})
 set(OPUS_OSCE_HELP_STR "enable OSCE.")
 option(OPUS_OSCE ${OPUS_OSCE_HELP_STR} OFF)
 add_feature_info(OPUS_OSCE OPUS_OSCE ${OPUS_OSCE_HELP_STR})
+
+set(OPUS_PFA_HELP_STR "enable PFA FFT/MDCT (experimental).")
+option(OPUS_PFA ${OPUS_PFA_HELP_STR} OFF)
+add_feature_info(OPUS_PFA OPUS_PFA ${OPUS_PFA_HELP_STR})
 
 if(APPLE)
   set(OPUS_BUILD_FRAMEWORK_HELP_STR "build Framework bundle for Apple systems.")
@@ -426,6 +435,10 @@ if (OPUS_OSCE)
   target_compile_definitions(opus PRIVATE ENABLE_OSCE ENABLE_OSCE_BWE)
 endif()
 
+if (OPUS_PFA)
+  target_compile_definitions(opus PRIVATE ENABLE_PFA)
+endif()
+
 if(NOT OPUS_DISABLE_INTRINSICS)
   if(((OPUS_X86_MAY_HAVE_SSE AND NOT OPUS_X86_PRESUME_SSE) OR
      (OPUS_X86_MAY_HAVE_SSE2 AND NOT OPUS_X86_PRESUME_SSE2) OR
@@ -684,6 +697,11 @@ if(OPUS_BUILD_PROGRAMS)
   add_executable(opus_compare ${opus_compare_sources})
   target_include_directories(opus_compare PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
   target_link_libraries(opus_compare PRIVATE opus ${OPUS_REQUIRED_LIBRARIES})
+
+  # osce metric (self-contained; only needs libm)
+  add_executable(osce_compare ${osce_compare_sources})
+  target_include_directories(osce_compare PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+  target_link_libraries(osce_compare PRIVATE ${OPUS_REQUIRED_LIBRARIES})
 endif()
 
 if(BUILD_TESTING AND NOT BUILD_SHARED_LIBS)

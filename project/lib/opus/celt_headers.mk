@@ -31,9 +31,9 @@ celt/stack_alloc.h \
 celt/vq.h \
 celt/static_modes_float.h \
 celt/static_modes_fixed.h \
-celt/static_modes_float_arm_ne10.h \
-celt/static_modes_fixed_arm_ne10.h \
 celt/arm/armcpu.h \
+celt/arm/celt_arm_asm.h \
+celt/celt_tx_tables.h \
 celt/arm/fixed_armv4.h \
 celt/arm/fixed_armv5e.h \
 celt/arm/fixed_arm64.h \

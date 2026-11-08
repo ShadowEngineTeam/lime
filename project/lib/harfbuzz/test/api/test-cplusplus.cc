@@ -28,33 +28,12 @@
 /* This file tests that all headers can be included from C++ files,
  * as well as test the C++ API. */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#define NO_MAIN
+#include "test-c.c"
+#undef NO_MAIN
 
-#include <hb.h>
-#include <hb-subset.h>
-#include <hb-ot.h>
-#include <hb-aat.h>
-
-#ifdef HAVE_GLIB
-#include <hb-glib.h>
-#endif
-
-#ifdef HAVE_ICU
-#include <hb-icu.h>
-#endif
-
-#ifdef HAVE_FREETYPE
-#include <hb-ft.h>
-#endif
-
-#ifdef HAVE_UNISCRIBE
-#include <hb-uniscribe.h>
-#endif
-
-#ifdef HAVE_CORETEXT
-#include <hb-coretext.h>
+#ifdef HAVE_DIRECTWRITE
+#include <hb-directwrite.h>
 #endif
 
 
@@ -62,39 +41,38 @@
 
 #include "hb-cplusplus.hh"
 
-#include <cassert>
 #include <functional>
 #include <utility>
 
-int
-main ()
+static void
+test_smart_ptrs (void)
 {
   hb_buffer_t *b = hb_buffer_create ();
   hb::shared_ptr<hb_buffer_t> pb {b};
 
   /* Test copy-construction. */
-  assert (bool (pb));
+  g_assert_true (bool (pb));
   hb::shared_ptr<hb_buffer_t> pb2 {pb};
-  assert (bool (pb2));
-  assert (bool (pb));
+  g_assert_true (bool (pb2));
+  g_assert_true (bool (pb));
 
   /* Test move-construction. */
-  assert (bool (pb2));
+  g_assert_true (bool (pb2));
   hb::shared_ptr<hb_buffer_t> pb4 {std::move (pb2)};
-  assert (!bool (pb2));
-  assert (bool (pb4));
+  g_assert_true (!bool (pb2));
+  g_assert_true (bool (pb4));
 
   /* Test copy-assignment. */
   hb::shared_ptr<hb_buffer_t> pb3;
-  assert (!bool (pb3));
+  g_assert_true (!bool (pb3));
   pb3 = pb;
-  assert (bool (pb3));
-  assert (bool (pb));
+  g_assert_true (bool (pb3));
+  g_assert_true (bool (pb));
 
   /* Test move-assignment. */
-  assert (bool (pb));
+  g_assert_true (bool (pb));
   pb2 = std::move (pb);
-  assert (!bool (pb));
+  g_assert_true (!bool (pb));
 
   pb.reference ();
   pb.destroy ();
@@ -117,9 +95,20 @@ main ()
   std::hash<hb::shared_ptr<hb_buffer_t>> hash2 {};
   std::hash<hb::unique_ptr<hb_buffer_t>> hash3 {};
 
-  assert (hash (b) == hash2 (pb4));
-  assert (hash2 (pb4) == hash2 (pb2));
-  assert (hash (b) == hash3 (pb5));
+  g_assert_true (hash (b) == hash2 (pb4));
+  g_assert_true (hash2 (pb4) == hash2 (pb2));
+  g_assert_true (hash (b) == hash3 (pb5));
 
-  return pb == pb.get_empty () || pb == pb2;
+  g_assert_true (pb != pb.get_empty ());
+  g_assert_true (pb != pb2);
+}
+
+int
+main (int argc, char **argv)
+{
+  hb_test_init (&argc, &argv);
+
+  hb_test_add (test_smart_ptrs);
+
+  return hb_test_run ();
 }

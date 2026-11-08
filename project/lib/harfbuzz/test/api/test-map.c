@@ -28,37 +28,142 @@
 
 
 static void
+assert_map_has (const hb_map_t *m, hb_codepoint_t key, hb_codepoint_t value)
+{
+  g_assert_true (hb_map_has (m, key));
+  g_assert_cmpint (hb_map_get (m, key), ==, value);
+}
+
+static void
 test_map_basic (void)
 {
   hb_map_t *empty = hb_map_get_empty ();
   hb_map_t *m;
-  g_assert (hb_map_is_empty (empty));
-  g_assert (!hb_map_allocation_successful (empty));
+  g_assert_true (hb_map_is_empty (empty));
+  g_assert_true (!hb_map_allocation_successful (empty));
   hb_map_destroy (empty);
 
   m = hb_map_create ();
-  g_assert (hb_map_allocation_successful (m));
-  g_assert (hb_map_is_empty (m));
+  g_assert_true (hb_map_allocation_successful (m));
+  g_assert_true (hb_map_is_empty (m));
 
   hb_map_set (m, 213, 223);
   hb_map_set (m, 643, 675);
   g_assert_cmpint (hb_map_get_population (m), ==, 2);
 
   g_assert_cmpint (hb_map_get (m, 213), ==, 223);
-  g_assert (!hb_map_has (m, 123));
-  g_assert (hb_map_has (m, 213));
+  g_assert_true (!hb_map_has (m, 123));
+  g_assert_true (hb_map_has (m, 213));
 
   hb_map_del (m, 213);
-  g_assert (!hb_map_has (m, 213));
+  g_assert_true (!hb_map_has (m, 213));
 
   g_assert_cmpint (hb_map_get (m, 643), ==, 675);
   hb_map_set (m, 237, 673);
-  g_assert (hb_map_has (m, 237));
+  g_assert_true (hb_map_has (m, 237));
   hb_map_clear (m);
-  g_assert (!hb_map_has (m, 237));
-  g_assert (!hb_map_has (m, 643));
+  g_assert_true (!hb_map_has (m, 237));
+  g_assert_true (!hb_map_has (m, 643));
   g_assert_cmpint (hb_map_get_population (m), ==, 0);
 
+  hb_map_destroy (m);
+}
+
+static void
+test_map_copy_equal_hash_update (void)
+{
+  hb_map_t *m = hb_map_create ();
+  hb_map_t *copy;
+  hb_map_t *updated;
+
+  hb_map_set (m, 11, 101);
+  hb_map_set (m, 22, 202);
+
+  copy = hb_map_copy (m);
+  g_assert_true (hb_map_allocation_successful (copy));
+  g_assert_true (hb_map_is_equal (m, copy));
+  g_assert_true (hb_map_is_equal (copy, m));
+  g_assert_cmpint (hb_map_hash (m), ==, hb_map_hash (copy));
+
+  hb_map_set (m, 33, 303);
+  g_assert_true (!hb_map_is_equal (m, copy));
+  g_assert_true (!hb_map_has (copy, 33));
+  assert_map_has (copy, 11, 101);
+  assert_map_has (copy, 22, 202);
+
+  updated = hb_map_create ();
+  hb_map_set (updated, 22, 222);
+  hb_map_set (updated, 44, 404);
+  hb_map_update (copy, updated);
+
+  g_assert_cmpint (hb_map_get_population (copy), ==, 3);
+  assert_map_has (copy, 11, 101);
+  assert_map_has (copy, 22, 222);
+  assert_map_has (copy, 44, 404);
+  assert_map_has (m, 22, 202);
+
+  /* Updating a map from itself is a no-op; 5 entries put the table at
+   * its growth threshold. */
+  hb_map_set (copy, 55, 505);
+  hb_map_set (copy, 66, 606);
+  hb_map_update (copy, copy);
+  g_assert_cmpint (hb_map_get_population (copy), ==, 5);
+  assert_map_has (copy, 11, 101);
+  assert_map_has (copy, 22, 222);
+  assert_map_has (copy, 44, 404);
+  assert_map_has (copy, 55, 505);
+  assert_map_has (copy, 66, 606);
+
+  hb_map_destroy (updated);
+  hb_map_destroy (copy);
+  hb_map_destroy (m);
+}
+
+static void
+test_map_next_keys_values (void)
+{
+  hb_map_t *m = hb_map_create ();
+  hb_set_t *iter_keys = hb_set_create ();
+  hb_set_t *iter_values = hb_set_create ();
+  hb_set_t *keys = hb_set_create ();
+  hb_set_t *values = hb_set_create ();
+  hb_codepoint_t key;
+  hb_codepoint_t value;
+  unsigned int count = 0;
+  int idx = -1;
+
+  hb_map_set (m, 7, 70);
+  hb_map_set (m, 19, 190);
+  hb_map_set (m, 23, 190);
+
+  while (hb_map_next (m, &idx, &key, &value))
+  {
+    g_assert_true (!hb_set_has (iter_keys, key));
+    assert_map_has (m, key, value);
+    hb_set_add (iter_keys, key);
+    hb_set_add (iter_values, value);
+    count++;
+  }
+
+  g_assert_cmpint (count, ==, hb_map_get_population (m));
+  g_assert_cmpint (hb_set_get_population (iter_keys), ==, 3);
+  g_assert_true (hb_set_has (iter_keys, 7));
+  g_assert_true (hb_set_has (iter_keys, 19));
+  g_assert_true (hb_set_has (iter_keys, 23));
+  g_assert_cmpint (hb_set_get_population (iter_values), ==, 2);
+  g_assert_true (hb_set_has (iter_values, 70));
+  g_assert_true (hb_set_has (iter_values, 190));
+
+  hb_map_keys (m, keys);
+  hb_map_values (m, values);
+
+  g_assert_true (hb_set_is_equal (keys, iter_keys));
+  g_assert_true (hb_set_is_equal (values, iter_values));
+
+  hb_set_destroy (values);
+  hb_set_destroy (keys);
+  hb_set_destroy (iter_values);
+  hb_set_destroy (iter_keys);
   hb_map_destroy (m);
 }
 
@@ -96,8 +201,8 @@ test_map_refcount (void)
   hb_map_destroy (m);
 
   /* We copied its reference so it is still usable after one destroy */
-  g_assert (hb_map_has (m, 213));
-  g_assert (hb_map_has (m2, 213));
+  g_assert_true (hb_map_has (m, 213));
+  g_assert_true (hb_map_has (m2, 213));
 
   hb_map_destroy (m2);
 
@@ -137,6 +242,8 @@ main (int argc, char **argv)
   hb_test_init (&argc, &argv);
 
   hb_test_add (test_map_basic);
+  hb_test_add (test_map_copy_equal_hash_update);
+  hb_test_add (test_map_next_keys_values);
   hb_test_add (test_map_userdata);
   hb_test_add (test_map_refcount);
   hb_test_add (test_map_get_population);

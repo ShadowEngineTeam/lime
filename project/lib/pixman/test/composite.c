@@ -76,6 +76,11 @@ static const int sizes[] =
 
 static const pixman_format_code_t formats[] =
 {
+    /* 128bpp formats */
+    PIXMAN_rgba_float,
+    /* 96bpp formats */
+    PIXMAN_rgb_float,
+
     /* 32 bpp formats */
     PIXMAN_a8r8g8b8,
     PIXMAN_x8r8g8b8,
@@ -182,19 +187,10 @@ static const pixman_op_t operators[] =
     PIXMAN_OP_CONJOINT_XOR,
 };
 
-static uint32_t
+static const uint8_t *
 get_value (pixman_image_t *image)
 {
-    uint32_t value = *(uint32_t *)pixman_image_get_data (image);
-
-#ifdef WORDS_BIGENDIAN
-    {
-	pixman_format_code_t format = pixman_image_get_format (image);
-	value >>= 8 * sizeof(value) - PIXMAN_FORMAT_BPP (format);
-    }
-#endif
-
-    return value;
+    return (const uint8_t *)pixman_image_get_data (image);
 }
 
 static char *
@@ -326,9 +322,9 @@ composite_test (image_t *dst,
 
     if (!pixel_checker_check (&checker, get_value (dst->image), &expected))
     {
-	char buf[40], buf2[40];
-	int a, r, g, b;
-	uint32_t pixel;
+	char buf[40], buf2[40], buf3[128];
+	ucolor_t u;
+	const uint8_t *pixel;
 
 	printf ("---- Test %d failed ----\n", testno);
 	printf ("Operator:      %s %s\n",
@@ -357,13 +353,16 @@ composite_test (image_t *dst,
 
 	printf ("Expected:      %s\n", describe_color (&expected, buf));
 
-	pixel_checker_split_pixel (&checker, pixel, &a, &r, &g, &b);
+	pixel_checker_split_pixel (&checker, pixel, &u);
 
-	printf ("Got:           %5d %5d %5d %5d  [pixel: 0x%08x]\n", r, g, b, a, pixel);
-	pixel_checker_get_min (&checker, &expected, &a, &r, &g, &b);
-	printf ("Min accepted:  %5d %5d %5d %5d\n", r, g, b, a);
-	pixel_checker_get_max (&checker, &expected, &a, &r, &g, &b);
-	printf ("Max accepted:  %5d %5d %5d %5d\n", r, g, b, a);
+	pixel_checker_convert_pixel_to_string (&checker, pixel, buf3,
+					       sizeof buf3);
+	printf ("Got:           %5g %5g %5g %5g  [pixel: %s]\n", u.r, u.g, u.b,
+		u.a, buf3);
+	pixel_checker_get_min (&checker, &expected, &u);
+	printf ("Min accepted:  %5g %5g %5g %5g\n", u.r, u.g, u.b, u.a);
+	pixel_checker_get_max (&checker, &expected, &u);
+	printf ("Max accepted:  %5g %5g %5g %5g\n", u.r, u.g, u.b, u.a);
 
 	return FALSE;
     }
@@ -508,6 +507,9 @@ main (int argc, char **argv)
 	seed = get_random_seed();
     else
 	seed = 1;
+
+    enable_divbyzero_exceptions ();
+    enable_invalid_exceptions ();
 
 #ifdef USE_OPENMP
 #   pragma omp parallel for default(none) shared(result, argv, seed)

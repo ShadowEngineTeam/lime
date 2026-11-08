@@ -1,1 +1,12 @@
-native-gnu.meson
+[binaries]
+c = 'gcc'
+ar = 'ar'
+strip = 'strip'
+pkg-config = 'pkg-config'
+exe_wrapper = ['qemu-arm', '-cpu', 'max']
+
+[host_machine]
+system = 'linux'
+cpu_family = 'arm'
+cpu = 'arm'
+endian = 'little'

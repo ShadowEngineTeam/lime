@@ -98,6 +98,7 @@ static bool HIDAPI_DriverZUIKI_IsSupportedDevice(SDL_HIDAPI_Device *device, cons
         case USB_PRODUCT_ZUIKI_EVOTOP_UWB_DINPUT:
         case USB_PRODUCT_ZUIKI_EVOTOP_PC_DINPUT:
         case USB_PRODUCT_ZUIKI_EVOTOP_PC_BT:
+        case USB_PRODUCT_ZUIKI_EVOTOP_AXIS_DINPUT:
             return true;
         default:
             break;
@@ -149,20 +150,14 @@ static bool HIDAPI_DriverZUIKI_InitDevice(SDL_HIDAPI_Device *device)
             }
             HIDAPI_SetDeviceName(device, "ZUIKI EVOTOP");
             break;
+        case USB_PRODUCT_ZUIKI_EVOTOP_AXIS_DINPUT:
+            HIDAPI_SetDeviceName(device, "ZUIKI EVOTOP AXIS");
+            break;
         default:
             break;
     }
 
     return HIDAPI_JoystickConnected(device, NULL);
-}
-
-static int HIDAPI_DriverZUIKI_GetDevicePlayerIndex(SDL_HIDAPI_Device *device, SDL_JoystickID instance_id)
-{
-    return -1;
-}
-
-static void HIDAPI_DriverZUIKI_SetDevicePlayerIndex(SDL_HIDAPI_Device *device, SDL_JoystickID instance_id, int player_index)
-{
 }
 
 #ifndef DEG2RAD
@@ -199,21 +194,13 @@ static bool HIDAPI_DriverZUIKI_RumbleJoystick(SDL_HIDAPI_Device *device, SDL_Joy
     return true;
 }
 
-static bool HIDAPI_DriverZUIKI_RumbleJoystickTriggers(SDL_HIDAPI_Device *device, SDL_Joystick *joystick, Uint16 left_rumble, Uint16 right_rumble)
-{
-    return SDL_Unsupported();
-}
-
 static Uint32 HIDAPI_DriverZUIKI_GetJoystickCapabilities(SDL_HIDAPI_Device *device, SDL_Joystick *joystick)
 {
     Uint32 caps = 0;
-    caps |= SDL_JOYSTICK_CAP_RUMBLE;
+    if (device->product_id != USB_PRODUCT_ZUIKI_EVOTOP_AXIS_DINPUT) {
+        caps |= SDL_JOYSTICK_CAP_RUMBLE;
+    }
     return caps;
-}
-
-static bool HIDAPI_DriverZUIKI_SetJoystickLED(SDL_HIDAPI_Device *device, SDL_Joystick *joystick, Uint8 red, Uint8 green, Uint8 blue)
-{
-    return SDL_Unsupported();
 }
 
 static bool HIDAPI_DriverZUIKI_SendJoystickEffect(SDL_HIDAPI_Device *device, SDL_Joystick *joystick, const void *data, int size)
@@ -453,7 +440,8 @@ static bool HIDAPI_DriverZUIKI_UpdateDevice(SDL_HIDAPI_Device *device)
             HIDAPI_DriverZUIKI_Handle_EVOTOP_PCBT_StatePacket(joystick, ctx, data, size);
         } else if (device->product_id == USB_PRODUCT_ZUIKI_EVOTOP_PC_DINPUT
             || device->product_id == USB_PRODUCT_ZUIKI_MASCON_PRO
-            || device->product_id == USB_PRODUCT_ZUIKI_EVOTOP_UWB_DINPUT) {
+            || device->product_id == USB_PRODUCT_ZUIKI_EVOTOP_UWB_DINPUT
+            || device->product_id == USB_PRODUCT_ZUIKI_EVOTOP_AXIS_DINPUT) {
             HIDAPI_DriverZUIKI_HandleOldStatePacket(joystick, ctx, data, size);
         }
     }
@@ -465,34 +453,20 @@ static bool HIDAPI_DriverZUIKI_UpdateDevice(SDL_HIDAPI_Device *device)
     return (size >= 0);
 }
 
-static void HIDAPI_DriverZUIKI_CloseJoystick(SDL_HIDAPI_Device *device, SDL_Joystick *joystick)
-{
-}
-
-static void HIDAPI_DriverZUIKI_FreeDevice(SDL_HIDAPI_Device *device)
-{
-}
-
 SDL_HIDAPI_DeviceDriver SDL_HIDAPI_DriverZUIKI = {
-    SDL_HINT_JOYSTICK_HIDAPI_ZUIKI,
-    true,
-    HIDAPI_DriverZUIKI_RegisterHints,
-    HIDAPI_DriverZUIKI_UnregisterHints,
-    HIDAPI_DriverZUIKI_IsEnabled,
-    HIDAPI_DriverZUIKI_IsSupportedDevice,
-    HIDAPI_DriverZUIKI_InitDevice,
-    HIDAPI_DriverZUIKI_GetDevicePlayerIndex,
-    HIDAPI_DriverZUIKI_SetDevicePlayerIndex,
-    HIDAPI_DriverZUIKI_UpdateDevice,
-    HIDAPI_DriverZUIKI_OpenJoystick,
-    HIDAPI_DriverZUIKI_RumbleJoystick,
-    HIDAPI_DriverZUIKI_RumbleJoystickTriggers,
-    HIDAPI_DriverZUIKI_GetJoystickCapabilities,
-    HIDAPI_DriverZUIKI_SetJoystickLED,
-    HIDAPI_DriverZUIKI_SendJoystickEffect,
-    HIDAPI_DriverZUIKI_SetJoystickSensorsEnabled,
-    HIDAPI_DriverZUIKI_CloseJoystick,
-    HIDAPI_DriverZUIKI_FreeDevice,
+    .name = SDL_HINT_JOYSTICK_HIDAPI_ZUIKI,
+    .enabled = true,
+    .RegisterHints = HIDAPI_DriverZUIKI_RegisterHints,
+    .UnregisterHints = HIDAPI_DriverZUIKI_UnregisterHints,
+    .IsEnabled = HIDAPI_DriverZUIKI_IsEnabled,
+    .IsSupportedDevice = HIDAPI_DriverZUIKI_IsSupportedDevice,
+    .InitDevice = HIDAPI_DriverZUIKI_InitDevice,
+    .UpdateDevice = HIDAPI_DriverZUIKI_UpdateDevice,
+    .OpenJoystick = HIDAPI_DriverZUIKI_OpenJoystick,
+    .RumbleJoystick = HIDAPI_DriverZUIKI_RumbleJoystick,
+    .GetJoystickCapabilities = HIDAPI_DriverZUIKI_GetJoystickCapabilities,
+    .SendJoystickEffect = HIDAPI_DriverZUIKI_SendJoystickEffect,
+    .SetJoystickSensorsEnabled = HIDAPI_DriverZUIKI_SetJoystickSensorsEnabled,
 };
 
 #endif // SDL_JOYSTICK_HIDAPI_ZUIKI

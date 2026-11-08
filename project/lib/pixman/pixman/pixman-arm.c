@@ -122,6 +122,65 @@ detect_cpu_features (void)
     return features;
 }
 
+#elif defined (HAVE_ELF_AUX_INFO)
+
+#include <sys/auxv.h>
+
+static arm_cpu_features_t
+detect_cpu_features (void)
+{
+    arm_cpu_features_t features = 0;
+    unsigned long hwcap = 0;
+
+    if (elf_aux_info (AT_HWCAP, &hwcap, sizeof(hwcap)) != 0)
+    {
+        return 0;
+    }
+
+    if (hwcap & HWCAP_VFP)
+        features |= ARM_VFP;
+    if (hwcap & HWCAP_NEON)
+        features |= ARM_NEON;
+
+    return features;
+}
+
+#elif defined (HAVE_GETAUXVAL)
+
+#include <sys/auxv.h>
+#include <stdint.h>
+
+static arm_cpu_features_t
+detect_cpu_features (void)
+{
+    arm_cpu_features_t features = 0;
+    unsigned long hwcap;
+    const char *plat;
+
+    hwcap = getauxval (AT_HWCAP);
+
+    if (hwcap & HWCAP_ARM_VFP)
+        features |= ARM_VFP;
+    if (hwcap & HWCAP_ARM_NEON)
+        features |= ARM_NEON;
+
+    plat = (const char *) (uintptr_t) getauxval (AT_PLATFORM);
+
+    if (plat == NULL)
+        return features;
+
+    if (plat[0] == 'v'
+        && (plat[1] == '6' || plat[1] == '7')
+        && plat[2] == 'l')
+    {
+        features |= ARM_V6;
+        if (plat[1] == '7')
+            features |= ARM_V7;
+    }
+
+    return features;
+}
+
 #elif defined (__linux__) /* linux ELF */
 
 #include <unistd.h>
@@ -131,6 +190,13 @@ detect_cpu_features (void)
 #include <fcntl.h>
 #include <string.h>
 #include <elf.h>
+
+#ifndef HWCAP_ARM_VFP
+#define HWCAP_ARM_VFP	(1 << 6)
+#endif
+#ifndef HWCAP_ARM_NEON
+#define HWCAP_ARM_NEON	(1 << 12)
+#endif
 
 static arm_cpu_features_t
 detect_cpu_features (void)
@@ -148,13 +214,9 @@ detect_cpu_features (void)
 	    {
 		uint32_t hwcap = aux.a_un.a_val;
 
-		/* hardcode these values to avoid depending on specific
-		 * versions of the hwcap header, e.g. HWCAP_NEON
-		 */
-		if ((hwcap & 64) != 0)
+		if ((hwcap & HWCAP_ARM_VFP) != 0)
 		    features |= ARM_VFP;
-		/* this flag is only present on kernel 2.6.29 */
-		if ((hwcap & 4096) != 0)
+		if ((hwcap & HWCAP_ARM_NEON) != 0)
 		    features |= ARM_NEON;
 	    }
 	    else if (aux.a_type == AT_PLATFORM)

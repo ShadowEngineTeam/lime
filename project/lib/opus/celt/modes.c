@@ -273,7 +273,11 @@ CELTMode *opus_custom_mode_create(opus_int32 Fs, int frame_size, int *error)
       return NULL;
    }
 #ifdef ENABLE_QEXT
-   if (frame_size < 40 || frame_size > 2048 || frame_size%2!=0)
+   /* Frames longer than 1024 samples are only supported for the 96 kHz modes
+      for which the encoder and decoder double their internal buffers
+      (qext_scale == 2, i.e. a short MDCT of 240 or 180 samples). */
+   if (frame_size < 40 || frame_size%2!=0 ||
+       (frame_size > 1024 && !(Fs == 96000 && (frame_size == 1920 || frame_size == 1440))))
 #else
    if (frame_size < 40 || frame_size > 1024 || frame_size%2!=0)
 #endif
@@ -484,7 +488,7 @@ void opus_custom_mode_destroy(CELTMode *mode)
 #ifdef ENABLE_QEXT
 
 static const opus_int16 qext_eBands_180[] = {
-/* 20k  22k  24k  26k  28k  30k  32k  34k  36k  38k  40k  42k  44k  47k  48k */
+/* 20k  22k  24k  26k  28k  30k  33k  35k  37k  39k  41k  43k  45k  46k  48k */
     74,  82,  90,  98, 106, 114, 122, 130, 138, 146, 154, 162, 168, 174, 180
 };
 

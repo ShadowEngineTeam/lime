@@ -49,6 +49,34 @@ dot (pixman_fixed_48_16_t x1,
     return x1 * x2 + y1 * y2 + z1 * z2;
 }
 
+void
+_pixman_radial_affine_setup (const radial_gradient_t *radial,
+			     pixman_vector_t         *v,
+			     const pixman_vector_t   *unit,
+			     pixman_fixed_32_32_t    *b,
+			     pixman_fixed_32_32_t    *db,
+			     pixman_fixed_32_32_t    *c,
+			     pixman_fixed_32_32_t    *dc,
+			     pixman_fixed_32_32_t    *ddc)
+{
+    /* warning: this computation may overflow */
+    v->vector[0] -= radial->c1.x;
+    v->vector[1] -= radial->c1.y;
+
+    *b  = dot (v->vector[0], v->vector[1], radial->c1.radius,
+	       radial->delta.x, radial->delta.y, radial->delta.radius);
+    *db = dot (unit->vector[0], unit->vector[1], 0,
+	       radial->delta.x, radial->delta.y, 0);
+    *c  = dot (v->vector[0], v->vector[1],
+	       -((pixman_fixed_48_16_t)radial->c1.radius),
+	       v->vector[0], v->vector[1], radial->c1.radius);
+    *dc = dot (2 * (pixman_fixed_48_16_t)v->vector[0] + unit->vector[0],
+	       2 * (pixman_fixed_48_16_t)v->vector[1] + unit->vector[1], 0,
+	       unit->vector[0], unit->vector[1], 0);
+    *ddc = 2 * dot (unit->vector[0], unit->vector[1], 0,
+		    unit->vector[0], unit->vector[1], 0);
+}
+
 static inline double
 fdot (double x1,
       double y1,
@@ -327,10 +355,6 @@ radial_get_scanline (pixman_iter_t                 *iter,
 	 */
 	pixman_fixed_32_32_t b, db, c, dc, ddc;
 
-	/* warning: this computation may overflow */
-	v.vector[0] -= radial->c1.x;
-	v.vector[1] -= radial->c1.y;
-
 	/*
 	 * B and C are computed and updated exactly.
 	 * If fdot was used instead of dot, in the worst case it would
@@ -340,20 +364,7 @@ radial_get_scanline (pixman_iter_t                 *iter,
 	 * This would mean a worst case of unbound relative error or
 	 * about 2^10 absolute error
 	 */
-	b = dot (v.vector[0], v.vector[1], radial->c1.radius,
-		 radial->delta.x, radial->delta.y, radial->delta.radius);
-	db = dot (unit.vector[0], unit.vector[1], 0,
-		  radial->delta.x, radial->delta.y, 0);
-
-	c = dot (v.vector[0], v.vector[1],
-		 -((pixman_fixed_48_16_t) radial->c1.radius),
-		 v.vector[0], v.vector[1], radial->c1.radius);
-	dc = dot (2 * (pixman_fixed_48_16_t) v.vector[0] + unit.vector[0],
-		  2 * (pixman_fixed_48_16_t) v.vector[1] + unit.vector[1],
-		  0,
-		  unit.vector[0], unit.vector[1], 0);
-	ddc = 2 * dot (unit.vector[0], unit.vector[1], 0,
-		       unit.vector[0], unit.vector[1], 0);
+	_pixman_radial_affine_setup (radial, &v, &unit, &b, &db, &c, &dc, &ddc);
 
 	while (buffer < end)
 	{
@@ -425,9 +436,9 @@ radial_get_scanline (pixman_iter_t                 *iter,
 
 	    buffer += (Bpp / 4);
 
-	    v.vector[0] += unit.vector[0];
-	    v.vector[1] += unit.vector[1];
-	    v.vector[2] += unit.vector[2];
+	    v.vector[0] = ADD_WRAP (v.vector[0], unit.vector[0]);
+	    v.vector[1] = ADD_WRAP (v.vector[1], unit.vector[1]);
+	    v.vector[2] = ADD_WRAP (v.vector[2], unit.vector[2]);
 	}
     }
 
@@ -492,9 +503,9 @@ pixman_image_create_radial_gradient (const pixman_point_fixed_t *  inner,
     radial->c2.radius = outer_radius;
 
     /* warning: this computations may overflow */
-    radial->delta.x = radial->c2.x - radial->c1.x;
-    radial->delta.y = radial->c2.y - radial->c1.y;
-    radial->delta.radius = radial->c2.radius - radial->c1.radius;
+    radial->delta.x = SUB_WRAP (radial->c2.x, radial->c1.x);
+    radial->delta.y = SUB_WRAP (radial->c2.y, radial->c1.y);
+    radial->delta.radius = SUB_WRAP (radial->c2.radius, radial->c1.radius);
 
     /* computed exactly, then cast to double -> every bit of the double
        representation is correct (53 bits) */

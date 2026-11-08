@@ -29,6 +29,7 @@
 extern float Android_GetDrawScale();
 extern bool Android_ShouldUseDrawScale(float scale);
 extern void Android_SetScreenResolution(int surfaceWidth, int surfaceHeight, int deviceWidth, int deviceHeight, float density, float rate);
+extern void Android_SetScreenHDRHeadroom(float headroom);
 extern void Android_SetFormat(int format_wanted, int format_got);
 extern void Android_SetOrientation(SDL_DisplayOrientation orientation);
 extern void Android_SendResize(SDL_Window *window);

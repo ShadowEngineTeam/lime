@@ -477,8 +477,10 @@ _cairo_win32_printing_surface_select_solid_brush (cairo_win32_printing_surface_t
     color = _cairo_win32_printing_surface_flatten_transparency (surface,
 								&pattern->color);
     surface->brush = CreateSolidBrush (color);
-    if (!surface->brush)
-	return _cairo_win32_print_gdi_error ("_cairo_win32_surface_select_solid_brush(CreateSolidBrush)");
+    if (!surface->brush) {
+        fprintf (stderr, "%s:%s\n", __FUNCTION__, "CreateSolidBrush");
+        return _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
+    }
     surface->old_brush = SelectObject (surface->win32.dc, surface->brush);
 
     return CAIRO_STATUS_SUCCESS;
@@ -501,13 +503,17 @@ _cairo_win32_printing_surface_get_ctm_clip_box (cairo_win32_printing_surface_t *
     XFORM xform;
 
     _cairo_matrix_to_win32_xform (&surface->ctm, &xform);
-    if (!ModifyWorldTransform (surface->win32.dc, &xform, MWT_LEFTMULTIPLY))
-	return _cairo_win32_print_gdi_error ("_cairo_win32_printing_surface_get_clip_box:ModifyWorldTransform");
+    if (!ModifyWorldTransform (surface->win32.dc, &xform, MWT_LEFTMULTIPLY)) {
+        fprintf (stderr, "%s:%s\n", __FUNCTION__, "ModifyWorldTransform");
+        return _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
+    }
     GetClipBox (surface->win32.dc, clip);
 
     _cairo_matrix_to_win32_xform (&surface->gdi_ctm, &xform);
-    if (!SetWorldTransform (surface->win32.dc, &xform))
-	return _cairo_win32_print_gdi_error ("_cairo_win32_printing_surface_get_clip_box:SetWorldTransform");
+    if (!SetWorldTransform (surface->win32.dc, &xform)) {
+        fprintf (stderr, "%s:%s\n", __FUNCTION__, "SetWorldTransform");
+        return _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
+    }
 
     return CAIRO_STATUS_SUCCESS;
 }
@@ -575,6 +581,7 @@ _cairo_win32_printing_surface_paint_recording_pattern (cairo_win32_printing_surf
 	    goto err;
 
 	_cairo_box_round_to_rectangle (&bbox, &recording_extents);
+	is_subsurface = FALSE;
     }
 
     status = _cairo_win32_printing_surface_get_ctm_clip_box (surface, &clip);
@@ -628,23 +635,23 @@ _cairo_win32_printing_surface_paint_recording_pattern (cairo_win32_printing_surf
 	    /* Set clip path around bbox of the pattern. */
 	    BeginPath (surface->win32.dc);
 
-	    x = 0;
-	    y = 0;
+	    x = recording_extents.x;
+	    y = recording_extents.y;
 	    cairo_matrix_transform_point (&surface->ctm, &x, &y);
 	    MoveToEx (surface->win32.dc, (int) x, (int) y, NULL);
 
-	    x = recording_extents.width;
-	    y = 0;
+	    x = recording_extents.x + recording_extents.width;
+	    y = recording_extents.y;
 	    cairo_matrix_transform_point (&surface->ctm, &x, &y);
 	    LineTo (surface->win32.dc, (int) x, (int) y);
 
-	    x = recording_extents.width;
-	    y = recording_extents.height;
+	    x = recording_extents.x + recording_extents.width;
+	    y = recording_extents.y + recording_extents.height;
 	    cairo_matrix_transform_point (&surface->ctm, &x, &y);
 	    LineTo (surface->win32.dc, (int) x, (int) y);
 
-	    x = 0;
-	    y = recording_extents.height;
+	    x = recording_extents.x;
+	    y = recording_extents.y + recording_extents.height;
 	    cairo_matrix_transform_point (&surface->ctm, &x, &y);
 	    LineTo (surface->win32.dc, (int) x, (int) y);
 
@@ -887,7 +894,8 @@ _cairo_win32_printing_surface_paint_image_pattern (cairo_win32_printing_surface_
     _cairo_matrix_to_win32_xform (&m, &xform);
 
     if (! SetWorldTransform (surface->win32.dc, &xform)) {
-	status = _cairo_win32_print_gdi_error ("_cairo_win32_printing_surface_paint_image_pattern");
+        fprintf (stderr, "%s:%s\n", __FUNCTION__, "SetWorldTransform");
+        status = _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
 	goto CLEANUP_OPAQUE_IMAGE;
     }
 
@@ -922,7 +930,8 @@ _cairo_win32_printing_surface_paint_image_pattern (cairo_win32_printing_surface_
 				DIB_RGB_COLORS,
 				SRCCOPY))
 	    {
-		status = _cairo_win32_print_gdi_error ("_cairo_win32_printing_surface_paint(StretchDIBits)");
+                fprintf (stderr, "%s:%s\n", __FUNCTION__, "StretchDIBits");
+                status = _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
 		goto CLEANUP_OPAQUE_IMAGE;
 	    }
 	}
@@ -996,8 +1005,10 @@ _cairo_win32_printing_surface_paint_linear_pattern (cairo_win32_printing_surface
 
     _cairo_matrix_to_win32_xform (&mat, &xform);
 
-    if (!SetWorldTransform (surface->win32.dc, &xform))
-	return _cairo_win32_print_gdi_error ("_win32_printing_surface_paint_linear_pattern:SetWorldTransform2");
+    if (!SetWorldTransform (surface->win32.dc, &xform)) {
+        fprintf (stderr, "%s:%s\n", __FUNCTION__, "SetWorldTransform");
+        return _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
+    }
 
     GetClipBox (surface->win32.dc, &clip);
 
@@ -1086,7 +1097,10 @@ _cairo_win32_printing_surface_paint_linear_pattern (cairo_win32_printing_surface
 		       vert, total_verts,
 		       rect, total_rects,
 		       GRADIENT_FILL_RECT_H))
-	return _cairo_win32_print_gdi_error ("_win32_printing_surface_paint_linear_pattern:GradientFill");
+    {
+        fprintf (stderr, "%s:%s\n", __FUNCTION__, "GradientFill");
+        return _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
+    }
 
     free (rect);
     free (vert);
@@ -1556,13 +1570,15 @@ _cairo_win32_printing_surface_stroke (void			*abstract_surface,
 		       style->num_dashes,
 		       dash_array);
     if (pen == NULL) {
-	status = _cairo_win32_print_gdi_error ("_win32_surface_stroke:ExtCreatePen");
+        fprintf (stderr, "%s:%s\n", __FUNCTION__, "ExtCreatePen");
+        status = _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
 	goto cleanup_composite;
     }
 
     obj = SelectObject (surface->win32.dc, pen);
     if (obj == NULL) {
-	status = _cairo_win32_print_gdi_error ("_win32_surface_stroke:SelectObject");
+        fprintf (stderr, "%s:%s\n", __FUNCTION__, "SelectObject");
+        status = _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
 	goto cleanup_composite;
     }
 
@@ -1582,7 +1598,8 @@ _cairo_win32_printing_surface_stroke (void			*abstract_surface,
     xform.eDy = 0.0f;
 
     if (!ModifyWorldTransform (surface->win32.dc, &xform, MWT_LEFTMULTIPLY)) {
-	status = _cairo_win32_print_gdi_error ("_win32_surface_stroke:SetWorldTransform");
+        fprintf (stderr, "%s:%s\n", __FUNCTION__, "ModifyWorldTransform");
+        status = _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
 	goto cleanup_composite;
     }
 
@@ -1590,18 +1607,21 @@ _cairo_win32_printing_surface_stroke (void			*abstract_surface,
 	StrokePath (surface->win32.dc);
     } else {
 	if (!WidenPath (surface->win32.dc)) {
-	    status = _cairo_win32_print_gdi_error ("_win32_surface_stroke:WidenPath");
+            fprintf (stderr, "%s:%s\n", __FUNCTION__, "WidenPath");
+            status = _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
 	    goto cleanup_composite;
 	}
 	if (!SelectClipPath (surface->win32.dc, RGN_AND)) {
-	    status = _cairo_win32_print_gdi_error ("_win32_surface_stroke:SelectClipPath");
+            fprintf (stderr, "%s:%s\n", __FUNCTION__, "SelectClipPath");
+            status = _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
 	    goto cleanup_composite;
 	}
 
 	/* Return to device space to paint the pattern */
 	_cairo_matrix_to_win32_xform (&surface->gdi_ctm, &xform);
 	if (!SetWorldTransform (surface->win32.dc, &xform)) {
-	    status = _cairo_win32_print_gdi_error ("_win32_surface_stroke:ModifyWorldTransform");
+            fprintf (stderr, "%s:%s\n", __FUNCTION__, "SetWorldTransform");
+            status = _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
 	    goto cleanup_composite;
 	}
 	status = _cairo_win32_printing_surface_paint_pattern (surface, source, &extents.bounded);
@@ -2102,8 +2122,10 @@ _cairo_win32_printing_surface_start_page (void *abstract_surface)
 	surface->ctm.x0 = xform.eDx;
 	surface->ctm.y0 = xform.eDy;
 	cairo_matrix_init_identity (&surface->gdi_ctm);
-	if (!ModifyWorldTransform (surface->win32.dc, NULL, MWT_IDENTITY))
-	    return _cairo_win32_print_gdi_error ("_cairo_win32_printing_surface_start_page:ModifyWorldTransform");
+	if (!ModifyWorldTransform (surface->win32.dc, NULL, MWT_IDENTITY)) {
+            fprintf (stderr, "%s:%s\n", __FUNCTION__, "ModifyWorldTransform");
+            return _cairo_error (CAIRO_STATUS_WIN32_GDI_ERROR);
+        }
     }
 
     surface->has_ctm = !_cairo_matrix_is_identity (&surface->ctm);

@@ -348,79 +348,83 @@ test_hb_ot_color_glyph_get_layers (void)
 static void
 test_hb_ot_color_has_data (void)
 {
-  g_assert (hb_ot_color_has_layers (empty) == FALSE);
-  g_assert (hb_ot_color_has_layers (cpal_v0) == TRUE);
-  g_assert (hb_ot_color_has_layers (cpal_v1) == TRUE);
-  g_assert (hb_ot_color_has_layers (cpal) == TRUE);
-  g_assert (hb_ot_color_has_layers (cbdt) == FALSE);
-  g_assert (hb_ot_color_has_layers (sbix) == FALSE);
-  g_assert (hb_ot_color_has_layers (svg) == FALSE);
-  g_assert (hb_ot_color_has_layers (colrv1) == FALSE);
+  g_assert_true (hb_ot_color_has_layers (empty) == FALSE);
+  g_assert_true (hb_ot_color_has_layers (cpal_v0) == TRUE);
+  g_assert_true (hb_ot_color_has_layers (cpal_v1) == TRUE);
+  g_assert_true (hb_ot_color_has_layers (cpal) == TRUE);
+  g_assert_true (hb_ot_color_has_layers (cbdt) == FALSE);
+  g_assert_true (hb_ot_color_has_layers (sbix) == FALSE);
+  g_assert_true (hb_ot_color_has_layers (svg) == FALSE);
+  g_assert_true (hb_ot_color_has_layers (colrv1) == FALSE);
 
-  g_assert (hb_ot_color_has_palettes (empty) == FALSE);
-  g_assert (hb_ot_color_has_palettes (cpal_v0) == TRUE);
-  g_assert (hb_ot_color_has_palettes (cpal_v1) == TRUE);
-  g_assert (hb_ot_color_has_palettes (cpal) == TRUE);
-  g_assert (hb_ot_color_has_palettes (cbdt) == FALSE);
-  g_assert (hb_ot_color_has_palettes (sbix) == FALSE);
-  g_assert (hb_ot_color_has_palettes (svg) == FALSE);
-  g_assert (hb_ot_color_has_palettes (colrv1) == TRUE);
+  g_assert_true (hb_ot_color_has_palettes (empty) == FALSE);
+  g_assert_true (hb_ot_color_has_palettes (cpal_v0) == TRUE);
+  g_assert_true (hb_ot_color_has_palettes (cpal_v1) == TRUE);
+  g_assert_true (hb_ot_color_has_palettes (cpal) == TRUE);
+  g_assert_true (hb_ot_color_has_palettes (cbdt) == FALSE);
+  g_assert_true (hb_ot_color_has_palettes (sbix) == FALSE);
+  g_assert_true (hb_ot_color_has_palettes (svg) == FALSE);
+  g_assert_true (hb_ot_color_has_palettes (colrv1) == TRUE);
 
-  g_assert (hb_ot_color_has_svg (empty) == FALSE);
-  g_assert (hb_ot_color_has_svg (cpal_v0) == FALSE);
-  g_assert (hb_ot_color_has_svg (cpal_v1) == FALSE);
-  g_assert (hb_ot_color_has_svg (cpal) == FALSE);
-  g_assert (hb_ot_color_has_svg (cbdt) == FALSE);
-  g_assert (hb_ot_color_has_svg (sbix) == FALSE);
-  g_assert (hb_ot_color_has_svg (svg) == TRUE);
-  g_assert (hb_ot_color_has_svg (colrv1) == FALSE);
+#ifndef HB_NO_SVG
+  g_assert_true (hb_ot_color_has_svg (empty) == FALSE);
+  g_assert_true (hb_ot_color_has_svg (cpal_v0) == FALSE);
+  g_assert_true (hb_ot_color_has_svg (cpal_v1) == FALSE);
+  g_assert_true (hb_ot_color_has_svg (cpal) == FALSE);
+  g_assert_true (hb_ot_color_has_svg (cbdt) == FALSE);
+  g_assert_true (hb_ot_color_has_svg (sbix) == FALSE);
+  g_assert_true (hb_ot_color_has_svg (svg) == TRUE);
+  g_assert_true (hb_ot_color_has_svg (colrv1) == FALSE);
+#endif
 
-  g_assert (hb_ot_color_has_png (empty) == FALSE);
-  g_assert (hb_ot_color_has_png (cpal_v0) == FALSE);
-  g_assert (hb_ot_color_has_png (cpal_v1) == FALSE);
-  g_assert (hb_ot_color_has_png (cpal) == FALSE);
-  g_assert (hb_ot_color_has_png (cbdt) == TRUE);
-  g_assert (hb_ot_color_has_png (sbix) == TRUE);
-  g_assert (hb_ot_color_has_png (svg) == FALSE);
-  g_assert (hb_ot_color_has_png (colrv1) == FALSE);
+  g_assert_true (hb_ot_color_has_png (empty) == FALSE);
+  g_assert_true (hb_ot_color_has_png (cpal_v0) == FALSE);
+  g_assert_true (hb_ot_color_has_png (cpal_v1) == FALSE);
+  g_assert_true (hb_ot_color_has_png (cpal) == FALSE);
+  g_assert_true (hb_ot_color_has_png (cbdt) == TRUE);
+  g_assert_true (hb_ot_color_has_png (sbix) == TRUE);
+  g_assert_true (hb_ot_color_has_png (svg) == FALSE);
+  g_assert_true (hb_ot_color_has_png (colrv1) == FALSE);
 
-  g_assert (hb_ot_color_has_paint (empty) == FALSE);
-  g_assert (hb_ot_color_has_paint (cpal_v0) == FALSE);
-  g_assert (hb_ot_color_has_paint (cpal_v1) == FALSE);
-  g_assert (hb_ot_color_has_paint (cpal) == FALSE);
-  g_assert (hb_ot_color_has_paint (cbdt) == FALSE);
-  g_assert (hb_ot_color_has_paint (sbix) == FALSE);
-  g_assert (hb_ot_color_has_paint (svg) == FALSE);
-  g_assert (hb_ot_color_has_paint (colrv1) == TRUE);
+  g_assert_true (hb_ot_color_has_paint (empty) == FALSE);
+  g_assert_true (hb_ot_color_has_paint (cpal_v0) == FALSE);
+  g_assert_true (hb_ot_color_has_paint (cpal_v1) == FALSE);
+  g_assert_true (hb_ot_color_has_paint (cpal) == FALSE);
+  g_assert_true (hb_ot_color_has_paint (cbdt) == FALSE);
+  g_assert_true (hb_ot_color_has_paint (sbix) == FALSE);
+  g_assert_true (hb_ot_color_has_paint (svg) == FALSE);
+  g_assert_true (hb_ot_color_has_paint (colrv1) == TRUE);
 }
 
 static void
 test_hb_ot_color_glyph_has_paint (void)
 {
-  g_assert (hb_ot_color_has_paint (colrv1));
-  g_assert (hb_ot_color_glyph_has_paint (colrv1, 10));
-  g_assert (!hb_ot_color_glyph_has_paint (colrv1, 20));
+  g_assert_true (hb_ot_color_has_paint (colrv1));
+  g_assert_true (hb_ot_color_glyph_has_paint (colrv1, 10));
+  g_assert_true (!hb_ot_color_glyph_has_paint (colrv1, 20));
 }
 
 static void
 test_hb_ot_color_svg (void)
 {
+#ifndef HB_NO_SVG
   hb_blob_t *blob;
   unsigned int length;
   const char *data;
 
   blob = hb_ot_color_glyph_reference_svg (svg, 0);
-  g_assert (hb_blob_get_length (blob) == 0);
+  g_assert_true (hb_blob_get_length (blob) == 0);
 
   blob = hb_ot_color_glyph_reference_svg (svg, 1);
   data = hb_blob_get_data (blob, &length);
   g_assert_cmpuint (length, ==, 146);
-  g_assert (strncmp (data, "<?xml", 4) == 0);
-  g_assert (strncmp (data + 140, "</svg>", 5) == 0);
+  g_assert_true (strncmp (data, "<?xml", 4) == 0);
+  g_assert_true (strncmp (data + 140, "</svg>", 5) == 0);
   hb_blob_destroy (blob);
 
   blob = hb_ot_color_glyph_reference_svg (empty, 0);
-  g_assert (hb_blob_get_length (blob) == 0);
+  g_assert_true (hb_blob_get_length (blob) == 0);
+#endif
 }
 
 
@@ -442,12 +446,12 @@ test_hb_ot_color_png (void)
   g_assert_cmpint (extents.y_bearing, ==, 0);
   g_assert_cmpint (extents.width, ==, 0);
   g_assert_cmpint (extents.height, ==, 0);
-  g_assert (hb_blob_get_length (blob) == 0);
+  g_assert_true (hb_blob_get_length (blob) == 0);
 
   blob = hb_ot_color_glyph_reference_png (sbix_font, 1);
   data = hb_blob_get_data (blob, &length);
   g_assert_cmpuint (length, ==, 224);
-  g_assert (strncmp (data + 1, "PNG", 3) == 0);
+  g_assert_true (strncmp (data + 1, "PNG", 3) == 0);
   hb_font_get_glyph_extents (sbix_font, 1, &extents);
   g_assert_cmpint (extents.x_bearing, ==, 0);
   g_assert_cmpint (extents.y_bearing, ==, 800);
@@ -459,12 +463,12 @@ test_hb_ot_color_png (void)
   /* cbdt */
   cbdt_font = hb_font_create (cbdt);
   blob = hb_ot_color_glyph_reference_png (cbdt_font, 0);
-  g_assert (hb_blob_get_length (blob) == 0);
+  g_assert_true (hb_blob_get_length (blob) == 0);
 
   blob = hb_ot_color_glyph_reference_png (cbdt_font, 1);
   data = hb_blob_get_data (blob, &length);
   g_assert_cmpuint (length, ==, 88);
-  g_assert (strncmp (data + 1, "PNG", 3) == 0);
+  g_assert_true (strncmp (data + 1, "PNG", 3) == 0);
   hb_font_get_glyph_extents (cbdt_font, 1, &extents);
   g_assert_cmpint (extents.x_bearing, ==, 0);
   g_assert_cmpint (extents.y_bearing, ==, 1024);
@@ -473,6 +477,169 @@ test_hb_ot_color_png (void)
   hb_blob_destroy (blob);
   hb_font_destroy (cbdt_font);
 }
+
+static void
+test_hb_ot_color_png_cbdt_records (void)
+{
+  /* Index subtable records that are out of order and overlap.  A glyph
+   * belongs to the first one that covers it.  Images of the Nth record
+   * are N bytes long.  This pins the accelerator's record index against
+   * the first-covering-record rule of the old linear walk. */
+  static const unsigned int lengths[] = {3, 2, 2, 3, 1, 1, 3, 3, 0};
+  static const uint8_t cblc[] = {
+    0, 3, 0, 0, /* version */
+    0, 0, 0, 1, /* numSizes */
+    /* BitmapSize */
+    0, 0, 0, 8 + 48, /* indexSubtableArrayOffset */
+    0, 0, 0, 78, /* indexTablesSize */
+    0, 0, 0, 3, /* numberOfIndexSubtables */
+    0, 0, 0, 0, /* colorRef */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* hori */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* vert */
+    0, 0, 0, 7, /* startGlyphIndex, endGlyphIndex */
+    32, 32, 32, 1, /* ppemX, ppemY, bitDepth, flags */
+    /* IndexSubtableRecords: firstGlyphIndex, lastGlyphIndex, offsetToSubtable */
+    0, 4, 0, 5, 0, 0, 0, 24,
+    0, 1, 0, 2, 0, 0, 0, 38,
+    0, 0, 0, 7, 0, 0, 0, 52,
+    /* IndexSubtableFormat3s: indexFormat, imageFormat, imageDataOffset, offsets */
+    0, 3, 0, 19, 0, 0, 0, 4, 0, 0, 0, 8, 0, 16,
+    0, 3, 0, 19, 0, 0, 0, 4 + 64, 0, 0, 0, 8, 0, 16,
+    0, 3, 0, 19, 0, 0, 0, 4 + 128, 0, 0, 0, 8, 0, 16, 0, 24, 0, 32, 0, 40, 0, 48, 0, 56, 0, 64,
+  };
+  uint8_t cbdt_data[4 + 3 * 64] = {0, 3, 0, 0};
+  for (unsigned int i = 0; i < 3 * 8; i++)
+    cbdt_data[4 + 8 * i + 3] = i / 8 + 1; /* GlyphBitmapDataFormat19 dataLen */
+
+  hb_face_t *face = hb_face_builder_create ();
+  hb_blob_t *blob = hb_blob_create ((const char *) cblc, sizeof (cblc),
+				    HB_MEMORY_MODE_READONLY, NULL, NULL);
+  hb_face_builder_add_table (face, HB_TAG ('C','B','L','C'), blob);
+  hb_blob_destroy (blob);
+  blob = hb_blob_create ((const char *) cbdt_data, sizeof (cbdt_data),
+			 HB_MEMORY_MODE_READONLY, NULL, NULL);
+  hb_face_builder_add_table (face, HB_TAG ('C','B','D','T'), blob);
+  hb_blob_destroy (blob);
+
+  hb_font_t *font = hb_font_create (face);
+  for (unsigned int gid = 0; gid < G_N_ELEMENTS (lengths); gid++)
+  {
+    blob = hb_ot_color_glyph_reference_png (font, gid);
+    g_assert_cmpuint (hb_blob_get_length (blob), ==, lengths[gid]);
+    hb_blob_destroy (blob);
+  }
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+}
+
+#if !defined(HB_NO_VAR) && !defined(HB_NO_PAINT)
+static void
+test_hb_ot_color_clip_extents_overflow (void)
+{
+  /* Glyph 1 has a ClipBoxFormat2 whose deltas saturate every edge to
+   * INT32_MAX at wght=1.  Scaling those extents must clamp them instead
+   * of converting an out-of-range float to int. */
+  hb_face_t *face = hb_test_open_font_file ("fonts/colr-var-overflow.ttf");
+  hb_font_t *font = hb_font_create (face);
+  hb_variation_t var = {HB_TAG ('w','g','h','t'), 1.f};
+  hb_glyph_extents_t extents;
+  const struct {
+    int scale;
+    hb_position_t bearing;
+    hb_position_t size;
+  } tests[] = {
+    /* float(INT32_MAX) rounds to 2^31, one past the clamped bearing. */
+    { 1, G_MAXINT32, 1},
+    { 2, G_MAXINT32, G_MAXINT32},
+    {-1, G_MININT32, 0},
+    {-2, G_MININT32, G_MININT32},
+  };
+
+  hb_font_set_variations (font, &var, 1);
+  int upem = hb_face_get_upem (face);
+  for (unsigned i = 0; i < G_N_ELEMENTS (tests); i++)
+  {
+    hb_font_set_scale (font, tests[i].scale * upem, tests[i].scale * upem);
+    g_assert_true (hb_font_get_glyph_extents (font, 1, &extents));
+    g_assert_cmpint (extents.x_bearing, ==, tests[i].bearing);
+    g_assert_cmpint (extents.y_bearing, ==, tests[i].bearing);
+    g_assert_cmpint (extents.width, ==, tests[i].size);
+    g_assert_cmpint (extents.height, ==, tests[i].size);
+  }
+
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+}
+
+static void
+test_hb_ot_color_varidx_add_overflow (void)
+{
+  /* Mutate Glyph 1's ClipBoxFormat2 varIdxBase in colr-var-overflow.ttf to
+   * 0xFFFFFFFE.  Offsets 0..3 must not wrap 32-bit uint32_t to varIdx 0..1
+   * (whose wght=1 deltas are INT32_MAX) or hit NO_VARIATION unchecked. */
+  hb_face_t *orig = hb_test_open_font_file ("fonts/colr-var-overflow.ttf");
+  hb_blob_t *colr_blob = hb_face_reference_table (orig, HB_TAG ('C','O','L','R'));
+  unsigned colr_len = 0;
+  const uint8_t *colr_src = (const uint8_t *) hb_blob_get_data (colr_blob, &colr_len);
+  g_assert_cmpuint (colr_len, >, 34);
+
+  uint8_t *colr_mut = (uint8_t *) g_malloc (colr_len);
+  memcpy (colr_mut, colr_src, colr_len);
+  hb_blob_destroy (colr_blob);
+
+  uint32_t off_clip = ((uint32_t) colr_mut[22] << 24) |
+                      ((uint32_t) colr_mut[23] << 16) |
+                      ((uint32_t) colr_mut[24] << 8)  |
+                      (uint32_t) colr_mut[25];
+  g_assert_cmpuint (off_clip + 12, <=, colr_len);
+  uint32_t box_off = ((uint32_t) colr_mut[off_clip + 9] << 16) |
+                     ((uint32_t) colr_mut[off_clip + 10] << 8) |
+                     (uint32_t) colr_mut[off_clip + 11];
+  uint32_t abs_box = off_clip + box_off;
+  g_assert_cmpuint (abs_box + 13, <=, colr_len);
+  g_assert_cmpuint (colr_mut[abs_box], ==, 2); /* ClipBoxFormat2 */
+
+  /* Set varIdxBase = 0xFFFFFFFE (base box is 300, 300, 300, 300). */
+  colr_mut[abs_box + 9]  = 0xFF;
+  colr_mut[abs_box + 10] = 0xFF;
+  colr_mut[abs_box + 11] = 0xFF;
+  colr_mut[abs_box + 12] = 0xFE;
+
+  hb_face_t *face = hb_face_builder_create ();
+  hb_tag_t tags[32];
+  unsigned tag_count = G_N_ELEMENTS (tags);
+  hb_face_get_table_tags (orig, 0, &tag_count, tags);
+  for (unsigned i = 0; i < tag_count; i++)
+  {
+    if (tags[i] == HB_TAG ('C','O','L','R'))
+      continue;
+    hb_blob_t *tb = hb_face_reference_table (orig, tags[i]);
+    hb_face_builder_add_table (face, tags[i], tb);
+    hb_blob_destroy (tb);
+  }
+  hb_blob_t *mut_blob = hb_blob_create ((const char *) colr_mut, colr_len,
+                                        HB_MEMORY_MODE_READONLY, colr_mut, g_free);
+  hb_face_builder_add_table (face, HB_TAG ('C','O','L','R'), mut_blob);
+  hb_blob_destroy (mut_blob);
+  hb_face_destroy (orig);
+
+  hb_font_t *font = hb_font_create (face);
+  hb_variation_t var = {HB_TAG ('w','g','h','t'), 1.f};
+  hb_font_set_variations (font, &var, 1);
+  int upem = hb_face_get_upem (face);
+  hb_font_set_scale (font, upem, upem);
+
+  hb_glyph_extents_t extents;
+  g_assert_true (hb_font_get_glyph_extents (font, 1, &extents));
+  g_assert_cmpint (extents.x_bearing, ==, 300);
+  g_assert_cmpint (extents.y_bearing, ==, 300);
+  g_assert_cmpint (extents.width, ==, 0);
+  g_assert_cmpint (extents.height, ==, 0);
+
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+}
+#endif
 
 int
 main (int argc, char **argv)
@@ -502,8 +669,17 @@ main (int argc, char **argv)
   hb_test_add (test_hb_ot_color_glyph_get_layers);
   hb_test_add (test_hb_ot_color_has_data);
   hb_test_add (test_hb_ot_color_png);
+  hb_test_add (test_hb_ot_color_png_cbdt_records);
+#if !defined(HB_NO_VAR) && !defined(HB_NO_PAINT)
+  hb_test_add (test_hb_ot_color_clip_extents_overflow);
+#endif
+#ifndef HB_NO_SVG
   hb_test_add (test_hb_ot_color_svg);
+#endif
   hb_test_add (test_hb_ot_color_glyph_has_paint);
+#if !defined(HB_NO_VAR) && !defined(HB_NO_PAINT)
+  hb_test_add (test_hb_ot_color_varidx_add_overflow);
+#endif
 
   status = hb_test_run();
   hb_face_destroy (cpal_v0);

@@ -30,6 +30,8 @@
 
 #include "../../../hb-open-type.hh"
 #include "../../../hb-paint.hh"
+#include "../../../hb-map.hh"
+#include "../../../hb-set.hh"
 
 /*
  * sbix -- Standard Bitmap Graphics
@@ -79,7 +81,7 @@ struct SBIXGlyph
 
 struct SBIXStrike
 {
-  static unsigned int get_size (unsigned num_glyphs)
+  static size_t get_size (unsigned num_glyphs)
   { return min_size + num_glyphs * HBUINT32::static_size; }
 
   bool sanitize (hb_sanitize_context_t *c) const
@@ -204,8 +206,21 @@ struct sbix
     {
       table = hb_sanitize_context_t ().reference_table<sbix> (face);
       num_glyphs = face->get_num_glyphs ();
+
+      /* Index strikes by ppem, such that choose_strike() doesn't have to
+       * walk them all.  Of those with equal ppem the first one wins. */
+      unsigned count = table->strikes.len;
+      for (unsigned int i = 0; i < count; i++)
+      {
+	unsigned int ppem = table->get_strike (i).ppem;
+	if (strike_ppems.has (ppem)) continue;
+	strike_ppems.add (ppem);
+	strike_for_ppem.set (ppem, i);
+      }
     }
     ~accelerator_t () { table.destroy (); }
+
+    hb_blob_ptr_t<sbix> borrow_sanitized_table () const { return table; }
 
     bool has_data () const { return table->has_data (); }
 
@@ -237,27 +252,28 @@ struct sbix
 
       int x_offset = 0, y_offset = 0;
       unsigned int strike_ppem = 0;
-      hb_blob_t *blob = reference_png (font, glyph, &x_offset, &y_offset, &strike_ppem);
       hb_glyph_extents_t extents;
       hb_glyph_extents_t pixel_extents;
 
-      if (blob == hb_blob_get_empty ())
-        return false;
-
-      if (!hb_font_get_glyph_extents (font, glyph, &extents))
+      if (!font->get_glyph_extents (glyph, &extents, false))
         return false;
 
       if (unlikely (!get_extents (font, glyph, &pixel_extents, false)))
+        return false;
+
+      hb_blob_t *blob = reference_png (font, glyph, &x_offset, &y_offset, &strike_ppem);
+      if (hb_blob_is_immutable (blob))
         return false;
 
       bool ret = funcs->image (data,
 			       blob,
 			       pixel_extents.width, -pixel_extents.height,
 			       HB_PAINT_IMAGE_FORMAT_PNG,
-			       font->slant_xy,
+			       0.f,
 			       &extents);
 
       hb_blob_destroy (blob);
+
       return ret;
     }
 
@@ -265,29 +281,20 @@ struct sbix
 
     const SBIXStrike &choose_strike (hb_font_t *font) const
     {
-      unsigned count = table->strikes.len;
-      if (unlikely (!count))
+      if (unlikely (strike_ppems.is_empty ()))
 	return Null (SBIXStrike);
 
       unsigned int requested_ppem = hb_max (font->x_ppem, font->y_ppem);
       if (!requested_ppem)
 	requested_ppem = 1<<30; /* Choose largest strike. */
       /* TODO Add DPI sensitivity as well? */
-      unsigned int best_i = 0;
-      unsigned int best_ppem = table->get_strike (0).ppem;
 
-      for (unsigned int i = 1; i < count; i++)
-      {
-	unsigned int ppem = (table->get_strike (i)).ppem;
-	if ((requested_ppem <= ppem && ppem < best_ppem) ||
-	    (requested_ppem > best_ppem && ppem > best_ppem))
-	{
-	  best_i = i;
-	  best_ppem = ppem;
-	}
-      }
+      /* Smallest strike that is large enough, or otherwise the largest. */
+      hb_codepoint_t ppem = requested_ppem - 1;
+      if (!strike_ppems.next (&ppem))
+	ppem = strike_ppems.get_max ();
 
-      return table->get_strike (best_i);
+      return table->get_strike (strike_for_ppem.get (ppem));
     }
 
     struct PNGHeader
@@ -336,18 +343,18 @@ struct sbix
       }
 
       extents->x_bearing = x_offset;
-      extents->y_bearing = png.IHDR.height + y_offset;
-      extents->width     = png.IHDR.width;
-      extents->height    = -1 * png.IHDR.height;
+      extents->y_bearing = hb_clamp_to<hb_position_t> ((int64_t) (unsigned int) png.IHDR.height + y_offset);
+      extents->width     = (hb_position_t) (unsigned int) png.IHDR.width;
+      extents->height    = -(hb_position_t) (unsigned int) png.IHDR.height;
 
       /* Convert to font units. */
       if (strike_ppem && scale)
       {
 	float scale = font->face->get_upem () / (float) strike_ppem;
-	extents->x_bearing = roundf (extents->x_bearing * scale);
-	extents->y_bearing = roundf (extents->y_bearing * scale);
-	extents->width = roundf (extents->width * scale);
-	extents->height = roundf (extents->height * scale);
+	extents->x_bearing = hb_clamp_to<hb_position_t> (roundf (extents->x_bearing * scale));
+	extents->y_bearing = hb_clamp_to<hb_position_t> (roundf (extents->y_bearing * scale));
+	extents->width = hb_clamp_to<hb_position_t> (roundf (extents->width * scale));
+	extents->height = hb_clamp_to<hb_position_t> (roundf (extents->height * scale));
       }
 
       if (scale)
@@ -362,6 +369,8 @@ struct sbix
     hb_blob_ptr_t<sbix> table;
 
     unsigned int num_glyphs;
+    hb_set_t strike_ppems;
+    hb_map_t strike_for_ppem;
   };
 
   bool sanitize (hb_sanitize_context_t *c) const

@@ -40,6 +40,14 @@
 
 #define FARGAN_FEATURES (NB_FEATURES)
 
+static int fargan_period(const float *features)
+{
+  int period;
+  period = (int)floor(.5+256./pow(2.f,((1./60.)*((features[NB_BANDS]+1.5)*60))));
+  /* Keep the period within the range the pitch buffer supports. */
+  return IMAX(PITCH_MIN_PERIOD, IMIN(PITCH_MAX_PERIOD, period));
+}
+
 static void compute_fargan_cond(FARGANState *st, float *cond, const float *features, int period)
 {
   FARGAN *model;
@@ -151,7 +159,7 @@ void fargan_cont(FARGANState *st, const float *pcm0, const float *features0)
   for (i=0;i<5;i++) {
     const float *features = &features0[i*NB_FEATURES];
     st->last_period = period;
-    period = (int)floor(.5+256./pow(2.f,((1./60.)*((features[NB_BANDS]+1.5)*60))));
+    period = fargan_period(features);
     compute_fargan_cond(st, cond, features, period);
   }
 
@@ -187,7 +195,7 @@ void fargan_init(FARGANState *st)
 int fargan_load_model(FARGANState *st, const void *data, int len) {
   WeightArray *list;
   int ret;
-  parse_weights(&list, data, len);
+  if (parse_weights(&list, data, len) < 0) return -1;
   ret = init_fargan(&st->model, list);
   opus_free(list);
   if (ret == 0) return 0;
@@ -201,7 +209,7 @@ static void fargan_synthesize_impl(FARGANState *st, float *pcm, const float *fea
   int period;
   celt_assert(st->cont_initialized);
 
-  period = (int)floor(.5+256./pow(2.f,((1./60.)*((features[NB_BANDS]+1.5)*60))));
+  period = fargan_period(features);
   compute_fargan_cond(st, cond, features, period);
   for (subframe=0;subframe<FARGAN_NB_SUBFRAMES;subframe++) {
     float *sub_cond;

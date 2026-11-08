@@ -1,5 +1,8 @@
 subdir('api')
-subdir('shape')
-subdir('subset')
 subdir('fuzzing')
 subdir('threads')
+if not get_option('utilities').disabled()
+subdir('subset')
+subdir('shape')
+subdir('vector')
+endif

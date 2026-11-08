@@ -18,6 +18,7 @@ project(SDL3_image
 )
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/GetGitRevisionDescription.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/PkgConfigHelper.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/PrivateSdlFunctions.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/sdlcpu.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/sdlplatform.cmake")
@@ -844,8 +845,8 @@ endif()
 list(APPEND SDLIMAGE_BACKENDS PNG)
 list(APPEND SDLIMAGE_BACKENDS APNG)
 set(SDLIMAGE_PNG_ENABLED FALSE)
+set(SDLIMAGE_APNG_ENABLED FALSE)
 if(SDLIMAGE_PNG)
-    set(SDLIMAGE_APNG_ENABLED FALSE)
     set(SDLIMAGE_PNG_ENABLED TRUE)
     set(SDLIMAGE_LIBPNG_ENABLED FALSE)
 
@@ -1083,7 +1084,7 @@ if(SDLIMAGE_WEBP)
         set(WEBP_BUILD_VWEBP OFF CACHE BOOL "" FORCE)
         set(WEBP_BUILD_WEBPINFO OFF CACHE BOOL "" FORCE)
         set(WEBP_BUILD_LIBWEBPMUX ON CACHE BOOL "" FORCE)
-        set(WEBP_BUILD_WEBPMUX ON CACHE BOOL "" FORCE)
+        set(WEBP_BUILD_WEBPMUX OFF CACHE BOOL "" FORCE)
         set(WEBP_BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
         message(STATUS "${PROJECT_NAME}: Using vendored libwebp")
         sdl_check_project_in_subfolder(external/libwebp libwebp SDLIMAGE_VENDORED)
@@ -1254,10 +1255,18 @@ if(SDLIMAGE_INSTALL)
         FILES
             "${CMAKE_CURRENT_BINARY_DIR}/SDL3_imageConfig.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}/SDL3_imageConfigVersion.cmake"
-            ${INSTALL_EXTRA_CMAKE_MODULES}
         DESTINATION "${SDLIMAGE_INSTALL_CMAKEDIR}"
         COMPONENT devel
     )
+    if(INSTALL_EXTRA_CMAKE_MODULES)
+        install(
+            FILES
+                cmake/PkgConfigHelper.cmake
+                ${INSTALL_EXTRA_CMAKE_MODULES}
+            DESTINATION "${SDLIMAGE_INSTALL_CMAKEDIR}"
+            COMPONENT devel
+        )
+    endif()
     install(EXPORT SDL3ImageExports
         FILE ${sdl3_image_target_name}-targets.cmake
         NAMESPACE SDL3_image::

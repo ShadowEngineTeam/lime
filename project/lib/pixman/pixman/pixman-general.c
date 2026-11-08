@@ -132,7 +132,7 @@ general_composite_rect  (pixman_implementation_t *imp,
     uint8_t *scanline_buffer = (uint8_t *) stack_scanline_buffer;
     uint8_t *src_buffer, *mask_buffer, *dest_buffer;
     pixman_iter_t src_iter, mask_iter, dest_iter;
-    pixman_combine_32_func_t compose;
+    pixman_combine_func_t compose;
     pixman_bool_t component_alpha;
     iter_flags_t width_flag, src_iter_flags;
     int Bpp;
@@ -165,26 +165,17 @@ general_composite_rect  (pixman_implementation_t *imp,
 
 	if (!scanline_buffer)
 	    return;
+    }
 
-	memset (scanline_buffer, 0, width * Bpp * 3 + 15 * 3);
-    }
-    else
-    {
-	memset (stack_scanline_buffer, 0, sizeof (stack_scanline_buffer));
-    }
+    /* Clear the part of the buffer we use, so iterators never see
+     * uninitialized memory and wide buffers contain no NaNs.
+     */
+    memset (scanline_buffer, 0, width * Bpp * 3 + 15 * 3);
 
     src_buffer = ALIGN (scanline_buffer);
     mask_buffer = ALIGN (src_buffer + width * Bpp);
     dest_buffer = ALIGN (mask_buffer + width * Bpp);
 
-    if (width_flag == ITER_WIDE)
-    {
-	/* To make sure there aren't any NANs in the buffers */
-	memset (src_buffer, 0, width * Bpp);
-	memset (mask_buffer, 0, width * Bpp);
-	memset (dest_buffer, 0, width * Bpp);
-    }
-    
     /* src iter */
     src_iter_flags = width_flag | op_flags[op].src | ITER_SRC;
 
@@ -227,7 +218,11 @@ general_composite_rect  (pixman_implementation_t *imp,
 	s = src_iter.get_scanline (&src_iter, m);
 	d = dest_iter.get_scanline (&dest_iter, NULL);
 
-	compose (imp->toplevel, op, d, s, m, width);
+	if (width_flag != ITER_WIDE)
+	    compose.f32 (imp->toplevel, op, d, s, m, width);
+	else
+	    compose.ff (imp->toplevel, op, (float *)d, (const float *)s,
+			(const float *)m, width);
 
 	dest_iter.write_back (&dest_iter);
     }
@@ -238,7 +233,7 @@ general_composite_rect  (pixman_implementation_t *imp,
 	mask_iter.fini (&mask_iter);
     if (dest_iter.fini)
 	dest_iter.fini (&dest_iter);
-    
+
     if (scanline_buffer != (uint8_t *) stack_scanline_buffer)
 	free (scanline_buffer);
 }
@@ -261,4 +256,3 @@ _pixman_implementation_create_general (void)
 
     return imp;
 }
-

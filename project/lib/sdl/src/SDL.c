@@ -61,6 +61,9 @@
 #ifdef SDL_PLATFORM_ANDROID
 #include "core/android/SDL_android.h"
 #endif
+#ifdef SDL_PLATFORM_OPENHARMONY
+#include "core/openharmony/SDL_openharmony.h"
+#endif
 
 #define SDL_ALL_SUBSYSTEM_FLAGS ~0U
 
@@ -356,7 +359,7 @@ bool SDL_InitSubSystem(SDL_InitFlags flags)
         if (typeof(SDL3.CPtrToHeap32Index) === 'undefined') { SDL3.CPtrToHeap32Index = function(ptr) { return ptr >>> 2; }; }
         #elif defined(__wasm64__)
         if (typeof(SDL3.JSVarToCPtr) === 'undefined') { SDL3.JSVarToCPtr = function(v) { return BigInt(v); }; }
-        if (typeof(SDL3.CPtrToHeap32Index) === 'undefined') { SDL3.CPtrToHeap32Index = function(ptr) { return Number(ptr / 4n); }; }
+        if (typeof(SDL3.CPtrToHeap32Index) === 'undefined') { SDL3.CPtrToHeap32Index = function(ptr) { return Math.floor(Number(ptr) / 4); }; } // This should NOT be SDL_floor()
         #else
         #error Please define your platform.
         #endif
@@ -420,7 +423,7 @@ bool SDL_InitSubSystem(SDL_InitFlags flags)
             SDL_assert(SDL_VideoThreadID == SDL_MainThreadID);
 #endif
 
-            if (!SDL_VideoInit(NULL)) {
+            if (!SDL_InitVideo(NULL)) {
                 SDL_DecrementSubsystemRefCount(SDL_INIT_VIDEO);
                 SDL_PushError();
                 SDL_QuitSubSystem(SDL_INIT_EVENTS);
@@ -565,7 +568,7 @@ bool SDL_InitSubSystem(SDL_InitFlags flags)
             }
 
             SDL_IncrementSubsystemRefCount(SDL_INIT_CAMERA);
-            if (!SDL_CameraInit(NULL)) {
+            if (!SDL_InitCamera(NULL)) {
                 SDL_DecrementSubsystemRefCount(SDL_INIT_CAMERA);
                 SDL_PushError();
                 SDL_QuitSubSystem(SDL_INIT_EVENTS);
@@ -668,7 +671,7 @@ void SDL_QuitSubSystem(SDL_InitFlags flags)
     if (flags & SDL_INIT_VIDEO) {
         if (SDL_ShouldQuitSubsystem(SDL_INIT_VIDEO)) {
             SDL_QuitRender();
-            SDL_VideoQuit();
+            SDL_QuitVideo();
             SDL_VideoThreadID = 0;
             // video implies events
             SDL_QuitSubSystem(SDL_INIT_EVENTS);
@@ -803,6 +806,8 @@ const char *SDL_GetPlatform(void)
     return "Nokia N-Gage";
 #elif defined(SDL_PLATFORM_OPENBSD)
     return "OpenBSD";
+#elif defined(SDL_PLATFORM_OPENHARMONY)
+    return "OpenHarmony";
 #elif defined(SDL_PLATFORM_OS2)
     return "OS/2";
 #elif defined(SDL_PLATFORM_OSF)
@@ -867,6 +872,8 @@ SDL_FormFactor SDL_GetDeviceFormFactor(void)
     return SDL_FORMFACTOR_PRIVATE;
 #elif defined(SDL_PLATFORM_ANDROID)
     return SDL_GetAndroidDeviceFormFactor();
+#elif defined(SDL_PLATFORM_OPENHARMONY)
+    return SDL_GetOpenHarmonyDeviceFormFactor();
 #elif defined(SDL_PLATFORM_IOS)
     extern SDL_FormFactor SDL_GetUIKitDeviceFormFactor(void);
     return SDL_GetUIKitDeviceFormFactor();

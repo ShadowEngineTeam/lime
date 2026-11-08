@@ -711,6 +711,38 @@ fetch_scanline_rgbaf_float (bits_image_t   *image,
 #endif
 
 static void
+fetch_scanline_a16b16g16r16_float (bits_image_t *  image,
+				   int             x,
+				   int             y,
+				   int             width,
+				   uint32_t *      b,
+				   const uint32_t *mask)
+{
+    const uint64_t *bits = (uint64_t *)(image->bits + y * image->rowstride);
+    const uint64_t *pixel = bits + x;
+    const uint64_t *end = pixel + width;
+    argb_t *buffer = (argb_t *)b;
+
+    while (pixel < end)
+    {
+	uint64_t a, r, g, b, p;
+
+	memcpy(&p, (const void *)pixel++, sizeof(p));
+	a = (p >> 48) & 0xffff;
+	b = (p >> 32) & 0xffff;
+	g = (p >> 16) & 0xffff;
+	r = (p >> 0) & 0xffff;
+
+	buffer->a = pixman_unorm_to_float (a, 16);
+	buffer->r = pixman_unorm_to_float (r, 16);
+	buffer->g = pixman_unorm_to_float (g, 16);
+	buffer->b = pixman_unorm_to_float (b, 16);
+
+	buffer++;
+    }
+}
+
+static void
 fetch_scanline_x2r10g10b10_float (bits_image_t   *image,
 				  int             x,
 				  int             y,
@@ -906,6 +938,29 @@ fetch_pixel_rgbaf_float (bits_image_t *image,
     return argb;
 }
 #endif
+
+static argb_t
+fetch_pixel_a16b16g16r16_float (bits_image_t *image,
+				int           offset,
+				int           line)
+{
+    uint64_t *bits = (uint64_t *)(image->bits + line * image->rowstride);
+    uint64_t a, r, g, b, p;
+    argb_t argb;
+
+    memcpy(&p, (const void *)(bits + offset), sizeof(p));
+    a = (p >> 48) & 0xffff;
+    b = (p >> 32) & 0xffff;
+    g = (p >> 16) & 0xffff;
+    r = (p >> 0)  & 0xffff;
+
+    argb.a = pixman_unorm_to_float (a, 16);
+    argb.r = pixman_unorm_to_float (r, 16);
+    argb.g = pixman_unorm_to_float (g, 16);
+    argb.b = pixman_unorm_to_float (b, 16);
+
+    return argb;
+}
 
 static argb_t
 fetch_pixel_x2r10g10b10_float (bits_image_t *image,
@@ -1120,6 +1175,32 @@ store_scanline_rgbf_float (bits_image_t *  image,
     }
 }
 #endif
+
+static void
+store_scanline_a16b16g16r16_float (bits_image_t *  image,
+				   int             x,
+				   int             y,
+				   int             width,
+				   const uint32_t *v)
+{
+    uint64_t *bits = (uint64_t *)(image->bits + image->rowstride * y);
+    uint64_t *pixel = bits + x;
+    argb_t *values = (argb_t *)v;
+    int i;
+
+    for (i = 0; i < width; ++i)
+    {
+	uint64_t a, r, g, b, p;
+
+	a = pixman_float_to_unorm (values[i].a, 16);
+	r = pixman_float_to_unorm (values[i].r, 16);
+	g = pixman_float_to_unorm (values[i].g, 16);
+	b = pixman_float_to_unorm (values[i].b, 16);
+
+	p = (a << 48) | (b << 32) | (g << 16) | (r << 0) ;
+	memcpy((void *)pixel++, &p, sizeof(uint64_t));
+    }
+}
 
 static void
 store_scanline_a2r10g10b10_float (bits_image_t *  image,
@@ -1633,6 +1714,10 @@ static const format_info_t accessors[] =
       fetch_pixel_generic_lossy_32, fetch_pixel_rgbf_float,
       NULL, store_scanline_rgbf_float },
 #endif
+    { PIXMAN_a16b16g16r16,
+      NULL, fetch_scanline_a16b16g16r16_float,
+      fetch_pixel_generic_lossy_32, fetch_pixel_a16b16g16r16_float,
+      NULL, store_scanline_a16b16g16r16_float },
 
     { PIXMAN_a2r10g10b10,
       NULL, fetch_scanline_a2r10g10b10_float,

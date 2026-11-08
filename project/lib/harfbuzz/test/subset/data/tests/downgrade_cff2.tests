@@ -1,0 +1,15 @@
+FONTS:
+SourceSerif4Variable-Roman-HelloWorld.otf
+
+PROFILES:
+downgrade-cff2.txt
+
+SUBSETS:
+Hello World
+
+INSTANCES:
+wght=400,opsz=20
+wght=650,opsz=48
+
+OPTIONS:
+no_fonttools

@@ -37,6 +37,36 @@
 #include "hb-bimap.hh"
 #include "hb-set.hh"
 
+/* Accelerators opt in only when they can provide full sanitization. */
+template<typename Face, hb_tag_t Tag>
+static hb_blob_t *
+_hb_subset_get_face_table (Face *, hb_integral_constant<hb_tag_t, Tag>, hb_priority<0>) { return nullptr; }
+
+/* Allow an accelerator to handle initialization inside libharfbuzz. */
+template<typename Accel, typename Face, typename Loader>
+static auto
+_hb_subset_borrow_sanitized_table (Face *face, Loader &, hb_priority<1>)
+HB_AUTO_RETURN (Accel::borrow_sanitized_table (face))
+
+template<typename Accel, typename Face, typename Loader>
+static auto
+_hb_subset_borrow_sanitized_table (Face *, Loader &loader, hb_priority<0>)
+HB_AUTO_RETURN (loader->borrow_sanitized_table ())
+
+#define HB_OT_TABLE(Namespace, Type) \
+template<typename Face> \
+static auto _hb_subset_get_face_table (Face *face, \
+  hb_integral_constant<hb_tag_t, hb_remove_pointer<decltype (face->table.Type.get ())>::tableTag>, hb_priority<1>) \
+HB_AUTO_RETURN (face->table.Type.get_blob ())
+#define HB_OT_ACCELERATOR(Namespace, Type) \
+template<typename Face> \
+static auto _hb_subset_get_face_table (Face *face, \
+  hb_integral_constant<hb_tag_t, decltype (_hb_subset_borrow_sanitized_table<Namespace::Type##_accelerator_t> (face, face->table.Type, hb_prioritize))::T::tableTag>, hb_priority<1>) \
+HB_AUTO_RETURN (_hb_subset_borrow_sanitized_table<Namespace::Type##_accelerator_t> (face, face->table.Type, hb_prioritize).get_blob ())
+#include "hb-ot-face-table-list.hh"
+#undef HB_OT_ACCELERATOR
+#undef HB_OT_TABLE
+
 namespace OT {
 struct Feature;
 }
@@ -95,7 +125,6 @@ struct contour_point_t
   HB_ALWAYS_INLINE
   void translate (const contour_point_t &p) { x += p.x; y += p.y; }
 
-
   float x;
   float y;
   uint8_t flag;
@@ -104,19 +133,9 @@ struct contour_point_t
 
 struct contour_point_vector_t : hb_vector_t<contour_point_t>
 {
-  void extend (const hb_array_t<contour_point_t> &a)
-  {
-    unsigned int old_len = length;
-    if (unlikely (!resize (old_len + a.length, false)))
-      return;
-    auto arrayZ = this->arrayZ + old_len;
-    unsigned count = a.length;
-    hb_memcpy (arrayZ, a.arrayZ, count * sizeof (arrayZ[0]));
-  }
-
-  bool add_deltas (const hb_vector_t<float> deltas_x,
-                   const hb_vector_t<float> deltas_y,
-                   const hb_vector_t<bool> indices)
+  bool add_deltas (hb_array_t<const float> deltas_x,
+                   hb_array_t<const float> deltas_y,
+                   hb_array_t<const bool> indices)
   {
     if (indices.length != deltas_x.length ||
         indices.length != deltas_y.length)
@@ -180,6 +199,12 @@ struct hb_subset_plan_t
   // whether GDEF ItemVariationStore is retained
   mutable bool has_gdef_varstore;
 
+  // whether every COLR variation region uses pinned axes only; -1 until computed
+  int colrv1_constant_after_pinning;
+
+  // whether we're doing avar2 partial instancing
+  bool has_avar2;
+
 #define HB_SUBSET_PLAN_MEMBER(Type, Name) Type Name;
 #include "hb-subset-plan-member-list.hh"
 #undef HB_SUBSET_PLAN_MEMBER
@@ -189,8 +214,8 @@ struct hb_subset_plan_t
 
   os2_info_t os2_info;
 
-  const hb_subset_accelerator_t* accelerator;
-  hb_subset_accelerator_t* inprogress_accelerator;
+  const hb_subset_accelerator_t* accelerator = nullptr;
+  hb_subset_accelerator_t* inprogress_accelerator = nullptr;
 
  public:
 
@@ -199,29 +224,35 @@ struct hb_subset_plan_t
   {
     hb_blob_ptr_t<T> operator () (hb_subset_plan_t *plan)
     {
+      if (hb_blob_t *blob = _hb_subset_get_face_table (plan->source, hb_integral_constant<hb_tag_t, T::tableTag> {}, hb_prioritize))
+	return blob;
+
       hb_lock_t lock (plan->accelerator ? &plan->accelerator->sanitized_table_cache_lock : nullptr);
 
       auto *cache = plan->accelerator ? &plan->accelerator->sanitized_table_cache : &plan->sanitized_table_cache;
       if (cache
 	  && !cache->in_error ()
 	  && cache->has (+T::tableTag)) {
-	return hb_blob_reference (cache->get (+T::tableTag).get ());
+	return cache->get (+T::tableTag).get ();
       }
 
       hb::unique_ptr<hb_blob_t> table_blob {hb_sanitize_context_t ().reference_table<T> (plan->source)};
-      hb_blob_t* ret = hb_blob_reference (table_blob.get ());
+      hb_blob_t* ret = table_blob.get ();
 
-      if (likely (cache))
-	cache->set (+T::tableTag, std::move (table_blob));
+      if (likely (cache) && cache->set (+T::tableTag, std::move (table_blob)))
+	return ret;
 
-      return ret;
+      return hb_blob_get_empty ();
     }
   };
 
+  // The source face or sanitized_table_cache owns the returned table.
   template<typename T>
   auto source_table() HB_AUTO_RETURN (source_table_loader<T> {} (this))
 
   bool in_error () const { return !successful; }
+
+  HB_INTERNAL double layout_variation_delta (unsigned var_idx);
 
   bool check_success(bool success)
   {
@@ -247,6 +278,18 @@ struct hb_subset_plan_t
   glyphset_gsub () const
   {
     return &_glyphset_gsub;
+  }
+
+  /*
+   * Old-to-new glyph id mapping for GSUB glyphs, through the flat
+   * array; returns HB_MAP_VALUE_INVALID for glyphs not retained.
+   */
+  inline hb_codepoint_t
+  map_gsub_glyph (hb_codepoint_t old_gid) const
+  {
+    return old_gid < glyph_map_gsub_flat.length
+	 ? glyph_map_gsub_flat.arrayZ[old_gid]
+	 : HB_MAP_VALUE_INVALID;
   }
 
   /*
@@ -306,6 +349,77 @@ struct hb_subset_plan_t
     return hb_face_builder_add_table (dest, tag, contents);
   }
 };
+
+// hb-subset-plan implementation is split into multiple files to keep
+// compile times more reasonable:
+// - hb-subset-plan.cc
+// - hb-subset-plan-layout.cc
+// - hb-subset-plan-var.cc
+//
+// The functions below are those needed to connect the split files
+// above together.
+HB_INTERNAL void
+remap_indexes (const hb_set_t *indexes,
+               hb_map_t       *mapping /* OUT */);
+
+
+#ifndef HB_NO_VAR
+template<typename ItemVarStore>
+HB_INTERNAL void
+remap_variation_indices (const ItemVarStore &var_store,
+                         const hb_set_t &variation_indices,
+                         const hb_vector_t<int>& normalized_coords,
+                         bool calculate_delta, /* not pinned at default */
+                         bool no_variations, /* all axes pinned */
+                         hb_hashmap_t<unsigned, hb_pair_t<unsigned, int>> &variation_idx_delta_map /* OUT */);
+
+
+template<typename DeltaSetIndexMap>
+HB_INTERNAL void
+remap_colrv1_delta_set_index_indices (const DeltaSetIndexMap &index_map,
+                                      const hb_set_t &delta_set_idxes,
+                                      hb_hashmap_t<unsigned, hb_pair_t<unsigned, int>> &variation_idx_delta_map, /* IN/OUT */
+                                      hb_map_t &new_deltaset_idx_varidx_map /* OUT */);
+
+
+HB_INTERNAL void
+generate_varstore_inner_maps (const hb_set_t& varidx_set,
+                              unsigned subtable_count,
+                              hb_vector_t<hb_inc_bimap_t> &inner_maps /* OUT */);
+
+HB_INTERNAL bool
+normalize_axes_location (hb_face_t *face, hb_subset_plan_t *plan);
+
+HB_INTERNAL void
+update_instance_metrics_map_from_cff2 (hb_subset_plan_t *plan);
+
+HB_INTERNAL bool
+get_instance_glyphs_contour_points (hb_subset_plan_t *plan);
+
+#ifndef HB_NO_BASE
+HB_INTERNAL void
+collect_base_variation_indices (hb_subset_plan_t* plan);
+#endif
+#endif
+
+#ifndef HB_NO_SUBSET_LAYOUT
+typedef hb_hashmap_t<unsigned, hb::unique_ptr<hb_set_t>> script_langsys_map;
+
+HB_INTERNAL void
+remap_used_mark_sets (hb_subset_plan_t *plan,
+                      hb_map_t& used_mark_sets_map);
+
+HB_INTERNAL void
+layout_nameid_closure (hb_subset_plan_t* plan,
+                       hb_set_t* drop_tables);
+
+HB_INTERNAL void
+layout_populate_gids_to_retain (hb_subset_plan_t* plan,
+                                hb_set_t* drop_tables);
+
+HB_INTERNAL void
+collect_layout_variation_indices (hb_subset_plan_t* plan);
+#endif
 
 
 #endif /* HB_SUBSET_PLAN_HH */

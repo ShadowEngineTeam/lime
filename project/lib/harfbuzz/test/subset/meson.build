@@ -1,5 +1,10 @@
 tests = [
   'basics',
+  'bidi',
+  'cmap',
+  'cmap14',
+  'cmap4_overflow',
+  'cmap_identity_delta',
   'preprocess',
   'full-font',
   'cff-full-font',
@@ -21,6 +26,7 @@ tests = [
   'layout.gsub5',
   'layout.gsub5_format2',
   'layout.gsub6',
+  'layout.gsub6.empty_input_classdef',
   'layout.gsub8',
   'layout.gdef',
   'layout.gdef.glyphset',
@@ -29,20 +35,22 @@ tests = [
   'layout.context_format2',
   'layout.gdef-varstore',
   'layout.gdef-attachlist',
+  'layout.markfilteringset',
   'layout.notonastaliqurdu',
   'layout.tinos',
   'layout.duplicate_features',
+  'layout.feature_dedup',
+  'layout.feature_dedup_instance',
   'layout.unsorted_featurelist',
   'layout.drop_feature',
   'no_layout_closure',
-  'cmap',
-  'cmap14',
   'sbix',
   'colr',
   'colr_glyphs',
   'math',
   'math_coverage_offset',
   'subset_base',
+  'subset_base_v1',
   # TODO: re-enable once colrv1 subsetting is stabilized.
   # 'colrv1.notoemoji',
   'colrv1',
@@ -57,8 +65,12 @@ tests = [
   'pin_all_at_default',
   'instantiate_base',
   'instantiate_colrv1',
+  'colrv1_alpha_instance',
   'instantiate_glyf',
   'instantiate_cff2',
+  'instantiate_cff2_partial',
+  'downgrade_cff2',
+  'instantiate_cff2_tsb',
   'full_instance',
   'instance_feature_variations',
   'instance_no_double_free',
@@ -67,9 +79,14 @@ tests = [
   'post_apply_mvar_delta',
   'apply_cvar_delta',
   'collect_name_ids',
+  'feature_params_variations',
+  'feature_params_alternate',
   'instantiate_cff2_update_metrics',
   'layout.empty_ligature_offset',
   'glyf_partial_instancing',
+  'glyf_iup_retry',
+  'glyf_iup_large_contour',
+  'hvar_partial_instance_implicit_map',
   'mvar_partial_instance',
   'update_def_wght',
   'feature_variations_partial_instance',
@@ -80,11 +97,16 @@ tests = [
   'empty_region_vardata',
   'colrv1_partial_instance',
   'instantiate_gvar_padding',
+  'avar2_full_instance',
+  'avar2_null_varstore_partial_instance',
+  'subset_gvar_padding',
 ]
 
 if get_option('experimental_api')
   tests += [
     'iftb_requirements',
+    'downgrade_cff2_iftb',
+    'retain-num-glyphs',
   ]
 endif
 
@@ -95,6 +117,7 @@ repack_tests = [
   'isolation',
   'advanced_prioritization',
   'space_splitting',
+  'duplicate_before_mutation',
 ]
 
 run_test = find_program('run-tests.py')
@@ -111,6 +134,7 @@ foreach t : tests
     # ideally better to break and let meson handles them in parallel
     timeout: 500,
     workdir: meson.current_build_dir() / '..' / '..',
+    protocol: 'tap',
     suite: 'subset',
   )
 endforeach
@@ -126,6 +150,7 @@ foreach t : repack_tests
       meson.current_source_dir() / 'data' / 'repack_tests' / fname,
     ],
     workdir: meson.current_build_dir() / '..' / '..',
+    protocol: 'tap',
     suite: ['subset', 'repack'],
   )
 endforeach

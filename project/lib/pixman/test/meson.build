@@ -28,8 +28,10 @@ tests = [
   'a1-trap-test',
   'prng-test',
   'radial-invalid',
+  'radial-gradient-test',
   'pdf-op-test',
   'region-test',
+  'region-fractional-test',
   'combiner-test',
   'scaling-crash-test',
   'alpha-loop',
@@ -51,6 +53,7 @@ tests = [
   'scaling-test',
   'composite',
   'tolerance-test',
+  'neg-stride-test',
 ]
 
 # Remove/update this once thread-test.c supports threading methods

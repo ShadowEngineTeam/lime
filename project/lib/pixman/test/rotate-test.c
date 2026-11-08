@@ -10,6 +10,14 @@ static const pixman_format_code_t formats[] =
     PIXMAN_a8b8g8r8,
     PIXMAN_x8r8g8b8,
     PIXMAN_x8b8g8r8,
+    PIXMAN_b8g8r8a8,
+    PIXMAN_b8g8r8x8,
+    PIXMAN_r8g8b8a8,
+    PIXMAN_r8g8b8x8,
+    PIXMAN_a2r10g10b10,
+    PIXMAN_x2r10g10b10,
+    PIXMAN_a2b10g10r10,
+    PIXMAN_x2b10g10r10,
     PIXMAN_r5g6b5,
     PIXMAN_b5g6r5,
     PIXMAN_a8,
@@ -91,14 +99,28 @@ static uint32_t
 test_transform (int testnum, int verbose)
 {
     pixman_image_t *src, *dest;
+    pixman_op_t op;
     uint32_t crc;
 
     prng_srand (testnum);
     
     src = make_image ();
     dest = make_image ();
+    op = RANDOM_OP();
 
-    pixman_image_composite (RANDOM_OP(),
+    /* With wide formats, the other operators use floating point math,
+     * which does not round the same way on all platforms. With SRC and
+     * nearest filtering, the only floating point math converts each
+     * channel to float and back, and the result is never close enough
+     * to an integer boundary to differ between platforms.
+     */
+    if (PIXMAN_FORMAT_IS_WIDE (pixman_image_get_format (src)) ||
+	PIXMAN_FORMAT_IS_WIDE (pixman_image_get_format (dest)))
+    {
+	op = PIXMAN_OP_SRC;
+    }
+
+    pixman_image_composite (op,
 			    src, NULL, dest,
 			    0, 0, 0, 0, WIDTH / 2, HEIGHT / 2,
 			    WIDTH, HEIGHT);
@@ -115,6 +137,6 @@ int
 main (int argc, const char *argv[])
 {
     return fuzzer_test_main ("rotate", 15000,
-			     0x81E9EC2F,
+			     0xDF33AE42,
 			     test_transform, argc, argv);
 }

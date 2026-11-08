@@ -220,16 +220,34 @@ inline unsigned int OpCode_Size (op_code_t op) { return Is_OpCode_ESC (op) ? 2: 
 struct number_t
 {
   void set_int (int v)       { value = v; }
-  int to_int () const        { return value; }
+  bool to_int (int *v) const
+  {
+    if (unlikely (!(value >= INT_MIN && value <= INT_MAX)))
+    {
+      *v = 0;
+      return false;
+    }
+    *v = (int) value;
+    return true;
+  }
+  int to_int () const
+  {
+    int v;
+    if (likely (to_int (&v))) return v;
+    return value < 0 ? INT_MIN : value > 0 ? INT_MAX : 0;
+  }
 
   void set_fixed (int32_t v) { value = v / 65536.0; }
-  int32_t to_fixed () const  { return value * 65536.0; }
+  int32_t to_fixed () const
+  { return (int32_t) hb_clamp (value * 65536.0, (double) INT32_MIN, (double) INT32_MAX); }
 
   void set_real (double v)   { value = v; }
   double to_real () const    { return value; }
 
-  bool in_int_range () const
-  { return ((double) (int16_t) to_int () == value); }
+  bool in_int16_range () const
+  { return value >= INT16_MIN && value <= INT16_MAX && (double) (int16_t) value == value; }
+  bool in_int32_range () const
+  { return value >= INT32_MIN && value <= INT32_MAX && (double) (int32_t) value == value; }
 
   bool operator >  (const number_t &n) const { return value > n.to_real (); }
   bool operator <  (const number_t &n) const { return n > *this; }
@@ -344,25 +362,25 @@ struct cff_stack_t
 {
   ELEM& operator [] (unsigned int i)
   {
-    if (unlikely (i >= count))
+    if (unlikely (i >= length))
     {
       set_error ();
       return Crap (ELEM);
     }
-    return elements[i];
+    return arrayZ[i];
   }
 
   void push (const ELEM &v)
   {
-    if (likely (count < LIMIT))
-      elements[count++] = v;
+    if (likely (length < LIMIT))
+      arrayZ[length++] = v;
     else
       set_error ();
   }
   ELEM &push ()
   {
-    if (likely (count < LIMIT))
-      return elements[count++];
+    if (likely (length < LIMIT))
+      return arrayZ[length++];
     else
     {
       set_error ();
@@ -372,8 +390,8 @@ struct cff_stack_t
 
   ELEM& pop ()
   {
-    if (likely (count > 0))
-      return elements[--count];
+    if (likely (length > 0))
+      return arrayZ[--length];
     else
     {
       set_error ();
@@ -382,45 +400,44 @@ struct cff_stack_t
   }
   void pop (unsigned int n)
   {
-    if (likely (count >= n))
-      count -= n;
+    if (likely (length >= n))
+      length -= n;
     else
       set_error ();
   }
 
   const ELEM& peek ()
   {
-    if (unlikely (count == 0))
+    if (unlikely (length == 0))
     {
       set_error ();
       return Null (ELEM);
     }
-    return elements[count - 1];
+    return arrayZ[length - 1];
   }
 
   void unpop ()
   {
-    if (likely (count < LIMIT))
-      count++;
+    if (likely (length < LIMIT))
+      length++;
     else
       set_error ();
   }
 
-  void clear () { count = 0; }
+  void clear () { length = 0; }
 
   bool in_error () const { return (error); }
   void set_error ()      { error = true; }
 
-  unsigned int get_count () const { return count; }
-  bool is_empty () const          { return !count; }
+  unsigned int get_count () const { return length; }
+  bool is_empty () const          { return !length; }
 
   hb_array_t<const ELEM> sub_array (unsigned start, unsigned length) const
-  { return hb_array_t<const ELEM> (elements).sub_array (start, length); }
+  { return hb_array_t<const ELEM> (arrayZ).sub_array (start, length); }
 
-  private:
   bool error = false;
-  unsigned int count = 0;
-  ELEM elements[LIMIT];
+  unsigned int length = 0;
+  ELEM arrayZ[LIMIT];
 };
 
 /* argument stack */
@@ -447,7 +464,13 @@ struct arg_stack_t : cff_stack_t<ARG, 513>
 
   ARG& pop_num () { return this->pop (); }
 
-  int pop_int ()  { return this->pop ().to_int (); }
+  int pop_int ()
+  {
+    int v;
+    if (unlikely (!this->pop ().to_int (&v)))
+      S::set_error ();
+    return v;
+  }
 
   unsigned int pop_uint ()
   {
@@ -460,9 +483,12 @@ struct arg_stack_t : cff_stack_t<ARG, 513>
     return (unsigned) i;
   }
 
+  static int parse_longint (uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+  { return (int) ((uint32_t (a) << 24) | (b << 16) | (c << 8) | d); }
+
   void push_longint_from_substr (byte_str_ref_t& str_ref)
   {
-    push_int ((str_ref[0] << 24) | (str_ref[1] << 16) | (str_ref[2] << 8) | (str_ref[3]));
+    push_int (parse_longint (str_ref[0], str_ref[1], str_ref[2], str_ref[3]));
     str_ref.inc (4);
   }
 
@@ -482,15 +508,15 @@ struct arg_stack_t : cff_stack_t<ARG, 513>
 /* an operator prefixed by its operands in a byte string */
 struct op_str_t
 {
-  /* This used to have a hb_ubytes_t. Using a pointer and length
-   * in a particular order, saves 8 bytes in this struct and more
-   * in our parsed_cs_op_t subclass. */
+  /* Borrow the encoded bytes. DICT entries with accumulated blends can
+   * exceed the length of an individual charstring token. */
 
   const unsigned char *ptr = nullptr;
 
   op_code_t  op = OpCode_Invalid;
 
-  uint8_t length = 0;
+  /* DICT entries can contain many blends before their final operator. */
+  unsigned length = 0;
 };
 
 /* base of OP_SERIALIZER */
@@ -522,7 +548,7 @@ struct parsed_values_t
 
   void alloc (unsigned n)
   {
-    values.alloc (n, true);
+    values.alloc_exact (n);
   }
 
   void add_op (op_code_t op, const byte_str_ref_t& str_ref = byte_str_ref_t (), const VAL &v = VAL ())
@@ -596,37 +622,52 @@ using num_interp_env_t =  interp_env_t<>;
 template <typename ARG=number_t>
 struct opset_t
 {
+private:
+  static constexpr int one_byte_bias = (OpCode_OneByteIntFirst + OpCode_OneByteIntLast) / 2;
+  static constexpr int two_byte_base = OpCode_OneByteIntLast - one_byte_bias + 1;
+  static_assert (one_byte_bias == 139, "CFF one-byte range centers on 139");
+  static_assert (two_byte_base == 108, "CFF two-byte range starts at 108");
+
+public:
+  static bool is_one_byte_integer (op_code_t op)
+  { return (OpCode_OneByteIntFirst <= op) && (op <= OpCode_OneByteIntLast); }
+  static int parse_one_byte_integer (op_code_t op) { return (int)op - one_byte_bias; }
+
+  static bool is_two_bytes_positive_integer (op_code_t op)
+  { return OpCode_TwoBytePosInt0 <= op && op <= OpCode_TwoBytePosInt3; }
+  static int parse_two_bytes_positive_integer (op_code_t op, uint8_t b)
+  { return (int16_t)(op - OpCode_TwoBytePosInt0) * 256 + b + two_byte_base; }
+
+  static bool is_two_bytes_negative_integer (op_code_t op)
+  { return OpCode_TwoByteNegInt0 <= op && op <= OpCode_TwoByteNegInt3; }
+  static int parse_two_bytes_negative_integer (op_code_t op, uint8_t b)
+  { return -(int16_t)(op - OpCode_TwoByteNegInt0) * 256 - b - two_byte_base; }
+
+  static bool is_shortint(op_code_t op) { return op == OpCode_shortint; }
+  static int parse_shortint (uint8_t a, uint8_t b) { return (int16_t) ((a << 8) | b); }
+
   static void process_op (op_code_t op, interp_env_t<ARG>& env)
   {
-    switch (op) {
-      case OpCode_shortint:
-	env.argStack.push_int ((int16_t)((env.str_ref[0] << 8) | env.str_ref[1]));
-	env.str_ref.inc (2);
-	break;
-
-      case OpCode_TwoBytePosInt0: case OpCode_TwoBytePosInt1:
-      case OpCode_TwoBytePosInt2: case OpCode_TwoBytePosInt3:
-	env.argStack.push_int ((int16_t)((op - OpCode_TwoBytePosInt0) * 256 + env.str_ref[0] + 108));
-	env.str_ref.inc ();
-	break;
-
-      case OpCode_TwoByteNegInt0: case OpCode_TwoByteNegInt1:
-      case OpCode_TwoByteNegInt2: case OpCode_TwoByteNegInt3:
-	env.argStack.push_int ((-(int16_t)(op - OpCode_TwoByteNegInt0) * 256 - env.str_ref[0] - 108));
-	env.str_ref.inc ();
-	break;
-
-      default:
-	/* 1-byte integer */
-	if (likely ((OpCode_OneByteIntFirst <= op) && (op <= OpCode_OneByteIntLast)))
-	{
-	  env.argStack.push_int ((int)op - 139);
-	} else {
-	  /* invalid unknown operator */
-	  env.clear_args ();
-	}
-	break;
+    if (is_one_byte_integer (op))
+      env.argStack.push_int (parse_one_byte_integer (op));
+    else if (is_two_bytes_positive_integer (op))
+    {
+      env.argStack.push_int (parse_two_bytes_positive_integer (op, env.str_ref[0]));
+      env.str_ref.inc ();
     }
+    else if (is_two_bytes_negative_integer (op))
+    {
+      env.argStack.push_int (parse_two_bytes_negative_integer (op, env.str_ref[0]));
+      env.str_ref.inc ();
+    }
+    else if (is_shortint (op))
+    {
+      env.argStack.push_int (parse_shortint (env.str_ref[0], env.str_ref[1]));
+      env.str_ref.inc (2);
+    }
+    else
+      /* invalid unknown operator */
+      env.clear_args ();
   }
 };
 

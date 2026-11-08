@@ -321,7 +321,7 @@ _hb_generate_unique_face_name (wchar_t *face_name, unsigned int *plen)
 
 /* Destroys blob. */
 static hb_blob_t *
-_hb_rename_font (hb_blob_t *blob, wchar_t *new_name)
+_hb_rename_font (hb_blob_t *blob_in, wchar_t *new_name)
 {
   /* Create a copy of the font data, with the 'name' table replaced by a
    * table that names the font with our private F_* name created above.
@@ -332,7 +332,7 @@ _hb_rename_font (hb_blob_t *blob, wchar_t *new_name)
    * full, PS. All of them point to the same name data with our unique name.
    */
 
-  blob = hb_sanitize_context_t ().sanitize_blob<OT::OpenTypeFontFile> (blob);
+  hb_unique_ptr_t<hb_blob_t> blob (hb_sanitize_context_t ().sanitize_blob<OT::OpenTypeFontFile> (blob_in));
 
   unsigned int length, new_length, name_str_len;
   const char *orig_sfnt_data = hb_blob_get_data (blob, &length);
@@ -350,10 +350,8 @@ _hb_rename_font (hb_blob_t *blob, wchar_t *new_name)
   new_length = name_table_offset + padded_name_table_length;
   void *new_sfnt_data = hb_calloc (1, new_length);
   if (!new_sfnt_data)
-  {
-    hb_blob_destroy (blob);
     return nullptr;
-  }
+  auto sfnt_guard = hb_make_scope_guard ([&]() { hb_free (new_sfnt_data); });
 
   hb_memcpy(new_sfnt_data, orig_sfnt_data, length);
 
@@ -380,35 +378,38 @@ _hb_rename_font (hb_blob_t *blob, wchar_t *new_name)
     *p++ = new_name[i] & 0xff;
   }
 
-  /* Adjust name table entry to point to new name table */
-  const OT::OpenTypeFontFile &file = * (OT::OpenTypeFontFile *) (new_sfnt_data);
+  /* Adjust name table entry to point to new name table.
+   *
+   * Look the entries up in the sanitized original, not in the copy we are
+   * editing: face directories of a TTC may overlap, so an edit for one face
+   * can change what another face's directory parses as, and the copy is
+   * never sanitized again.  Edits are then applied to the copy at the same
+   * offsets, which are all within the original's length. */
+  const OT::OpenTypeFontFile &file = *blob->as<OT::OpenTypeFontFile> ();
   unsigned int face_count = file.get_face_count ();
   for (unsigned int face_index = 0; face_index < face_count; face_index++)
   {
-    /* Note: doing multiple edits (ie. TTC) can be unsafe.  There may be
-     * toe-stepping.  But we don't really care. */
+    /* Note: doing multiple edits (ie. TTC) may step on each other's toes
+     * and produce a wrong font.  But we don't really care. */
     const OT::OpenTypeFontFace &face = file.get_face (face_index);
     unsigned int index;
     if (face.find_table_index (HB_OT_TAG_name, &index))
     {
-      OT::TableRecord &record = const_cast<OT::TableRecord &> (face.get_table (index));
+      unsigned int record_offset = (const char *) &face.get_table (index) - orig_sfnt_data;
+      OT::TableRecord &record = StructAtOffset<OT::TableRecord> (new_sfnt_data, record_offset);
       record.checkSum.set_for_data (&name, padded_name_table_length);
       record.offset = name_table_offset;
       record.length = name_table_length;
     }
     else if (face_index == 0) /* Fail if first face doesn't have 'name' table. */
-    {
-      hb_free (new_sfnt_data);
-      hb_blob_destroy (blob);
       return nullptr;
-    }
   }
 
   /* The checkSumAdjustment field in the 'head' table is now wrong,
    * but that doesn't actually seem to cause any problems so we don't
    * bother. */
 
-  hb_blob_destroy (blob);
+  sfnt_guard.release ();
   return hb_blob_create ((const char *) new_sfnt_data, new_length,
 			 HB_MEMORY_MODE_WRITABLE, new_sfnt_data, hb_free);
 }
@@ -490,6 +491,11 @@ populate_log_font (LOGFONTW  *lf,
 hb_uniscribe_font_data_t *
 _hb_uniscribe_shaper_font_data_create (hb_font_t *font)
 {
+  /* Face data creation may have failed, eg. if GDI rejected the font.
+   * populate_log_font() dereferences it, so bail out before that. */
+  if (unlikely (!font->face->data.uniscribe))
+    return nullptr;
+
   hb_uniscribe_font_data_t *data = (hb_uniscribe_font_data_t *) hb_calloc (1, sizeof (hb_uniscribe_font_data_t));
   if (unlikely (!data))
     return nullptr;
@@ -870,9 +876,10 @@ retry:
     hb_glyph_position_t *pos = &buffer->pos[i];
 
     /* TODO vertical */
-    pos->x_advance = x_mult * (int32_t) info->mask;
-    pos->x_offset = x_mult * (backward ? -info->var1.i32 : info->var1.i32);
-    pos->y_offset = y_mult * info->var2.i32;
+    pos->x_advance = hb_clamp_to<hb_position_t> (x_mult * (int32_t) info->mask);
+    double x_offset = backward ? -(double) info->var1.i32 : info->var1.i32;
+    pos->x_offset = hb_clamp_to<hb_position_t> (x_mult * x_offset);
+    pos->y_offset = hb_clamp_to<hb_position_t> (y_mult * info->var2.i32);
   }
 
   if (backward)

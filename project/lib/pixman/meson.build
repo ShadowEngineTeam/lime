@@ -21,7 +21,7 @@
 project(
   'pixman',
   ['c'],
-  version : '0.44.2',
+  version : '0.46.5',
   license : 'MIT',
   meson_version : '>= 1.3.0',
   default_options : ['c_std=gnu99,c99', 'buildtype=debugoptimized'],
@@ -231,10 +231,21 @@ if not use_vmx.disabled()
   if host_machine.cpu_family().startswith('ppc')
     if cc.compiles('''
         #include <altivec.h>
-        int main () {
+        int main (int argc, char **argv) {
             vector unsigned int v = vec_splat_u32 (1);
             v = vec_sub (v, v);
-            return 0;
+        #ifdef __VSX__
+            /* When VSX is enabled in CFLAGS, the VMX code also uses
+             * VSX unaligned loads and stores and 64-bit vector element
+             * operations, which need GCC >= 7. */
+            vector unsigned long long w =
+                vec_splats ((unsigned long long) argc);
+            w = vec_insert (vec_extract (w, 0), w, 1);
+            v = vec_add (v, vec_xl (0, (const unsigned int *) argv));
+            vec_xst ((vector unsigned char) w, 0,
+                     (unsigned char *) argv[0]);
+        #endif
+            return vec_extract (v, 0);
         }''',
         args : vmx_flags,
         name : 'VMX/Altivec Intrinsic Support')
@@ -282,6 +293,100 @@ if have_vmx
   config.set10('USE_VMX', true)
 elif use_vmx.enabled()
   error('vmx Support unavailable, but required')
+endif
+
+# The POWER8 and POWER9 backends are recompilations of the VMX one with a
+# higher -mcpu.  pixman-vmx.c itself is compiled with the toolchain's
+# default -mcpu, so if that baseline already implies the ISA level of a
+# variant, the variant would be a byte for byte duplicate of the VMX object
+# and there is nothing to gain from building it.
+#
+# This is always the case for POWER8 on ppc64le, whose ABI baseline is
+# POWER8, and it also covers a distribution that puts -mcpu=power9 or newer
+# into CFLAGS.
+vmx_baseline_covers = []
+if have_vmx
+  foreach v : [['power8', '_ARCH_PWR8'], ['power9', '_ARCH_PWR9']]
+    if cc.compiles('''
+        #ifndef @0@
+        #error "baseline is older than this ISA level"
+        #endif
+        int main (void) { return 0; }'''.format(v[1]),
+        args : vmx_flags,
+        name : 'VMX baseline already provides ' + v[0])
+      vmx_baseline_covers += v[0]
+    endif
+  endforeach
+endif
+
+use_power8 = get_option('power8')
+have_power8 = false
+power8_flags = ['-mcpu=power8']
+if not use_power8.disabled() and not vmx_baseline_covers.contains('power8')
+  if host_machine.cpu_family().startswith('ppc')
+    if cc.compiles('''
+        #ifndef _ARCH_PWR8
+        #error "no ISA 2.07"
+        #endif
+        #include <altivec.h>
+        int main (int argc, char **argv) {
+            /* The intrinsics the recompiled VMX code uses on its
+             * __VSX__ paths. */
+            vector unsigned long long w =
+                vec_splats ((unsigned long long) argc);
+            vector unsigned int v =
+                vec_xl (0, (const unsigned int *) argv);
+            w = vec_insert (vec_extract (w, 0), w, 1);
+            vec_xst ((vector unsigned char) w, 0,
+                     (unsigned char *) argv[0]);
+            return vec_extract (v, 0);
+        }''',
+        args : power8_flags,
+        name : 'POWER8/ISA 2.07 Intrinsic Support')
+      have_power8 = true
+    endif
+  endif
+endif
+
+if have_power8
+  config.set10('USE_POWER8', true)
+elif use_power8.enabled() and not vmx_baseline_covers.contains('power8')
+  error('power8 Support unavailable, but required')
+endif
+
+use_power9 = get_option('power9')
+have_power9 = false
+power9_flags = ['-mcpu=power9']
+if not use_power9.disabled() and not vmx_baseline_covers.contains('power9')
+  if host_machine.cpu_family().startswith('ppc')
+    if cc.compiles('''
+        #ifndef _ARCH_PWR9
+        #error "no ISA 3.0"
+        #endif
+        #include <altivec.h>
+        int main (int argc, char **argv) {
+            /* The intrinsics the recompiled VMX code uses on its
+             * __VSX__ paths. */
+            vector unsigned long long w =
+                vec_splats ((unsigned long long) argc);
+            vector unsigned int v =
+                vec_xl (0, (const unsigned int *) argv);
+            w = vec_insert (vec_extract (w, 0), w, 1);
+            vec_xst ((vector unsigned char) w, 0,
+                     (unsigned char *) argv[0]);
+            return vec_extract (v, 0);
+        }''',
+        args : power9_flags,
+        name : 'POWER9/ISA 3.0 Intrinsic Support')
+      have_power9 = true
+    endif
+  endif
+endif
+
+if have_power9
+  config.set10('USE_POWER9', true)
+elif use_power9.enabled() and not vmx_baseline_covers.contains('power9')
+  error('power9 Support unavailable, but required')
 endif
 
 use_armv6_simd = get_option('arm-simd')
@@ -372,9 +477,15 @@ if not use_rvv.disabled()
   if host_machine.cpu_family() == 'riscv64'
     if cc.compiles('''
         #include <riscv_vector.h>
+
+        #if defined(__riscv_v) && __riscv_v < 1000000
+        #error "Minimum supported RVV is 1.0"
+        #endif
+
         int main() {
-            vfloat32m1_t tmp1; /* added in gcc-13 */
-            vfloat32m1x4_t tmp2; /* added in gcc-14 */
+            vfloat32m1_t da2, dr2, dg2, db2;
+            /* ensure GCC 14 / Clang 18 */
+            __riscv_vcreate_v_f32m1x4 (da2, dr2, dg2, db2);
             return 0;
         }
       ''',
@@ -492,6 +603,14 @@ foreach f : funcs
   endif
 endforeach
 
+if cc.has_function('getauxval', prefix : '#include <sys/auxv.h>')
+  config.set('HAVE_GETAUXVAL', 1)
+endif
+
+if cc.has_function('elf_aux_info', prefix : '#include <sys/auxv.h>')
+  config.set('HAVE_ELF_AUX_INFO', 1)
+endif
+
 # This is only used in one test, that defines _GNU_SOURCE
 if cc.has_function('feenableexcept',
                    prefix : '#define _GNU_SOURCE\n#include <fenv.h>',
@@ -556,6 +675,29 @@ endif
 
 if cc.has_function('clz')
   config.set('HAVE_BUILTIN_CLZ', 1)
+endif
+
+if host_machine.system() == 'linux' and host_machine.cpu_family() == 'riscv64'
+  if cc.links('''
+      #include <asm/hwcap.h>
+      #include <asm/hwprobe.h>
+      #include <sys/syscall.h>
+      #include <asm/unistd.h>
+      #include <unistd.h>
+
+      #ifndef COMPAT_HWCAP_ISA_V /* added in linux-6.5 */
+      #error "COMPAT_HWCAP_ISA_V is not available"
+      #endif
+
+      int main() {
+          struct riscv_hwprobe pair = {RISCV_HWPROBE_KEY_IMA_EXT_0, 0};
+          long result = syscall (__NR_riscv_hwprobe, &pair, 1, 0, 0, 0);
+          return 0;
+      }
+      ''',
+      name : 'Linux hwprobe and getauxval for RVV')
+    config.set('HAVE_HWPROBE_GETAUXVAL', 1)
+  endif
 endif
 
 if cc.links('''

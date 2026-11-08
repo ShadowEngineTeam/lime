@@ -179,6 +179,200 @@ test_shape_clusters (void)
   hb_font_destroy (font);
 }
 
+static void
+test_shape_overlong_mark_cluster (void)
+{
+  hb_face_t *face = hb_test_open_font_file ("fonts/NotoSans-Bold.ttf");
+  hb_font_t *font = hb_font_create (face);
+  hb_buffer_t *buffer = hb_buffer_create ();
+
+  hb_font_set_scale (font, 12 * 65536, 12 * 65536);
+  hb_buffer_set_content_type (buffer, HB_BUFFER_CONTENT_TYPE_UNICODE);
+  hb_buffer_add (buffer, 'e', 0);
+  for (unsigned i = 0; i < 35000; i++)
+    hb_buffer_add (buffer, 0x0301, i + 1);
+  hb_buffer_add (buffer, 'X', 35001);
+  hb_buffer_guess_segment_properties (buffer);
+
+  hb_shape (font, buffer, NULL, 0);
+
+  unsigned len;
+  hb_glyph_position_t *positions = hb_buffer_get_glyph_positions (buffer, &len);
+  g_assert_cmpuint (len, ==, 35001);
+  g_assert_cmpint (positions[len - 2].y_offset, ==, INT32_MAX);
+
+  hb_buffer_destroy (buffer);
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+}
+
+static void
+test_shape_overlong_cluster_remerge (void)
+{
+  /* The font has no space glyph, so default-ignorables are deleted in
+   * place.  Shaped RTL, the deleted soft hyphens follow the big mark
+   * cluster with descending cluster values, so each deletion would rewrite
+   * the cluster of the whole preceding run.  That re-merge walk must be
+   * charged to the buffer's op budget and fail the buffer, instead of
+   * taking O(N^2) time. */
+  hb_face_t *face = hb_test_open_font_file ("fonts/Roboto-Regular.abc.ttf");
+  hb_font_t *font = hb_font_create (face);
+  hb_buffer_t *buffer = hb_buffer_create ();
+
+  hb_buffer_set_content_type (buffer, HB_BUFFER_CONTENT_TYPE_UNICODE);
+  for (unsigned i = 0; i < 20000; i++)
+    hb_buffer_add (buffer, 0x00AD, i);
+  hb_buffer_add (buffer, 'a', 20000);
+  for (unsigned i = 0; i < 20000; i++)
+    hb_buffer_add (buffer, 0x0301, 20001 + i);
+  hb_buffer_guess_segment_properties (buffer);
+  hb_buffer_set_direction (buffer, HB_DIRECTION_RTL);
+
+  /* This exercises the native cluster re-merge op budget in hb-buffer.cc, so
+   * force the "ot" shaper: other shapers (e.g. harfrust) do their own cluster
+   * handling and never hit this path. */
+  const char *shaper_list[] = {"ot", NULL};
+  hb_shape_full (font, buffer, NULL, 0, shaper_list);
+
+  g_assert_true (!hb_buffer_allocation_successful (buffer));
+
+  hb_buffer_destroy (buffer);
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+}
+
+
+
+#ifndef HB_NO_AAT
+static hb_bool_t
+count_contour_point_calls (hb_font_t      *font HB_UNUSED,
+			   void           *font_data,
+			   hb_codepoint_t  glyph HB_UNUSED,
+			   unsigned int    point_index HB_UNUSED,
+			   hb_position_t  *x,
+			   hb_position_t  *y,
+			   void           *user_data HB_UNUSED)
+{
+  (*(unsigned *) font_data)++;
+  *x = *y = 0;
+  return TRUE;
+}
+
+static void
+test_shape_kerx_control_point_actions_are_charged (void)
+{
+  /* A two-glyph font whose kerx format-4 subtable loops on the letter 'a'
+   * in state 1 without advancing, performing a control-point action on
+   * every transition.  Each action asks the font for two contour points,
+   * which may load a whole glyph outline, so shaping must charge them to
+   * the buffer's work budget. */
+  static const char maxp[] = {0x00, 0x00, 0x50, 0x00,  0x00, 0x02};
+  static const char cmap[] = {0, 0,  0, 1,  0, 3,  0, 10,  0, 0, 0, 12,
+			      0, 12,  0, 0,  0, 0, 0, 28,  0, 0, 0, 0,  0, 0, 0, 1,
+			      0, 0, 0, 'a',  0, 0, 0, 'a',  0, 0, 0, 1};
+  static const unsigned char kerx[] = {
+    0, 2, 0, 0,  0, 0, 0, 1,			/* version 2, one subtable */
+    0, 0, 0, 82,  0, 0, 0, 4,  0, 0, 0, 0,	/* length, format 4, tupleCount */
+    0, 0, 0, 5,  0, 0, 0, 20,  0, 0, 0, 28,  0, 0, 0, 48, /* nClasses, class, state, entry offsets */
+    0, 0, 0, 66,				/* action type 0, control points at 66 */
+    0, 8,  0, 1,  0, 1,  0, 4,			/* class lookup format 8: glyph 1 is class 4 */
+    0, 0,  0, 0,  0, 0,  0, 0,  0, 1,		/* state 0: class 4 takes entry 1 */
+    0, 0,  0, 0,  0, 0,  0, 0,  0, 2,		/* state 1: class 4 takes entry 2 */
+    0, 0,  0x00, 0,  0xFF, 0xFF,		/* entry 0: to state 0 */
+    0, 1,  0xC0, 0,  0xFF, 0xFF,		/* entry 1: to state 1, Mark, DontAdvance */
+    0, 1,  0x40, 0,  0, 0,			/* entry 2: to state 1, DontAdvance, action 0 */
+    0, 0,  0, 0					/* action 0: mark point 0, current point 0 */
+  };
+  static const char *shapers[] = {"ot", NULL};
+
+  hb_face_t *builder = hb_face_builder_create ();
+  hb_blob_t *blob = hb_blob_create (maxp, sizeof (maxp), HB_MEMORY_MODE_READONLY, NULL, NULL);
+  hb_face_builder_add_table (builder, HB_TAG ('m','a','x','p'), blob);
+  hb_blob_destroy (blob);
+  blob = hb_blob_create (cmap, sizeof (cmap), HB_MEMORY_MODE_READONLY, NULL, NULL);
+  hb_face_builder_add_table (builder, HB_TAG ('c','m','a','p'), blob);
+  hb_blob_destroy (blob);
+  blob = hb_blob_create ((const char *) kerx, sizeof (kerx), HB_MEMORY_MODE_READONLY, NULL, NULL);
+  hb_face_builder_add_table (builder, HB_TAG ('k','e','r','x'), blob);
+  hb_blob_destroy (blob);
+  blob = hb_face_reference_blob (builder);
+  hb_face_destroy (builder);
+  hb_face_t *face = hb_face_create (blob, 0);
+  hb_blob_destroy (blob);
+
+  unsigned calls = 0;
+  hb_font_t *parent = hb_font_create (face);
+  hb_font_t *font = hb_font_create_sub_font (parent);
+  hb_font_funcs_t *funcs = hb_font_funcs_create ();
+  hb_font_funcs_set_glyph_contour_point_func (funcs, count_contour_point_calls, NULL, NULL);
+  hb_font_set_funcs (font, funcs, &calls, NULL);
+  hb_font_funcs_destroy (funcs);
+
+  hb_buffer_t *buffer = hb_buffer_create ();
+  hb_buffer_add_utf8 (buffer, "aa", -1, 0, -1);
+  hb_buffer_guess_segment_properties (buffer);
+  hb_shape_full (font, buffer, NULL, 0, shapers);
+
+  /* 131074 before the budget was charged. */
+  g_assert_cmpuint (calls, >=, 2);
+  g_assert_cmpuint (calls, <=, 256);
+
+  hb_buffer_destroy (buffer);
+  hb_font_destroy (font);
+  hb_font_destroy (parent);
+  hb_face_destroy (face);
+}
+#endif
+
+static void
+test_shape_harfrust_budget (void)
+{
+  /* A HarfRust max_ops / preprocessing-budget trip must propagate to the C
+   * buffer's allocation_successful flag, the same way the ot shaper reports a
+   * budget failure.  Many ranged (non-global) features make HarfRust's
+   * setup_masks() overrun the per-text op budget and mark its own buffer
+   * unsuccessful; hb-harfrust.cc must forward that to the hb_buffer_t so that a
+   * caller of the void-returning hb_shape() can see it.  Only meaningful when
+   * HarfRust is built in, so skip otherwise. */
+  hb_bool_t have_harfrust = false;
+  for (const char * const *s = hb_shape_list_shapers (); *s; s++)
+    if (0 == strcmp (*s, "harfrust")) { have_harfrust = true; break; }
+  if (!have_harfrust)
+  {
+    g_test_skip ("HarfRust shaper not built");
+    return;
+  }
+
+  hb_face_t *face = hb_test_open_font_file ("fonts/Roboto-Regular.abc.ttf");
+  hb_font_t *font = hb_font_create (face);
+  hb_buffer_t *buffer = hb_buffer_create ();
+
+  hb_buffer_add_utf8 (buffer, "abcabcab", -1, 0, -1);
+  hb_buffer_guess_segment_properties (buffer);
+
+  /* One ranged feature per entry; count times the text length exceeds the
+   * per-text op budget, which HarfRust charges in setup_masks(). */
+  const unsigned num_features = 20000;
+  hb_feature_t *features = g_new0 (hb_feature_t, num_features);
+  for (unsigned i = 0; i < num_features; i++)
+  {
+    features[i].tag = HB_TAG ('k', 'e', 'r', 'n');
+    features[i].value = 0;
+    features[i].start = i;
+    features[i].end = i + 1;
+  }
+
+  const char *shaper_list[] = {"harfrust", NULL};
+  hb_shape_full (font, buffer, features, num_features, shaper_list);
+
+  g_assert_true (!hb_buffer_allocation_successful (buffer));
+
+  g_free (features);
+  hb_buffer_destroy (buffer);
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+}
+
 
 static void
 test_shape_list (void)
@@ -190,7 +384,7 @@ test_shape_list (void)
     ;
 
   g_assert_cmpint (i, >, 1);
-  g_assert (!strcmp (shapers[i - 1], "fallback"));
+  g_assert_true (!strcmp (shapers[i - 1], "fallback"));
 }
 
 int
@@ -200,6 +394,12 @@ main (int argc, char **argv)
 
   hb_test_add (test_shape);
   hb_test_add (test_shape_clusters);
+  hb_test_add (test_shape_overlong_mark_cluster);
+  hb_test_add (test_shape_overlong_cluster_remerge);
+  hb_test_add (test_shape_harfrust_budget);
+#ifndef HB_NO_AAT
+  hb_test_add (test_shape_kerx_control_point_actions_are_charged);
+#endif
   /* TODO test fallback shaper */
   /* TODO test shaper_full */
   hb_test_add (test_shape_list);

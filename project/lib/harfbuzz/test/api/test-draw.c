@@ -26,9 +26,6 @@
 #include <math.h>
 
 #include <hb.h>
-#ifdef HAVE_FREETYPE
-#include <hb-ft.h>
-#endif
 
 typedef struct draw_data_t
 {
@@ -99,11 +96,12 @@ test_itoa (void)
 }
 
 static void
-move_to (HB_UNUSED hb_draw_funcs_t *dfuncs, draw_data_t *draw_data,
+move_to (HB_UNUSED hb_draw_funcs_t *dfuncs, void *draw_data_,
 	 HB_UNUSED hb_draw_state_t *st,
 	 float to_x, float to_y,
 	 HB_UNUSED void *user_data)
 {
+  draw_data_t *draw_data = (draw_data_t *) draw_data_;
   /* 4 = command character space + comma + array starts with 0 index + nul character space */
   if (draw_data->consumed + 2 * ITOA_BUF_SIZE + 4 > draw_data->size) return;
   draw_data->str[draw_data->consumed++] = 'M';
@@ -113,11 +111,12 @@ move_to (HB_UNUSED hb_draw_funcs_t *dfuncs, draw_data_t *draw_data,
 }
 
 static void
-line_to (HB_UNUSED hb_draw_funcs_t *dfuncs, draw_data_t *draw_data,
+line_to (HB_UNUSED hb_draw_funcs_t *dfuncs, void *draw_data_,
 	 HB_UNUSED hb_draw_state_t *st,
 	 float to_x, float to_y,
 	 HB_UNUSED void *user_data)
 {
+  draw_data_t *draw_data = (draw_data_t *) draw_data_;
   if (draw_data->consumed + 2 * ITOA_BUF_SIZE + 4 > draw_data->size) return;
   draw_data->str[draw_data->consumed++] = 'L';
   draw_data->consumed += _hb_itoa (to_x, draw_data->str + draw_data->consumed);
@@ -126,13 +125,13 @@ line_to (HB_UNUSED hb_draw_funcs_t *dfuncs, draw_data_t *draw_data,
 }
 
 static void
-quadratic_to (HB_UNUSED hb_draw_funcs_t *dfuncs, draw_data_t *draw_data,
+quadratic_to (HB_UNUSED hb_draw_funcs_t *dfuncs, void *draw_data_,
 	      HB_UNUSED hb_draw_state_t *st,
 	      float control_x, float control_y,
 	      float to_x, float to_y,
 	      HB_UNUSED void *user_data)
 {
-
+  draw_data_t *draw_data = (draw_data_t *) draw_data_;
   if (draw_data->consumed + 4 * ITOA_BUF_SIZE + 6 > draw_data->size) return;
   draw_data->str[draw_data->consumed++] = 'Q';
   draw_data->consumed += _hb_itoa (control_x, draw_data->str + draw_data->consumed);
@@ -145,13 +144,14 @@ quadratic_to (HB_UNUSED hb_draw_funcs_t *dfuncs, draw_data_t *draw_data,
 }
 
 static void
-cubic_to (HB_UNUSED hb_draw_funcs_t *dfuncs, draw_data_t *draw_data,
+cubic_to (HB_UNUSED hb_draw_funcs_t *dfuncs, void *draw_data_,
 	  HB_UNUSED hb_draw_state_t *st,
 	  float control1_x, float control1_y,
 	  float control2_x, float control2_y,
 	  float to_x, float to_y,
 	  HB_UNUSED void *user_data)
 {
+  draw_data_t *draw_data = (draw_data_t *) draw_data_;
   if (draw_data->consumed + 6 * ITOA_BUF_SIZE + 8 > draw_data->size) return;
   draw_data->str[draw_data->consumed++] = 'C';
   draw_data->consumed += _hb_itoa (control1_x, draw_data->str + draw_data->consumed);
@@ -168,10 +168,11 @@ cubic_to (HB_UNUSED hb_draw_funcs_t *dfuncs, draw_data_t *draw_data,
 }
 
 static void
-close_path (HB_UNUSED hb_draw_funcs_t *dfuncs, draw_data_t *draw_data,
+close_path (HB_UNUSED hb_draw_funcs_t *dfuncs, void *draw_data_,
 	    HB_UNUSED hb_draw_state_t *st,
 	    HB_UNUSED void *user_data)
 {
+  draw_data_t *draw_data = (draw_data_t *) draw_data_;
   if (draw_data->consumed + 2 > draw_data->size) return;
   draw_data->str[draw_data->consumed++] = 'Z';
 }
@@ -709,7 +710,7 @@ test_hb_draw_font_kit_variations_tests (void)
 		        "C436,229 405,295 271,349L247,359C160,393 119,439 119,506"
 		        "C119,592 178,637 262,637C311,637 346,626 390,585L348,629L373,535"
 		        "C380,510 394,503 408,503C424,503 434,510 437,526C418,614 348,665 259,665"
-		        "C161,665 78,606 78,500C78,414 128,361 224,321L261,305C367,259 395,217 395,152"
+		        "C161,665 78,606 78,500C78,414 128,361 224,320L261,305C367,259 395,217 395,152"
 		        "C395,65 334,15 246,15ZM267,331L267,759L240,759L240,331L267,331ZM240,-115"
 		        "L267,-115L267,331L240,331L240,-115Z";
       g_assert_cmpmem (str, draw_data.consumed, expected, sizeof (expected) - 1);
@@ -1068,15 +1069,185 @@ static void
 test_hb_draw_immutable (void)
 {
   hb_draw_funcs_t *draw_funcs = hb_draw_funcs_create ();
-  g_assert (!hb_draw_funcs_is_immutable (draw_funcs));
+  g_assert_true (!hb_draw_funcs_is_immutable (draw_funcs));
   hb_draw_funcs_make_immutable (draw_funcs);
-  g_assert (hb_draw_funcs_is_immutable (draw_funcs));
+  g_assert_true (hb_draw_funcs_is_immutable (draw_funcs));
   hb_draw_funcs_destroy (draw_funcs);
 }
 
-#ifdef HAVE_FREETYPE
-static void test_hb_draw_ft (void)
+typedef struct
 {
+  int64_t policy;
+  int64_t live;
+} draw_budget_data_t;
+
+static hb_bool_t
+draw_set_budget (hb_draw_funcs_t *dfuncs HB_UNUSED,
+		 void *draw_data,
+		 int64_t budget,
+		 void *user_data HB_UNUSED)
+{
+  draw_budget_data_t *data = (draw_budget_data_t *) draw_data;
+  data->policy = budget;
+  data->live = budget == HB_BUDGET_DEFAULT ? 1234 : budget;
+  return TRUE;
+}
+
+static int64_t
+draw_get_budget (hb_draw_funcs_t *dfuncs HB_UNUSED,
+		 void *draw_data,
+		 void *user_data HB_UNUSED)
+{
+  return ((draw_budget_data_t *) draw_data)->policy;
+}
+
+static int64_t *
+draw_get_budget_remaining (hb_draw_funcs_t *dfuncs HB_UNUSED,
+			   void *draw_data,
+			   void *user_data HB_UNUSED)
+{
+  return &((draw_budget_data_t *) draw_data)->live;
+}
+
+static int64_t
+draw_budget_consumption (const char *font_file,
+			 hb_codepoint_t glyph,
+			 const hb_variation_t *variation)
+{
+  const int64_t budget = 100000;
+  draw_budget_data_t data = {HB_BUDGET_DEFAULT, 0};
+  hb_draw_funcs_t *draw_funcs = hb_draw_funcs_create ();
+  hb_draw_funcs_set_set_budget_func (draw_funcs, draw_set_budget, NULL, NULL);
+  hb_draw_funcs_set_get_budget_func (draw_funcs, draw_get_budget, NULL, NULL);
+  hb_draw_funcs_set_get_budget_remaining_func (draw_funcs, draw_get_budget_remaining, NULL, NULL);
+  g_assert_true (hb_draw_set_budget (draw_funcs, &data, budget));
+
+  hb_face_t *face = hb_test_open_font_file (font_file);
+  hb_font_t *font = hb_font_create (face);
+  hb_face_destroy (face);
+  if (variation)
+    hb_font_set_variations (font, variation, 1);
+
+  g_assert_true (hb_font_draw_glyph_or_fail (font, glyph, draw_funcs, &data));
+  int64_t consumption = budget - data.live;
+
+  hb_font_destroy (font);
+  hb_draw_funcs_destroy (draw_funcs);
+
+  return consumption;
+}
+
+static void
+test_hb_draw_cff_budget (void)
+{
+  int64_t cff1_seac = draw_budget_consumption ("fonts/cff1_seac.otf", 3, NULL);
+  hb_variation_t variation = {HB_TAG ('w','g','h','t'), 800};
+  int64_t cff2_blend = draw_budget_consumption ("fonts/AdobeVFPrototype.abc.otf", 3, &variation);
+
+  /* These bounds exceed the parent charstring's flat operator cost, so they
+   * specifically cover the two seac children and the proportional blend. */
+  g_assert_cmpint (cff1_seac, >, 100);
+  g_assert_cmpint (cff2_blend, >, 512);
+}
+
+static void
+test_hb_draw_glyf_composite_budget (void)
+{
+  /* A child composite whose 256 components all reference itself.  Preparing
+   * its offsets must consume budget even when cycle detection skips children. */
+  char glyf_data[16 + 10 + 256 * 6] = {0};
+  glyf_data[0] = glyf_data[1] = (char) 0xFF;
+  glyf_data[11] = 0x02;
+  glyf_data[13] = 0x01;
+  glyf_data[16] = glyf_data[17] = (char) 0xFF;
+  for (unsigned i = 0; i < 256; i++)
+  {
+    glyf_data[26 + i * 6 + 1] = i < 255 ? 0x22 : 0x02;
+    glyf_data[26 + i * 6 + 3] = 0x01;
+  }
+  const char loca_data[] = {0, 0, 0, 8, 0x03, 0x0D};
+
+  hb_face_t *face = hb_face_builder_create ();
+  HB_FACE_ADD_TABLE (face, "glyf", glyf_data);
+  HB_FACE_ADD_TABLE (face, "loca", loca_data);
+  hb_face_set_glyph_count (face, 2);
+  hb_font_t *font = hb_font_create (face);
+
+  draw_budget_data_t data = {HB_BUDGET_DEFAULT, 0};
+  hb_draw_funcs_t *draw_funcs = hb_draw_funcs_create ();
+  hb_draw_funcs_set_set_budget_func (draw_funcs, draw_set_budget, NULL, NULL);
+  hb_draw_funcs_set_get_budget_remaining_func (draw_funcs, draw_get_budget_remaining, NULL, NULL);
+
+  g_assert_true (hb_draw_set_budget (draw_funcs, &data, 10000));
+  g_assert_true (hb_font_draw_glyph_or_fail (font, 0, draw_funcs, &data));
+
+  g_assert_true (hb_draw_set_budget (draw_funcs, &data, 2048));
+  g_assert_false (hb_font_draw_glyph_or_fail (font, 0, draw_funcs, &data));
+  g_assert_cmpint (data.live, <, 0);
+
+  g_assert_true (hb_draw_set_budget (draw_funcs, &data, 10000));
+  g_assert_true (hb_font_draw_glyph_or_fail (font, 0, draw_funcs, &data));
+
+  hb_draw_funcs_destroy (draw_funcs);
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+}
+
+static void
+test_hb_draw_budget (void)
+{
+  draw_budget_data_t data = {HB_BUDGET_DEFAULT, 1234};
+  hb_draw_funcs_t *draw_funcs = hb_draw_funcs_create ();
+
+  g_assert_false (hb_draw_set_budget (draw_funcs, &data, 100));
+  g_assert_cmpint (hb_draw_get_budget (draw_funcs, &data), ==, HB_BUDGET_DEFAULT);
+  g_assert_cmpint (hb_draw_get_budget_remaining (draw_funcs, &data), ==, HB_BUDGET_UNLIMITED);
+
+  hb_draw_funcs_set_set_budget_func (draw_funcs, draw_set_budget, NULL, NULL);
+  hb_draw_funcs_set_get_budget_func (draw_funcs, draw_get_budget, NULL, NULL);
+  hb_draw_funcs_set_get_budget_remaining_func (draw_funcs, draw_get_budget_remaining, NULL, NULL);
+
+  g_assert_true (hb_draw_set_budget (draw_funcs, &data, -42));
+  g_assert_cmpint (hb_draw_get_budget (draw_funcs, &data), ==, 0);
+  g_assert_cmpint (hb_draw_get_budget_remaining (draw_funcs, &data), ==, 0);
+
+  g_assert_true (hb_draw_set_budget (draw_funcs, &data, HB_BUDGET_DEFAULT));
+  g_assert_cmpint (hb_draw_get_budget (draw_funcs, &data), ==, HB_BUDGET_DEFAULT);
+  g_assert_cmpint (hb_draw_get_budget_remaining (draw_funcs, &data), ==, 1234);
+
+  g_assert_true (hb_draw_set_budget (draw_funcs, &data, HB_BUDGET_UNLIMITED));
+  g_assert_cmpint (hb_draw_get_budget (draw_funcs, &data), ==, HB_BUDGET_UNLIMITED);
+  g_assert_cmpint (hb_draw_get_budget_remaining (draw_funcs, &data), ==, HB_BUDGET_UNLIMITED);
+
+  hb_face_t *face = hb_test_open_font_file ("fonts/glyphs.ttf");
+  hb_font_t *font = hb_font_create (face);
+
+  g_assert_true (hb_draw_set_budget (draw_funcs, &data, 100000));
+  g_assert_true (hb_font_draw_glyph_or_fail (font, 0, draw_funcs, &data));
+  g_assert_cmpint (hb_draw_get_budget (draw_funcs, &data), ==, 100000);
+  g_assert_cmpint (hb_draw_get_budget_remaining (draw_funcs, &data), <, 100000);
+  g_assert_cmpint (hb_draw_get_budget_remaining (draw_funcs, &data), >=, 0);
+
+  g_assert_true (hb_draw_set_budget (draw_funcs, &data, HB_BUDGET_UNLIMITED));
+  g_assert_true (hb_font_draw_glyph_or_fail (font, 0, draw_funcs, &data));
+  g_assert_cmpint (hb_draw_get_budget (draw_funcs, &data), ==, HB_BUDGET_UNLIMITED);
+  g_assert_cmpint (hb_draw_get_budget_remaining (draw_funcs, &data), <, HB_BUDGET_UNLIMITED);
+  g_assert_cmpint (hb_draw_get_budget_remaining (draw_funcs, &data), >, 0);
+
+  hb_font_set_synthetic_slant (font, 0.2f);
+  g_assert_true (hb_draw_set_budget (draw_funcs, &data, 1));
+  g_assert_false (hb_font_draw_glyph_or_fail (font, 0, draw_funcs, &data));
+  g_assert_cmpint (hb_draw_get_budget_remaining (draw_funcs, &data), <, 0);
+
+  hb_font_destroy (font);
+  hb_face_destroy (face);
+  hb_draw_funcs_destroy (draw_funcs);
+}
+
+static void
+test_hb_draw_funcs (const void* user_data)
+{
+  const char *font_funcs_name = user_data;
   char str[1024];
   draw_data_t draw_data = {
     .str = str,
@@ -1085,7 +1256,8 @@ static void test_hb_draw_ft (void)
   {
     hb_face_t *face = hb_test_open_font_file ("fonts/glyphs.ttf");
     hb_font_t *font = hb_font_create (face);
-    hb_ft_font_set_funcs (font);
+    hb_bool_t ret = hb_font_set_funcs_using (font, font_funcs_name);
+    g_assert_true (ret);
     hb_face_destroy (face);
     {
       draw_data.consumed = 0;
@@ -1093,18 +1265,13 @@ static void test_hb_draw_ft (void)
       char expected[] = "M50,0L50,750L450,750L450,0L50,0Z";
       g_assert_cmpmem (str, draw_data.consumed, expected, sizeof (expected) - 1);
     }
-    {
-      draw_data.consumed = 0;
-      hb_font_draw_glyph (font, 5, funcs, &draw_data);
-      char expected[] = "M15,0Q15,0 15,0Z";
-      g_assert_cmpmem (str, draw_data.consumed, expected, sizeof (expected) - 1);
-    }
     hb_font_destroy (font);
   }
   {
     hb_face_t *face = hb_test_open_font_file ("fonts/cff1_flex.otf");
     hb_font_t *font = hb_font_create (face);
-    hb_ft_font_set_funcs (font);
+    hb_bool_t ret = hb_font_set_funcs_using (font, font_funcs_name);
+    g_assert_true (ret);
     hb_face_destroy (face);
 
     draw_data.consumed = 0;
@@ -1122,8 +1289,9 @@ static void test_hb_draw_ft (void)
 }
 
 static void
-test_hb_draw_compare_ot_ft (void)
+test_hb_draw_compare_ot_funcs (const void *user_data)
 {
+  const char* font_funcs_name = user_data;
   char str[1024];
   draw_data_t draw_data = {
     .str = str,
@@ -1145,7 +1313,8 @@ test_hb_draw_compare_ot_ft (void)
   hb_font_draw_glyph (font, 1, funcs, &draw_data);
   draw_data.str[draw_data.consumed] = '\0';
 
-  hb_ft_font_set_funcs (font);
+  hb_bool_t ret = hb_font_set_funcs_using (font, font_funcs_name);
+  g_assert_true (ret);
 
   hb_font_draw_glyph (font, 1, funcs, &draw_data2);
   draw_data2.str[draw_data2.consumed] = '\0';
@@ -1155,24 +1324,23 @@ test_hb_draw_compare_ot_ft (void)
   hb_font_destroy (font);
   hb_face_destroy (face);
 }
-#endif
 
 int
 main (int argc, char **argv)
 {
   funcs = hb_draw_funcs_create ();
-  hb_draw_funcs_set_move_to_func (funcs, (hb_draw_move_to_func_t) move_to, NULL, NULL);
-  hb_draw_funcs_set_line_to_func (funcs, (hb_draw_line_to_func_t) line_to, NULL, NULL);
-  hb_draw_funcs_set_quadratic_to_func (funcs, (hb_draw_quadratic_to_func_t) quadratic_to, NULL, NULL);
-  hb_draw_funcs_set_cubic_to_func (funcs, (hb_draw_cubic_to_func_t) cubic_to, NULL, NULL);
-  hb_draw_funcs_set_close_path_func (funcs, (hb_draw_close_path_func_t) close_path, NULL, NULL);
+  hb_draw_funcs_set_move_to_func (funcs, move_to, NULL, NULL);
+  hb_draw_funcs_set_line_to_func (funcs, line_to, NULL, NULL);
+  hb_draw_funcs_set_quadratic_to_func (funcs, quadratic_to, NULL, NULL);
+  hb_draw_funcs_set_cubic_to_func (funcs, cubic_to, NULL, NULL);
+  hb_draw_funcs_set_close_path_func (funcs, close_path, NULL, NULL);
   hb_draw_funcs_make_immutable (funcs);
 
   funcs2 = hb_draw_funcs_create ();
-  hb_draw_funcs_set_move_to_func (funcs2, (hb_draw_move_to_func_t) move_to, NULL, NULL);
-  hb_draw_funcs_set_line_to_func (funcs2, (hb_draw_line_to_func_t) line_to, NULL, NULL);
-  hb_draw_funcs_set_cubic_to_func (funcs2, (hb_draw_cubic_to_func_t) cubic_to, NULL, NULL);
-  hb_draw_funcs_set_close_path_func (funcs2, (hb_draw_close_path_func_t) close_path, NULL, NULL);
+  hb_draw_funcs_set_move_to_func (funcs2, move_to, NULL, NULL);
+  hb_draw_funcs_set_line_to_func (funcs2, line_to, NULL, NULL);
+  hb_draw_funcs_set_cubic_to_func (funcs2, cubic_to, NULL, NULL);
+  hb_draw_funcs_set_close_path_func (funcs2, close_path, NULL, NULL);
   hb_draw_funcs_make_immutable (funcs2);
 
   hb_test_init (&argc, &argv);
@@ -1191,10 +1359,17 @@ main (int argc, char **argv)
   hb_test_add (test_hb_draw_synthetic_slant);
   hb_test_add (test_hb_draw_subfont_scale);
   hb_test_add (test_hb_draw_immutable);
-#ifdef HAVE_FREETYPE
-  hb_test_add (test_hb_draw_ft);
-  hb_test_add (test_hb_draw_compare_ot_ft);
-#endif
+  hb_test_add (test_hb_draw_budget);
+  hb_test_add (test_hb_draw_cff_budget);
+  hb_test_add (test_hb_draw_glyf_composite_budget);
+
+  const char **font_funcs = hb_font_list_funcs ();
+  for (const char **font_funcs_name = font_funcs; *font_funcs_name; font_funcs_name++)
+  {
+    hb_test_add_flavor (*font_funcs_name, test_hb_draw_funcs);
+    hb_test_add_flavor (*font_funcs_name, test_hb_draw_compare_ot_funcs);
+  }
+
   unsigned result = hb_test_run ();
 
   hb_draw_funcs_destroy (funcs);

@@ -1,7 +1,44 @@
 #include <assert.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "utils.h"
+
+/* Adding an unsigned size to a negative origin used to wrap before the
+ * result was stored in a double.
+ */
+static void
+test_region64f_negative_origin (void)
+{
+    pixman_region64f_t rf, expected;
+    pixman_box64f_t *box;
+
+    pixman_region64f_init_rectf (&expected, -10, -10, 5, 5);
+    pixman_region64f_init_rect (&rf, -10, -10, 5, 5);
+    assert (pixman_region64f_equal (&rf, &expected));
+    pixman_region64f_fini (&rf);
+
+    pixman_region64f_init_rectf (&rf, -20, -20, 40, 40);
+    assert (pixman_region64f_intersect_rect (&rf, &rf, -10, -10, 5, 5));
+    assert (pixman_region64f_equal (&rf, &expected));
+    pixman_region64f_fini (&rf);
+
+    pixman_region64f_init (&rf);
+    assert (pixman_region64f_union_rect (&rf, &rf, -10, -10, 5, 5));
+    assert (pixman_region64f_equal (&rf, &expected));
+    pixman_region64f_fini (&rf);
+    pixman_region64f_fini (&expected);
+
+    pixman_region64f_init_rect (&rf, -10, -10, 0, 1);
+    assert (pixman_region64f_n_rects (&rf) == 0);
+    pixman_region64f_fini (&rf);
+
+    pixman_region64f_init_rect (&rf, -10, -10, UINT_MAX, 1);
+    box = pixman_region64f_extents (&rf);
+    assert (box->x1 == -10);
+    assert (box->x2 == (double)UINT_MAX - 10);
+    pixman_region64f_fini (&rf);
+}
 
 int
 main ()
@@ -31,6 +68,42 @@ main ()
 	0xffff,
 	0xffff
     };
+
+    /* An empty intersection used to leave a degenerate one-box region. */
+    for (i = 0; i < 2; i++)
+    {
+	for (j = 0; j < 2; j++)
+	{
+	    pixman_region16_t  r16;
+	    pixman_region64f_t rf;
+
+	    pixman_region_init_rect (&r16, -10, -10, 20, 20);
+	    pixman_region_intersect_rect (&r16, &r16, 0, 0, i, j);
+	    assert (pixman_region_not_empty (&r16) == (i && j));
+	    assert (pixman_region_n_rects (&r16) == (i && j));
+	    pixman_region_fini (&r16);
+
+	    pixman_region32_init_rect (&r1, -10, -10, 20, 20);
+	    pixman_region32_intersect_rect (&r1, &r1, 0, 0, i, j);
+	    assert (pixman_region32_not_empty (&r1) == (i && j));
+	    assert (pixman_region32_n_rects (&r1) == (i && j));
+	    pixman_region32_fini (&r1);
+
+	    pixman_region64f_init_rect (&rf, -10, -10, 20, 20);
+	    pixman_region64f_intersect_rect (&rf, &rf, 0, 0, i, j);
+	    assert (pixman_region64f_not_empty (&rf) == (i && j));
+	    assert (pixman_region64f_n_rects (&rf) == (i && j));
+	    pixman_region64f_fini (&rf);
+
+	    pixman_region64f_init_rectf (&rf, -10.5, -10.5, 20.5, 20.5);
+	    pixman_region64f_intersect_rectf (&rf, &rf, 0.5, 0.5, i, j);
+	    assert (pixman_region64f_not_empty (&rf) == (i && j));
+	    assert (pixman_region64f_n_rects (&rf) == (i && j));
+	    pixman_region64f_fini (&rf);
+	}
+    }
+
+    test_region64f_negative_origin ();
 
     prng_srand (0);
 

@@ -172,11 +172,15 @@
       they will need to make a duplicate of the original.
     </para>
     <para>
-      Finally, object constructors (and, indeed, as much of the
-      shaping API as possible) will never return
-      <literal>NULL</literal>.  Instead, if there is an allocation
-      error, each constructor will return an “empty” object
-      singleton.
+      Finally, most object constructors return an “empty” object
+      singleton on allocation failure rather than
+      <literal>NULL</literal>. Constructors whose names end in
+      <literal>_or_fail</literal>, such as
+      <function>hb_blob_create_or_fail()</function> and
+      <function>hb_blob_create_from_file_or_fail()</function>, instead
+      return <literal>NULL</literal> on failure. Check their return
+      values before using the objects, and consult each constructor's
+      API Reference documentation for its failure behavior.
     </para>
     <para>
       These empty-object singletons are inert and safe (although
@@ -247,9 +251,9 @@
       callbacks. If you allocated the memory for the data using
       <function>malloc()</function>, you would create the blob using
     </para>
-    <programlisting language="C">
-      hb_blob_create (data, length, HB_MEMORY_MODE_WRITABLE, data, free)
-    </programlisting>
+<programlisting language="C">
+hb_blob_create (data, length, HB_MEMORY_MODE_WRITABLE, data, free)
+</programlisting>
     <para>
       That way, HarfBuzz will call <function>free()</function> on the
       allocated memory whenever the blob drops its last reference and

@@ -59,6 +59,9 @@ struct hb_subset_context_t :
   hb_subset_plan_t *plan;
   hb_serialize_context_t *serializer;
   hb_tag_t table_tag;
+  /* Outline work left for instancing this table.  Lives here rather than in
+   * the table's subset() so retries with a larger buffer share it. */
+  int64_t budget_remaining = HB_BUDGET_SUBSET_GLYF;
 
   hb_subset_context_t (hb_blob_t *source_blob_,
 		       hb_subset_plan_t *plan_,
@@ -69,6 +72,5 @@ struct hb_subset_context_t :
 			serializer (serializer_),
 			table_tag (table_tag_) {}
 };
-
 
 #endif /* HB_SUBSET_HH */

@@ -236,10 +236,33 @@ format_name (pixman_format_code_t format);
 const char *
 dither_name (pixman_dither_t dither);
 
+/* An RGBA color value in linear space. Values are expected to be in range [0,1]. */
 typedef struct
 {
     double r, g, b, a;
 } color_t;
+
+/* An unnormalized, unlinearized RGBA color, which acts as an intermediate point
+ * between color_t and the raw pixel values. This can faithfully encode any
+ * value that a Pixman image pixel can have.
+ *
+ * The intepretation of this color depends on the pixel format from which it
+ * was created.
+ *
+ * If a color channel uses floating point, then the corresponding entry here
+ * will be the same as the raw pixel value, except cast to 'double'.
+ *
+ * If a color channel has an integer type, then the value will be an integral
+ * in the list {0.0, 1.0, ... , (double)(1uLL << channel width) - 1 }. Note
+ * that sRGB formats are presented in compressed {0..255} form, not in their
+ * linear equivalent.
+ *
+ * When a channel is not present in the format, the value is 0.0.
+ */
+typedef struct
+{
+	double a, r, g, b;
+} ucolor_t;
 
 void
 do_composite (pixman_op_t op,
@@ -255,9 +278,16 @@ round_color (pixman_format_code_t format, color_t *color);
 typedef struct
 {
     pixman_format_code_t format;
+    /* UNSHIFTED masks for each channel.
+     * Example: a2r10g10b10 has 0x3,0x3f,0x3f,0x3f */
     uint32_t am, rm, gm, bm;
+    /* Shift values for each channel.
+     * Example: a2r10g10b10 has 30, 20, 10, 0*/
     uint32_t as, rs, gs, bs;
+    /* Bit widths of each channel.
+     * Example: a2r10g10b10 has 2,10,10,10*/
     uint32_t aw, rw, gw, bw;
+    /* Allowed deviations in each channel */
     float ad, rd, gd, bd;
 } pixel_checker_t;
 
@@ -267,25 +297,36 @@ pixel_checker_init (pixel_checker_t *checker, pixman_format_code_t format);
 void
 pixel_checker_allow_dither (pixel_checker_t *checker);
 
-void
-pixel_checker_split_pixel (const pixel_checker_t *checker, uint32_t pixel,
-			   int *a, int *r, int *g, int *b);
+/* Extract the raw channel values for a pixel. The pointer `pixel` indicates
+ * the first byte in memory of the pixel data. */
+void pixel_checker_split_pixel (const pixel_checker_t *checker,
+				const uint8_t         *pixel,
+				ucolor_t              *u);
 
-void
-pixel_checker_get_max (const pixel_checker_t *checker, color_t *color,
-		       int *a, int *r, int *g, int *b);
+void pixel_checker_get_max (const pixel_checker_t *checker,
+			    color_t               *color,
+			    ucolor_t              *u);
 
-void
-pixel_checker_get_min (const pixel_checker_t *checker, color_t *color,
-		       int *a, int *r, int *g, int *b);
+void pixel_checker_get_min (const pixel_checker_t *checker,
+			    color_t               *color,
+			    ucolor_t              *u);
 
-pixman_bool_t
-pixel_checker_check (const pixel_checker_t *checker,
-		     uint32_t pixel, color_t *color);
+pixman_bool_t pixel_checker_check (const pixel_checker_t *checker,
+				   const uint8_t         *pixel,
+				   color_t               *color);
 
-void
-pixel_checker_convert_pixel_to_color (const pixel_checker_t *checker,
-                                      uint32_t pixel, color_t *color);
+void pixel_checker_convert_pixel_to_color (const pixel_checker_t *checker,
+					   const uint8_t         *pixel,
+					   color_t               *color);
+
+/* Given a pixel, produce a string representation of its bits. This can depend
+ * on the pixel format, so e.g. 32bpp formats are displayed as 0x%08x, while
+ * 16bpp formats might be displayed as 0x%04x.
+ */
+void pixel_checker_convert_pixel_to_string (const pixel_checker_t *checker,
+					    const uint8_t         *pixel,
+					    char                  *buf,
+					    size_t                 len);
 
 void
 pixel_checker_get_masks (const pixel_checker_t *checker,

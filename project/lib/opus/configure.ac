@@ -184,6 +184,15 @@ AS_IF([test "$enable_opus_custom_api" = "yes"],[
 
 AM_CONDITIONAL([CUSTOM_MODES], [test "$enable_custom_modes" = "yes" || test "$enable_opus_custom_api" = "yes"])
 
+AC_ARG_ENABLE([pfa],
+    [AS_HELP_STRING([--enable-pfa], [enable PFA FFT/MDCT (experimental)])],,
+    [enable_pfa=no])
+
+AS_IF([test "$enable_pfa" = "yes"],[
+  AC_DEFINE([ENABLE_PFA], [1], [Enable PFA])
+])
+AM_CONDITIONAL([ENABLE_PFA], [test "$enable_pfa" = "yes"])
+
 AC_ARG_ENABLE([dred],
     [AS_HELP_STRING([--enable-dred], [use Deep REDundancy (DRED)])],,
     [enable_dred=no])
@@ -447,79 +456,6 @@ AS_VAR_SET_IF([X86_AVX2_CFLAGS], [], [AS_VAR_SET([X86_AVX2_CFLAGS], "DEFAULT_X86
 AS_VAR_SET_IF([ARM_NEON_INTR_CFLAGS], [], [AS_VAR_SET([ARM_NEON_INTR_CFLAGS], ["$RESOLVED_DEFAULT_ARM_NEON_INTR_CFLAGS"])])
 AS_VAR_SET_IF([ARM_DOTPROD_INTR_CFLAGS], [], [AS_VAR_SET([ARM_DOTPROD_INTR_CFLAGS], ["DEFAULT_ARM_DOTPROD_INTR_CFLAGS"])])
 
-AC_DEFUN([OPUS_PATH_NE10],
-   [
-      AC_ARG_WITH(NE10,
-                  AS_HELP_STRING([--with-NE10=PFX],[prefix where libNE10 is installed (optional)]),
-                  NE10_prefix="$withval", NE10_prefix="")
-      AC_ARG_WITH(NE10-libraries,
-                  AS_HELP_STRING([--with-NE10-libraries=DIR],
-                                 [directory where libNE10 library is installed (optional)]),
-                  NE10_libraries="$withval", NE10_libraries="")
-      AC_ARG_WITH(NE10-includes,
-                  AS_HELP_STRING([--with-NE10-includes=DIR],
-                                 [directory where libNE10 header files are installed (optional)]),
-                  NE10_includes="$withval", NE10_includes="")
-
-      if test "x$NE10_libraries" != "x" ; then
-         NE10_LIBS="-L$NE10_libraries"
-      elif test "x$NE10_prefix" = "xno" || test "x$NE10_prefix" = "xyes" ; then
-         NE10_LIBS=""
-      elif test "x$NE10_prefix" != "x" ; then
-         NE10_LIBS="-L$NE10_prefix/lib"
-      elif test "x$prefix" != "xNONE" ; then
-         NE10_LIBS="-L$prefix/lib"
-      fi
-
-      if test "x$NE10_prefix" != "xno" ; then
-         NE10_LIBS="$NE10_LIBS -lNE10"
-      fi
-
-      if test "x$NE10_includes" != "x" ; then
-         NE10_CFLAGS="-I$NE10_includes"
-      elif test "x$NE10_prefix" = "xno" || test "x$NE10_prefix" = "xyes" ; then
-         NE10_CFLAGS=""
-      elif test "x$NE10_prefix" != "x" ; then
-         NE10_CFLAGS="-I$NE10_prefix/include"
-      elif test "x$prefix" != "xNONE"; then
-         NE10_CFLAGS="-I$prefix/include"
-      fi
-
-      AC_MSG_CHECKING(for NE10)
-      save_CFLAGS="$CFLAGS"; CFLAGS="$CFLAGS $NE10_CFLAGS"
-      save_LIBS="$LIBS"; LIBS="$LIBS $NE10_LIBS $LIBM"
-      AC_LINK_IFELSE(
-         [
-            AC_LANG_PROGRAM(
-               [[#include <NE10_dsp.h>
-               ]],
-               [[
-                  ne10_fft_cfg_float32_t cfg;
-                  cfg = ne10_fft_alloc_c2c_float32_neon(480);
-               ]]
-            )
-         ],[
-            HAVE_ARM_NE10=1
-            AC_MSG_RESULT([yes])
-         ],[
-            HAVE_ARM_NE10=0
-            AC_MSG_RESULT([no])
-            NE10_CFLAGS=""
-            NE10_LIBS=""
-         ]
-      )
-      CFLAGS="$save_CFLAGS"; LIBS="$save_LIBS"
-      #Now we know if libNE10 is installed or not
-      AS_IF([test x"$HAVE_ARM_NE10" = x"1"],
-         [
-            AC_DEFINE([HAVE_ARM_NE10], 1, [NE10 library is installed on host. Make sure it is on target!])
-            AC_SUBST(HAVE_ARM_NE10)
-            AC_SUBST(NE10_CFLAGS)
-            AC_SUBST(NE10_LIBS)
-         ]
-      )
-   ]
-)
 
 AS_IF([test x"$enable_intrinsics" = x"yes"],[
    intrinsics_support=""
@@ -559,15 +495,6 @@ AS_IF([test x"$enable_intrinsics" = x"yes"],[
 
          AS_IF([test x"$OPUS_ARM_PRESUME_NEON_INTR" = x"1"],
             [AC_DEFINE([OPUS_ARM_PRESUME_NEON_INTR], 1, [Define if binary requires NEON intrinsics support])])
-
-         OPUS_PATH_NE10()
-         AS_IF([test x"$NE10_LIBS" != x""],
-         [
-              intrinsics_support="$intrinsics_support (NE10)"
-              AS_IF([test x"enable_rtcd" != x"" \
-               && test x"$OPUS_ARM_PRESUME_NEON_INTR" != x"1"],
-                 [rtcd_support="$rtcd_support (NE10)"])
-         ])
 
          OPUS_CHECK_INTRINSICS(
             [Aarch64 Neon],
@@ -857,8 +784,6 @@ AM_CONDITIONAL([HAVE_ARM_DOTPROD],
     [test x"$OPUS_ARM_MAY_HAVE_DOTPROD" = x"1"])
 AM_CONDITIONAL([HAVE_ARM_NEON_INTR],
     [test x"$OPUS_ARM_MAY_HAVE_NEON_INTR" = x"1"])
-AM_CONDITIONAL([HAVE_ARM_NE10],
-    [test x"$HAVE_ARM_NE10" = x"1"])
 AM_CONDITIONAL([CPU_X86], [test "$cpu_x86" = "yes"])
 AM_CONDITIONAL([HAVE_SSE],
     [test x"$OPUS_X86_MAY_HAVE_SSE" = x"1"])
@@ -1097,6 +1022,7 @@ AC_MSG_NOTICE([
       Intrinsics Optimizations: ...... ${intrinsics_support}
       Run-time CPU detection: ........ ${rtcd_support}
       Custom modes: .................. ${enable_custom_modes}
+      PFA support: ................... ${enable_pfa}
       Assertion checking: ............ ${enable_assertions}
       Hardening: ..................... ${enable_hardening}
       Fuzzing: ....................... ${enable_fuzzing}

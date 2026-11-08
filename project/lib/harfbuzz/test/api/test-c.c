@@ -26,37 +26,68 @@
 
 /* This file tests that all headers can be included from C files */
 
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "hb-test.h"
 
 #include <hb.h>
+#include <hb-subset.h>
 #include <hb-ot.h>
 #include <hb-aat.h>
 
-#ifdef HAVE_GLIB
-#include <hb-glib.h>
-#endif
-
-#ifdef HAVE_ICU
-#include <hb-icu.h>
-#endif
-
-#ifdef HAVE_FREETYPE
-#include <hb-ft.h>
-#endif
-
-#ifdef HAVE_UNISCRIBE
-#include <hb-uniscribe.h>
+#ifdef HAVE_CAIRO
+#include <hb-cairo.h>
 #endif
 
 #ifdef HAVE_CORETEXT
 #include <hb-coretext.h>
 #endif
 
-int
-main (void)
+#ifdef HAVE_FREETYPE
+#include <hb-ft.h>
+#endif
+
+#ifdef HAVE_FONTATIONS
+#include <hb-fontations.h>
+#endif
+
+#ifdef HAVE_GDI
+#include <hb-gdi.h>
+#endif
+
+#ifdef HAVE_GLIB
+#include <hb-glib.h>
+#endif
+
+#ifdef HAVE_GRAPHITE2
+#include <hb-graphite2.h>
+#endif
+
+#ifdef HAVE_GOBJECT
+//#include <hb-gobject.h> // Doesn't work uninstalled
+#endif
+
+#ifdef HAVE_ICU
+#include <hb-icu.h>
+#endif
+
+#ifdef HAVE_UNISCRIBE
+#include <hb-uniscribe.h>
+#endif
+
+#ifndef NO_MAIN
+static void
+test_list_shapers (void)
 {
-  return !*hb_shape_list_shapers ();
+  const char *first = *hb_shape_list_shapers ();
+  g_assert_true (first);
 }
+
+int
+main (int argc, char **argv)
+{
+  hb_test_init (&argc, &argv);
+
+  hb_test_add (test_list_shapers);
+
+  return hb_test_run ();
+}
+#endif
