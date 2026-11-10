@@ -56,18 +56,14 @@ namespace lime
 			sdlWindowFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
 
 #if defined(LIME_OPENGL_GLES)
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 #elif defined(__APPLE__)
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-#else
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 #endif
 
 		if (flags & WINDOW_FLAG_DEPTH_BUFFER)
@@ -80,68 +76,47 @@ namespace lime
 			SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		}
 
-		if (flags & WINDOW_FLAG_ANTIALIASING_8X)
-		{
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, true);
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
-		}
-		else if (flags & WINDOW_FLAG_ANTIALIASING_4X)
-		{
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, true);
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-		}
-		else if (flags & WINDOW_FLAG_ANTIALIASING_2X)
-		{
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, true);
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
-		}
+		const int samples = (flags & WINDOW_FLAG_ANTIALIASING_8X) ? 8 : (flags & WINDOW_FLAG_ANTIALIASING_4X) ? 4 : (flags & WINDOW_FLAG_ANTIALIASING_2X) ? 2 : 0;
 
-		if (flags & WINDOW_FLAG_COLOR_DEPTH_32_BIT)
-		{
-			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-			SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-		}
-		else
-		{
-			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
-			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-		}
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, samples > 0 ? 1 : 0);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samples);
+
+		const bool color32 = (flags & WINDOW_FLAG_COLOR_DEPTH_32_BIT) != 0;
+
+		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, color32 ? 8 : 5);
+		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, color32 ? 8 : 6);
+		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, color32 ? 8 : 5);
+		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, color32 ? 8 : 0);
 
 		sdlWindow = SDL_CreateWindow(title, width, height, sdlWindowFlags);
 
-		if (!sdlWindow && (flags & (WINDOW_FLAG_ANTIALIASING_2X | WINDOW_FLAG_ANTIALIASING_4X | WINDOW_FLAG_ANTIALIASING_8X)))
+		// Retry without MSAA
+		if (!sdlWindow && samples > 0)
 		{
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, false);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 
 			sdlWindow = SDL_CreateWindow(title, width, height, sdlWindowFlags);
 		}
 
+#if defined(LIME_OPENGL_GLES)
+		// Retry with ES 2
 		if (!sdlWindow)
 		{
-			// #if defined(IPHONE)
-			SDL_Log("Could not create SDL Window with OpenGL ES 3: %s.\nTrying to create SDL Window using OpenGL ES 2...", SDL_GetError());
-			/*#else
-			SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL Window", SDL_GetError (), NULL);
-			#endif*/
+			SDL_Log("Could not create SDL Window with OpenGL ES 3: %s\nTrying OpenGL ES 2...", SDL_GetError());
 
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
 			sdlWindow = SDL_CreateWindow(title, width, height, sdlWindowFlags);
+		}
+#endif
 
-			if (!sdlWindow)
-			{
-				// #if defined(IPHONE)
-				SDL_Log("Could not create SDL Window with OpenGL ES 2: %s.\nReturning null...\n", SDL_GetError());
-				/*#else
-				SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL Window", SDL_GetError (), NULL);
-				#endif*/
-
-				return;
-			}
+		if (!sdlWindow)
+		{
+			SDL_Log("Could not create SDL Window: %s\n", SDL_GetError());
+			return;
 		}
 
 #if defined(LIME_OPENGL_GL) && !defined(__APPLE__)
@@ -162,9 +137,9 @@ namespace lime
 			};
 
 			const char *forceCompat = SDL_getenv("LIME_GL_COMPAT");
-			const size_t first = (forceCompat != NULL && forceCompat[0] != '\0' && forceCompat[0] != '0') ? 2 : 0;
+			const bool compatOnly = forceCompat != NULL && forceCompat[0] != '\0' && forceCompat[0] != '0';
 
-			for (size_t i = first; i < sizeof(contextRequests) / sizeof(contextRequests[0]); ++i)
+			for (size_t i = compatOnly ? 2 : 0; i < SDL_arraysize(contextRequests); ++i)
 			{
 				const GLContextRequest &request = contextRequests[i];
 
@@ -210,11 +185,7 @@ namespace lime
 		}
 		else
 		{
-			// #if defined(IPHONE)
 			SDL_Log("Could not create SDL GL Context: %s\n", SDL_GetError());
-			/*#else
-			SDL_ShowSimpleMessageBox (SDL_MESSAGEBOX_ERROR, "Could not create SDL GL Context", SDL_GetError (), sdlWindow);
-			#endif*/
 
 			if (sdlWindow)
 			{
@@ -340,7 +311,7 @@ namespace lime
 	{
 		if (context)
 		{
-#if defined(LIME_OPENGL) && defined(LIME_OPENGL_GLES)
+#if defined(LIME_OPENGL_GLES)
 #if defined(LIME_GLAD)
 			const bool canInvalidate = glInvalidateFramebuffer != NULL;
 #else
@@ -358,7 +329,7 @@ namespace lime
 					glInvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
 				}
 			}
-			#endif
+#endif
 
 			SDL_GL_SwapWindow(sdlWindow);
 		}
@@ -677,14 +648,7 @@ namespace lime
 
 	void Window::SetMouseLock(bool mouseLock)
 	{
-		if (mouseLock)
-		{
-			SDL_SetWindowRelativeMouseMode(sdlWindow, true);
-		}
-		else
-		{
-			SDL_SetWindowRelativeMouseMode(sdlWindow, false);
-		}
+		SDL_SetWindowRelativeMouseMode(sdlWindow, mouseLock);
 	}
 
 	void Window::SetOpacity(float opacity)
@@ -694,14 +658,7 @@ namespace lime
 
 	bool Window::SetResizable(bool resizable)
 	{
-		if (resizable)
-		{
-			SDL_SetWindowResizable(sdlWindow, true);
-		}
-		else
-		{
-			SDL_SetWindowResizable(sdlWindow, false);
-		}
+		SDL_SetWindowResizable(sdlWindow, resizable);
 
 		return (SDL_GetWindowFlags(sdlWindow) & SDL_WINDOW_RESIZABLE);
 	}
