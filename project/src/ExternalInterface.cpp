@@ -754,7 +754,7 @@ namespace lime
 
 		if (file.handle)
 		{
-			ImageBuffer imageBuffer = ImageBuffer(buffer);
+			ImageBuffer imageBuffer(buffer);
 
 			bool success = PNG::Decode(&file, &imageBuffer) || JPEG::Decode(&file, &imageBuffer) || BMP::Decode(&file, &imageBuffer) || SVG::Decode(&file, &imageBuffer) || GIF::Decode(&file, &imageBuffer) || WEBP::Decode(&file, &imageBuffer);
 
@@ -1546,8 +1546,7 @@ namespace lime
 	{
 		Window *targetWindow = (Window *)val_data(window);
 		ImageBuffer buffer(imageBuffer);
-		Rectangle rectangle = Rectangle(rect);
-
+		Rectangle rectangle(rect);
 		targetWindow->ReadPixels(&buffer, &rectangle);
 	}
 
@@ -1597,7 +1596,7 @@ namespace lime
 	void lime_window_set_icon(value window, value buffer)
 	{
 		Window *targetWindow = (Window *)val_data(window);
-		ImageBuffer imageBuffer = ImageBuffer(buffer);
+		ImageBuffer imageBuffer(buffer);
 		targetWindow->SetIcon(&imageBuffer);
 	}
 
