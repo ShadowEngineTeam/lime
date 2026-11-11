@@ -1,3 +1,4 @@
+#include <system/CFFI.h>
 #include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
 #include <utils/File.h>
@@ -31,34 +32,7 @@
 namespace lime
 {
 
-	value alloc_Int64(int64_t val)
-	{
-		int32_t high = (val >> 32);
-		int32_t low = val;
 
-		value int64Value = alloc_empty_object();
-		alloc_field(int64Value, val_id("high"), alloc_int(high));
-		alloc_field(int64Value, val_id("low"), alloc_int(low));
-		return int64Value;
-	}
-
-	int64_t val_Int64(value inValue)
-	{
-		if (val_is_null(inValue))
-		{
-			return 0;
-		}
-
-		value lowVal = val_field(inValue, val_id("low"));
-		value highVal = val_field(inValue, val_id("high"));
-
-		if (val_is_null(lowVal) || val_is_null(highVal))
-		{
-			return 0;
-		}
-
-		return (((int64_t)val_int(highVal)) << 32) | (uint32_t)val_int(lowVal);
-	}
 
 	value alloc_Vec3(ma_vec3f val)
 	{
@@ -396,14 +370,14 @@ namespace lime
 	{
 		ma_uint64 framesRead = 0;
 
-		ma_decoder_read_pcm_frames((ma_decoder *)val_data(pDecoder), (void *)val_data(pFrames), (ma_uint64)val_Int64(frameCount), &framesRead);
+		ma_decoder_read_pcm_frames((ma_decoder *)val_data(pDecoder), (void *)val_data(pFrames), (ma_uint64)val_int64(frameCount), &framesRead);
 
-		return alloc_Int64(framesRead);
+		return alloc_int64(framesRead);
 	}
 
 	int lime_ma_decoder_seek_to_pcm_frame(value pDecoder, value frameIndex)
 	{
-		return ma_decoder_seek_to_pcm_frame((ma_decoder *)val_data(pDecoder), (ma_uint64)val_Int64(frameIndex));
+		return ma_decoder_seek_to_pcm_frame((ma_decoder *)val_data(pDecoder), (ma_uint64)val_int64(frameIndex));
 	}
 
 	value lime_ma_decoder_get_data_format(value pDecoder)
@@ -442,7 +416,7 @@ namespace lime
 
 		ma_decoder_get_cursor_in_pcm_frames((ma_decoder *)val_data(pDecoder), &cursor);
 
-		return alloc_Int64(cursor);
+		return alloc_int64(cursor);
 	}
 
 	value lime_ma_decoder_get_length_in_pcm_frames(value pDecoder)
@@ -451,7 +425,7 @@ namespace lime
 
 		ma_decoder_get_length_in_pcm_frames((ma_decoder *)val_data(pDecoder), &length);
 
-		return alloc_Int64(length);
+		return alloc_int64(length);
 	}
 
 	value lime_ma_decoder_get_available_frames(value pDecoder)
@@ -460,7 +434,7 @@ namespace lime
 
 		ma_decoder_get_available_frames((ma_decoder *)val_data(pDecoder), &availableFrames);
 
-		return alloc_Int64(availableFrames);
+		return alloc_int64(availableFrames);
 	}
 
 	void gc_ma_audio_buffer(value handle)
@@ -484,7 +458,7 @@ namespace lime
 		bufferConfig.format = (ma_format)val_int(val_field(pConfig, val_id("format")));
 		bufferConfig.channels = val_int(val_field(pConfig, val_id("channels")));
 		bufferConfig.sampleRate = val_int(val_field(pConfig, val_id("sampleRate")));
-		bufferConfig.sizeInFrames = (ma_uint64)val_Int64(val_field(pConfig, val_id("sizeInFrames")));
+		bufferConfig.sizeInFrames = (ma_uint64)val_int64(val_field(pConfig, val_id("sizeInFrames")));
 		bufferConfig.pData = (void *)val_data(val_field(pConfig, val_id("pData")));
 
 		ma_audio_buffer *buffer = new ma_audio_buffer();
@@ -508,7 +482,7 @@ namespace lime
 		bufferConfig.format = (ma_format)val_int(val_field(pConfig, val_id("format")));
 		bufferConfig.channels = val_int(val_field(pConfig, val_id("channels")));
 		bufferConfig.sampleRate = val_int(val_field(pConfig, val_id("sampleRate")));
-		bufferConfig.sizeInFrames = (ma_uint64)val_Int64(val_field(pConfig, val_id("sizeInFrames")));
+		bufferConfig.sizeInFrames = (ma_uint64)val_int64(val_field(pConfig, val_id("sizeInFrames")));
 		bufferConfig.pData = (void *)val_data(val_field(pConfig, val_id("pData")));
 
 		ma_audio_buffer *buffer = new ma_audio_buffer();
@@ -541,28 +515,28 @@ namespace lime
 	{
 		ma_uint64 framesRead = 0;
 
-		ma_audio_buffer_read_pcm_frames((ma_audio_buffer *)val_data(pAudioBuffer), (void *)val_data(pFrames), (ma_uint64)val_Int64(frameCount), &framesRead);
+		ma_audio_buffer_read_pcm_frames((ma_audio_buffer *)val_data(pAudioBuffer), (void *)val_data(pFrames), (ma_uint64)val_int64(frameCount), &framesRead);
 
-		return alloc_Int64(framesRead);
+		return alloc_int64(framesRead);
 	}
 
 	int lime_ma_audio_buffer_seek_to_pcm_frame(value pAudioBuffer, value frameIndex)
 	{
-		return ma_audio_buffer_seek_to_pcm_frame((ma_audio_buffer *)val_data(pAudioBuffer), (ma_uint64)val_Int64(frameIndex));
+		return ma_audio_buffer_seek_to_pcm_frame((ma_audio_buffer *)val_data(pAudioBuffer), (ma_uint64)val_int64(frameIndex));
 	}
 
 	value lime_ma_audio_buffer_map(value pAudioBuffer, value ppFramesOut, value frameCount)
 	{
-		ma_uint64 pFrameCount = (ma_uint64)val_Int64(frameCount);
+		ma_uint64 pFrameCount = (ma_uint64)val_int64(frameCount);
 
 		ma_audio_buffer_map((ma_audio_buffer *)val_data(pAudioBuffer), (void **)val_data(ppFramesOut), &pFrameCount);
 
-		return alloc_Int64(pFrameCount);
+		return alloc_int64(pFrameCount);
 	}
 
 	int lime_ma_audio_buffer_unmap(value pAudioBuffer, value frameCount)
 	{
-		return ma_audio_buffer_unmap((ma_audio_buffer *)val_data(pAudioBuffer), (ma_uint64)val_Int64(frameCount));
+		return ma_audio_buffer_unmap((ma_audio_buffer *)val_data(pAudioBuffer), (ma_uint64)val_int64(frameCount));
 	}
 
 	bool lime_ma_audio_buffer_at_end(value pAudioBuffer)
@@ -576,7 +550,7 @@ namespace lime
 
 		ma_audio_buffer_get_cursor_in_pcm_frames((ma_audio_buffer *)val_data(pAudioBuffer), &cursor);
 
-		return alloc_Int64(cursor);
+		return alloc_int64(cursor);
 	}
 
 	value lime_ma_audio_buffer_get_length_in_pcm_frames(value pAudioBuffer)
@@ -585,7 +559,7 @@ namespace lime
 
 		ma_audio_buffer_get_length_in_pcm_frames((ma_audio_buffer *)val_data(pAudioBuffer), &length);
 
-		return alloc_Int64(length);
+		return alloc_int64(length);
 	}
 
 	value lime_ma_audio_buffer_get_available_frames(value pAudioBuffer)
@@ -594,7 +568,7 @@ namespace lime
 
 		ma_audio_buffer_get_available_frames((ma_audio_buffer *)val_data(pAudioBuffer), &availableFrames);
 
-		return alloc_Int64(availableFrames);
+		return alloc_int64(availableFrames);
 	}
 
 	void gc_ma_audio_ring_buffer(value handle)
@@ -1488,7 +1462,7 @@ namespace lime
 
 			gc_set_top_of_stack(&base, true);
 
-			val_call2(data->onProcess->get(), CFFIPointer(pFramesOut, NULL), alloc_Int64(frameCount));
+			val_call2(data->onProcess->get(), CFFIPointer(pFramesOut, NULL), alloc_int64(frameCount));
 
 			gc_set_top_of_stack(0, true);
 		}
@@ -1688,9 +1662,9 @@ namespace lime
 	{
 		ma_uint64 framesRead = 0;
 
-		ma_engine_read_pcm_frames((ma_engine *)val_data(pEngine), (void *)val_data(pFrames), (ma_uint64)val_Int64(frameCount), &framesRead);
+		ma_engine_read_pcm_frames((ma_engine *)val_data(pEngine), (void *)val_data(pFrames), (ma_uint64)val_int64(frameCount), &framesRead);
 
-		return alloc_Int64(framesRead);
+		return alloc_int64(framesRead);
 	}
 
 	value lime_ma_engine_get_node_graph(value pEngine)
@@ -1710,22 +1684,22 @@ namespace lime
 
 	value lime_ma_engine_get_time_in_pcm_frames(value pEngine)
 	{
-		return alloc_Int64(ma_engine_get_time_in_pcm_frames((ma_engine *)val_data(pEngine)));
+		return alloc_int64(ma_engine_get_time_in_pcm_frames((ma_engine *)val_data(pEngine)));
 	}
 
 	value lime_ma_engine_get_time_in_milliseconds(value pEngine)
 	{
-		return alloc_Int64(ma_engine_get_time_in_milliseconds((ma_engine *)val_data(pEngine)));
+		return alloc_int64(ma_engine_get_time_in_milliseconds((ma_engine *)val_data(pEngine)));
 	}
 
 	int lime_ma_engine_set_time_in_pcm_frames(value pEngine, value globalTime)
 	{
-		return ma_engine_set_time_in_pcm_frames((ma_engine *)val_data(pEngine), (ma_uint64)val_Int64(globalTime));
+		return ma_engine_set_time_in_pcm_frames((ma_engine *)val_data(pEngine), (ma_uint64)val_int64(globalTime));
 	}
 
 	int lime_ma_engine_set_time_in_milliseconds(value pEngine, value globalTime)
 	{
-		return ma_engine_set_time_in_milliseconds((ma_engine *)val_data(pEngine), (ma_uint64)val_Int64(globalTime));
+		return ma_engine_set_time_in_milliseconds((ma_engine *)val_data(pEngine), (ma_uint64)val_int64(globalTime));
 	}
 
 	int lime_ma_engine_get_channels(value pEngine)
@@ -1995,17 +1969,17 @@ namespace lime
 		config.initialAttachmentInputBusIndex = val_int(val_field(pConfig, val_id("initialAttachmentInputBusIndex")));
 		config.flags = val_int(val_field(pConfig, val_id("flags")));
 		config.volumeSmoothTimeInPCMFrames = val_int(val_field(pConfig, val_id("volumeSmoothTimeInPCMFrames")));
-		config.initialSeekPointInPCMFrames = (ma_uint64)val_Int64(val_field(pConfig, val_id("initialSeekPointInPCMFrames")));
+		config.initialSeekPointInPCMFrames = (ma_uint64)val_int64(val_field(pConfig, val_id("initialSeekPointInPCMFrames")));
 
 		value rangeBegInPCMFrames = val_field(pConfig, val_id("rangeBegInPCMFrames"));
 		value rangeEndInPCMFrames = val_field(pConfig, val_id("rangeEndInPCMFrames"));
 		value loopPointBegInPCMFrames = val_field(pConfig, val_id("loopPointBegInPCMFrames"));
 		value loopPointEndInPCMFrames = val_field(pConfig, val_id("loopPointEndInPCMFrames"));
 
-		config.rangeBegInPCMFrames = (ma_uint64)val_Int64(rangeBegInPCMFrames);
-		config.rangeEndInPCMFrames = val_is_null(rangeEndInPCMFrames) ? ~((ma_uint64)0) : (ma_uint64)val_Int64(rangeEndInPCMFrames);
-		config.loopPointBegInPCMFrames = (ma_uint64)val_Int64(loopPointBegInPCMFrames);
-		config.loopPointEndInPCMFrames = val_is_null(loopPointEndInPCMFrames) ? ~((ma_uint64)0) : (ma_uint64)val_Int64(loopPointEndInPCMFrames);
+		config.rangeBegInPCMFrames = (ma_uint64)val_int64(rangeBegInPCMFrames);
+		config.rangeEndInPCMFrames = val_is_null(rangeEndInPCMFrames) ? ~((ma_uint64)0) : (ma_uint64)val_int64(rangeEndInPCMFrames);
+		config.loopPointBegInPCMFrames = (ma_uint64)val_int64(loopPointBegInPCMFrames);
+		config.loopPointEndInPCMFrames = val_is_null(loopPointEndInPCMFrames) ? ~((ma_uint64)0) : (ma_uint64)val_int64(loopPointEndInPCMFrames);
 
 		ma_sound_notifications notifications = ma_sound_notifications_init();
 
@@ -2083,12 +2057,12 @@ namespace lime
 
 	int lime_ma_sound_stop_with_fade_in_pcm_frames(value pSound, value fadeLength)
 	{
-		return ma_sound_stop_with_fade_in_pcm_frames((ma_sound *)val_data(pSound), (ma_uint64)val_Int64(fadeLength));
+		return ma_sound_stop_with_fade_in_pcm_frames((ma_sound *)val_data(pSound), (ma_uint64)val_int64(fadeLength));
 	}
 
 	int lime_ma_sound_stop_with_fade_in_milliseconds(value pSound, value fadeLength)
 	{
-		return ma_sound_stop_with_fade_in_milliseconds((ma_sound *)val_data(pSound), (ma_uint64)val_Int64(fadeLength));
+		return ma_sound_stop_with_fade_in_milliseconds((ma_sound *)val_data(pSound), (ma_uint64)val_int64(fadeLength));
 	}
 
 	void lime_ma_sound_reset_start_time(value pSound)
@@ -2347,22 +2321,22 @@ namespace lime
 
 	void lime_ma_sound_set_fade_in_pcm_frames(value pSound, double volumeBeg, double volumeEnd, value fadeLengthInFrames)
 	{
-		ma_sound_set_fade_in_pcm_frames((ma_sound *)val_data(pSound), volumeBeg, volumeEnd, (ma_uint64)val_Int64(fadeLengthInFrames));
+		ma_sound_set_fade_in_pcm_frames((ma_sound *)val_data(pSound), volumeBeg, volumeEnd, (ma_uint64)val_int64(fadeLengthInFrames));
 	}
 
 	void lime_ma_sound_set_fade_in_milliseconds(value pSound, double volumeBeg, double volumeEnd, value fadeLengthInMilliseconds)
 	{
-		ma_sound_set_fade_in_milliseconds((ma_sound *)val_data(pSound), volumeBeg, volumeEnd, (ma_uint64)val_Int64(fadeLengthInMilliseconds));
+		ma_sound_set_fade_in_milliseconds((ma_sound *)val_data(pSound), volumeBeg, volumeEnd, (ma_uint64)val_int64(fadeLengthInMilliseconds));
 	}
 
 	void lime_ma_sound_set_fade_start_in_pcm_frames(value pSound, double volumeBeg, double volumeEnd, value fadeLengthInFrames, value absoluteGlobalTimeInFrames)
 	{
-		ma_sound_set_fade_start_in_pcm_frames((ma_sound *)val_data(pSound), volumeBeg, volumeEnd, (ma_uint64)val_Int64(fadeLengthInFrames), (ma_uint64)val_Int64(absoluteGlobalTimeInFrames));
+		ma_sound_set_fade_start_in_pcm_frames((ma_sound *)val_data(pSound), volumeBeg, volumeEnd, (ma_uint64)val_int64(fadeLengthInFrames), (ma_uint64)val_int64(absoluteGlobalTimeInFrames));
 	}
 
 	void lime_ma_sound_set_fade_start_in_milliseconds(value pSound, double volumeBeg, double volumeEnd, value fadeLengthInMilliseconds, value absoluteGlobalTimeInMilliseconds)
 	{
-		ma_sound_set_fade_start_in_milliseconds((ma_sound *)val_data(pSound), volumeBeg, volumeEnd, (ma_uint64)val_Int64(fadeLengthInMilliseconds), (ma_uint64)val_Int64(absoluteGlobalTimeInMilliseconds));
+		ma_sound_set_fade_start_in_milliseconds((ma_sound *)val_data(pSound), volumeBeg, volumeEnd, (ma_uint64)val_int64(fadeLengthInMilliseconds), (ma_uint64)val_int64(absoluteGlobalTimeInMilliseconds));
 	}
 
 	double lime_ma_sound_get_current_fade_volume(value pSound)
@@ -2372,32 +2346,32 @@ namespace lime
 
 	void lime_ma_sound_set_start_time_in_pcm_frames(value pSound, value absoluteGlobalTimeInFrames)
 	{
-		ma_sound_set_start_time_in_pcm_frames((ma_sound *)val_data(pSound), (ma_uint64)val_Int64(absoluteGlobalTimeInFrames));
+		ma_sound_set_start_time_in_pcm_frames((ma_sound *)val_data(pSound), (ma_uint64)val_int64(absoluteGlobalTimeInFrames));
 	}
 
 	void lime_ma_sound_set_start_time_in_milliseconds(value pSound, value absoluteGlobalTimeInMilliseconds)
 	{
-		ma_sound_set_start_time_in_milliseconds((ma_sound *)val_data(pSound), (ma_uint64)val_Int64(absoluteGlobalTimeInMilliseconds));
+		ma_sound_set_start_time_in_milliseconds((ma_sound *)val_data(pSound), (ma_uint64)val_int64(absoluteGlobalTimeInMilliseconds));
 	}
 
 	void lime_ma_sound_set_stop_time_in_pcm_frames(value pSound, value absoluteGlobalTimeInFrames)
 	{
-		ma_sound_set_stop_time_in_pcm_frames((ma_sound *)val_data(pSound), (ma_uint64)val_Int64(absoluteGlobalTimeInFrames));
+		ma_sound_set_stop_time_in_pcm_frames((ma_sound *)val_data(pSound), (ma_uint64)val_int64(absoluteGlobalTimeInFrames));
 	}
 
 	void lime_ma_sound_set_stop_time_in_milliseconds(value pSound, value absoluteGlobalTimeInMilliseconds)
 	{
-		ma_sound_set_stop_time_in_milliseconds((ma_sound *)val_data(pSound), (ma_uint64)val_Int64(absoluteGlobalTimeInMilliseconds));
+		ma_sound_set_stop_time_in_milliseconds((ma_sound *)val_data(pSound), (ma_uint64)val_int64(absoluteGlobalTimeInMilliseconds));
 	}
 
 	void lime_ma_sound_set_stop_time_with_fade_in_pcm_frames(value pSound, value stopAbsoluteGlobalTimeInFrames, value fadeLengthInFrames)
 	{
-		ma_sound_set_stop_time_with_fade_in_pcm_frames((ma_sound *)val_data(pSound), (ma_uint64)val_Int64(stopAbsoluteGlobalTimeInFrames), (ma_uint64)val_Int64(fadeLengthInFrames));
+		ma_sound_set_stop_time_with_fade_in_pcm_frames((ma_sound *)val_data(pSound), (ma_uint64)val_int64(stopAbsoluteGlobalTimeInFrames), (ma_uint64)val_int64(fadeLengthInFrames));
 	}
 
 	void lime_ma_sound_set_stop_time_with_fade_in_milliseconds(value pSound, value stopAbsoluteGlobalTimeInMilliseconds, value fadeLengthInMilliseconds)
 	{
-		ma_sound_set_stop_time_with_fade_in_milliseconds((ma_sound *)val_data(pSound), (ma_uint64)val_Int64(stopAbsoluteGlobalTimeInMilliseconds), (ma_uint64)val_Int64(fadeLengthInMilliseconds));
+		ma_sound_set_stop_time_with_fade_in_milliseconds((ma_sound *)val_data(pSound), (ma_uint64)val_int64(stopAbsoluteGlobalTimeInMilliseconds), (ma_uint64)val_int64(fadeLengthInMilliseconds));
 	}
 
 	bool lime_ma_sound_is_playing(value pSound)
@@ -2407,12 +2381,12 @@ namespace lime
 
 	value lime_ma_sound_get_time_in_pcm_frames(value pSound)
 	{
-		return alloc_Int64(ma_sound_get_time_in_pcm_frames((ma_sound *)val_data(pSound)));
+		return alloc_int64(ma_sound_get_time_in_pcm_frames((ma_sound *)val_data(pSound)));
 	}
 
 	value lime_ma_sound_get_time_in_milliseconds(value pSound)
 	{
-		return alloc_Int64(ma_sound_get_time_in_milliseconds((ma_sound *)val_data(pSound)));
+		return alloc_int64(ma_sound_get_time_in_milliseconds((ma_sound *)val_data(pSound)));
 	}
 
 	void lime_ma_sound_set_looping(value pSound, bool isLooping)
@@ -2432,7 +2406,7 @@ namespace lime
 
 	int lime_ma_sound_seek_to_pcm_frame(value pSound, value frameIndex)
 	{
-		return ma_sound_seek_to_pcm_frame((ma_sound *)val_data(pSound), (ma_uint64)val_Int64(frameIndex));
+		return ma_sound_seek_to_pcm_frame((ma_sound *)val_data(pSound), (ma_uint64)val_int64(frameIndex));
 	}
 
 	int lime_ma_sound_seek_to_second(value pSound, double seekPointInSeconds)
@@ -2476,7 +2450,7 @@ namespace lime
 
 		ma_sound_get_cursor_in_pcm_frames((ma_sound *)val_data(pSound), &cursor);
 
-		return alloc_Int64(cursor);
+		return alloc_int64(cursor);
 	}
 
 	value lime_ma_sound_get_length_in_pcm_frames(value pSound)
@@ -2485,7 +2459,7 @@ namespace lime
 
 		ma_sound_get_length_in_pcm_frames((ma_sound *)val_data(pSound), &length);
 
-		return alloc_Int64(length);
+		return alloc_int64(length);
 	}
 
 	double lime_ma_sound_get_cursor_in_seconds(value pSound)
