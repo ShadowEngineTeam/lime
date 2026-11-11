@@ -16,6 +16,9 @@
 #if defined(IPHONE) || defined(HX_MACOS)
 #define MA_NO_RUNTIME_LINKING
 #endif
+#ifdef HX_WINDOWS
+#define MA_WASAPI_NO_LOW_LATENCY_SHARED_MODE
+#endif
 #if defined(ANDROID) && !defined(MA_NO_AAUDIO)
 // sdk < 30 -> opensl, otherwise aaudio
 #define MA_AAUDIO_MIN_ANDROID_SDK_VERSION 30
