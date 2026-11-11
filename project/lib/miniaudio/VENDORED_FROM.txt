@@ -1,4 +1,4 @@
-93c665238bb3744d0ba49430597af66a0c9f6111 (mackron/miniaudio, vendored: miniaudio.h + extras/decoders/{libopus,libvorbis})
+559634ec8061559fc4200462d905307bc3019936 (FunkinCrew/miniaudio, vendored: miniaudio.h + extras/decoders/{libopus,libvorbis})
 
 Local additions (NOT part of upstream miniaudio):
   extras/resamplers/bsinc/  OpenAL Soft `bsinc24` resampler backport, LGPL-2.0+ (see COPYING there).
