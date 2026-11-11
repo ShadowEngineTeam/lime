@@ -48,6 +48,13 @@ class RenderContext
 
 	public var version(default, null):String;
 
+	/**
+		Access to the current BGFX render API, if available
+	**/
+	#if (!lime_doc_gen || native)
+	public var bgfx(default, null):BGFXRenderContext;
+	#end
+
 	public var window(default, null):Window;
 
 	@:noCompletion private function new() {}

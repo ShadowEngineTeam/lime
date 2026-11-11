@@ -13,8 +13,9 @@
 	<define name="lime-harfbuzz" if="native" />
 	<define name="lime-miniaudio" if="native" />
 	<define name="lime-native" if="native" />
-	<define name="lime-opengl" if="desktop" />
-	<define name="lime-opengles" if="mobile || linux armv7 || linux arm64" />
+	<!-- <define name="lime-opengl" if="desktop" /> -->
+	<!-- <define name="lime-opengles" if="mobile || linux armv7 || linux arm64" /> -->
+	<define name="lime-bgfx" unless="lime-opengl || lime-opengles" />
 
 	<haxedef name="no-compilation" />
 
@@ -83,6 +84,7 @@
 			<dependency name="GameController.framework" />
 			<dependency name="MediaPlayer.framework" />
 			<dependency name="Metal.framework" />
+			<dependency name="MetalKit.framework" />
 			<dependency name="OpenGLES.framework" />
 			<dependency name="QuartzCore.framework" />
 			<dependency name="Security.framework" />

@@ -1,0 +1,263 @@
+/*
+ * Copyright 2011-2026 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ */
+
+#include "bgfx_p.h"
+
+#if BGFX_CONFIG_RENDERER_OPENGLES
+#	include "renderer_gl.h"
+
+#	if BGFX_USE_HTML5
+
+#		include "emscripten.h"
+
+// from emscripten gl.c, because we're not going to go
+// through egl
+extern "C" void* emscripten_GetProcAddress(const char *name_);
+extern "C" void* emscripten_webgl1_get_proc_address(const char *name_);
+extern "C" void* emscripten_webgl2_get_proc_address(const char *name_);
+
+namespace bgfx { namespace gl
+{
+
+#	define GL_IMPORT(_optional, _proto, _func, _import) _proto _func = NULL
+#	include "glimports.h"
+
+	static EmscriptenWebGLContextAttributes s_attrs;
+
+	struct SwapChainGL
+	{
+		SwapChainGL(EMSCRIPTEN_WEBGL_CONTEXT_HANDLE _context, const char* _canvas)
+			: m_context(_context)
+		{
+			size_t length = bx::strLen(_canvas) + 1;
+			m_canvas = (char*)bx::alloc(g_allocator, length);
+			bx::strCopy(m_canvas, length, _canvas);
+
+			makeCurrent();
+			GL_CHECK(glClearColor(0.0f, 0.0f, 0.0f, 0.0f) );
+			GL_CHECK(glClear(GL_COLOR_BUFFER_BIT) );
+			swapBuffers();
+			GL_CHECK(glClear(GL_COLOR_BUFFER_BIT) );
+			swapBuffers();
+		}
+
+		~SwapChainGL()
+		{
+			EMSCRIPTEN_CHECK(emscripten_webgl_destroy_context(m_context) );
+			bx::free(g_allocator, m_canvas);
+		}
+
+		void makeCurrent()
+		{
+			EMSCRIPTEN_CHECK(emscripten_webgl_make_context_current(m_context) );
+		}
+
+		void swapBuffers()
+		{
+			// There is no swapBuffers equivalent.  A swap happens whenever control is returned back
+			// to the browser.
+		}
+
+		EMSCRIPTEN_WEBGL_CONTEXT_HANDLE m_context;
+		char* m_canvas;
+	};
+
+	bool GlContext::create(const SwapChain& _swapChain, uint32_t _reset)
+	{
+		if (NULL != m_primary)
+		{
+			return true;
+		}
+
+		const bimg::ImageBlockInfo& colorBlockInfo       = bimg::getBlockInfo(bimg::TextureFormat::Enum(_swapChain.formatColor) );
+		const bimg::ImageBlockInfo& depthStecilBlockInfo = bimg::getBlockInfo(bimg::TextureFormat::Enum(_swapChain.formatDepthStencil) );
+
+		emscripten_webgl_init_context_attributes(&s_attrs);
+		s_attrs.alpha                     = 0 != colorBlockInfo.aBits;
+		s_attrs.premultipliedAlpha        = false;
+		s_attrs.depth                     = 0 != depthStecilBlockInfo.depthBits;
+		s_attrs.stencil                   = 0 != depthStecilBlockInfo.stencilBits;
+		s_attrs.enableExtensionsByDefault = true;
+		s_attrs.antialias                 = false;
+		s_attrs.minorVersion = 0;
+
+		const char* canvas = (const char*)_swapChain.nwh;
+		EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = bx::narrowCast<EMSCRIPTEN_WEBGL_CONTEXT_HANDLE>( (uintptr_t) g_platformData.context);
+		if (context > 0)
+		{
+			if (emscripten_webgl_get_context_attributes(context, &s_attrs) < 0)
+			{
+				BX_TRACE("Init error: Invalid WebGL context. (Canvas handle: '%s', context handle: %d)", canvas, context);
+				return false;
+			}
+
+			if (!import() )
+			{
+				return false;
+			}
+
+			m_primary = BX_NEW(g_allocator, SwapChainGL)(context, canvas);
+		}
+		else
+		{
+			m_primary = createSwapChain( (void*)canvas, _swapChain.width, _swapChain.height);
+
+			if (NULL == m_primary)
+			{
+				BX_TRACE("Init error: Failed to create WebGL context.");
+				return false;
+			}
+		}
+
+		if (0 != _swapChain.width
+		&&  0 != _swapChain.height)
+		{
+			EMSCRIPTEN_CHECK(emscripten_set_canvas_element_size(
+				  canvas
+				, _swapChain.width
+				, _swapChain.height
+				) );
+		}
+
+		makeCurrent(m_primary);
+
+		return true;
+	}
+
+	void GlContext::destroy()
+	{
+		if (m_primary)
+		{
+			if (m_current == m_primary)
+			{
+				m_current = NULL;
+			}
+
+			bx::deleteObject(g_allocator, m_primary);
+			m_primary = NULL;
+		}
+	}
+
+	void GlContext::resize(const SwapChain& _swapChain, uint32_t _reset)
+	{
+		if (m_primary == NULL)
+		{
+			return;
+		}
+
+		EMSCRIPTEN_CHECK(emscripten_set_canvas_element_size(
+			  m_primary->m_canvas
+			, _swapChain.width
+			, _swapChain.height
+			) );
+	}
+
+	SwapChainGL* GlContext::createSwapChain(void* _nwh, int32_t _width, int32_t _height)
+	{
+		BX_UNUSED(_width, _height);
+
+		const char* canvas = (const char*)_nwh;
+
+		s_attrs.majorVersion = 2;
+		EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = emscripten_webgl_create_context(canvas, &s_attrs);
+
+		if (context > 0)
+		{
+			EMSCRIPTEN_CHECK(emscripten_webgl_make_context_current(context) );
+
+			SwapChainGL* swapChain = BX_NEW(g_allocator, SwapChainGL)(context, canvas);
+
+			if (!import() )
+			{
+				bx::deleteObject(g_allocator, swapChain);
+				return NULL;
+			}
+
+			return swapChain;
+		}
+
+		BX_TRACE("Failed to create WebGL 2 context. (Canvas handle: '%s', error %d)", canvas, (int32_t)context);
+
+		return NULL;
+	}
+
+	uint64_t GlContext::getCaps() const
+	{
+		return BGFX_CAPS_SWAP_CHAIN;
+	}
+
+	void GlContext::destroySwapChain(SwapChainGL* _swapChain)
+	{
+		bx::deleteObject(g_allocator, _swapChain);
+	}
+
+	void GlContext::swap(SwapChainGL* /* _swapChain */, bool /* _vsync */)
+	{
+	}
+
+	void GlContext::makeCurrent(SwapChainGL* _swapChain)
+	{
+		if (m_current != _swapChain)
+		{
+			m_current = _swapChain;
+
+			if (NULL == _swapChain)
+			{
+				if (NULL != m_primary)
+				{
+					m_primary->makeCurrent();
+				}
+			}
+			else
+			{
+				_swapChain->makeCurrent();
+			}
+		}
+	}
+
+	template<typename Fn>
+	static Fn getProcAddress(const char* _name)
+	{
+		Fn func = reinterpret_cast<Fn>(emscripten_webgl1_get_proc_address(_name) );
+		if (NULL == func)
+		{
+			func = reinterpret_cast<Fn>(emscripten_webgl2_get_proc_address(_name) );
+		}
+
+		return func;
+	}
+
+	bool GlContext::import()
+	{
+		BX_TRACE("Import:");
+
+		bool imported = true;
+
+#	define GL_EXTENSION(_optional, _proto, _func, _import)                          \
+	{                                                                               \
+		if (NULL == _func)                                                          \
+		{                                                                           \
+			_func = getProcAddress<_proto>(#_import);                               \
+			BX_TRACE("\t%p " #_func " (" #_import ")", _func);                      \
+			if (!BX_IGNORE_C4127(_optional)                                         \
+			&&  NULL == _func)                                                      \
+			{                                                                       \
+				BX_TRACE("Init error: Failed to import %s.", #_import);             \
+				imported = false;                                                   \
+			}                                                                       \
+		}                                                                           \
+	}
+
+#	include "glimports.h"
+
+#	undef GL_EXTENSION
+
+		return imported;
+	}
+
+} /* namespace gl */ } // namespace bgfx
+
+#	endif // BGFX_USE_EGL
+#endif // (BGFX_CONFIG_RENDERER_OPENGLES || BGFX_CONFIG_RENDERER_OPENGL)

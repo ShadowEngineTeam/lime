@@ -1,0 +1,1539 @@
+/*
+ * Copyright 2010-2026 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ */
+
+#include <bx/cpu.h>
+#include <bx/math.h>
+#include <bx/string.h>
+
+namespace bx
+{
+	/*
+	 * https://github.com/miloyip/dtoa-benchmark
+	 *
+	 * Copyright (C) 2014 Milo Yip
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 *
+	 */
+
+	struct DiyFp
+	{
+		DiyFp()
+		{
+		}
+
+		DiyFp(uint64_t _f, int32_t _e)
+			: f(_f)
+			, e(_e)
+		{
+		}
+
+		DiyFp(double d)
+		{
+			union
+			{
+				double d;
+				uint64_t u64;
+			} u = { d };
+
+			int32_t biased_e = (u.u64 & kDpExponentMask) >> kDpSignificandSize;
+			uint64_t significand = (u.u64 & kDpSignificandMask);
+			if (biased_e != 0)
+			{
+				f = significand + kDpHiddenBit;
+				e = biased_e - kDpExponentBias;
+			}
+			else
+			{
+				f = significand;
+				e = kDpMinExponent + 1;
+			}
+		}
+
+		DiyFp operator-(const DiyFp& rhs) const
+		{
+			BX_ASSERT(e == rhs.e, "");
+			BX_ASSERT(f >= rhs.f, "");
+			return DiyFp(f - rhs.f, e);
+		}
+
+		DiyFp operator*(const DiyFp& rhs) const
+		{
+			const uint64_t M32 = UINT32_MAX;
+			const uint64_t a = f >> 32;
+			const uint64_t b = f & M32;
+			const uint64_t c = rhs.f >> 32;
+			const uint64_t d = rhs.f & M32;
+			const uint64_t ac = a * c;
+			const uint64_t bc = b * c;
+			const uint64_t ad = a * d;
+			const uint64_t bd = b * d;
+			uint64_t tmp = (bd >> 32) + (ad & M32) + (bc & M32);
+			tmp += 1U << 31;  /// mult_round
+			return DiyFp(ac + (ad >> 32) + (bc >> 32) + (tmp >> 32), e + rhs.e + 64);
+		}
+
+		DiyFp Normalize() const
+		{
+			uint8_t s = countLeadingZeros(f);
+			return DiyFp(f << s, e - s);
+		}
+
+		DiyFp NormalizeBoundary() const
+		{
+			uint8_t index = countLeadingZeros(f);
+			return DiyFp (f << index, e - index);
+		}
+
+		void NormalizedBoundaries(DiyFp* minus, DiyFp* plus) const
+		{
+			DiyFp pl = DiyFp( (f << 1) + 1, e - 1).NormalizeBoundary();
+			DiyFp mi = (f == kDpHiddenBit) ? DiyFp( (f << 2) - 1, e - 2) : DiyFp( (f << 1) - 1, e - 1);
+			mi.f <<= mi.e - pl.e;
+			mi.e = pl.e;
+			*plus = pl;
+			*minus = mi;
+		}
+
+#define UINT64_C2(h, l) ( (static_cast<uint64_t>(h) << 32) | static_cast<uint64_t>(l) )
+
+		static const int32_t  kDiySignificandSize = 64;
+		static const int32_t  kDpSignificandSize  = 52;
+		static const int32_t  kDpExponentBias     = 0x3FF + kDpSignificandSize;
+		static const int32_t  kDpMinExponent      = -kDpExponentBias;
+		static const uint64_t kDpExponentMask     = UINT64_C2(0x7FF00000, 0x00000000);
+		static const uint64_t kDpSignificandMask  = UINT64_C2(0x000FFFFF, 0xFFFFFFFF);
+		static const uint64_t kDpHiddenBit        = UINT64_C2(0x00100000, 0x00000000);
+
+		uint64_t f;
+		int32_t e;
+	};
+
+	// 10^-348, 10^-340, ..., 10^340
+	static const uint64_t s_kCachedPowers_F[] =
+	{
+		UINT64_C2(0xfa8fd5a0, 0x081c0288), UINT64_C2(0xbaaee17f, 0xa23ebf76),
+		UINT64_C2(0x8b16fb20, 0x3055ac76), UINT64_C2(0xcf42894a, 0x5dce35ea),
+		UINT64_C2(0x9a6bb0aa, 0x55653b2d), UINT64_C2(0xe61acf03, 0x3d1a45df),
+		UINT64_C2(0xab70fe17, 0xc79ac6ca), UINT64_C2(0xff77b1fc, 0xbebcdc4f),
+		UINT64_C2(0xbe5691ef, 0x416bd60c), UINT64_C2(0x8dd01fad, 0x907ffc3c),
+		UINT64_C2(0xd3515c28, 0x31559a83), UINT64_C2(0x9d71ac8f, 0xada6c9b5),
+		UINT64_C2(0xea9c2277, 0x23ee8bcb), UINT64_C2(0xaecc4991, 0x4078536d),
+		UINT64_C2(0x823c1279, 0x5db6ce57), UINT64_C2(0xc2109436, 0x4dfb5637),
+		UINT64_C2(0x9096ea6f, 0x3848984f), UINT64_C2(0xd77485cb, 0x25823ac7),
+		UINT64_C2(0xa086cfcd, 0x97bf97f4), UINT64_C2(0xef340a98, 0x172aace5),
+		UINT64_C2(0xb23867fb, 0x2a35b28e), UINT64_C2(0x84c8d4df, 0xd2c63f3b),
+		UINT64_C2(0xc5dd4427, 0x1ad3cdba), UINT64_C2(0x936b9fce, 0xbb25c996),
+		UINT64_C2(0xdbac6c24, 0x7d62a584), UINT64_C2(0xa3ab6658, 0x0d5fdaf6),
+		UINT64_C2(0xf3e2f893, 0xdec3f126), UINT64_C2(0xb5b5ada8, 0xaaff80b8),
+		UINT64_C2(0x87625f05, 0x6c7c4a8b), UINT64_C2(0xc9bcff60, 0x34c13053),
+		UINT64_C2(0x964e858c, 0x91ba2655), UINT64_C2(0xdff97724, 0x70297ebd),
+		UINT64_C2(0xa6dfbd9f, 0xb8e5b88f), UINT64_C2(0xf8a95fcf, 0x88747d94),
+		UINT64_C2(0xb9447093, 0x8fa89bcf), UINT64_C2(0x8a08f0f8, 0xbf0f156b),
+		UINT64_C2(0xcdb02555, 0x653131b6), UINT64_C2(0x993fe2c6, 0xd07b7fac),
+		UINT64_C2(0xe45c10c4, 0x2a2b3b06), UINT64_C2(0xaa242499, 0x697392d3),
+		UINT64_C2(0xfd87b5f2, 0x8300ca0e), UINT64_C2(0xbce50864, 0x92111aeb),
+		UINT64_C2(0x8cbccc09, 0x6f5088cc), UINT64_C2(0xd1b71758, 0xe219652c),
+		UINT64_C2(0x9c400000, 0x00000000), UINT64_C2(0xe8d4a510, 0x00000000),
+		UINT64_C2(0xad78ebc5, 0xac620000), UINT64_C2(0x813f3978, 0xf8940984),
+		UINT64_C2(0xc097ce7b, 0xc90715b3), UINT64_C2(0x8f7e32ce, 0x7bea5c70),
+		UINT64_C2(0xd5d238a4, 0xabe98068), UINT64_C2(0x9f4f2726, 0x179a2245),
+		UINT64_C2(0xed63a231, 0xd4c4fb27), UINT64_C2(0xb0de6538, 0x8cc8ada8),
+		UINT64_C2(0x83c7088e, 0x1aab65db), UINT64_C2(0xc45d1df9, 0x42711d9a),
+		UINT64_C2(0x924d692c, 0xa61be758), UINT64_C2(0xda01ee64, 0x1a708dea),
+		UINT64_C2(0xa26da399, 0x9aef774a), UINT64_C2(0xf209787b, 0xb47d6b85),
+		UINT64_C2(0xb454e4a1, 0x79dd1877), UINT64_C2(0x865b8692, 0x5b9bc5c2),
+		UINT64_C2(0xc83553c5, 0xc8965d3d), UINT64_C2(0x952ab45c, 0xfa97a0b3),
+		UINT64_C2(0xde469fbd, 0x99a05fe3), UINT64_C2(0xa59bc234, 0xdb398c25),
+		UINT64_C2(0xf6c69a72, 0xa3989f5c), UINT64_C2(0xb7dcbf53, 0x54e9bece),
+		UINT64_C2(0x88fcf317, 0xf22241e2), UINT64_C2(0xcc20ce9b, 0xd35c78a5),
+		UINT64_C2(0x98165af3, 0x7b2153df), UINT64_C2(0xe2a0b5dc, 0x971f303a),
+		UINT64_C2(0xa8d9d153, 0x5ce3b396), UINT64_C2(0xfb9b7cd9, 0xa4a7443c),
+		UINT64_C2(0xbb764c4c, 0xa7a44410), UINT64_C2(0x8bab8eef, 0xb6409c1a),
+		UINT64_C2(0xd01fef10, 0xa657842c), UINT64_C2(0x9b10a4e5, 0xe9913129),
+		UINT64_C2(0xe7109bfb, 0xa19c0c9d), UINT64_C2(0xac2820d9, 0x623bf429),
+		UINT64_C2(0x80444b5e, 0x7aa7cf85), UINT64_C2(0xbf21e440, 0x03acdd2d),
+		UINT64_C2(0x8e679c2f, 0x5e44ff8f), UINT64_C2(0xd433179d, 0x9c8cb841),
+		UINT64_C2(0x9e19db92, 0xb4e31ba9), UINT64_C2(0xeb96bf6e, 0xbadf77d9),
+		UINT64_C2(0xaf87023b, 0x9bf0ee6b)
+	};
+
+	static const int16_t s_kCachedPowers_E[] =
+	{
+		-1220, -1193, -1166, -1140, -1113, -1087, -1060, -1034, -1007,  -980,
+		 -954,  -927,  -901,  -874,  -847,  -821,  -794,  -768,  -741,  -715,
+		 -688,  -661,  -635,  -608,  -582,  -555,  -529,  -502,  -475,  -449,
+		 -422,  -396,  -369,  -343,  -316,  -289,  -263,  -236,  -210,  -183,
+		 -157,  -130,  -103,   -77,   -50,   -24,     3,    30,    56,    83,
+		  109,   136,   162,   189,   216,   242,   269,   295,   322,   348,
+		  375,   402,   428,   455,   481,   508,   534,   561,   588,   614,
+		  641,   667,   694,   720,   747,   774,   800,   827,   853,   880,
+		  907,   933,   960,   986,  1013,  1039,  1066
+	};
+
+	static const char s_cDigitsLut[200] =
+	{
+		'0', '0', '0', '1', '0', '2', '0', '3', '0', '4', '0', '5', '0', '6', '0', '7', '0', '8', '0', '9',
+		'1', '0', '1', '1', '1', '2', '1', '3', '1', '4', '1', '5', '1', '6', '1', '7', '1', '8', '1', '9',
+		'2', '0', '2', '1', '2', '2', '2', '3', '2', '4', '2', '5', '2', '6', '2', '7', '2', '8', '2', '9',
+		'3', '0', '3', '1', '3', '2', '3', '3', '3', '4', '3', '5', '3', '6', '3', '7', '3', '8', '3', '9',
+		'4', '0', '4', '1', '4', '2', '4', '3', '4', '4', '4', '5', '4', '6', '4', '7', '4', '8', '4', '9',
+		'5', '0', '5', '1', '5', '2', '5', '3', '5', '4', '5', '5', '5', '6', '5', '7', '5', '8', '5', '9',
+		'6', '0', '6', '1', '6', '2', '6', '3', '6', '4', '6', '5', '6', '6', '6', '7', '6', '8', '6', '9',
+		'7', '0', '7', '1', '7', '2', '7', '3', '7', '4', '7', '5', '7', '6', '7', '7', '7', '8', '7', '9',
+		'8', '0', '8', '1', '8', '2', '8', '3', '8', '4', '8', '5', '8', '6', '8', '7', '8', '8', '8', '9',
+		'9', '0', '9', '1', '9', '2', '9', '3', '9', '4', '9', '5', '9', '6', '9', '7', '9', '8', '9', '9'
+	};
+
+	static const uint64_t s_kPow10[] =
+	{
+		UINT64_C(1),
+		UINT64_C(10),
+		UINT64_C(100),
+		UINT64_C(1000),
+		UINT64_C(10000),
+		UINT64_C(100000),
+		UINT64_C(1000000),
+		UINT64_C(10000000),
+		UINT64_C(100000000),
+		UINT64_C(1000000000),
+		UINT64_C(10000000000),
+		UINT64_C(100000000000),
+		UINT64_C(1000000000000),
+		UINT64_C(10000000000000),
+		UINT64_C(100000000000000),
+		UINT64_C(1000000000000000),
+		UINT64_C(10000000000000000),
+		UINT64_C(100000000000000000),
+		UINT64_C(1000000000000000000),
+		UINT64_C(10000000000000000000),
+	};
+
+	DiyFp GetCachedPower(int32_t e, int32_t* K)
+	{
+		double dk = (-61 - e) * 0.30102999566398114 + 347;	// dk must be positive, so can do ceiling in positive
+		int32_t k = static_cast<int32_t>(dk);
+		if (k != dk)
+		{
+			k++;
+		}
+
+		uint32_t index = static_cast<uint32_t>( (k >> 3) + 1);
+		*K = -(-348 + static_cast<int32_t>(index << 3) );	// decimal exponent no need lookup table
+
+		BX_ASSERT(index < sizeof(s_kCachedPowers_F) / sizeof(s_kCachedPowers_F[0]), "");
+		return DiyFp(s_kCachedPowers_F[index], s_kCachedPowers_E[index]);
+	}
+
+	void GrisuRound(char* buffer, int32_t len, uint64_t delta, uint64_t rest, uint64_t ten_kappa, uint64_t wp_w)
+	{
+		while (rest < wp_w
+			&& delta - rest >= ten_kappa
+			&& (rest + ten_kappa < wp_w || wp_w - rest > rest + ten_kappa - wp_w) )
+		{
+			buffer[len - 1]--;
+			rest += ten_kappa;
+		}
+	}
+
+	uint32_t CountDecimalDigit32(uint32_t n)
+	{
+		// Simple pure C++ implementation was faster than __builtin_clz version in this situation.
+		if (n < 10) return 1;
+		if (n < 100) return 2;
+		if (n < 1000) return 3;
+		if (n < 10000) return 4;
+		if (n < 100000) return 5;
+		if (n < 1000000) return 6;
+		if (n < 10000000) return 7;
+		if (n < 100000000) return 8;
+		if (n < 1000000000) return 9;
+		return 10;
+	}
+
+	void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buffer, int32_t* len, int32_t* K)
+	{
+		const DiyFp one(uint64_t(1) << -Mp.e, Mp.e);
+		const DiyFp wp_w = Mp - W;
+		uint32_t p1 = static_cast<uint32_t>(Mp.f >> -one.e);
+		uint64_t p2 = Mp.f & (one.f - 1);
+		int32_t kappa = static_cast<int32_t>(CountDecimalDigit32(p1) );
+		*len = 0;
+
+		while (kappa > 0)
+		{
+			uint32_t d;
+			switch (kappa)
+			{
+				case 10: d = p1 / 1000000000; p1 %= 1000000000; break;
+				case  9: d = p1 /  100000000; p1 %=  100000000; break;
+				case  8: d = p1 /   10000000; p1 %=   10000000; break;
+				case  7: d = p1 /    1000000; p1 %=    1000000; break;
+				case  6: d = p1 /     100000; p1 %=     100000; break;
+				case  5: d = p1 /      10000; p1 %=      10000; break;
+				case  4: d = p1 /       1000; p1 %=       1000; break;
+				case  3: d = p1 /        100; p1 %=        100; break;
+				case  2: d = p1 /         10; p1 %=         10; break;
+				case  1: d = p1;              p1  =          0; break;
+				default:
+					d = 0;
+					break;
+			}
+
+			if (d || *len)
+			{
+				buffer[(*len)++] = '0' + static_cast<char>(d);
+			}
+
+			kappa--;
+			uint64_t tmp = (static_cast<uint64_t>(p1) << -one.e) + p2;
+			if (tmp <= delta)
+			{
+				*K += kappa;
+				GrisuRound(buffer, *len, delta, tmp, s_kPow10[kappa] << -one.e, wp_w.f);
+				return;
+			}
+		}
+
+		// kappa = 0
+		for (;;)
+		{
+			p2 *= 10;
+			delta *= 10;
+			char d = static_cast<char>(p2 >> -one.e);
+			if (d || *len)
+			{
+				buffer[(*len)++] = '0' + d;
+			}
+
+			p2 &= one.f - 1;
+			kappa--;
+			if (p2 < delta)
+			{
+				*K += kappa;
+				const int index = -static_cast<int>(kappa);
+				GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * (index < int32_t(BX_COUNTOF(s_kPow10) ) ? s_kPow10[index] : 0));
+				return;
+			}
+		}
+	}
+
+	void Grisu2(double value, char* buffer, int32_t* length, int32_t* K)
+	{
+		const DiyFp v(value);
+		DiyFp w_m, w_p;
+		v.NormalizedBoundaries(&w_m, &w_p);
+
+		const DiyFp c_mk = GetCachedPower(w_p.e, K);
+		const DiyFp W = v.Normalize() * c_mk;
+		DiyFp Wp = w_p * c_mk;
+		DiyFp Wm = w_m * c_mk;
+		Wm.f++;
+		Wp.f--;
+		DigitGen(W, Wp, Wp.f - Wm.f, buffer, length, K);
+	}
+
+	int32_t WriteExponent(int32_t K, char* buffer)
+	{
+		const char* ptr = buffer;
+
+		if (K < 0)
+		{
+			*buffer++ = '-';
+			K = -K;
+		}
+
+		if (K >= 100)
+		{
+			*buffer++ = '0' + static_cast<char>(K / 100);
+			K %= 100;
+			const char* d = s_cDigitsLut + K * 2;
+			*buffer++ = d[0];
+			*buffer++ = d[1];
+		}
+		else if (K >= 10)
+		{
+			const char* d = s_cDigitsLut + K * 2;
+			*buffer++ = d[0];
+			*buffer++ = d[1];
+		}
+		else
+		{
+			*buffer++ = '0' + static_cast<char>(K);
+		}
+
+		*buffer = '\0';
+
+		return int32_t(buffer - ptr);
+	}
+
+	int32_t Prettify(char* buffer, int32_t length, int32_t k)
+	{
+		const int32_t kk = length + k;	// 10^(kk-1) <= v < 10^kk
+
+		if (length <= kk && kk <= 21)
+		{
+			// 1234e7 -> 12340000000
+			for (int32_t i = length; i < kk; i++)
+			{
+				buffer[i] = '0';
+			}
+
+			buffer[kk] = '.';
+			buffer[kk + 1] = '0';
+			buffer[kk + 2] = '\0';
+			return kk + 2;
+		}
+
+		if (0 < kk && kk <= 21)
+		{
+			// 1234e-2 -> 12.34
+			memMove(&buffer[kk + 1], &buffer[kk], length - kk);
+			buffer[kk] = '.';
+			buffer[length + 1] = '\0';
+			return length + 1;
+		}
+
+		if (-6 < kk && kk <= 0)
+		{
+			// 1234e-6 -> 0.001234
+			const int32_t offset = 2 - kk;
+			memMove(&buffer[offset], &buffer[0], length);
+			buffer[0] = '0';
+			buffer[1] = '.';
+			for (int32_t i = 2; i < offset; i++)
+			{
+				buffer[i] = '0';
+			}
+
+			buffer[length + offset] = '\0';
+			return length + offset;
+		}
+
+		if (length == 1)
+		{
+			// 1e30
+			buffer[1] = 'e';
+			int32_t exp = WriteExponent(kk - 1, &buffer[2]);
+			return 2 + exp;
+		}
+
+		// 1234e30 -> 1.234e33
+		memMove(&buffer[2], &buffer[1], length - 1);
+		buffer[1] = '.';
+		buffer[length + 1] = 'e';
+		int32_t exp = WriteExponent(kk - 1, &buffer[length + 2]);
+		return length + 2 + exp;
+	}
+
+	int32_t toString(char* _dst, int32_t _max, double _value)
+	{
+		int32_t sign = 0 != (doubleToBits(_value) & kDoubleSignMask) ? 1 : 0;
+		if (1 == sign)
+		{
+			*_dst++ = '-';
+			--_max;
+			_value = -_value;
+		}
+
+		if (isNan(_value) )
+		{
+			return (int32_t)strCopy(_dst, _max, "nan") + sign;
+		}
+		else if (isInfinite(_value) )
+		{
+			return (int32_t)strCopy(_dst, _max, "inf") + sign;
+		}
+
+		int32_t len;
+		if (0.0 == _value)
+		{
+			len = (int32_t)strCopy(_dst, _max, "0.0");
+		}
+		else
+		{
+			int32_t kk;
+			Grisu2(_value, _dst, &len, &kk);
+			len = Prettify(_dst, len, kk);
+		}
+
+		return len + sign;
+	}
+
+	static void reverse(char* _dst, int32_t _len)
+	{
+		for (int32_t ii = 0, jj = _len - 1; ii < jj; ++ii, --jj)
+		{
+			swap(_dst[ii], _dst[jj]);
+		}
+	}
+
+	template<typename Ty>
+	int32_t toStringSigned(char* _dst, int32_t _max, Ty _value, uint32_t _base, char _separator)
+	{
+		if (_base == 10
+		&&  _value < 0)
+		{
+			if (_max < 1)
+			{
+				return 0;
+			}
+
+			_max = toString(_dst + 1, _max - 1, 0 - asUnsigned(_value), _base, _separator);
+
+			if (_max == 0)
+			{
+				return 0;
+			}
+
+			*_dst = '-';
+			return int32_t(_max + 1);
+		}
+
+		return toString(_dst, _max, asUnsigned(_value), _base, _separator);
+	}
+
+	int32_t toString(char* _dst, int32_t _max, int32_t _value, uint32_t _base, char _separator)
+	{
+		return toStringSigned(_dst, _max, _value, _base, _separator);
+	}
+
+	int32_t toString(char* _dst, int32_t _max, int64_t _value, uint32_t _base, char _separator)
+	{
+		return toStringSigned(_dst, _max, _value, _base, _separator);
+	}
+
+	template<typename Ty>
+	int32_t toStringUnsigned(char* _dst, int32_t _max, Ty _value, uint32_t _base, char _separator)
+	{
+		char data[32];
+		int32_t len = 0;
+
+		if (_base > 16
+		||  _base < 2)
+		{
+			return 0;
+		}
+
+		uint32_t count = 1;
+
+		do
+		{
+			const Ty rem = _value % _base;
+			_value /= _base;
+			if (rem < 10)
+			{
+				data[len++] = char('0' + rem);
+			}
+			else
+			{
+				data[len++] = char('a' + rem - 10);
+			}
+
+			if ('\0' != _separator
+			&&  0 == count%3
+			&&  0 != _value)
+			{
+				data[len++] = _separator;
+			}
+
+			++count;
+		}
+		while (0 != _value);
+
+		if (_max < len + 1)
+		{
+			return 0;
+		}
+
+		reverse(data, len);
+
+		memCopy(_dst, data, len);
+		_dst[len] = '\0';
+		return int32_t(len);
+	}
+
+	int32_t toString(char* _dst, int32_t _max, uint32_t _value, uint32_t _base, char _separator)
+	{
+		return toStringUnsigned(_dst, _max, _value, _base, _separator);
+	}
+
+	int32_t toString(char* _dst, int32_t _max, uint64_t _value, uint32_t _base, char _separator)
+	{
+		return toStringUnsigned(_dst, _max, _value, _base, _separator);
+	}
+
+	constexpr uint32_t kFromStringMaxDigits = 768;
+
+	constexpr uint32_t kFromStringNumLimbs = 96;
+
+	constexpr uint32_t kFromStringPow5[] =
+	{
+		1,
+		5,
+		25,
+		125,
+		625,
+		3125,
+		15625,
+		78125,
+		390625,
+		1953125,
+		9765625,
+		48828125,
+		244140625,
+		1220703125,
+	};
+
+	constexpr int32_t kFromStringPow5Max = BX_COUNTOF(kFromStringPow5) - 1;
+
+	struct FloatBig
+	{
+		uint32_t num;
+		uint64_t limb[kFromStringNumLimbs];
+	};
+
+	static bool floatBigMulAdd(FloatBig& _big, uint32_t _mul, uint32_t _add)
+	{
+		uint64_t carry = _add;
+
+		for (uint32_t ii = 0; ii < _big.num; ++ii)
+		{
+			const uint64_t lo = (_big.limb[ii] & UINT32_MAX) * _mul + (carry & UINT32_MAX);
+			const uint64_t hi = (_big.limb[ii] >> 32)        * _mul + (carry >> 32) + (lo >> 32);
+
+			_big.limb[ii] = (hi << 32) | (lo & UINT32_MAX);
+			carry = hi >> 32;
+		}
+
+		if (0 != carry)
+		{
+			if (kFromStringNumLimbs <= _big.num)
+			{
+				return false;
+			}
+
+			_big.limb[_big.num] = carry;
+			++_big.num;
+		}
+
+		return true;
+	}
+
+	static bool floatBigShiftLeft(FloatBig& _big, uint32_t _bits)
+	{
+		if (0 == _big.num)
+		{
+			return true;
+		}
+
+		const uint32_t words = _bits / 64;
+		const uint32_t bits  = _bits % 64;
+		const uint32_t extra = 0 != bits ? 1 : 0;
+
+		if (kFromStringNumLimbs < _big.num + words + extra)
+		{
+			return false;
+		}
+
+		if (0 != bits)
+		{
+			uint64_t carry = 0;
+
+			for (uint32_t ii = 0; ii < _big.num; ++ii)
+			{
+				const uint64_t value = _big.limb[ii];
+
+				_big.limb[ii] = (value << bits) | carry;
+				carry = value >> (64 - bits);
+			}
+
+			if (0 != carry)
+			{
+				_big.limb[_big.num] = carry;
+				++_big.num;
+			}
+		}
+
+		if (0 != words)
+		{
+			for (uint32_t ii = _big.num; ii > 0; --ii)
+			{
+				_big.limb[ii - 1 + words] = _big.limb[ii - 1];
+			}
+
+			for (uint32_t ii = 0; ii < words; ++ii)
+			{
+				_big.limb[ii] = 0;
+			}
+
+			_big.num += words;
+		}
+
+		return true;
+	}
+
+	static uint32_t floatBigDivSmall(FloatBig& _big, uint32_t _div)
+	{
+		uint64_t rem = 0;
+
+		for (uint32_t ii = _big.num; ii > 0; --ii)
+		{
+			const uint64_t value = _big.limb[ii - 1];
+
+			const uint64_t hiNum = (rem << 32) | (value >> 32);
+			const uint64_t hiQ   = hiNum / _div;
+			const uint64_t hiR   = hiNum % _div;
+
+			const uint64_t loNum = (hiR << 32) | (value & UINT32_MAX);
+			const uint64_t loQ   = loNum / _div;
+
+			rem = loNum % _div;
+
+			_big.limb[ii - 1] = (hiQ << 32) | loQ;
+		}
+
+		while (0 != _big.num
+		&&     0 == _big.limb[_big.num - 1])
+		{
+			--_big.num;
+		}
+
+		return uint32_t(rem);
+	}
+
+	static uint32_t floatBigBitLength(const FloatBig& _big)
+	{
+		if (0 == _big.num)
+		{
+			return 0;
+		}
+
+		return (_big.num - 1)*64 + 64 - countLeadingZeros(_big.limb[_big.num - 1]);
+	}
+
+	static bool floatBigBit(const FloatBig& _big, uint32_t _bit)
+	{
+		const uint32_t word = _bit / 64;
+
+		if (_big.num <= word)
+		{
+			return false;
+		}
+
+		return 0 != ( (_big.limb[word] >> (_bit % 64) ) & 1);
+	}
+
+	static bool floatBigAnyBitBelow(const FloatBig& _big, uint32_t _bit)
+	{
+		const uint32_t word = _bit / 64;
+		const uint32_t bits = _bit % 64;
+
+		for (uint32_t ii = 0; ii < word && ii < _big.num; ++ii)
+		{
+			if (0 != _big.limb[ii])
+			{
+				return true;
+			}
+		}
+
+		if (word < _big.num
+		&&  0 != bits)
+		{
+			const uint64_t mask = (UINT64_C(1) << bits) - 1;
+
+			if (0 != (_big.limb[word] & mask) )
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	static uint64_t floatBigBits(const FloatBig& _big, uint32_t _from, uint32_t _count)
+	{
+		uint64_t result = 0;
+
+		for (uint32_t ii = 0; ii < _count; ++ii)
+		{
+			if (floatBigBit(_big, _from + ii) )
+			{
+				result |= UINT64_C(1) << ii;
+			}
+		}
+
+		return result;
+	}
+
+	static double floatBigRound(const FloatBig& _big, int32_t _binExp, bool _sticky, bool _negative, int32_t _mantBits, int32_t _minExp)
+	{
+		const uint32_t length = floatBigBitLength(_big);
+
+		if (0 == length)
+		{
+			return _negative ? -0.0 : 0.0;
+		}
+
+		const int32_t unbiased = int32_t(length) - 1 + _binExp;
+		const int32_t smallest = _minExp - _mantBits + 1;
+
+		int32_t keep = _mantBits;
+
+		if (_minExp > unbiased)
+		{
+			keep = _mantBits + (unbiased - _minExp);
+		}
+
+		if (0 >= keep)
+		{
+			const bool half = 0 == keep && floatBigBit(_big, length - 1);
+			const bool more = _sticky || floatBigAnyBitBelow(_big, length - 1);
+			const double tiny = (half && more) ? ldexp(1.0, smallest) : 0.0;
+
+			return _negative ? -tiny : tiny;
+		}
+
+		const int32_t shift = int32_t(length) - keep;
+
+		uint64_t mantissa = 0;
+		bool     roundBit = false;
+		bool     tail     = _sticky;
+
+		if (0 < shift)
+		{
+			mantissa = floatBigBits(_big, uint32_t(shift), uint32_t(keep) );
+			roundBit = floatBigBit(_big, uint32_t(shift) - 1);
+			tail     = tail || (1 < shift && floatBigAnyBitBelow(_big, uint32_t(shift) - 1) );
+		}
+		else
+		{
+			mantissa  = floatBigBits(_big, 0, length);
+			mantissa <<= uint32_t(-shift);
+		}
+
+		if (roundBit
+		&& (tail || 0 != (mantissa & 1) ) )
+		{
+			++mantissa;
+		}
+
+		const double scaled = ldexp(double(mantissa), _binExp + shift);
+
+		return _negative ? -scaled : scaled;
+	}
+
+	static void floatBigShiftRight(FloatBig& _big, uint32_t _bits, bool& _sticky)
+	{
+		const uint32_t words = _bits / 64;
+		const uint32_t bits  = _bits % 64;
+
+		for (uint32_t ii = 0; ii < words && ii < _big.num; ++ii)
+		{
+			_sticky = _sticky || 0 != _big.limb[ii];
+		}
+
+		if (_big.num <= words)
+		{
+			_big.num = 0;
+			return;
+		}
+
+		const uint32_t num = _big.num - words;
+
+		for (uint32_t ii = 0; ii < num; ++ii)
+		{
+			_big.limb[ii] = _big.limb[ii + words];
+		}
+
+		if (0 != bits)
+		{
+			_sticky = _sticky || 0 != (_big.limb[0] & ( (UINT64_C(1) << bits) - 1) );
+
+			for (uint32_t ii = 0; ii < num; ++ii)
+			{
+				const uint64_t next = ii + 1 < num ? _big.limb[ii + 1] : 0;
+				_big.limb[ii] = (_big.limb[ii] >> bits) | (next << (64 - bits) );
+			}
+		}
+
+		_big.num = num;
+
+		while (0 != _big.num
+		&&     0 == _big.limb[_big.num - 1])
+		{
+			--_big.num;
+		}
+	}
+
+	static bool floatBigIsOdd(const FloatBig& _big)
+	{
+		return 0 != _big.num
+			&& 0 != (_big.limb[0] & 1)
+			;
+	}
+
+	static int32_t floatBigScaledDigits(char* _out, int32_t _max, double _value, int32_t _scale)
+	{
+		const uint64_t bits   = doubleToBits(_value);
+		const uint64_t frac   = bits & kDoubleMantissaMask;
+		const int32_t  biased = int32_t( (bits & kDoubleExponentMask) >> kDoubleExponentShift);
+
+		const uint64_t mantissa = 0 == biased ? frac : frac | (UINT64_C(1) << kDoubleMantissaNumBits);
+		const int32_t  binExp   = (0 == biased ? 1 : biased) - int32_t(kDoubleExponentBias) - kDoubleMantissaNumBits;
+
+		FloatBig big;
+		big.num     = 1;
+		big.limb[0] = mantissa;
+
+		if (0 == mantissa)
+		{
+			big.num = 0;
+		}
+
+		bool sticky = false;
+
+		for (int32_t left = _scale; 0 < left; left -= kFromStringPow5Max)
+		{
+			if (!floatBigMulAdd(big, kFromStringPow5[min(left, kFromStringPow5Max)], 0) )
+			{
+				return -1;
+			}
+		}
+
+		const int32_t shift = binExp + _scale + 1;
+
+		if (0 < shift
+		&&  !floatBigShiftLeft(big, uint32_t(shift) ) )
+		{
+			return -1;
+		}
+
+		for (int32_t left = -_scale; 0 < left; left -= kFromStringPow5Max)
+		{
+			const uint32_t rem = floatBigDivSmall(big, kFromStringPow5[min(left, kFromStringPow5Max)]);
+
+			sticky = sticky || 0 != rem;
+		}
+
+		if (0 > shift)
+		{
+			floatBigShiftRight(big, uint32_t(-shift), sticky);
+		}
+
+		const bool half = floatBigIsOdd(big);
+
+		bool halfOut = false;
+		floatBigShiftRight(big, 1, halfOut);
+
+		if (half
+		&& (sticky || floatBigIsOdd(big) ) )
+		{
+			if (0 == big.num)
+			{
+				big.num     = 1;
+				big.limb[0] = 0;
+			}
+
+			floatBigMulAdd(big, 1, 1);
+		}
+
+		constexpr uint32_t kChunk       = 1000000000;
+		constexpr int32_t  kChunkDigits = 9;
+
+		uint32_t chunks[kFromStringNumLimbs*64/29 + 1];
+		int32_t  numChunks = 0;
+
+		while (0 != big.num)
+		{
+			chunks[numChunks++] = floatBigDivSmall(big, kChunk);
+		}
+
+		if (0 == numChunks)
+		{
+			chunks[numChunks++] = 0;
+		}
+
+		char top[kChunkDigits];
+		int32_t topLen = 0;
+
+		for (uint32_t value = chunks[numChunks - 1]; 0 == topLen || 0 != value; value /= 10)
+		{
+			top[topLen++] = char('0' + value % 10);
+		}
+
+		const int32_t len = topLen + (numChunks - 1)*kChunkDigits;
+
+		if (len > _max)
+		{
+			return -1;
+		}
+
+		int32_t pos = 0;
+
+		for (int32_t ii = topLen; ii > 0; --ii)
+		{
+			_out[pos++] = top[ii - 1];
+		}
+
+		for (int32_t ii = numChunks - 1; ii > 0; --ii)
+		{
+			uint32_t value = chunks[ii - 1];
+
+			for (int32_t jj = kChunkDigits; jj > 0; --jj)
+			{
+				_out[pos + jj - 1] = char('0' + value % 10);
+				value /= 10;
+			}
+
+			pos += kChunkDigits;
+		}
+
+		return len;
+	}
+
+	static int32_t decimalExponentEstimate(double _value)
+	{
+		const uint64_t bits   = doubleToBits(_value);
+		const uint64_t frac   = bits & kDoubleMantissaMask;
+		const int32_t  biased = int32_t( (bits & kDoubleExponentMask) >> kDoubleExponentShift);
+
+		const int32_t topBit = 0 == biased
+			? 63 - int32_t(countLeadingZeros(frac) ) + 1 - int32_t(kDoubleExponentBias) - kDoubleMantissaNumBits
+			: biased - int32_t(kDoubleExponentBias)
+			;
+
+		return int32_t(floor(double(topBit) * 0.30102999566398119521) );
+	}
+
+	static int32_t floatSignificantDigits(char* _out, int32_t _max, double _value, int32_t _count, int32_t& _exp)
+	{
+		int32_t exp = decimalExponentEstimate(_value);
+
+		int32_t len = floatBigScaledDigits(_out, _max, _value, _count - 1 - exp);
+
+		if (len > _count)
+		{
+			++exp;
+			len = floatBigScaledDigits(_out, _max, _value, _count - 1 - exp);
+		}
+
+		if (len > _count)
+		{
+			++exp;
+			len = _count;
+		}
+
+		_exp = exp;
+
+		return len;
+	}
+
+	static int32_t writeExponent(char* _out, int32_t _exp)
+	{
+		int32_t pos = 0;
+		_out[pos++] = 'e';
+		_out[pos++] = 0 > _exp ? '-' : '+';
+
+		const int32_t value = 0 > _exp ? -_exp : _exp;
+
+		if (100 <= value)
+		{
+			_out[pos++] = char('0' + value / 100);
+		}
+
+		_out[pos++] = char('0' + value / 10 % 10);
+		_out[pos++] = char('0' + value % 10);
+
+		return pos;
+	}
+
+	int32_t toStringFormatted(char* _out, int32_t _max, double _value, char _fmt, int32_t _prec, bool _alt)
+	{
+		constexpr int32_t kMaxDigits = 1100;
+
+		if (!isFinite(_value) )
+		{
+			return toString(_out, _max, _value);
+		}
+
+		char digits[kMaxDigits];
+		char tmp[kMaxDigits + 32];
+		int32_t pos = 0;
+
+		if (0 != (doubleToBits(_value) & kDoubleSignMask) )
+		{
+			tmp[pos++] = '-';
+		}
+
+		const bool zero  = 0.0 == _value;
+		int32_t    prec  = min(_prec, kMaxDigits - 2);
+		char       fmt   = _fmt;
+		bool       strip = false;
+
+		if ('g' == fmt)
+		{
+			const int32_t count = max(prec, 1);
+
+			int32_t exp = 0;
+
+			if (!zero
+			&&  0 > floatSignificantDigits(digits, kMaxDigits, _value, count, exp) )
+			{
+				return toString(_out, _max, _value);
+			}
+
+			if (count > exp
+			&&  -4 <= exp)
+			{
+				fmt  = 'f';
+				prec = count - 1 - exp;
+			}
+			else
+			{
+				fmt  = 'e';
+				prec = count - 1;
+			}
+
+			strip = !_alt;
+		}
+
+		if ('e' == fmt)
+		{
+			int32_t exp = 0;
+			int32_t len = 1;
+			digits[0] = '0';
+
+			if (!zero)
+			{
+				len = floatSignificantDigits(digits, kMaxDigits, _value, prec + 1, exp);
+
+				if (0 > len)
+				{
+					return toString(_out, _max, _value);
+				}
+			}
+
+			tmp[pos++] = digits[0];
+
+			if (0 < prec
+			||  _alt)
+			{
+				tmp[pos++] = '.';
+			}
+
+			for (int32_t ii = 1; ii <= prec; ++ii)
+			{
+				tmp[pos++] = ii < len ? digits[ii] : '0';
+			}
+
+			if (strip
+			&&  0 < prec)
+			{
+				while ('0' == tmp[pos - 1])
+				{
+					--pos;
+				}
+
+				if ('.' == tmp[pos - 1])
+				{
+					--pos;
+				}
+			}
+
+			pos += writeExponent(&tmp[pos], exp);
+		}
+		else
+		{
+			const int32_t len = floatBigScaledDigits(digits, kMaxDigits, _value, prec);
+
+			if (0 > len)
+			{
+				return toString(_out, _max, _value);
+			}
+
+			const int32_t intLen = len - prec;
+
+			if (0 >= intLen)
+			{
+				tmp[pos++] = '0';
+			}
+
+			for (int32_t ii = 0; ii < intLen; ++ii)
+			{
+				tmp[pos++] = digits[ii];
+			}
+
+			if (0 < prec
+			||  _alt)
+			{
+				tmp[pos++] = '.';
+			}
+
+			for (int32_t ii = 0; ii < prec; ++ii)
+			{
+				const int32_t at = intLen + ii;
+				tmp[pos++] = 0 > at ? '0' : digits[at];
+			}
+
+			if (strip
+			&&  0 < prec)
+			{
+				while ('0' == tmp[pos - 1])
+				{
+					--pos;
+				}
+
+				if ('.' == tmp[pos - 1])
+				{
+					--pos;
+				}
+			}
+		}
+
+		return int32_t(strCopy(_out, _max, StringView(tmp, pos) ) );
+	}
+
+	int32_t toString(char* _out, int32_t _max, bool _value)
+	{
+		StringView str(_value ? "true" : "false");
+		strCopy(_out, _max, str);
+		return str.getLength();
+	}
+
+	bool fromString(bool* _out, const StringView& _str)
+	{
+		char ch = toLower(_str.getPtr()[0]);
+		*_out = ch == 't' ||  ch == '1';
+		return 0 != _str.getLength();
+	}
+
+	static bool toHexDigit(uint32_t* _out, char _ch)
+	{
+		if (_ch >= '0' && _ch <= '9')
+		{
+			*_out = uint32_t(_ch - '0');
+			return true;
+		}
+
+		if (_ch >= 'a' && _ch <= 'f')
+		{
+			*_out = uint32_t(_ch - 'a' + 10);
+			return true;
+		}
+
+		if (_ch >= 'A' && _ch <= 'F')
+		{
+			*_out = uint32_t(_ch - 'A' + 10);
+			return true;
+		}
+
+		return false;
+	}
+
+	static bool fromStringFloating(double* _out, const StringView& _str, int32_t _mantBits, int32_t _minExp)
+	{
+		const char* ptr  = _str.getPtr();
+		const char* term = _str.getTerm();
+
+		while (ptr != term
+		&&     isSpace(*ptr) )
+		{
+			++ptr;
+		}
+
+		bool negative = false;
+
+		if (ptr != term
+		&& ('+' == *ptr || '-' == *ptr) )
+		{
+			negative = '-' == *ptr;
+			++ptr;
+		}
+
+		const bool hex = (term - ptr) >= 2
+			&& '0' == ptr[0]
+			&& ('x' == ptr[1] || 'X' == ptr[1])
+			;
+
+		if (hex)
+		{
+			ptr += 2;
+		}
+
+		const uint32_t radix    = hex ? 16 : 10;
+		const int32_t  bitsEach = hex ?  4 :  1;
+
+		FloatBig big;
+		big.num     = 0;
+		big.limb[0] = 0;
+
+		uint32_t numDigits = 0;
+		int32_t  pointExp  = 0;
+		int32_t  dropped   = 0;
+		bool     sticky    = false;
+		bool     anyDigit  = false;
+		bool     fraction  = false;
+
+		for (; ptr != term; ++ptr)
+		{
+			const char ch = *ptr;
+
+			if ('.' == ch)
+			{
+				if (fraction)
+				{
+					break;
+				}
+
+				fraction = true;
+				continue;
+			}
+
+			uint32_t digit = 0;
+
+			if (hex)
+			{
+				if (!toHexDigit(&digit, ch) )
+				{
+					break;
+				}
+			}
+			else
+			{
+				if (!isNumeric(ch) )
+				{
+					break;
+				}
+
+				digit = uint32_t(ch - '0');
+			}
+
+			anyDigit = true;
+
+			if (0 == numDigits
+			&&  0 == digit)
+			{
+				if (fraction)
+				{
+					pointExp -= bitsEach;
+				}
+
+				continue;
+			}
+
+			if (kFromStringMaxDigits > numDigits)
+			{
+				if (!floatBigMulAdd(big, radix, digit) )
+				{
+					return false;
+				}
+
+				++numDigits;
+
+				if (fraction)
+				{
+					pointExp -= bitsEach;
+				}
+			}
+			else
+			{
+				sticky = sticky || (0 != digit);
+
+				if (!fraction)
+				{
+					dropped += bitsEach;
+				}
+			}
+		}
+
+		if (!anyDigit)
+		{
+			return false;
+		}
+
+		int32_t expPart = 0;
+
+		const bool expMark = ptr != term
+			&& ( hex
+				? ('p' == *ptr || 'P' == *ptr)
+				: ('e' == *ptr || 'E' == *ptr)
+				)
+			;
+
+		if (expMark)
+		{
+			const char* save = ptr;
+
+			++ptr;
+
+			bool expNeg = false;
+
+			if (ptr != term
+			&& ('+' == *ptr || '-' == *ptr) )
+			{
+				expNeg = '-' == *ptr;
+				++ptr;
+			}
+
+			if (ptr == term
+			|| !isNumeric(*ptr) )
+			{
+				ptr = save;
+			}
+			else
+			{
+				for (; ptr != term && isNumeric(*ptr); ++ptr)
+				{
+					if (100000 > expPart)
+					{
+						expPart = expPart*10 + (*ptr - '0');
+					}
+				}
+
+				if (expNeg)
+				{
+					expPart = -expPart;
+				}
+			}
+		}
+
+		if (0 == big.num)
+		{
+			*_out = negative ? -0.0 : 0.0;
+			return true;
+		}
+
+		if (hex)
+		{
+			*_out = floatBigRound(big, expPart + pointExp + dropped, sticky, negative, _mantBits, _minExp);
+			return true;
+		}
+
+		const int32_t decExp = expPart + pointExp + dropped;
+
+		const int32_t magnitude = decExp + int32_t(numDigits);
+		const int32_t maxBinExp = 1 - _minExp;
+		const int32_t minBinExp = _minExp - _mantBits + 1;
+
+		if (magnitude > (maxBinExp + 1)*10/33 + 2)
+		{
+			*_out = negative ? -kDoubleInfinity : kDoubleInfinity;
+			return true;
+		}
+
+		if (magnitude < minBinExp*10/33 - 2)
+		{
+			*_out = negative ? -0.0 : 0.0;
+			return true;
+		}
+
+		int32_t binExp = decExp;
+
+		if (0 <= decExp)
+		{
+			for (int32_t left = decExp; 0 < left; left -= kFromStringPow5Max)
+			{
+				const int32_t step = min(left, kFromStringPow5Max);
+
+				if (!floatBigMulAdd(big, kFromStringPow5[step], 0) )
+				{
+					*_out = negative ? -kDoubleInfinity : kDoubleInfinity;
+					return true;
+				}
+			}
+		}
+		else
+		{
+			const int32_t count = -decExp;
+
+			const uint32_t prescale = uint32_t(count)*7/3 + 70;
+
+			if (!floatBigShiftLeft(big, prescale) )
+			{
+				return false;
+			}
+
+			binExp -= int32_t(prescale);
+
+			for (int32_t left = count; 0 < left; left -= kFromStringPow5Max)
+			{
+				const int32_t  step = min(left, kFromStringPow5Max);
+				const uint32_t rem  = floatBigDivSmall(big, kFromStringPow5[step]);
+
+				sticky = sticky || (0 != rem);
+			}
+		}
+
+		*_out = floatBigRound(big, binExp, sticky, negative, _mantBits, _minExp);
+
+		return true;
+	}
+
+	bool fromString(float* _out, const StringView& _str)
+	{
+		double value;
+
+		const bool result = fromStringFloating(&value, _str, 24, -126);
+
+		*_out = float(value);
+
+		return result;
+	}
+
+	bool fromString(double* _out, const StringView& _str)
+	{
+		return fromStringFloating(_out, _str, 53, -1022);
+	}
+
+	bool fromString(long long* _out, const StringView& _str)
+	{
+		StringView str = strLTrimSpace(_str);
+
+		const char* ptr  = str.getPtr();
+		const char* term = str.getTerm();
+
+		char ch = *ptr++;
+		bool neg = false;
+		switch (ch)
+		{
+		case '-':
+		case '+': neg = '-' == ch;
+			break;
+
+		default:
+			--ptr;
+			break;
+		}
+
+		long long result = 0;
+
+		for (ch = *ptr++; isNumeric(ch) && ptr <= term; ch = *ptr++)
+		{
+			result = 10*result - (ch - '0');
+		}
+
+		*_out = neg ? result : -result;
+
+		return true;
+	}
+
+} // namespace bx

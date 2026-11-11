@@ -1,0 +1,4 @@
+9af322003a0a638796160713fb33b78a74b8c348 (FunkinCrew/bgfx, vendored: include, src, 3rdparty, tools/shaderc)
+
+Left out, as nothing in bgfx-files.xml builds or includes them: examples, bindings, docs, scripts,
+tools/bin and the tools other than shaderc.
