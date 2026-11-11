@@ -150,6 +150,7 @@ class NativeCFFI
 	private static var lime_window_focus = new cpp.Callable<cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_window_focus", "ov", false));
 	private static var lime_window_get_handle = new cpp.Callable<cpp.Object->Float>(cpp.Prime._loadPrime("lime", "lime_window_get_handle", "od", false));
 	private static var lime_window_get_context = new cpp.Callable<cpp.Object->Float>(cpp.Prime._loadPrime("lime", "lime_window_get_context", "od", false));
+	private static var lime_window_get_context_type = new cpp.Callable<cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_window_get_context_type", "oo", false));
 	private static var lime_window_get_display = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_window_get_display", "oi", false));
 	private static var lime_window_get_display_mode = new cpp.Callable<cpp.Object->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_window_get_display_mode", "oo", false));
 	private static var lime_window_get_height = new cpp.Callable<cpp.Object->Int>(cpp.Prime._loadPrime("lime", "lime_window_get_height", "oi", false));
@@ -320,6 +321,7 @@ class NativeCFFI
 	private static var lime_window_focus = CFFI.load("lime", "lime_window_focus", 1);
 	private static var lime_window_get_handle = CFFI.load("lime", "lime_window_get_handle", 1);
 	private static var lime_window_get_context = CFFI.load("lime", "lime_window_get_context", 1);
+	private static var lime_window_get_context_type = CFFI.load("lime", "lime_window_get_context_type", 1);
 	private static var lime_window_get_display = CFFI.load("lime", "lime_window_get_display", 1);
 	private static var lime_window_get_display_mode = CFFI.load("lime", "lime_window_get_display_mode", 1);
 	private static var lime_window_get_height = CFFI.load("lime", "lime_window_get_height", 1);
@@ -626,7 +628,7 @@ class NativeCFFI
 	#end
 
 	// OpenGL bindings
-	#if (lime_cffi && !macro && (lime_opengl || lime_opengles) && !lime_bgfx)
+	#if (lime_cffi && !macro && (lime_opengl || lime_opengles))
 	#if cpp
 	private static var lime_gl_active_texture = new cpp.Callable<Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_gl_active_texture", "iv", false));
 	private static var lime_gl_attach_shader = new cpp.Callable<Int->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_gl_attach_shader", "iiv", false));
@@ -1375,7 +1377,8 @@ class NativeCFFI
 	private static var lime_gl_polygon_mode = CFFI.load("lime", "lime_gl_polygon_mode", 2);
 	#end
 	#end
-	#if (lime_cffi && !macro && lime_bgfx && !(lime_opengl || lime_opengles))
+	// bgfx bindings
+	#if (lime_cffi && !macro && lime_bgfx)
 	#if cpp
 	private static var lime_bgfx_render_frame = new cpp.Callable<Void->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_render_frame", "i", false));
 	private static var lime_bgfx_set_debug = new cpp.Callable<Int->cpp.Object->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_debug", "ioiv", false));

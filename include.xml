@@ -13,9 +13,10 @@
 	<define name="lime-harfbuzz" if="native" />
 	<define name="lime-miniaudio" if="native" />
 	<define name="lime-native" if="native" />
-	<!-- <define name="lime-opengl" if="desktop" /> -->
-	<!-- <define name="lime-opengles" if="mobile || linux armv7 || linux arm64" /> -->
-	<define name="lime-bgfx" unless="lime-opengl || lime-opengles" />
+	<!-- Both renderers are built in. Which one a window uses is decided when it is created. -->
+	<define name="lime-opengl" if="desktop" />
+	<define name="lime-opengles" if="mobile || linux armv7 || linux arm64" />
+	<define name="lime-bgfx" />
 
 	<haxedef name="no-compilation" />
 
