@@ -175,6 +175,7 @@
 			<section>
 
 				<file name="src/graphics/AnimationDecoder.cpp" />
+				<file name="src/graphics/AnimationDecoderFrame.cpp" />
 
 			</section>
 

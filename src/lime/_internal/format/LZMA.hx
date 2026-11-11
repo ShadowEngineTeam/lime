@@ -11,7 +11,14 @@ class LZMA
 	public static function compress(bytes:Bytes):Bytes
 	{
 		#if (lime_cffi && !macro)
-		return NativeCFFI.lime_lzma_compress(bytes, Bytes.alloc(0));
+		var result:Bytes = Bytes.alloc(0);
+
+		if (NativeCFFI.lime_lzma_compress(bytes, result))
+		{
+			return result;
+		}
+
+		return null;
 		#else
 		return null;
 		#end
@@ -20,7 +27,14 @@ class LZMA
 	public static function decompress(bytes:Bytes):Bytes
 	{
 		#if (lime_cffi && !macro)
-		return NativeCFFI.lime_lzma_decompress(bytes, Bytes.alloc(0));
+		var result:Bytes = Bytes.alloc(0);
+
+		if (NativeCFFI.lime_lzma_decompress(bytes, result))
+		{
+			return result;
+		}
+
+		return null;
 		#else
 		return null;
 		#end
