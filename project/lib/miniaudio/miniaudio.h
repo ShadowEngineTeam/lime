@@ -16743,9 +16743,11 @@ ma_atomic_spinlock ma_atomic_global_lock;
             #pragma clang diagnostic ignored "-Watomic-alignment"
         #endif
     #endif
+    /* Every 64-bit atomic in miniaudio is declared MA_ATOMIC(8, ...). Saying so here keeps 32-bit x86 from calling libatomic's __atomic_compare_exchange, as the pointer alone only promises 4 bytes. */
+    typedef ma_uint64 ma_atomic_uint64_aligned8 __attribute__((aligned(8)));
     static MA_INLINE ma_uint64 ma_atomic_compare_and_swap_64(volatile ma_uint64* dst, ma_uint64 expected, ma_uint64 replacement)
     {
-        __atomic_compare_exchange_n(dst, &expected, replacement, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+        __atomic_compare_exchange_n((volatile ma_atomic_uint64_aligned8*)dst, &expected, replacement, 0, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
         return expected;
     }
     #if defined(__clang__)
