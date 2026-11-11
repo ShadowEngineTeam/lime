@@ -1,5 +1,10 @@
 #include <app/Application.h>
+#ifdef LIME_OPENGL
 #include <bindings/opengl/OpenGLBindings.h>
+#endif
+#ifdef LIME_BGFX
+#include <bindings/bgfx/BGFXBindings.h>
+#endif
 #ifdef ANDROID
 #include <android/native_window.h>
 #endif
@@ -26,7 +31,11 @@ namespace lime
 
 		this->flags = flags;
 
+#ifdef LIME_OPENGL
 		int sdlWindowFlags = SDL_WINDOW_OPENGL;
+#else
+		int sdlWindowFlags = 0;
+#endif
 
 		if (flags & WINDOW_FLAG_FULLSCREEN)
 			sdlWindowFlags |= SDL_WINDOW_FULLSCREEN;
@@ -55,6 +64,9 @@ namespace lime
 		if (flags & WINDOW_FLAG_ALWAYS_ON_TOP)
 			sdlWindowFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
 
+		const int samples = (flags & WINDOW_FLAG_ANTIALIASING_8X) ? 8 : (flags & WINDOW_FLAG_ANTIALIASING_4X) ? 4 : (flags & WINDOW_FLAG_ANTIALIASING_2X) ? 2 : 0;
+
+#ifdef LIME_OPENGL
 #if defined(LIME_OPENGL_GLES)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -76,8 +88,6 @@ namespace lime
 			SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		}
 
-		const int samples = (flags & WINDOW_FLAG_ANTIALIASING_8X) ? 8 : (flags & WINDOW_FLAG_ANTIALIASING_4X) ? 4 : (flags & WINDOW_FLAG_ANTIALIASING_2X) ? 2 : 0;
-
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, samples > 0 ? 1 : 0);
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samples);
 
@@ -87,16 +97,43 @@ namespace lime
 		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, color32 ? 8 : 6);
 		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, color32 ? 8 : 5);
 		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, color32 ? 8 : 0);
+#endif
 
-		sdlWindow = SDL_CreateWindow(title, width, height, sdlWindowFlags);
+		auto createWindow = [&]() -> SDL_Window *
+		{
+			SDL_PropertiesID props = SDL_CreateProperties();
 
+			if (title && (*title))
+			{
+				SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title);
+			}
+
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, sdlWindowFlags);
+
+#ifdef LIME_BGFX
+			// bgfx creates the graphics context itself, so SDL must not set one up for the window
+			SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT_BOOLEAN, true);
+#endif
+
+			SDL_Window *window = SDL_CreateWindowWithProperties(props);
+
+			SDL_DestroyProperties(props);
+
+			return window;
+		};
+
+		sdlWindow = createWindow();
+
+#ifdef LIME_OPENGL
 		// Retry without MSAA
 		if (!sdlWindow && samples > 0)
 		{
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 
-			sdlWindow = SDL_CreateWindow(title, width, height, sdlWindowFlags);
+			sdlWindow = createWindow();
 		}
 
 #if defined(LIME_OPENGL_GLES)
@@ -109,8 +146,9 @@ namespace lime
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
-			sdlWindow = SDL_CreateWindow(title, width, height, sdlWindowFlags);
+			sdlWindow = createWindow();
 		}
+#endif
 #endif
 
 		if (!sdlWindow)
@@ -119,6 +157,48 @@ namespace lime
 			return;
 		}
 
+		if (!CreateRenderer())
+		{
+			if (sdlWindow)
+			{
+				SDL_DestroyWindow(sdlWindow);
+				sdlWindow = 0;
+			}
+
+#ifdef LIME_OPENGL
+			if (context)
+			{
+				SDL_GL_DestroyContext(context);
+				context = 0;
+			}
+#endif
+		}
+	}
+
+	Window::~Window()
+	{
+		if (sdlWindow)
+		{
+			SDL_DestroyWindow(sdlWindow);
+			sdlWindow = 0;
+		}
+
+#ifdef LIME_OPENGL
+		if (context)
+		{
+			SDL_GL_DestroyContext(context);
+			context = 0;
+		}
+#endif
+
+#ifdef LIME_BGFX
+		BGFXBindings::Shutdown();
+#endif
+	}
+
+	bool Window::CreateRenderer()
+	{
+#ifdef LIME_OPENGL
 #if defined(LIME_OPENGL_GL) && !defined(__APPLE__)
 		{
 			struct GLContextRequest
@@ -182,38 +262,37 @@ namespace lime
 #endif
 
 			currentApplication->RegisterWindow(this);
+
+			return true;
 		}
 		else
 		{
 			SDL_Log("Could not create SDL GL Context: %s\n", SDL_GetError());
 
-			if (sdlWindow)
-			{
-				SDL_DestroyWindow(sdlWindow);
-				sdlWindow = 0;
-			}
-
-			if (context)
-			{
-				SDL_GL_DestroyContext(context);
-				context = 0;
-			}
+			return false;
 		}
-	}
+#endif
 
-	Window::~Window()
-	{
-		if (sdlWindow)
+#ifdef LIME_BGFX
+		if (BGFXBindings::Init(sdlWindow))
 		{
-			SDL_DestroyWindow(sdlWindow);
-			sdlWindow = 0;
-		}
+			currentApplication->RegisterWindow(this);
 
-		if (context)
-		{
-			SDL_GL_DestroyContext(context);
-			context = 0;
+			return true;
 		}
+		else
+		{
+#if defined(IPHONE)
+			printf("Could not initialize BGFX backend: %s\n", SDL_GetError());
+#else
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Could not initialize BGFX backend", SDL_GetError(), sdlWindow);
+#endif
+
+			return false;
+		}
+#endif
+
+		return false;
 	}
 
 	int Window::Alert(int type, const char *message, const char *title, const char **buttons, int count)
@@ -601,6 +680,10 @@ namespace lime
 
 	bool Window::SetFullscreen(bool fullscreen)
 	{
+#if (defined(LIME_BGFX) && (defined(IPHONE) || defined(HX_MACOS)))
+		BGFXBindings::SetMetalLayerComposited(!fullscreen);
+#endif
+
 		SDL_SetWindowFullscreen(sdlWindow, fullscreen);
 		return fullscreen;
 	}
