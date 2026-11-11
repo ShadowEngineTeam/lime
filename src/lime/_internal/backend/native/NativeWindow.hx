@@ -139,36 +139,48 @@ class NativeWindow
 		var context = new RenderContext();
 		context.window = parent;
 
-		#if (lime_opengl || lime_opengles)
-		var gl = new NativeOpenGLRenderContext();
+		// The native window decides which renderer it runs on when it is created: bgfx, or an
+		// OpenGL context of its own when bgfx could not start (see `ui/Window.cpp`)
+		var useBGFX = false;
 
-		#if (lime_opengl || lime_opengles)
-		context.gl = gl;
+		#if lime_bgfx
+		var contextType:String = handle != null ? NativeCFFI.lime_window_get_context_type(handle) : null;
+		useBGFX = (contextType == "bgfx");
+
+		if (useBGFX)
+		{
+			var bgfx = new NativeBGFXRenderContext();
+
+			context.bgfx = bgfx;
+			context.type = bgfx.type;
+			context.version = Std.string(bgfx.version);
+
+			if (BGFX.context == null)
+			{
+				BGFX.context = bgfx;
+			}
+		}
 		#end
 
-		context.gles2 = gl;
-		context.type = gl.type;
-		context.version = Std.string(gl.version);
-
-		if (gl.type == OPENGLES && gl.version >= 3)
+		#if (lime_opengl || lime_opengles)
+		if (!useBGFX)
 		{
-			context.gles3 = gl;
-		}
+			var gl = new NativeOpenGLRenderContext();
 
-		if (GL.context == null)
-		{
-			GL.context = gl;
-		}
-		#elseif lime_bgfx
-		var bgfx = new NativeBGFXRenderContext();
+			context.gl = gl;
+			context.gles2 = gl;
+			context.type = gl.type;
+			context.version = Std.string(gl.version);
 
-		context.bgfx = bgfx;
-		context.type = bgfx.type;
-		context.version = Std.string(bgfx.version);
+			if (gl.type == OPENGLES && gl.version >= 3)
+			{
+				context.gles3 = gl;
+			}
 
-		if (BGFX.context == null)
-		{
-			BGFX.context = bgfx;
+			if (GL.context == null)
+			{
+				GL.context = gl;
+			}
 		}
 		#end
 

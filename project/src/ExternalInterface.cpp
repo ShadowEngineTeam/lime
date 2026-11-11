@@ -1938,6 +1938,7 @@ namespace lime
 	DEFINE_PRIME1v(lime_window_focus);
 	DEFINE_PRIME1(lime_window_get_handle);
 	DEFINE_PRIME1(lime_window_get_context);
+	DEFINE_PRIME1(lime_window_get_context_type);
 	DEFINE_PRIME1(lime_window_get_display);
 	DEFINE_PRIME1(lime_window_get_display_mode);
 	DEFINE_PRIME1(lime_window_get_height);

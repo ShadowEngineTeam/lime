@@ -27,13 +27,14 @@
 	<set name="LIME_OGG" value="1" />
 	<set name="LIME_OPUS" value="1" />
 	<set name="LIME_MINIAUDIO" value="1" />
-	<!-- <set name="LIME_OPENGL" value="1" /> -->
+	<!-- Both renderers are built in and the window picks one when it is created, see ui/Window.cpp. -->
+	<set name="LIME_OPENGL" value="1" unless="LIME_NO_OPENGL" />
 	<set name="LIME_GLAD" value="1" if="LIME_OPENGL" unless="iphone" />
 	<set name="LIME_PIXMAN" value="1" />
 	<set name="LIME_SDL" value="1" />
 	<set name="LIME_SDL_IMAGE" value="1" if="LIME_SDL" />
 	<set name="LIME_ZLIB" value="1" />
-	<set name="LIME_BGFX" value="1" unless="LIME_OPENGL" />
+	<set name="LIME_BGFX" value="1" unless="LIME_NO_BGFX" />
 
 	<set name="OUTPUT_DIR" value="../ndll" unless="OUTPUT_DIR" />
 	<set name="DEBUGEXTRA" value="-debug" if="fulldebug" />
@@ -43,8 +44,8 @@
 
 	<files id="lime">
 
-		<objprefix value="opengl_" if="LIME_OPENGL" />
-		<objprefix value="bgfx_" if="LIME_BGFX" />
+		<objprefix value="opengl_" if="LIME_OPENGL" unless="LIME_BGFX" />
+		<objprefix value="bgfx_" if="LIME_BGFX" unless="LIME_OPENGL" />
 
 		<compilerflag value="-Iinclude" />
 

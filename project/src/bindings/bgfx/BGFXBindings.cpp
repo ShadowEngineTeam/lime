@@ -2108,19 +2108,89 @@ namespace lime
 
 #undef DEFINE_BGFX_DESTROY
 
-	static bgfx::RendererType::Enum getRendererType()
+	int BGFXBindings::GetDefaultRendererType()
 	{
-#if defined(ANDROID)
-		return bgfx::RendererType::Vulkan;
-#elif defined(HX_LINUX)
-		return bgfx::RendererType::Vulkan;
-#elif defined(IPHONE) || defined(HX_MACOS)
+#if defined(IPHONE) || defined(HX_MACOS)
 		return bgfx::RendererType::Metal;
-#elif defined(HX_WINDOWS)
-		return bgfx::RendererType::Direct3D11;
 #else
-		return bgfx::RendererType::Noop;
+		return bgfx::RendererType::Vulkan;
 #endif
+	}
+
+	int BGFXBindings::GetRendererType(const char *name)
+	{
+		struct NamedRenderer
+		{
+			const char *name;
+			bgfx::RendererType::Enum type;
+		};
+
+		static const NamedRenderer renderers[] = {
+			{"vulkan", bgfx::RendererType::Vulkan},
+			{"metal", bgfx::RendererType::Metal},
+			{"d3d11", bgfx::RendererType::Direct3D11},
+			{"d3d12", bgfx::RendererType::Direct3D12},
+			{"bgfx-opengl", bgfx::RendererType::OpenGL},
+			{"bgfx-opengles", bgfx::RendererType::OpenGLES},
+		};
+
+		if (name)
+		{
+			for (size_t i = 0; i < SDL_arraysize(renderers); i++)
+			{
+				if (SDL_strcasecmp(name, renderers[i].name) == 0)
+				{
+					return renderers[i].type;
+				}
+			}
+		}
+
+		return -1;
+	}
+
+	const char *BGFXBindings::GetRendererName(int rendererType)
+	{
+		if (rendererType < 0 || rendererType >= bgfx::RendererType::Count)
+		{
+			return "unknown";
+		}
+
+		return bgfx::getRendererName((bgfx::RendererType::Enum)rendererType);
+	}
+
+	// Whether the device bgfx started on is a software implementation
+	static bool isSoftwareDevice()
+	{
+		const bgfx::Caps *caps = bgfx::getCaps();
+
+		if (!caps)
+		{
+			return false;
+		}
+
+		// Direct3D's WARP and Basic Render Driver report Microsoft as the vendor
+		if (caps->vendorId == BGFX_PCI_ID_SOFTWARE_RASTERIZER || caps->vendorId == BGFX_PCI_ID_MICROSOFT)
+		{
+			return true;
+		}
+
+		// The Vulkan renderer marks CPU implementations (lavapipe, SwiftShader) in the adapter list only
+		bool software = false;
+
+		for (uint8_t i = 0; i < caps->numGPUs; i++)
+		{
+			if (caps->gpu[i].deviceId == caps->deviceId)
+			{
+				if (caps->gpu[i].vendorId != BGFX_PCI_ID_SOFTWARE_RASTERIZER)
+				{
+					return false;
+				}
+
+				software = true;
+			}
+		}
+
+		return software;
 	}
 
 	static void *getNativeWindowHandle(SDL_Window *sdlWindow)
@@ -2209,16 +2279,39 @@ namespace lime
 
 	static bgfx::TextureFormat::Enum defaultBackbufferFormat = bgfx::TextureFormat::BGRA8;
 
-	bool BGFXBindings::Init(SDL_Window *sdlWindow)
+	bool BGFXBindings::Init(SDL_Window *sdlWindow, int rendererType, bool allowSoftware)
 	{
+		if (rendererType < 0 || rendererType >= bgfx::RendererType::Count)
+		{
+			return false;
+		}
+
+		// A renderer that is not compiled in for this platform
+		bgfx::RendererType::Enum supported[bgfx::RendererType::Count];
+		const uint8_t numSupported = bgfx::getSupportedRenderers(bgfx::RendererType::Count, supported);
+		bool isSupported = false;
+
+		for (uint8_t i = 0; i < numSupported; i++)
+		{
+			isSupported = isSupported || supported[i] == rendererType;
+		}
+
+		if (!isSupported)
+		{
+			SDL_SetError("bgfx has no %s renderer on this platform", GetRendererName(rendererType));
+			return false;
+		}
+
 		// Sets the renderer to run on the main thread
 		// bgfx::renderFrame();
 
 		// Setup bgfx init struct
 		bgfx::Init init;
 
-		// Set renderer type based on platform
-		init.type = getRendererType();
+		// Only this renderer: what to try next is up to the caller, so that bgfx does not move on
+		// to Direct3D, its own OpenGL renderer or the one that draws nothing
+		init.type = (bgfx::RendererType::Enum)rendererType;
+		init.fallback = false;
 
 		// Get native window/display handles from SDL
 		init.swapChain.nwh = getNativeWindowHandle(sdlWindow);
@@ -2245,7 +2338,22 @@ namespace lime
 
 		// Init bgfx with the config
 		__initialized = bgfx::init(init);
-		return __initialized;
+
+		if (!__initialized)
+		{
+			SDL_SetError("bgfx could not start its %s renderer", GetRendererName(rendererType));
+			Shutdown();
+			return false;
+		}
+
+		if (!allowSoftware && isSoftwareDevice())
+		{
+			Shutdown();
+			SDL_SetError("the only %s device is a software one", GetRendererName(rendererType));
+			return false;
+		}
+
+		return true;
 	}
 
 	SDL_Window *BGFXBindings::defaultWindow = nullptr;
@@ -2275,8 +2383,11 @@ namespace lime
 	// Clean up any required resources
 	void BGFXBindings::Shutdown()
 	{
-		bgfx::shutdown();
-		__initialized = false;
+		if (__initialized)
+		{
+			bgfx::shutdown();
+			__initialized = false;
+		}
 
 // Destroy the metal view
 #if defined(IPHONE) || defined(HX_MACOS)

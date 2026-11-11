@@ -101,6 +101,10 @@ namespace lime
 		SDL_Window *sdlWindow;
 
 	  private:
+		// Whether the window is drawn through bgfx, and not through an OpenGL context of its own
+		bool bgfxRenderer;
+		// Whether an OpenGL context on a software implementation is accepted
+		bool softwareAllowed = false;
 		SDL_GLContext context;
 		int contextWidth;
 		int contextHeight;

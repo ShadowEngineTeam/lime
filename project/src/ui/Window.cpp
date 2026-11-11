@@ -20,9 +20,27 @@ namespace lime
 
 	double drawScale = 1.0;
 
+	static bool envEnabled(const char *name)
+	{
+		const char *value = SDL_getenv(name);
+		return value != NULL && value[0] != '\0' && value[0] != '0';
+	}
+
+	static void showRendererError(SDL_Window *window, const char *title)
+	{
+#if defined(IPHONE)
+		printf("%s: %s\n", title, SDL_GetError());
+#else
+		SDL_Log("%s: %s\n", title, SDL_GetError());
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, SDL_GetError(), window);
+#endif
+	}
+
 	Window::Window(Application *application, int width, int height, int flags, const char *title)
 	{
 		context = 0;
+		bgfxRenderer = false;
+		sdlWindow = 0;
 
 		contextWidth = 0;
 		contextHeight = 0;
@@ -31,11 +49,7 @@ namespace lime
 
 		this->flags = flags;
 
-#ifdef LIME_OPENGL
-		int sdlWindowFlags = SDL_WINDOW_OPENGL;
-#else
 		int sdlWindowFlags = 0;
-#endif
 
 		if (flags & WINDOW_FLAG_FULLSCREEN)
 			sdlWindowFlags |= SDL_WINDOW_FULLSCREEN;
@@ -64,9 +78,107 @@ namespace lime
 		if (flags & WINDOW_FLAG_ALWAYS_ON_TOP)
 			sdlWindowFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
 
-		const int samples = (flags & WINDOW_FLAG_ANTIALIASING_8X) ? 8 : (flags & WINDOW_FLAG_ANTIALIASING_4X) ? 4 : (flags & WINDOW_FLAG_ANTIALIASING_2X) ? 2 : 0;
+		auto createWindow = [&](int windowFlags, bool externalContext) -> SDL_Window *
+		{
+			SDL_PropertiesID props = SDL_CreateProperties();
+
+			if (title && (*title))
+			{
+				SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title);
+			}
+
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, windowFlags);
+
+			if (externalContext)
+			{
+				// bgfx creates the graphics context itself, so SDL must not set one up for the window
+				SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT_BOOLEAN, true);
+			}
+
+			SDL_Window *window = SDL_CreateWindowWithProperties(props);
+
+			SDL_DestroyProperties(props);
+
+			return window;
+		};
+
+		// The renderers are tried in this order:
+		//   1. bgfx on Vulkan (Metal on Apple)
+		//   2. OpenGL 4 or 3 core, then OpenGL 2 (OpenGL ES 3, then ES 2, where that is the platform's)
+		//
+		// LIME_RENDERER names one instead: "opengl" for step 2 alone, or a bgfx renderer ("vulkan", "metal",
+		// "d3d11", "d3d12", "bgfx-opengl", "bgfx-opengles"), which then has nothing to fall back to.
+		//
+		// A software implementation (lavapipe, llvmpipe, WARP...) counts as a failure at every step,
+		// unless LIME_ALLOW_SOFTWARE_RENDERER is set.
+		const char *requested = SDL_getenv("LIME_RENDERER");
+		bool hasRequest = requested != NULL && requested[0] != '\0' && SDL_strcasecmp(requested, "auto") != 0;
+		const bool openglRequested = hasRequest && (SDL_strcasecmp(requested, "opengl") == 0 || SDL_strcasecmp(requested, "opengles") == 0);
+		const bool allowSoftware = envEnabled("LIME_ALLOW_SOFTWARE_RENDERER");
+
+#ifdef LIME_BGFX
+		if (!openglRequested)
+		{
+			int rendererType = hasRequest ? BGFXBindings::GetRendererType(requested) : BGFXBindings::GetDefaultRendererType();
+
+			if (rendererType < 0)
+			{
+				SDL_Log("LIME_RENDERER: \"%s\" is not a renderer, using the default order\n", requested);
+
+				hasRequest = false;
+				rendererType = BGFXBindings::GetDefaultRendererType();
+			}
+
+			sdlWindow = createWindow(sdlWindowFlags, true);
+
+			if (sdlWindow)
+			{
+				if (BGFXBindings::Init(sdlWindow, rendererType, allowSoftware))
+				{
+					bgfxRenderer = true;
+
+					currentApplication->RegisterWindow(this);
+
+					return;
+				}
+
+				if (hasRequest)
+				{
+					// Asked for by name: there is nothing to fall back to
+					showRendererError(sdlWindow, "Could not start the renderer LIME_RENDERER asks for");
+				}
+				else
+				{
+					SDL_Log("bgfx: %s. Falling back to OpenGL\n", SDL_GetError());
+				}
+
+				SDL_DestroyWindow(sdlWindow);
+				sdlWindow = 0;
+			}
+			else if (hasRequest)
+			{
+				showRendererError(NULL, "Could not create a window");
+			}
+
+			if (hasRequest)
+			{
+				return;
+			}
+		}
+#else
+		if (hasRequest && !openglRequested)
+		{
+			SDL_Log("LIME_RENDERER: this build has no bgfx renderers, using OpenGL\n");
+		}
+#endif
 
 #ifdef LIME_OPENGL
+		softwareAllowed = allowSoftware;
+
+		const int samples = (flags & WINDOW_FLAG_ANTIALIASING_8X) ? 8 : (flags & WINDOW_FLAG_ANTIALIASING_4X) ? 4 : (flags & WINDOW_FLAG_ANTIALIASING_2X) ? 2 : 0;
+
 #if defined(LIME_OPENGL_GLES)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -97,43 +209,16 @@ namespace lime
 		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, color32 ? 8 : 6);
 		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, color32 ? 8 : 5);
 		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, color32 ? 8 : 0);
-#endif
 
-		auto createWindow = [&]() -> SDL_Window *
-		{
-			SDL_PropertiesID props = SDL_CreateProperties();
+		sdlWindow = createWindow(sdlWindowFlags | SDL_WINDOW_OPENGL, false);
 
-			if (title && (*title))
-			{
-				SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title);
-			}
-
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width);
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height);
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, sdlWindowFlags);
-
-#ifdef LIME_BGFX
-			// bgfx creates the graphics context itself, so SDL must not set one up for the window
-			SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT_BOOLEAN, true);
-#endif
-
-			SDL_Window *window = SDL_CreateWindowWithProperties(props);
-
-			SDL_DestroyProperties(props);
-
-			return window;
-		};
-
-		sdlWindow = createWindow();
-
-#ifdef LIME_OPENGL
 		// Retry without MSAA
 		if (!sdlWindow && samples > 0)
 		{
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 
-			sdlWindow = createWindow();
+			sdlWindow = createWindow(sdlWindowFlags | SDL_WINDOW_OPENGL, false);
 		}
 
 #if defined(LIME_OPENGL_GLES)
@@ -146,56 +231,60 @@ namespace lime
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
-			sdlWindow = createWindow();
+			sdlWindow = createWindow(sdlWindowFlags | SDL_WINDOW_OPENGL, false);
 		}
 #endif
 #endif
 
 		if (!sdlWindow)
 		{
-			SDL_Log("Could not create SDL Window: %s\n", SDL_GetError());
+			showRendererError(NULL, "Could not create a window with a supported renderer");
 			return;
 		}
 
 		if (!CreateRenderer())
 		{
-			if (sdlWindow)
-			{
-				SDL_DestroyWindow(sdlWindow);
-				sdlWindow = 0;
-			}
+			showRendererError(sdlWindow, "Could not start a renderer");
 
-#ifdef LIME_OPENGL
 			if (context)
 			{
 				SDL_GL_DestroyContext(context);
 				context = 0;
 			}
-#endif
+
+			if (sdlWindow)
+			{
+				SDL_DestroyWindow(sdlWindow);
+				sdlWindow = 0;
+			}
 		}
 	}
 
 	Window::~Window()
 	{
+#ifdef LIME_BGFX
+		// Before the window goes: bgfx still presents to it
+		if (bgfxRenderer)
+		{
+			BGFXBindings::Shutdown();
+			bgfxRenderer = false;
+		}
+#endif
+
 		if (sdlWindow)
 		{
 			SDL_DestroyWindow(sdlWindow);
 			sdlWindow = 0;
 		}
 
-#ifdef LIME_OPENGL
 		if (context)
 		{
 			SDL_GL_DestroyContext(context);
 			context = 0;
 		}
-#endif
-
-#ifdef LIME_BGFX
-		BGFXBindings::Shutdown();
-#endif
 	}
 
+	// Creates the OpenGL context of a window made for one. bgfx is started by the constructor.
 	bool Window::CreateRenderer()
 	{
 #ifdef LIME_OPENGL
@@ -216,8 +305,7 @@ namespace lime
 				{SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 2, 1, (SDL_GLContextFlag)0},
 			};
 
-			const char *forceCompat = SDL_getenv("LIME_GL_COMPAT");
-			const bool compatOnly = forceCompat != NULL && forceCompat[0] != '\0' && forceCompat[0] != '0';
+			const bool compatOnly = envEnabled("LIME_GL_COMPAT");
 
 			for (size_t i = compatOnly ? 2 : 0; i < SDL_arraysize(contextRequests); ++i)
 			{
@@ -234,15 +322,44 @@ namespace lime
 					break;
 			}
 		}
+#elif defined(LIME_OPENGL_GLES)
+		context = SDL_GL_CreateContext(sdlWindow);
+
+		// The window can exist while the driver has no OpenGL ES 3 context for it
+		if (!context)
+		{
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+			context = SDL_GL_CreateContext(sdlWindow);
+		}
 #else
 		context = SDL_GL_CreateContext(sdlWindow);
 #endif
 
 		if (context && SDL_GL_MakeCurrent(sdlWindow, context))
 		{
-			SetVSyncMode((flags & WINDOW_FLAG_VSYNC) ? WINDOW_VSYNC_ON : WINDOW_VSYNC_OFF);
-
 			OpenGLBindings::Init();
+
+			if (!softwareAllowed)
+			{
+				// The names the software OpenGL implementations go by
+				static const char *softwareRenderers[] = {"llvmpipe", "softpipe", "swrast", "SwiftShader", "GDI Generic", "Software Rasterizer", "Software Renderer"};
+
+				const char *renderer = (const char *)glGetString(GL_RENDERER);
+
+				for (size_t i = 0; renderer && i < SDL_arraysize(softwareRenderers); ++i)
+				{
+					if (SDL_strcasestr(renderer, softwareRenderers[i]))
+					{
+						SDL_SetError("the only OpenGL device is a software one (%s)", renderer);
+						return false;
+					}
+				}
+			}
+
+			SetVSyncMode((flags & WINDOW_FLAG_VSYNC) ? WINDOW_VSYNC_ON : WINDOW_VSYNC_OFF);
 
 #if defined(LIME_OPENGL_GL)
 #if defined(LIME_GLAD)
@@ -265,34 +382,12 @@ namespace lime
 
 			return true;
 		}
-		else
-		{
-			SDL_Log("Could not create SDL GL Context: %s\n", SDL_GetError());
-
-			return false;
-		}
-#endif
-
-#ifdef LIME_BGFX
-		if (BGFXBindings::Init(sdlWindow))
-		{
-			currentApplication->RegisterWindow(this);
-
-			return true;
-		}
-		else
-		{
-#if defined(IPHONE)
-			printf("Could not initialize BGFX backend: %s\n", SDL_GetError());
-#else
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Could not initialize BGFX backend", SDL_GetError(), sdlWindow);
-#endif
-
-			return false;
-		}
-#endif
 
 		return false;
+#else
+		SDL_SetError("this build has no OpenGL renderer");
+		return false;
+#endif
 	}
 
 	int Window::Alert(int type, const char *message, const char *title, const char **buttons, int count)
@@ -365,6 +460,14 @@ namespace lime
 
 	void Window::Close()
 	{
+#ifdef LIME_BGFX
+		if (bgfxRenderer)
+		{
+			BGFXBindings::Shutdown();
+			bgfxRenderer = false;
+		}
+#endif
+
 		if (sdlWindow)
 		{
 			SDL_DestroyWindow(sdlWindow);
@@ -463,6 +566,11 @@ namespace lime
 
 	const char *Window::GetContextType()
 	{
+		if (bgfxRenderer)
+		{
+			return "bgfx";
+		}
+
 		if (context)
 		{
 			return "opengl";
