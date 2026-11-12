@@ -86,6 +86,10 @@ class NativeApplication
 
 		#if (!macro && lime_cffi)
 		handle = NativeCFFI.lime_application_create();
+
+		// bgfx reads its shader include from the Haxe resources. The stock ApplicationMain hands
+		// them over as well, but a project that brings its own ApplicationMain template may not.
+		NativeCFFI.lime_haxe_resource_init(haxe.Resource.listNames, haxe.Resource.getBytes);
 		#end
 
 		#if (!macro && lime_cffi && macos)
