@@ -2130,8 +2130,8 @@ namespace lime
 			{"metal", bgfx::RendererType::Metal},
 			{"d3d11", bgfx::RendererType::Direct3D11},
 			{"d3d12", bgfx::RendererType::Direct3D12},
-			{"bgfx-opengl", bgfx::RendererType::OpenGL},
-			{"bgfx-opengles", bgfx::RendererType::OpenGLES},
+			{"opengl", bgfx::RendererType::OpenGL},
+			{"opengles", bgfx::RendererType::OpenGLES},
 		};
 
 		if (name)
@@ -2154,6 +2154,10 @@ namespace lime
 		{
 			return "unknown";
 		}
+
+		// bgfx gives its two OpenGL renderers one name, that of the one it was built with
+		if (rendererType == bgfx::RendererType::OpenGL) return "OpenGL";
+		if (rendererType == bgfx::RendererType::OpenGLES) return "OpenGL ES";
 
 		return bgfx::getRendererName((bgfx::RendererType::Enum)rendererType);
 	}

@@ -27,14 +27,35 @@
 	<set name="LIME_OGG" value="1" />
 	<set name="LIME_OPUS" value="1" />
 	<set name="LIME_MINIAUDIO" value="1" />
-	<!-- Both renderers are built in and the window picks one when it is created, see ui/Window.cpp. -->
-	<set name="LIME_OPENGL" value="1" unless="LIME_NO_OPENGL" />
-	<set name="LIME_GLAD" value="1" if="LIME_OPENGL" unless="iphone" />
 	<set name="LIME_PIXMAN" value="1" />
 	<set name="LIME_SDL" value="1" />
 	<set name="LIME_SDL_IMAGE" value="1" if="LIME_SDL" />
 	<set name="LIME_ZLIB" value="1" />
-	<set name="LIME_BGFX" value="1" unless="LIME_NO_BGFX" />
+
+	<!--
+		One renderer per build. bgfx is the default; "lime rebuild <target> -DLIME_OPENGL" (or
+		-DLIME_OPENGL_GLES) gives an OpenGL build instead. The renderer that is not chosen is off:
+		with LIME_BGFX, LIME_OPENGL and LIME_OPENGL_GLES are false, and the other way round. hxcpp
+		only knows whether a name is set, so false means not set, here and in the compiler flags.
+	-->
+	<set name="LIME_BGFX" value="1" unless="LIME_OPENGL || LIME_OPENGL_GLES" />
+
+	<section if="LIME_BGFX">
+
+		<unset name="LIME_OPENGL" />
+		<unset name="LIME_OPENGL_GLES" />
+
+	</section>
+
+	<section unless="LIME_BGFX">
+
+		<set name="LIME_OPENGL" value="1" />
+		<set name="LIME_OPENGL_GLES" value="1" if="android || linux HXCPP_ARMV7 || linux HXCPP_ARM64 || iphone" />
+		<unset name="LIME_OPENGL_GLES" unless="android || linux HXCPP_ARMV7 || linux HXCPP_ARM64 || iphone" />
+
+	</section>
+
+	<set name="LIME_GLAD" value="1" if="LIME_OPENGL" unless="iphone" />
 
 	<set name="OUTPUT_DIR" value="../ndll" unless="OUTPUT_DIR" />
 	<set name="DEBUGEXTRA" value="-debug" if="fulldebug" />
@@ -44,8 +65,8 @@
 
 	<files id="lime">
 
-		<objprefix value="opengl_" if="LIME_OPENGL" unless="LIME_BGFX" />
-		<objprefix value="bgfx_" if="LIME_BGFX" unless="LIME_OPENGL" />
+		<objprefix value="opengl_" if="LIME_OPENGL" />
+		<objprefix value="bgfx_" if="LIME_BGFX" />
 
 		<compilerflag value="-Iinclude" />
 
@@ -179,8 +200,8 @@
 
 			</section>
 
-			<compilerflag value="-DLIME_OPENGL_GL" if="windows || mac || linux" unless="linux HXCPP_ARMV7 || linux HXCPP_ARM64" />
-			<compilerflag value="-DLIME_OPENGL_GLES" if="android || linux HXCPP_ARMV7 || linux HXCPP_ARM64 || iphone" />
+			<compilerflag value="-DLIME_OPENGL_GL" unless="LIME_OPENGL_GLES" />
+			<compilerflag value="-DLIME_OPENGL_GLES" if="LIME_OPENGL_GLES" />
 			<compilerflag value="-DLIME_OPENGL" />
 
 			<file name="src/bindings/opengl/OpenGLBindings.cpp" />
