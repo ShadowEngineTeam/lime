@@ -14,14 +14,6 @@
 	<define name="lime-miniaudio" if="native" />
 	<define name="lime-native" if="native" />
 
-	<!--
-		One renderer per build. bgfx is the default; a project that defines lime-opengl (or
-		lime-opengles) gets OpenGL instead, and needs a Lime binary rebuilt with -DLIME_OPENGL.
-		The renderer that is not chosen is off: with lime-bgfx, lime-opengl and lime-opengles are
-		false, and the other way round. A define that is set counts as true in Haxe whatever its
-		value, so false means not set. The tools apply the same rule again after the command line
-		defines (HXProject.resolveRenderer).
-	-->
 	<define name="lime-bgfx" unless="lime-opengl || lime-opengles || lime_opengl || lime_opengles" />
 
 	<section if="lime-bgfx || lime_bgfx">

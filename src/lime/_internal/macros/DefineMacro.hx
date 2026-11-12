@@ -18,14 +18,6 @@ class DefineMacro
 
 			Compiler.define(mobile ? "mobile" : "desktop");
 
-			// One renderer per build: bgfx, unless OpenGL is asked for with lime-opengl or
-			// lime-opengles. The one that is not chosen stays off. A define cannot be taken back
-			// here, and one that is set counts as true whatever its value, so asking for both is
-			// an error instead.
-			//
-			// Only C++ builds render. Lime's own tools run on Neko, which binds every native
-			// function it declares when it starts: with no renderer defined they work with a
-			// Lime binary of either kind.
 			if (cffi && Context.defined("cpp"))
 			{
 				var opengl = Context.defined("lime_opengl") || Context.defined("lime_opengles");

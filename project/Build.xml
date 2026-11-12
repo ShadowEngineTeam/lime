@@ -32,13 +32,6 @@
 	<set name="LIME_SDL_IMAGE" value="1" if="LIME_SDL" />
 	<set name="LIME_ZLIB" value="1" />
 
-	<!--
-		One renderer per build. bgfx is the default; "lime rebuild <target> -D lime-opengl" gives an
-		OpenGL build instead, with the same define a project uses (LIME_OPENGL and LIME_OPENGL_GLES
-		work too). The renderer that is not chosen is off: with LIME_BGFX, LIME_OPENGL and
-		LIME_OPENGL_GLES are false, and the other way round. hxcpp only knows whether a name is set,
-		so false means not set, here and in the compiler flags.
-	-->
 	<set name="LIME_OPENGL" value="1" if="lime-opengl || lime-opengles || lime_opengl || lime_opengles" unless="LIME_BGFX" />
 	<set name="LIME_BGFX" value="1" unless="LIME_OPENGL || LIME_OPENGL_GLES" />
 
@@ -52,8 +45,6 @@
 	<section unless="LIME_BGFX">
 
 		<set name="LIME_OPENGL" value="1" />
-		<set name="LIME_OPENGL_GLES" value="1" if="android || linux HXCPP_ARMV7 || linux HXCPP_ARM64 || iphone" />
-		<unset name="LIME_OPENGL_GLES" unless="android || linux HXCPP_ARMV7 || linux HXCPP_ARM64 || iphone" />
 
 	</section>
 
@@ -69,6 +60,7 @@
 
 		<objprefix value="opengl_" if="LIME_OPENGL" />
 		<objprefix value="bgfx_" if="LIME_BGFX" />
+
 
 		<compilerflag value="-Iinclude" />
 
@@ -202,8 +194,8 @@
 
 			</section>
 
-			<compilerflag value="-DLIME_OPENGL_GL" unless="LIME_OPENGL_GLES" />
-			<compilerflag value="-DLIME_OPENGL_GLES" if="LIME_OPENGL_GLES" />
+			<compilerflag value="-DLIME_OPENGL_GL" if="windows || mac || linux" unless="linux HXCPP_ARMV7 || linux HXCPP_ARM64" />
+			<compilerflag value="-DLIME_OPENGL_GLES" if="android || linux HXCPP_ARMV7 || linux HXCPP_ARM64 || iphone" />
 			<compilerflag value="-DLIME_OPENGL" />
 
 			<file name="src/bindings/opengl/OpenGLBindings.cpp" />

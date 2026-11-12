@@ -21,11 +21,6 @@ namespace lime
 
 	double drawScale = 1.0;
 
-	// A setting is the environment variable of that name, or else what the game set with
-	// lime.system.System.setHint, which stores it under an "SDL_" prefix.
-	//
-	// The environment is read live: SDL keeps a copy of its own, taken the first time it is asked,
-	// and that copy misses a variable the game sets afterwards (Sys.putEnv).
 	static const char *setting(const char *name)
 	{
 		const char *value = SDL_getenv_unsafe(name);
@@ -48,6 +43,38 @@ namespace lime
 	{
 		const char *value = setting(name);
 		return value != NULL && value[0] != '0';
+	}
+
+	static std::vector<std::string> rendererTable()
+	{
+		std::vector<std::string> entries;
+		const char *table = setting("LIME_BGFX_PLATFORM");
+
+		if (table == NULL)
+			return entries;
+
+		std::string entry;
+
+		for (const char *c = table;; ++c)
+		{
+			if (*c != ',' && *c != ';' && *c != '\0')
+			{
+				if (*c != ' ' && *c != '\t')
+					entry += (char)SDL_tolower(*c);
+
+				continue;
+			}
+
+			if (!entry.empty() && entry != "auto")
+				entries.push_back(entry);
+
+			entry.clear();
+
+			if (*c == '\0')
+				break;
+		}
+
+		return entries;
 	}
 
 	static void showRendererError(SDL_Window *window, const char *title)
@@ -128,60 +155,23 @@ namespace lime
 			return window;
 		};
 
-		// A build has one renderer: bgfx, or Lime's own OpenGL context (see Build.xml).
-		//
-		// The order is Vulkan (Metal on Apple), then OpenGL (ES), then software: a software
-		// implementation (lavapipe, llvmpipe, WARP...) is the very last resort, only used once
-		// nothing has started on real hardware. A LIME_BGFX_PLATFORM table that names renderers
-		// leaves software out unless it has a "software" entry, wherever that entry stands.
-		//
-		// The table can come from the environment or from the game itself, which sets it before the
-		// window is created with Sys.putEnv or lime.system.System.setHint (see `setting`).
-		const char *table = setting("LIME_BGFX_PLATFORM");
-
-		// Whether software may be used in the end: no renderers named, or a "software" entry
+		std::vector<std::string> entries = rendererTable();
 		bool softwareLast = false;
-		bool namesRenderers = false;
 
-		if (table != NULL)
+		for (size_t i = 0; i < entries.size();)
 		{
-			std::string entry;
-
-			for (const char *c = table;; ++c)
+			if (entries[i] == "software")
 			{
-				if (*c != ',' && *c != ';' && *c != '\0')
-				{
-					if (*c != ' ' && *c != '\t')
-						entry += *c;
-
-					continue;
-				}
-
-				if (SDL_strcasecmp(entry.c_str(), "software") == 0)
-					softwareLast = true;
-				else if (!entry.empty() && SDL_strcasecmp(entry.c_str(), "auto") != 0)
-					namesRenderers = true;
-
-				entry.clear();
-
-				if (*c == '\0')
-					break;
+				softwareLast = true;
+				entries.erase(entries.begin() + i);
+			}
+			else
+			{
+				++i;
 			}
 		}
 
-		softwareLast = softwareLast || !namesRenderers;
-
 #ifdef LIME_BGFX
-		// Which bgfx renderers to try, in order, is a table:
-		//
-		//   LIME_BGFX_PLATFORM = "vulkan,d3d11,opengl"
-		//
-		// Entries are "vulkan", "metal", "d3d11", "d3d12", "opengl" and "opengles". The first one that
-		// starts is used and nothing outside the table is tried. Without those, or with "auto", the
-		// order is Vulkan, then OpenGL, then OpenGL ES (Metal alone on Apple).
-		//
-		// "software" is not a renderer of its own: when every entry has failed, the same entries are
-		// tried once more with software devices accepted. The default order ends that way too.
 		struct RendererChoice
 		{
 			int rendererType;
@@ -190,35 +180,14 @@ namespace lime
 
 		std::vector<RendererChoice> choices;
 
-		if (table != NULL)
+		for (size_t i = 0; i < entries.size(); ++i)
 		{
-			std::string entry;
+			const int rendererType = BGFXBindings::GetRendererType(entries[i].c_str());
 
-			for (const char *c = table;; ++c)
-			{
-				if (*c != ',' && *c != ';' && *c != '\0')
-				{
-					if (*c != ' ' && *c != '\t')
-						entry += *c;
-
-					continue;
-				}
-
-				if (!entry.empty() && SDL_strcasecmp(entry.c_str(), "auto") != 0 && SDL_strcasecmp(entry.c_str(), "software") != 0)
-				{
-					const int rendererType = BGFXBindings::GetRendererType(entry.c_str());
-
-					if (rendererType >= 0)
-						choices.push_back({rendererType, entry});
-					else
-						SDL_Log("LIME_BGFX_PLATFORM: \"%s\" is not a renderer, skipping it\n", entry.c_str());
-				}
-
-				entry.clear();
-
-				if (*c == '\0')
-					break;
-			}
+			if (rendererType >= 0)
+				choices.push_back({rendererType, entries[i]});
+			else
+				SDL_Log("LIME_BGFX_PLATFORM: \"%s\" is not a renderer, skipping it\n", entries[i].c_str());
 		}
 
 		const bool fromTable = !choices.empty();
@@ -232,11 +201,11 @@ namespace lime
 			choices.push_back({BGFXBindings::GetRendererType("opengl"), "opengl"});
 			choices.push_back({BGFXBindings::GetRendererType("opengles"), "opengles"});
 #endif
+			softwareLast = true;
 		}
 
 		std::string failures;
 
-		// The second round only happens with "software" in the table
 		for (size_t i = 0; i < choices.size() * (softwareLast ? 2 : 1); ++i)
 		{
 			const bool software = i >= choices.size();
@@ -284,7 +253,7 @@ namespace lime
 
 		showRendererError(NULL, fromTable ? "None of the renderers in LIME_BGFX_PLATFORM could start" : "Could not start a renderer");
 #else
-		if (namesRenderers)
+		if (!entries.empty())
 		{
 			SDL_Log("LIME_BGFX_PLATFORM: this build renders with OpenGL, not bgfx. The renderers it names only switch the software fallback off, unless \"software\" is one of them\n");
 		}
@@ -382,7 +351,7 @@ namespace lime
 
 		if (!startOpenGL())
 		{
-			// The last resort
+			softwareLast = softwareLast || entries.empty();
 			softwareAllowed = softwareLast;
 
 			if (softwareLast)
