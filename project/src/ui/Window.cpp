@@ -130,16 +130,18 @@ namespace lime
 
 		// A build has one renderer: bgfx, or Lime's own OpenGL context (see Build.xml).
 		//
-		// A software implementation (lavapipe, llvmpipe, WARP...) counts as a failure either way,
-		// unless the LIME_BGFX_PLATFORM table has a "software" entry. Software is the very last
-		// resort wherever the entry stands: it is only used once nothing else has started.
+		// The order is Vulkan (Metal on Apple), then OpenGL (ES), then software: a software
+		// implementation (lavapipe, llvmpipe, WARP...) is the very last resort, only used once
+		// nothing has started on real hardware. A LIME_BGFX_PLATFORM table that names renderers
+		// leaves software out unless it has a "software" entry, wherever that entry stands.
 		//
 		// The table can come from the environment or from the game itself, which sets it before the
 		// window is created with Sys.putEnv or lime.system.System.setHint (see `setting`).
 		const char *table = setting("LIME_BGFX_PLATFORM");
 
-		// Whether the table has a "software" entry
+		// Whether software may be used in the end: no renderers named, or a "software" entry
 		bool softwareLast = false;
+		bool namesRenderers = false;
 
 		if (table != NULL)
 		{
@@ -155,13 +157,19 @@ namespace lime
 					continue;
 				}
 
-				softwareLast = softwareLast || SDL_strcasecmp(entry.c_str(), "software") == 0;
+				if (SDL_strcasecmp(entry.c_str(), "software") == 0)
+					softwareLast = true;
+				else if (!entry.empty() && SDL_strcasecmp(entry.c_str(), "auto") != 0)
+					namesRenderers = true;
+
 				entry.clear();
 
 				if (*c == '\0')
 					break;
 			}
 		}
+
+		softwareLast = softwareLast || !namesRenderers;
 
 #ifdef LIME_BGFX
 		// Which bgfx renderers to try, in order, is a table:
@@ -173,8 +181,7 @@ namespace lime
 		// order is Vulkan, then OpenGL, then OpenGL ES (Metal alone on Apple).
 		//
 		// "software" is not a renderer of its own: when every entry has failed, the same entries are
-		// tried once more with software devices accepted. "software" alone does that for the
-		// default order.
+		// tried once more with software devices accepted. The default order ends that way too.
 		struct RendererChoice
 		{
 			int rendererType;
@@ -236,7 +243,12 @@ namespace lime
 			RendererChoice choice = choices[i % choices.size()];
 
 			if (software)
+			{
+				if (i == choices.size())
+					SDL_Log("No renderer started on real hardware, falling back to software rendering\n");
+
 				choice.name += " (software)";
+			}
 
 			sdlWindow = createWindow(sdlWindowFlags, true);
 
@@ -272,9 +284,9 @@ namespace lime
 
 		showRendererError(NULL, fromTable ? "None of the renderers in LIME_BGFX_PLATFORM could start" : "Could not start a renderer");
 #else
-		if (table != NULL && SDL_strcasecmp(table, "software") != 0)
+		if (namesRenderers)
 		{
-			SDL_Log("LIME_BGFX_PLATFORM: this build renders with OpenGL, not bgfx. Only its \"software\" entry is used\n");
+			SDL_Log("LIME_BGFX_PLATFORM: this build renders with OpenGL, not bgfx. The renderers it names only switch the software fallback off, unless \"software\" is one of them\n");
 		}
 
 		auto startOpenGL = [&]() -> bool
@@ -370,8 +382,11 @@ namespace lime
 
 		if (!startOpenGL())
 		{
-			// The last resort, and only when the table asks for it
+			// The last resort
 			softwareAllowed = softwareLast;
+
+			if (softwareLast)
+				SDL_Log("OpenGL did not start on real hardware, falling back to software rendering\n");
 
 			if (!softwareLast || !startOpenGL())
 			{
