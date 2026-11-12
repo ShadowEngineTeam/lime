@@ -28,6 +28,16 @@
 #  define _bswap64(x) __builtin_bswap64(x)
 #endif
 
+#if defined __SSE4_1__ && ( defined _M_IX86 || defined __i386__ )
+// These three only exist on x86-64.
+static inline __m128i etcpak_cvtsi64_si128( int64_t v ) { return _mm_loadl_epi64( (const __m128i*)&v ); }
+static inline int64_t etcpak_cvtsi128_si64( __m128i v ) { int64_t r; _mm_storel_epi64( (__m128i*)&r, v ); return r; }
+static inline int64_t etcpak_extract_epi64( __m128i v, int i ) { return etcpak_cvtsi128_si64( i ? _mm_srli_si128( v, 8 ) : v ); }
+#  define _mm_cvtsi64_si128 etcpak_cvtsi64_si128
+#  define _mm_cvtsi128_si64 etcpak_cvtsi128_si64
+#  define _mm_extract_epi64 etcpak_extract_epi64
+#endif
+
 static const uint32_t MaxError = 1065369600; // ((38+76+14) * 255)^2
 // common T-/H-mode table
 static uint8_t tableTH[8] = { 3, 6, 11, 16, 23, 32, 41, 64 };

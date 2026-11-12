@@ -13,7 +13,6 @@
 	<set name="HXCPP_OBJCXX_STANDARD" value="20" if="apple" />
 
 	<set name="HXCPP_NO_SEGV_HANDLING" value="1" if="isMsvc" />
-	<set name="HXCPP_NO_ARCH_LEVEL" value="1" if="isMsvc HXCPP_M32" />
 
 	<include name="${HXCPP}/build-tool/BuildCommon.xml" />
 
