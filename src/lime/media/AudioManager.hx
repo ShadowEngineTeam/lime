@@ -59,6 +59,7 @@ class AudioManager
 			final config:MAEngineConfig = MAEngineConfig.init();
 
 			#if lime_miniaudio_debug_output
+			// Attach the debug logging output
 			config.pLog = log;
 			#end
 

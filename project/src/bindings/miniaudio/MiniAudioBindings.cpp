@@ -16,6 +16,9 @@
 #if defined(IPHONE) || defined(HX_MACOS)
 #define MA_NO_RUNTIME_LINKING
 #endif
+#ifdef HX_WINDOWS
+#define MA_WASAPI_NO_LOW_LATENCY_SHARED_MODE
+#endif
 #if defined(ANDROID) && !defined(MA_NO_AAUDIO)
 // sdk < 30 -> opensl, otherwise aaudio
 #define MA_AAUDIO_MIN_ANDROID_SDK_VERSION 30
@@ -1586,6 +1589,17 @@ namespace lime
 		config.listenerCount = val_int(val_field(pConfig, val_id("listenerCount")));
 		config.channels = val_int(val_field(pConfig, val_id("channels")));
 		config.sampleRate = val_int(val_field(pConfig, val_id("sampleRate")));
+
+		// 0 keeps the defaults set above
+		const int periods = val_int(val_field(pConfig, val_id("periods")));
+		const int periodSizeInFrames = val_int(val_field(pConfig, val_id("periodSizeInFrames")));
+
+		if (periods > 0)
+			config.deviceConfig.periods = periods;
+
+		if (periodSizeInFrames > 0)
+			config.deviceConfig.periodSizeInFrames = periodSizeInFrames;
+
 		config.spatializationVolumeSmoothTimeInFrames = val_int(val_field(pConfig, val_id("spatializationVolumeSmoothTimeInFrames")));
 		config.spatializationVolumeSmoothTimeInMilliseconds = val_int(val_field(pConfig, val_id("spatializationVolumeSmoothTimeInMilliseconds")));
 		config.defaultVolumeSmoothTimeInFrames = val_int(val_field(pConfig, val_id("defaultVolumeSmoothTimeInFrames")));
@@ -1721,7 +1735,7 @@ namespace lime
 			return 0;
 		}
 
-		return (double)device->playback.internalPeriodSizeInFrames * device->playback.internalPeriods * 1000.0 / device->playback.internalSampleRate;
+		return (double)(ma_device_get_period_size_in_frames(device) * 1000.0 / device->playback.internalSampleRate);
 	}
 
 	int lime_ma_engine_start(value pEngine)
