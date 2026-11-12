@@ -6960,11 +6960,10 @@ namespace bgfx { namespace gl
 				, getName( (TextureFormat::Enum)m_textureFormat)
 				);
 
+			// Lime: a compressed mip is decoded in whole blocks, so it can be larger than the
+			// texture level it is for. The buffer is sized for the mip, see below.
 			uint8_t* temp = NULL;
-			if (convert)
-			{
-				temp = (uint8_t*)bx::alloc(g_allocator, ti.width*ti.height*ti.depth*4);
-			}
+			uint32_t tempSize = 0;
 
 			const uint16_t numSides = ti.numLayers * (imageContainer.m_cubeMap ? 6 : 1);
 
@@ -7029,6 +7028,14 @@ namespace bgfx { namespace gl
 
 							if (convert)
 							{
+								const uint32_t mipSize = mip.m_width*4*mip.m_height*mip.m_depth;
+
+								if (mipSize > tempSize)
+								{
+									temp = (uint8_t*)bx::realloc(g_allocator, temp, mipSize);
+									tempSize = mipSize;
+								}
+
 								imageDecodeToRgba8(
 									  temp
 									, mip.m_data
@@ -7040,6 +7047,10 @@ namespace bgfx { namespace gl
 									, mip.m_format
 									);
 								data = temp;
+
+								// The rows (and slices) of the decoded mip are longer than those of the level
+								GL_CHECK(glPixelStorei(GL_UNPACK_ROW_LENGTH,   mip.m_width  != width  ? mip.m_width  : 0) );
+								GL_CHECK(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, mip.m_height != height ? mip.m_height : 0) );
 							}
 
 							if (m_immutableStorage
@@ -7145,6 +7156,9 @@ namespace bgfx { namespace gl
 
 			if (NULL != temp)
 			{
+				GL_CHECK(glPixelStorei(GL_UNPACK_ROW_LENGTH,   0) );
+				GL_CHECK(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0) );
+
 				bx::free(g_allocator, temp);
 			}
 		}
