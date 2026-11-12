@@ -2375,6 +2375,30 @@ namespace bgfx { namespace gl
 				}
 			}
 
+			// Lime: report a CPU implementation the way the other renderers do, so that it can
+			// be turned down. The OpenGL vendor string does not tell them apart.
+			{
+				static const char* s_softwareRenderers[] =
+				{
+					"llvmpipe",
+					"softpipe",
+					"swrast",
+					"SwiftShader",
+					"GDI Generic",
+					"Software Rasterizer",
+					"Software Renderer",
+				};
+
+				for (uint32_t ii = 0; ii < BX_COUNTOF(s_softwareRenderers); ++ii)
+				{
+					if (!bx::strFindI(m_renderer, s_softwareRenderers[ii]).isEmpty() )
+					{
+						g_caps.vendorId = BGFX_PCI_ID_SOFTWARE_RASTERIZER;
+						break;
+					}
+				}
+			}
+
 			m_workaround.reset();
 
 			GL_CHECK(glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS, &numCmpFormats) );
