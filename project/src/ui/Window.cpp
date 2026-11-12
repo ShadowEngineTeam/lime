@@ -10,6 +10,7 @@
 #endif
 
 #include <cstring>
+#include <string>
 #include <system/System.h>
 #include <ui/Window.h>
 #include <vector>
@@ -20,10 +21,33 @@ namespace lime
 
 	double drawScale = 1.0;
 
+	// A setting is the environment variable of that name, or else what the game set with
+	// lime.system.System.setHint, which stores it under an "SDL_" prefix.
+	//
+	// The environment is read live: SDL keeps a copy of its own, taken the first time it is asked,
+	// and that copy misses a variable the game sets afterwards (Sys.putEnv).
+	static const char *setting(const char *name)
+	{
+		const char *value = SDL_getenv_unsafe(name);
+
+		if (value == NULL || value[0] == '\0')
+		{
+			value = SDL_GetHint(name);
+		}
+
+		if (value == NULL || value[0] == '\0')
+		{
+			const std::string prefixed = std::string("SDL_") + name;
+			value = SDL_GetHint(prefixed.c_str());
+		}
+
+		return (value != NULL && value[0] != '\0') ? value : NULL;
+	}
+
 	static bool envEnabled(const char *name)
 	{
-		const char *value = SDL_getenv(name);
-		return value != NULL && value[0] != '\0' && value[0] != '0';
+		const char *value = setting(name);
+		return value != NULL && value[0] != '0';
 	}
 
 	static void showRendererError(SDL_Window *window, const char *title)
@@ -104,147 +128,185 @@ namespace lime
 			return window;
 		};
 
-		// The renderers are tried in this order:
-		//   1. bgfx on Vulkan (Metal on Apple)
-		//   2. OpenGL 4 or 3 core, then OpenGL 2 (OpenGL ES 3, then ES 2, where that is the platform's)
+		// Which renderers to try, in order, is a table read when the window is created:
 		//
-		// LIME_RENDERER names one instead: "opengl" for step 2 alone, or a bgfx renderer ("vulkan", "metal",
-		// "d3d11", "d3d12", "bgfx-opengl", "bgfx-opengles"), which then has nothing to fall back to.
+		//   LIME_BGFX_PLATFORM = "vulkan,d3d11,opengl"
 		//
-		// A software implementation (lavapipe, llvmpipe, WARP...) counts as a failure at every step,
+		// Entries are "vulkan", "metal", "d3d11", "d3d12", "bgfx-opengl", "bgfx-opengles" (bgfx on that
+		// API) and "opengl" / "opengles" (Lime's own OpenGL context: 4 or 3 core, then 2; ES 3, then ES 2).
+		// The first one that starts is used and nothing outside the table is tried. Without a table, or
+		// with "auto", the order is bgfx on Vulkan (Metal on Apple), then OpenGL.
+		//
+		// A software implementation (lavapipe, llvmpipe, WARP...) counts as a failure for every entry,
 		// unless LIME_ALLOW_SOFTWARE_RENDERER is set.
-		const char *requested = SDL_getenv("LIME_RENDERER");
-		bool hasRequest = requested != NULL && requested[0] != '\0' && SDL_strcasecmp(requested, "auto") != 0;
-		const bool openglRequested = hasRequest && (SDL_strcasecmp(requested, "opengl") == 0 || SDL_strcasecmp(requested, "opengles") == 0);
+		//
+		// Both can come from the environment or from the game itself, which sets them before the window
+		// is created with Sys.putEnv or lime.system.System.setHint (see `setting`).
+		struct RendererChoice
+		{
+			bool bgfx;
+			int rendererType;
+			std::string name;
+		};
+
+		std::vector<RendererChoice> choices;
+
+		const char *table = setting("LIME_BGFX_PLATFORM");
+
+		if (table != NULL)
+		{
+			std::string entry;
+
+			for (const char *c = table;; ++c)
+			{
+				if (*c != ',' && *c != ';' && *c != '\0')
+				{
+					if (*c != ' ' && *c != '\t')
+						entry += *c;
+
+					continue;
+				}
+
+				if (!entry.empty() && SDL_strcasecmp(entry.c_str(), "auto") != 0)
+				{
+					if (SDL_strcasecmp(entry.c_str(), "opengl") == 0 || SDL_strcasecmp(entry.c_str(), "opengles") == 0)
+					{
+						choices.push_back({false, -1, entry});
+					}
+					else
+					{
+#ifdef LIME_BGFX
+						const int rendererType = BGFXBindings::GetRendererType(entry.c_str());
+
+						if (rendererType >= 0)
+							choices.push_back({true, rendererType, entry});
+						else
+							SDL_Log("LIME_BGFX_PLATFORM: \"%s\" is not a renderer, skipping it\n", entry.c_str());
+#else
+						SDL_Log("LIME_BGFX_PLATFORM: this build has no bgfx renderers, skipping \"%s\"\n", entry.c_str());
+#endif
+					}
+				}
+
+				entry.clear();
+
+				if (*c == '\0')
+					break;
+			}
+		}
+
+		const bool fromTable = !choices.empty();
+
+		if (!fromTable)
+		{
+#ifdef LIME_BGFX
+			const int defaultType = BGFXBindings::GetDefaultRendererType();
+#if defined(__APPLE__)
+			choices.push_back({true, defaultType, "metal"});
+#else
+			choices.push_back({true, defaultType, "vulkan"});
+#endif
+#endif
+			choices.push_back({false, -1, "opengl"});
+		}
+
 		const bool allowSoftware = envEnabled("LIME_ALLOW_SOFTWARE_RENDERER");
 
 #ifdef LIME_BGFX
-		if (!openglRequested)
+		auto startBGFX = [&](int rendererType) -> bool
 		{
-			int rendererType = hasRequest ? BGFXBindings::GetRendererType(requested) : BGFXBindings::GetDefaultRendererType();
-
-			if (rendererType < 0)
-			{
-				SDL_Log("LIME_RENDERER: \"%s\" is not a renderer, using the default order\n", requested);
-
-				hasRequest = false;
-				rendererType = BGFXBindings::GetDefaultRendererType();
-			}
-
 			sdlWindow = createWindow(sdlWindowFlags, true);
 
-			if (sdlWindow)
+			if (!sdlWindow)
+				return false;
+
+			if (BGFXBindings::Init(sdlWindow, rendererType, allowSoftware))
 			{
-				if (BGFXBindings::Init(sdlWindow, rendererType, allowSoftware))
-				{
-					bgfxRenderer = true;
+				bgfxRenderer = true;
 
-					currentApplication->RegisterWindow(this);
+				currentApplication->RegisterWindow(this);
 
-					return;
-				}
-
-				if (hasRequest)
-				{
-					// Asked for by name: there is nothing to fall back to
-					showRendererError(sdlWindow, "Could not start the renderer LIME_RENDERER asks for");
-				}
-				else
-				{
-					SDL_Log("bgfx: %s. Falling back to OpenGL\n", SDL_GetError());
-				}
-
-				SDL_DestroyWindow(sdlWindow);
-				sdlWindow = 0;
-			}
-			else if (hasRequest)
-			{
-				showRendererError(NULL, "Could not create a window");
+				return true;
 			}
 
-			if (hasRequest)
-			{
-				return;
-			}
-		}
-#else
-		if (hasRequest && !openglRequested)
-		{
-			SDL_Log("LIME_RENDERER: this build has no bgfx renderers, using OpenGL\n");
-		}
+			SDL_DestroyWindow(sdlWindow);
+			sdlWindow = 0;
+
+			return false;
+		};
 #endif
 
+		auto startOpenGL = [&]() -> bool
+		{
 #ifdef LIME_OPENGL
-		softwareAllowed = allowSoftware;
+			softwareAllowed = allowSoftware;
 
-		const int samples = (flags & WINDOW_FLAG_ANTIALIASING_8X) ? 8 : (flags & WINDOW_FLAG_ANTIALIASING_4X) ? 4 : (flags & WINDOW_FLAG_ANTIALIASING_2X) ? 2 : 0;
-
-#if defined(LIME_OPENGL_GLES)
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#elif defined(__APPLE__)
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-#endif
-
-		if (flags & WINDOW_FLAG_DEPTH_BUFFER)
-		{
-			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32 - ((flags & WINDOW_FLAG_STENCIL_BUFFER) ? 8 : 0));
-		}
-
-		if (flags & WINDOW_FLAG_STENCIL_BUFFER)
-		{
-			SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-		}
-
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, samples > 0 ? 1 : 0);
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samples);
-
-		const bool color32 = (flags & WINDOW_FLAG_COLOR_DEPTH_32_BIT) != 0;
-
-		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, color32 ? 8 : 5);
-		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, color32 ? 8 : 6);
-		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, color32 ? 8 : 5);
-		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, color32 ? 8 : 0);
-
-		sdlWindow = createWindow(sdlWindowFlags | SDL_WINDOW_OPENGL, false);
-
-		// Retry without MSAA
-		if (!sdlWindow && samples > 0)
-		{
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-
-			sdlWindow = createWindow(sdlWindowFlags | SDL_WINDOW_OPENGL, false);
-		}
+			const int samples = (flags & WINDOW_FLAG_ANTIALIASING_8X) ? 8 : (flags & WINDOW_FLAG_ANTIALIASING_4X) ? 4 : (flags & WINDOW_FLAG_ANTIALIASING_2X) ? 2 : 0;
 
 #if defined(LIME_OPENGL_GLES)
-		// Retry with ES 2
-		if (!sdlWindow)
-		{
-			SDL_Log("Could not create SDL Window with OpenGL ES 3: %s\nTrying OpenGL ES 2...", SDL_GetError());
-
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#elif defined(__APPLE__)
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+#endif
+
+			if (flags & WINDOW_FLAG_DEPTH_BUFFER)
+			{
+				SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32 - ((flags & WINDOW_FLAG_STENCIL_BUFFER) ? 8 : 0));
+			}
+
+			if (flags & WINDOW_FLAG_STENCIL_BUFFER)
+			{
+				SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+			}
+
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, samples > 0 ? 1 : 0);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samples);
+
+			const bool color32 = (flags & WINDOW_FLAG_COLOR_DEPTH_32_BIT) != 0;
+
+			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, color32 ? 8 : 5);
+			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, color32 ? 8 : 6);
+			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, color32 ? 8 : 5);
+			SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, color32 ? 8 : 0);
 
 			sdlWindow = createWindow(sdlWindowFlags | SDL_WINDOW_OPENGL, false);
-		}
-#endif
+
+			// Retry without MSAA
+			if (!sdlWindow && samples > 0)
+			{
+				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+
+				sdlWindow = createWindow(sdlWindowFlags | SDL_WINDOW_OPENGL, false);
+			}
+
+#if defined(LIME_OPENGL_GLES)
+			// Retry with ES 2
+			if (!sdlWindow)
+			{
+				SDL_Log("Could not create SDL Window with OpenGL ES 3: %s\nTrying OpenGL ES 2...", SDL_GetError());
+
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+				sdlWindow = createWindow(sdlWindowFlags | SDL_WINDOW_OPENGL, false);
+			}
 #endif
 
-		if (!sdlWindow)
-		{
-			showRendererError(NULL, "Could not create a window with a supported renderer");
-			return;
-		}
+			if (!sdlWindow)
+				return false;
 
-		if (!CreateRenderer())
-		{
-			showRendererError(sdlWindow, "Could not start a renderer");
+			if (CreateRenderer())
+				return true;
+
+			// Keep the reason: destroying the context and the window may set an error of its own
+			const std::string reason = SDL_GetError();
 
 			if (context)
 			{
@@ -252,12 +314,44 @@ namespace lime
 				context = 0;
 			}
 
-			if (sdlWindow)
-			{
-				SDL_DestroyWindow(sdlWindow);
-				sdlWindow = 0;
-			}
+			SDL_DestroyWindow(sdlWindow);
+			sdlWindow = 0;
+
+			SDL_SetError("%s", reason.c_str());
+
+			return false;
+#else
+			SDL_SetError("this build has no OpenGL renderer");
+			return false;
+#endif
+		};
+
+		std::string failures;
+
+		for (size_t i = 0; i < choices.size(); ++i)
+		{
+			const RendererChoice &choice = choices[i];
+
+#ifdef LIME_BGFX
+			const bool started = choice.bgfx ? startBGFX(choice.rendererType) : startOpenGL();
+#else
+			const bool started = startOpenGL();
+#endif
+
+			if (started)
+				return;
+
+			SDL_Log("Renderer \"%s\" could not start: %s\n", choice.name.c_str(), SDL_GetError());
+
+			if (!failures.empty())
+				failures += "\n";
+
+			failures += choice.name + ": " + SDL_GetError();
 		}
+
+		SDL_SetError("%s", failures.c_str());
+
+		showRendererError(NULL, fromTable ? "None of the renderers in LIME_BGFX_PLATFORM could start" : "Could not start a renderer");
 	}
 
 	Window::~Window()
