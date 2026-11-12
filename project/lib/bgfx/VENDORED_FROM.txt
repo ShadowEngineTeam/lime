@@ -7,3 +7,6 @@ Local changes on top of that commit (keep them when re-vendoring):
 - src/renderer_vk.cpp: TextureVK::create tells the buffer-to-image copy the row length of a
   CPU-decoded (emulated) compressed mip, which is rounded up to whole blocks. Without it a
   texture whose size is not a multiple of the block size came out sheared.
+- src/renderer_gl.cpp: the OpenGL renderer sets caps.vendorId to BGFX_PCI_ID_SOFTWARE_RASTERIZER when
+  GL_RENDERER names a CPU implementation (llvmpipe, SwiftShader, GDI Generic...). Lime uses it to
+  refuse software renderers; the vendor string alone does not tell them apart.
