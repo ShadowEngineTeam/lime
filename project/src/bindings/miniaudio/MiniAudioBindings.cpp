@@ -1589,6 +1589,17 @@ namespace lime
 		config.listenerCount = val_int(val_field(pConfig, val_id("listenerCount")));
 		config.channels = val_int(val_field(pConfig, val_id("channels")));
 		config.sampleRate = val_int(val_field(pConfig, val_id("sampleRate")));
+
+		// 0 keeps the defaults set above
+		const int periods = val_int(val_field(pConfig, val_id("periods")));
+		const int periodSizeInFrames = val_int(val_field(pConfig, val_id("periodSizeInFrames")));
+
+		if (periods > 0)
+			config.deviceConfig.periods = periods;
+
+		if (periodSizeInFrames > 0)
+			config.deviceConfig.periodSizeInFrames = periodSizeInFrames;
+
 		config.spatializationVolumeSmoothTimeInFrames = val_int(val_field(pConfig, val_id("spatializationVolumeSmoothTimeInFrames")));
 		config.spatializationVolumeSmoothTimeInMilliseconds = val_int(val_field(pConfig, val_id("spatializationVolumeSmoothTimeInMilliseconds")));
 		config.defaultVolumeSmoothTimeInFrames = val_int(val_field(pConfig, val_id("defaultVolumeSmoothTimeInFrames")));
