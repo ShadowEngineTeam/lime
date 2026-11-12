@@ -13,26 +13,9 @@
 	<define name="lime-harfbuzz" if="native" />
 	<define name="lime-miniaudio" if="native" />
 	<define name="lime-native" if="native" />
-
-	<define name="lime-bgfx" unless="lime-opengl || lime-opengles || lime_opengl || lime_opengles" />
-
-	<section if="lime-bgfx || lime_bgfx">
-
-		<undefine name="lime-opengl" />
-		<undefine name="lime-opengles" />
-
-	</section>
-
-	<section unless="lime-bgfx || lime_bgfx">
-
-		<undefine name="lime-opengl" />
-		<undefine name="lime-opengles" />
-
-		<define name="lime-opengles" if="mobile || linux armv7 || linux arm64" />
-		<define name="lime-opengl" unless="lime-opengles" />
-
-	</section>
-
+	<!-- <define name="lime-opengl" if="desktop" /> -->
+	<!-- <define name="lime-opengles" if="mobile || linux armv7 || linux arm64" /> -->
+	<define name="lime-bgfx" unless="lime-opengl || lime-opengles" />
 
 	<haxedef name="no-compilation" />
 

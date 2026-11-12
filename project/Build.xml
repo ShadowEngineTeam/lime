@@ -27,28 +27,13 @@
 	<set name="LIME_OGG" value="1" />
 	<set name="LIME_OPUS" value="1" />
 	<set name="LIME_MINIAUDIO" value="1" />
+	<!-- <set name="LIME_OPENGL" value="1" /> -->
+	<set name="LIME_GLAD" value="1" if="LIME_OPENGL" unless="iphone" />
 	<set name="LIME_PIXMAN" value="1" />
 	<set name="LIME_SDL" value="1" />
 	<set name="LIME_SDL_IMAGE" value="1" if="LIME_SDL" />
 	<set name="LIME_ZLIB" value="1" />
-
-	<set name="LIME_OPENGL" value="1" if="lime-opengl || lime-opengles || lime_opengl || lime_opengles" unless="LIME_BGFX" />
-	<set name="LIME_BGFX" value="1" unless="LIME_OPENGL || LIME_OPENGL_GLES" />
-
-	<section if="LIME_BGFX">
-
-		<unset name="LIME_OPENGL" />
-		<unset name="LIME_OPENGL_GLES" />
-
-	</section>
-
-	<section unless="LIME_BGFX">
-
-		<set name="LIME_OPENGL" value="1" />
-
-	</section>
-
-	<set name="LIME_GLAD" value="1" if="LIME_OPENGL" unless="iphone" />
+	<set name="LIME_BGFX" value="1" unless="LIME_OPENGL" />
 
 	<set name="OUTPUT_DIR" value="../ndll" unless="OUTPUT_DIR" />
 	<set name="DEBUGEXTRA" value="-debug" if="fulldebug" />
@@ -60,7 +45,6 @@
 
 		<objprefix value="opengl_" if="LIME_OPENGL" />
 		<objprefix value="bgfx_" if="LIME_BGFX" />
-
 
 		<compilerflag value="-Iinclude" />
 
