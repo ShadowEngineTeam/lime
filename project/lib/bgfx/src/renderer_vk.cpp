@@ -8170,6 +8170,8 @@ VK_DESTROY
 				uint32_t size;
 				uint32_t mipLevel;
 				uint32_t layer;
+				uint32_t rowLength;   // texels per row of `data`, 0 when rows are as wide as the mip
+				uint32_t imageHeight; // rows per slice of `data`, 0 when as tall as the mip
 			};
 
 			ImageInfo* imageInfos = (ImageInfo*)bx::alloc(g_allocator, sizeof(ImageInfo) * numSrd);
@@ -8211,6 +8213,12 @@ VK_DESTROY
 							imageInfos[kk].size     = size;
 							imageInfos[kk].mipLevel = lod;
 							imageInfos[kk].layer    = side;
+
+							// A block-compressed mip is decoded at its size rounded up to whole blocks,
+							// which is wider than the image whenever the size is not a multiple of the
+							// block: the copy has to be told, or every row lands shifted.
+							imageInfos[kk].rowLength   = pitch / (bpp / 8);
+							imageInfos[kk].imageHeight = slice / pitch;
 						}
 						else if (compressed)
 						{
@@ -8279,8 +8287,9 @@ VK_DESTROY
 				const uint32_t idealWidth  = bx::max<uint32_t>(1, m_width  >> imageInfos[ii].mipLevel);
 				const uint32_t idealHeight = bx::max<uint32_t>(1, m_height >> imageInfos[ii].mipLevel);
 				bufferCopyInfo[ii].bufferOffset      = totalMemSize;
-				bufferCopyInfo[ii].bufferRowLength   = 0; // assume that image data are tightly aligned
-				bufferCopyInfo[ii].bufferImageHeight = 0; // assume that image data are tightly aligned
+				// 0 means the image data are tightly aligned
+				bufferCopyInfo[ii].bufferRowLength   = imageInfos[ii].rowLength   > idealWidth  ? imageInfos[ii].rowLength   : 0;
+				bufferCopyInfo[ii].bufferImageHeight = imageInfos[ii].imageHeight > idealHeight ? imageInfos[ii].imageHeight : 0;
 				bufferCopyInfo[ii].imageSubresource.aspectMask     = m_aspectFlags;
 				bufferCopyInfo[ii].imageSubresource.mipLevel       = imageInfos[ii].mipLevel;
 				bufferCopyInfo[ii].imageSubresource.baseArrayLayer = imageInfos[ii].layer;

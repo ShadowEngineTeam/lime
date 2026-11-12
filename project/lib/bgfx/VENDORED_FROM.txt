@@ -2,3 +2,8 @@
 
 Left out, as nothing in bgfx-files.xml builds or includes them: examples, bindings, docs, scripts,
 tools/bin and the tools other than shaderc.
+
+Local changes on top of that commit (keep them when re-vendoring):
+- src/renderer_vk.cpp: TextureVK::create tells the buffer-to-image copy the row length of a
+  CPU-decoded (emulated) compressed mip, which is rounded up to whole blocks. Without it a
+  texture whose size is not a multiple of the block size came out sheared.
