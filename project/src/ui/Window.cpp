@@ -131,12 +131,37 @@ namespace lime
 		// A build has one renderer: bgfx, or Lime's own OpenGL context (see Build.xml).
 		//
 		// A software implementation (lavapipe, llvmpipe, WARP...) counts as a failure either way,
-		// unless LIME_ALLOW_SOFTWARE_RENDERER is set.
+		// unless the LIME_BGFX_PLATFORM table has a "software" entry. Software is the very last
+		// resort wherever the entry stands: it is only used once nothing else has started.
 		//
-		// The settings can come from the environment or from the game itself, which sets them before
-		// the window is created with Sys.putEnv or lime.system.System.setHint (see `setting`).
-		const bool allowSoftware = envEnabled("LIME_ALLOW_SOFTWARE_RENDERER");
+		// The table can come from the environment or from the game itself, which sets it before the
+		// window is created with Sys.putEnv or lime.system.System.setHint (see `setting`).
 		const char *table = setting("LIME_BGFX_PLATFORM");
+
+		// Whether the table has a "software" entry
+		bool softwareLast = false;
+
+		if (table != NULL)
+		{
+			std::string entry;
+
+			for (const char *c = table;; ++c)
+			{
+				if (*c != ',' && *c != ';' && *c != '\0')
+				{
+					if (*c != ' ' && *c != '\t')
+						entry += *c;
+
+					continue;
+				}
+
+				softwareLast = softwareLast || SDL_strcasecmp(entry.c_str(), "software") == 0;
+				entry.clear();
+
+				if (*c == '\0')
+					break;
+			}
+		}
 
 #ifdef LIME_BGFX
 		// Which bgfx renderers to try, in order, is a table:
@@ -144,8 +169,12 @@ namespace lime
 		//   LIME_BGFX_PLATFORM = "vulkan,d3d11,opengl"
 		//
 		// Entries are "vulkan", "metal", "d3d11", "d3d12", "opengl" and "opengles". The first one that
-		// starts is used and nothing outside the table is tried. Without a table, or with "auto", the
+		// starts is used and nothing outside the table is tried. Without those, or with "auto", the
 		// order is Vulkan, then OpenGL, then OpenGL ES (Metal alone on Apple).
+		//
+		// "software" is not a renderer of its own: when every entry has failed, the same entries are
+		// tried once more with software devices accepted. "software" alone does that for the
+		// default order.
 		struct RendererChoice
 		{
 			int rendererType;
@@ -168,7 +197,7 @@ namespace lime
 					continue;
 				}
 
-				if (!entry.empty() && SDL_strcasecmp(entry.c_str(), "auto") != 0)
+				if (!entry.empty() && SDL_strcasecmp(entry.c_str(), "auto") != 0 && SDL_strcasecmp(entry.c_str(), "software") != 0)
 				{
 					const int rendererType = BGFXBindings::GetRendererType(entry.c_str());
 
@@ -200,15 +229,20 @@ namespace lime
 
 		std::string failures;
 
-		for (size_t i = 0; i < choices.size(); ++i)
+		// The second round only happens with "software" in the table
+		for (size_t i = 0; i < choices.size() * (softwareLast ? 2 : 1); ++i)
 		{
-			const RendererChoice &choice = choices[i];
+			const bool software = i >= choices.size();
+			RendererChoice choice = choices[i % choices.size()];
+
+			if (software)
+				choice.name += " (software)";
 
 			sdlWindow = createWindow(sdlWindowFlags, true);
 
 			if (sdlWindow)
 			{
-				if (BGFXBindings::Init(sdlWindow, choice.rendererType, allowSoftware))
+				if (BGFXBindings::Init(sdlWindow, choice.rendererType, software))
 				{
 					bgfxRenderer = true;
 
@@ -238,15 +272,14 @@ namespace lime
 
 		showRendererError(NULL, fromTable ? "None of the renderers in LIME_BGFX_PLATFORM could start" : "Could not start a renderer");
 #else
-		if (table != NULL)
+		if (table != NULL && SDL_strcasecmp(table, "software") != 0)
 		{
-			SDL_Log("LIME_BGFX_PLATFORM is ignored: this build renders with OpenGL, not bgfx\n");
+			SDL_Log("LIME_BGFX_PLATFORM: this build renders with OpenGL, not bgfx. Only its \"software\" entry is used\n");
 		}
 
 		auto startOpenGL = [&]() -> bool
 		{
 #ifdef LIME_OPENGL
-			softwareAllowed = allowSoftware;
 
 			const int samples = (flags & WINDOW_FLAG_ANTIALIASING_8X) ? 8 : (flags & WINDOW_FLAG_ANTIALIASING_4X) ? 4 : (flags & WINDOW_FLAG_ANTIALIASING_2X) ? 2 : 0;
 
@@ -333,9 +366,17 @@ namespace lime
 #endif
 		};
 
+		softwareAllowed = false;
+
 		if (!startOpenGL())
 		{
-			showRendererError(NULL, "Could not start a renderer");
+			// The last resort, and only when the table asks for it
+			softwareAllowed = softwareLast;
+
+			if (!softwareLast || !startOpenGL())
+			{
+				showRendererError(NULL, "Could not start a renderer");
+			}
 		}
 #endif
 	}
