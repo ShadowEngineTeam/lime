@@ -47,6 +47,7 @@
 
 				<compilerflag value="/Ob2" />
 				<compilerflag value="/EHs-c-" />
+				<compilerflag value="-D__SSE4_1__" if="HXCPP_M64" />
 
 				<section>
 
@@ -130,6 +131,7 @@
 
 				<compilerflag value="/Ob2" />
 				<compilerflag value="/EHs-c-" />
+				<compilerflag value="-D__SSE4_1__" if="HXCPP_M64" />
 					<!-- <compilerflag value="/experimental:c11atomics" /> -->
 
 				<section>
