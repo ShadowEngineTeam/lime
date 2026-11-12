@@ -14,3 +14,6 @@ Local changes on top of that commit (keep them when re-vendoring):
   from the mip, which is rounded up to whole blocks, and gives OpenGL its row length. The buffer was
   sized from the texture, so a texture whose size is not a multiple of the block size overflowed it
   (heap corruption, "free(): invalid pointer") and would have come out sheared.
+- src/bgfx.cpp: parseAttrTo reads its number with plain loops instead of bx::strFind, strCopy and
+  fromString. Those measure a string up to INT32_MAX; inlined on a stack buffer, clang 23 could not
+  link the 32-bit x86 Linux build with ThinLTO ("64-bit offset calculated but target is 32-bit").
