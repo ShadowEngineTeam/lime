@@ -624,17 +624,25 @@ namespace bgfx
 
 	static uint8_t parseAttrTo(char*& _ptr, char _to, uint8_t _default)
 	{
-		const bx::StringView str = bx::strFind(_ptr, _to);
-		if (!str.isEmpty()
-		&&  3 > str.getPtr()-_ptr)
+		// Lime: read the (at most two digit) number by hand. bx's string functions measure a
+		// string of unknown length up to INT32_MAX; inlined here on a stack buffer, that made
+		// clang 23 fail on 32-bit x86 with link-time optimisation ("64-bit offset calculated but
+		// target is 32-bit").
+		int32_t len = 0;
+		while (len < 3 && '\0' != _ptr[len] && _to != _ptr[len])
 		{
-			char tmp[4];
+			++len;
+		}
 
-			int32_t len = int32_t(str.getPtr()-_ptr);
-			bx::strCopy(tmp, sizeof(tmp), _ptr, len);
+		if (len < 3
+		&&  _to == _ptr[len])
+		{
+			uint32_t attr = 0;
 
-			uint32_t attr;
-			bx::fromString(&attr, tmp);
+			for (int32_t ii = 0; ii < len && '0' <= _ptr[ii] && '9' >= _ptr[ii]; ++ii)
+			{
+				attr = attr*10 + uint32_t(_ptr[ii] - '0');
+			}
 
 			_ptr += len+1;
 			return uint8_t(attr);
