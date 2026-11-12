@@ -1,1 +1,5 @@
 9bfbd6493b48a15238f2d1374a718ec026524515 (bkaradzic/bimg, vendored whole)
+
+Local changes on top of that commit (keep them when re-vendoring):
+- 3rdparty/astc-encoder/source/astcenc_vecmathlib_sse_4.h: popcount uses __builtin_popcountll on
+  32-bit x86, where _mm_popcnt_u64 does not exist (the build failed with -m32 -march=haswell).

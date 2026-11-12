@@ -81,6 +81,9 @@
 			<compilerflag value="-DBX_CONFIG_DEBUG=1" if="debug" />
 			<compilerflag value="-DBX_CONFIG_DEBUG=0" unless="debug" />
 
+			<!-- bx needs SSE4.2 on x86. Every other x86 target gets it from the toolchain; the x86_64 iOS simulator does not. -->
+			<compilerflag value="-msse4.2" if="iphonesim" unless="HXCPP_ARM64" />
+
 			<!-- disable uneeded asserts -->
 			<compilerflag value="-DBGFX_CONFIG_DEBUG_UNIFORM=0" />
 
@@ -220,6 +223,9 @@
 
 			<compilerflag value="-DBX_CONFIG_DEBUG=1" if="debug" />
 			<compilerflag value="-DBX_CONFIG_DEBUG=0" unless="debug" />
+
+			<!-- bx needs SSE4.2 on x86. Every other x86 target gets it from the toolchain; the x86_64 iOS simulator does not. -->
+			<compilerflag value="-msse4.2" if="iphonesim" unless="HXCPP_ARM64" />
 
 			<!-- disable uneeded asserts -->
 			<compilerflag value="-DBGFX_CONFIG_DEBUG_UNIFORM=0" />
