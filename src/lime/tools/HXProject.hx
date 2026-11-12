@@ -844,13 +844,6 @@ class HXProject extends Script
 		}
 	}
 
-	/**
-		One renderer per build: bgfx, unless the project defines `lime-opengl` or `lime-opengles`,
-		which gives OpenGL. The renderer that is not chosen is switched off, so `#if lime_bgfx` and
-		`#if (lime_opengl || lime_opengles)` are never both true. bgfx wins when both are asked for.
-
-		`include.xml` applies the same rule, but defines given on the command line are added after it.
-	**/
 	public function resolveRenderer():Void
 	{
 		var names = ["lime-bgfx", "lime-opengl", "lime-opengles"];
