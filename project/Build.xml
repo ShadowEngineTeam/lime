@@ -33,11 +33,13 @@
 	<set name="LIME_ZLIB" value="1" />
 
 	<!--
-		One renderer per build. bgfx is the default; "lime rebuild <target> -DLIME_OPENGL" (or
-		-DLIME_OPENGL_GLES) gives an OpenGL build instead. The renderer that is not chosen is off:
-		with LIME_BGFX, LIME_OPENGL and LIME_OPENGL_GLES are false, and the other way round. hxcpp
-		only knows whether a name is set, so false means not set, here and in the compiler flags.
+		One renderer per build. bgfx is the default; "lime rebuild <target> -D lime-opengl" gives an
+		OpenGL build instead, with the same define a project uses (LIME_OPENGL and LIME_OPENGL_GLES
+		work too). The renderer that is not chosen is off: with LIME_BGFX, LIME_OPENGL and
+		LIME_OPENGL_GLES are false, and the other way round. hxcpp only knows whether a name is set,
+		so false means not set, here and in the compiler flags.
 	-->
+	<set name="LIME_OPENGL" value="1" if="lime-opengl || lime-opengles || lime_opengl || lime_opengles" unless="LIME_BGFX" />
 	<set name="LIME_BGFX" value="1" unless="LIME_OPENGL || LIME_OPENGL_GLES" />
 
 	<section if="LIME_BGFX">
