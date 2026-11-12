@@ -1658,6 +1658,7 @@ class CommandLineTools
 		}
 
 		MapTools.copyKeysDynamic(userDefines, project.haxedefs);
+		project.resolveRenderer();
 
 		getBuildNumber(project, (project.command == "build" || project.command == "test"));
 

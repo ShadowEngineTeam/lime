@@ -128,30 +128,31 @@ namespace lime
 			return window;
 		};
 
-		// Which renderers to try, in order, is a table read when the window is created:
+		// A build has one renderer: bgfx, or Lime's own OpenGL context (see Build.xml).
+		//
+		// A software implementation (lavapipe, llvmpipe, WARP...) counts as a failure either way,
+		// unless LIME_ALLOW_SOFTWARE_RENDERER is set.
+		//
+		// The settings can come from the environment or from the game itself, which sets them before
+		// the window is created with Sys.putEnv or lime.system.System.setHint (see `setting`).
+		const bool allowSoftware = envEnabled("LIME_ALLOW_SOFTWARE_RENDERER");
+		const char *table = setting("LIME_BGFX_PLATFORM");
+
+#ifdef LIME_BGFX
+		// Which bgfx renderers to try, in order, is a table:
 		//
 		//   LIME_BGFX_PLATFORM = "vulkan,d3d11,opengl"
 		//
-		// Entries are "vulkan", "metal", "d3d11", "d3d12", "bgfx-opengl", "bgfx-opengles" (bgfx on that
-		// API) and "opengl" / "opengles" (Lime's own OpenGL context: 4 or 3 core, then 2; ES 3, then ES 2).
-		// The first one that starts is used and nothing outside the table is tried. Without a table, or
-		// with "auto", the order is bgfx on Vulkan (Metal on Apple), then OpenGL.
-		//
-		// A software implementation (lavapipe, llvmpipe, WARP...) counts as a failure for every entry,
-		// unless LIME_ALLOW_SOFTWARE_RENDERER is set.
-		//
-		// Both can come from the environment or from the game itself, which sets them before the window
-		// is created with Sys.putEnv or lime.system.System.setHint (see `setting`).
+		// Entries are "vulkan", "metal", "d3d11", "d3d12", "opengl" and "opengles". The first one that
+		// starts is used and nothing outside the table is tried. Without a table, or with "auto", the
+		// order is Vulkan, then OpenGL, then OpenGL ES (Metal alone on Apple).
 		struct RendererChoice
 		{
-			bool bgfx;
 			int rendererType;
 			std::string name;
 		};
 
 		std::vector<RendererChoice> choices;
-
-		const char *table = setting("LIME_BGFX_PLATFORM");
 
 		if (table != NULL)
 		{
@@ -169,23 +170,12 @@ namespace lime
 
 				if (!entry.empty() && SDL_strcasecmp(entry.c_str(), "auto") != 0)
 				{
-					if (SDL_strcasecmp(entry.c_str(), "opengl") == 0 || SDL_strcasecmp(entry.c_str(), "opengles") == 0)
-					{
-						choices.push_back({false, -1, entry});
-					}
-					else
-					{
-#ifdef LIME_BGFX
-						const int rendererType = BGFXBindings::GetRendererType(entry.c_str());
+					const int rendererType = BGFXBindings::GetRendererType(entry.c_str());
 
-						if (rendererType >= 0)
-							choices.push_back({true, rendererType, entry});
-						else
-							SDL_Log("LIME_BGFX_PLATFORM: \"%s\" is not a renderer, skipping it\n", entry.c_str());
-#else
-						SDL_Log("LIME_BGFX_PLATFORM: this build has no bgfx renderers, skipping \"%s\"\n", entry.c_str());
-#endif
-					}
+					if (rendererType >= 0)
+						choices.push_back({rendererType, entry});
+					else
+						SDL_Log("LIME_BGFX_PLATFORM: \"%s\" is not a renderer, skipping it\n", entry.c_str());
 				}
 
 				entry.clear();
@@ -199,42 +189,59 @@ namespace lime
 
 		if (!fromTable)
 		{
-#ifdef LIME_BGFX
-			const int defaultType = BGFXBindings::GetDefaultRendererType();
 #if defined(__APPLE__)
-			choices.push_back({true, defaultType, "metal"});
+			choices.push_back({BGFXBindings::GetRendererType("metal"), "metal"});
 #else
-			choices.push_back({true, defaultType, "vulkan"});
+			choices.push_back({BGFXBindings::GetRendererType("vulkan"), "vulkan"});
+			choices.push_back({BGFXBindings::GetRendererType("opengl"), "opengl"});
+			choices.push_back({BGFXBindings::GetRendererType("opengles"), "opengles"});
 #endif
-#endif
-			choices.push_back({false, -1, "opengl"});
 		}
 
-		const bool allowSoftware = envEnabled("LIME_ALLOW_SOFTWARE_RENDERER");
+		std::string failures;
 
-#ifdef LIME_BGFX
-		auto startBGFX = [&](int rendererType) -> bool
+		for (size_t i = 0; i < choices.size(); ++i)
 		{
+			const RendererChoice &choice = choices[i];
+
 			sdlWindow = createWindow(sdlWindowFlags, true);
 
-			if (!sdlWindow)
-				return false;
-
-			if (BGFXBindings::Init(sdlWindow, rendererType, allowSoftware))
+			if (sdlWindow)
 			{
-				bgfxRenderer = true;
+				if (BGFXBindings::Init(sdlWindow, choice.rendererType, allowSoftware))
+				{
+					bgfxRenderer = true;
 
-				currentApplication->RegisterWindow(this);
+					currentApplication->RegisterWindow(this);
 
-				return true;
+					return;
+				}
+
+				// Keep the reason: destroying the window may set an error of its own
+				const std::string reason = SDL_GetError();
+
+				SDL_DestroyWindow(sdlWindow);
+				sdlWindow = 0;
+
+				SDL_SetError("%s", reason.c_str());
 			}
 
-			SDL_DestroyWindow(sdlWindow);
-			sdlWindow = 0;
+			SDL_Log("Renderer \"%s\" could not start: %s\n", choice.name.c_str(), SDL_GetError());
 
-			return false;
-		};
-#endif
+			if (!failures.empty())
+				failures += "\n";
+
+			failures += choice.name + ": " + SDL_GetError();
+		}
+
+		SDL_SetError("%s", failures.c_str());
+
+		showRendererError(NULL, fromTable ? "None of the renderers in LIME_BGFX_PLATFORM could start" : "Could not start a renderer");
+#else
+		if (table != NULL)
+		{
+			SDL_Log("LIME_BGFX_PLATFORM is ignored: this build renders with OpenGL, not bgfx\n");
+		}
 
 		auto startOpenGL = [&]() -> bool
 		{
@@ -326,32 +333,11 @@ namespace lime
 #endif
 		};
 
-		std::string failures;
-
-		for (size_t i = 0; i < choices.size(); ++i)
+		if (!startOpenGL())
 		{
-			const RendererChoice &choice = choices[i];
-
-#ifdef LIME_BGFX
-			const bool started = choice.bgfx ? startBGFX(choice.rendererType) : startOpenGL();
-#else
-			const bool started = startOpenGL();
-#endif
-
-			if (started)
-				return;
-
-			SDL_Log("Renderer \"%s\" could not start: %s\n", choice.name.c_str(), SDL_GetError());
-
-			if (!failures.empty())
-				failures += "\n";
-
-			failures += choice.name + ": " + SDL_GetError();
+			showRendererError(NULL, "Could not start a renderer");
 		}
-
-		SDL_SetError("%s", failures.c_str());
-
-		showRendererError(NULL, fromTable ? "None of the renderers in LIME_BGFX_PLATFORM could start" : "Could not start a renderer");
+#endif
 	}
 
 	Window::~Window()

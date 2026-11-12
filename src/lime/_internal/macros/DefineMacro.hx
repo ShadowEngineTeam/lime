@@ -14,21 +14,37 @@ class DefineMacro
 			Compiler.define("native");
 
 			var cffi = !Context.defined("nocffi");
+			var mobile = Context.defined("ios") || Context.defined("android");
 
-			if (Context.defined("ios") || Context.defined("android"))
+			Compiler.define(mobile ? "mobile" : "desktop");
+
+			// One renderer per build: bgfx, unless OpenGL is asked for with lime-opengl or
+			// lime-opengles. The one that is not chosen stays off. A define cannot be taken back
+			// here, and one that is set counts as true whatever its value, so asking for both is
+			// an error instead.
+			//
+			// Only C++ builds render. Lime's own tools run on Neko, which binds every native
+			// function it declares when it starts: with no renderer defined they work with a
+			// Lime binary of either kind.
+			if (cffi && Context.defined("cpp"))
 			{
-				Compiler.define("mobile");
+				var opengl = Context.defined("lime_opengl") || Context.defined("lime_opengles");
 
-				if (cffi)
+				if (opengl && Context.defined("lime_bgfx"))
+				{
+					Context.fatalError("lime-bgfx is defined together with lime-opengl or lime-opengles, but a Lime build has one renderer. Define only one of them.",
+						(macro null).pos);
+				}
+
+				if (!opengl)
+				{
+					Compiler.define("lime-bgfx");
+				}
+				else if (mobile)
 				{
 					Compiler.define("lime-opengles");
 				}
-			}
-			else
-			{
-				Compiler.define("desktop");
-
-				if (cffi)
+				else
 				{
 					Compiler.define("lime-opengl");
 				}
@@ -36,7 +52,6 @@ class DefineMacro
 
 			if (cffi)
 			{
-				Compiler.define("lime-bgfx");
 				Compiler.define("lime-cairo");
 				Compiler.define("lime-harfbuzz");
 				Compiler.define("lime-miniaudio");

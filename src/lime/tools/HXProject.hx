@@ -844,6 +844,64 @@ class HXProject extends Script
 		}
 	}
 
+	/**
+		One renderer per build: bgfx, unless the project defines `lime-opengl` or `lime-opengles`,
+		which gives OpenGL. The renderer that is not chosen is switched off, so `#if lime_bgfx` and
+		`#if (lime_opengl || lime_opengles)` are never both true. bgfx wins when both are asked for.
+
+		`include.xml` applies the same rule, but defines given on the command line are added after it.
+	**/
+	public function resolveRenderer():Void
+	{
+		var names = ["lime-bgfx", "lime-opengl", "lime-opengles"];
+		var found = new Map<String, Bool>();
+
+		for (name in names)
+		{
+			for (key in [name, name.split("-").join("_")])
+			{
+				if (haxedefs.exists(key) || defines.exists(key))
+				{
+					found.set(name, true);
+				}
+
+				// Unlike Haxe, a project file tells "lime-bgfx" from "lime_bgfx": keep one spelling
+				haxedefs.remove(key);
+				defines.remove(key);
+
+				if (environment != null)
+				{
+					environment.remove(key);
+				}
+			}
+		}
+
+		var chosen:String = null;
+
+		if (found.exists("lime-bgfx"))
+		{
+			chosen = "lime-bgfx";
+		}
+		else if (found.exists("lime-opengl") || found.exists("lime-opengles"))
+		{
+			var arm = architectures.indexOf(Architecture.ARMV7) != -1 || architectures.indexOf(Architecture.ARM64) != -1;
+
+			// The same split as the native side: OpenGL ES on mobile and on ARM Linux
+			chosen = (platformType == PlatformType.MOBILE || (target == Platform.LINUX && arm)) ? "lime-opengles" : "lime-opengl";
+		}
+
+		if (chosen != null)
+		{
+			haxedefs.set(chosen, "");
+			defines.set(chosen, "");
+
+			if (environment != null)
+			{
+				environment.set(chosen, "");
+			}
+		}
+	}
+
 	public function merge(project:HXProject):Void
 	{
 		if (project != null)
