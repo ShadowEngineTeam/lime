@@ -139,8 +139,7 @@ class NativeWindow
 		var context = new RenderContext();
 		context.window = parent;
 
-		// The native window decides which renderer it runs on when it is created: bgfx, or an
-		// OpenGL context of its own when bgfx could not start (see `ui/Window.cpp`)
+		// The native window tells which renderer it was created with (see `ui/Window.cpp`)
 		var useBGFX = false;
 
 		#if lime_bgfx
