@@ -26,7 +26,6 @@
 
 				<section>
 
-					<compilerflag value="-D_HAS_EXCEPTIONS=0" />
 					<compilerflag value="-D_SCL_SECURE=0" />
 					<compilerflag value="-D_SECURE_SCL=0" />
 					<compilerflag value="-D_SCL_SECURE_NO_WARNINGS" />
@@ -43,7 +42,6 @@
 				</section>
 
 				<compilerflag value="/Ob2" />
-				<compilerflag value="/EHs-c-" />
 
 				<section>
 
