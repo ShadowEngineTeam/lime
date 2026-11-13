@@ -350,7 +350,7 @@ static bool SDL_EGL_LoadLibraryInternal(SDL_VideoDevice *_this, const char *egl_
 #endif
     const char *path = NULL;
 #ifdef SDL_PLATFORM_ANDROID
-    // Lime: a GLES driver bundled in the app (lib*_mesa.so, names the system doesn't have) wins
+    // A GLES driver bundled in the app (lib*_mesa.so, names the system doesn't have) wins
     // over the system's; EGL then comes from the same driver.
     bool bundled_driver = false;
 #endif
