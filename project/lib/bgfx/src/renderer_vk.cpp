@@ -143,8 +143,8 @@ namespace bgfx { namespace vk
 	{
 		{ VK_PRESENT_MODE_FIFO_KHR,         true,  "VK_PRESENT_MODE_FIFO_KHR"         },
 		{ VK_PRESENT_MODE_FIFO_RELAXED_KHR, true,  "VK_PRESENT_MODE_FIFO_RELAXED_KHR" },
+		{ VK_PRESENT_MODE_MAILBOX_KHR,      true,  "VK_PRESENT_MODE_MAILBOX_KHR"      },
 		{ VK_PRESENT_MODE_IMMEDIATE_KHR,    false, "VK_PRESENT_MODE_IMMEDIATE_KHR"    },
-		{ VK_PRESENT_MODE_MAILBOX_KHR,      false, "VK_PRESENT_MODE_MAILBOX_KHR"      },
 	};
 
 	static const VkLatencyMarkerNV s_latencyMarker[] =
