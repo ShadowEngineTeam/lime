@@ -2552,7 +2552,7 @@ namespace bgfx
 
 	/// Returns name of the device the renderer runs on, as its driver reports it.
 	///
-	/// @returns Name of device, empty before `bgfx::init`.
+	/// @returns Name of device, empty before `bgfx::init` and with a renderer that has no device (Noop).
 	///
 	const char* getDeviceName();
 

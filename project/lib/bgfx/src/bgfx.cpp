@@ -4715,6 +4715,7 @@ namespace bgfx
 		}
 
 		bx::memSet(&g_caps, 0, sizeof(g_caps) );
+		g_deviceName[0] = '\0';
 		g_caps.limits.maxDrawCalls = BX_ENABLED(BGFX_CONFIG_DYNAMIC_FRAME_STORAGE)
 			? BGFX_CONFIG_MAX_DRAW_CALLS
 			: init.limits.numDrawCalls
