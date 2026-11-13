@@ -1,1 +1,6 @@
 f7947b40842b8e3e249e425f60fe82d42630cc47 (bkaradzic/bx, vendored whole)
+
+Local changes on top of that commit (keep them when re-vendoring):
+- src/thread.cpp: the MSVC thread naming __try/__except lives in its own function, setThreadNameSeh.
+  In Thread::setThreadName it failed with C2712 once hxcpp's -EHs is on, as that function needs
+  C++ unwinding.
