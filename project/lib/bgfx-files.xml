@@ -111,7 +111,11 @@
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/glcontext_egl.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/glcontext_html5.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/glcontext_wgl.cpp" />
-			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/glcontext_gles.cpp" if="windows || linux" />
+			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/glcontext_gles.cpp" if="windows || linux">
+				<depend name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_gles.h" />
+				<depend name="${NATIVE_TOOLKIT_PATH}/bgfx/src/glcontext_egl.cpp" />
+				<depend name="${NATIVE_TOOLKIT_PATH}/bgfx/src/glcontext_wgl.cpp" />
+			</file>
 
 		</section>
 
@@ -123,7 +127,10 @@
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_d3d11.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_d3d12.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_gl.cpp" />
-			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_gles.cpp" if="windows || linux" />
+			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_gles.cpp" if="windows || linux">
+				<depend name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_gles.h" />
+				<depend name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_gl.cpp" />
+			</file>
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_gnm.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_mtl.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_noop.cpp" />
