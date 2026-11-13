@@ -24,3 +24,7 @@ Local changes on top of that commit (keep them when re-vendoring):
   itself only exposes the PCI ids.
 - src/bgfx.cpp: caps.limits.maxTextureSize is raised to 16384 when the renderer reports less. A
   renderer that reports 16384 or more keeps its own value.
+- src/renderer_d3d11.cpp: Direct3D 11 no longer reports BGFX_CAPS_TEXTURE_DIRECT_ACCESS on Intel GPUs,
+  so textures are not created through Intel's direct access extension. That path maps its staging
+  copy without checking it was created, and crashed in ID3D11DeviceContext::Map at startup when the
+  driver refused it. Nothing in Lime or OpenFL uses bgfx::getDirectAccessPtr.

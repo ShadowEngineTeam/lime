@@ -1312,7 +1312,6 @@ namespace bgfx { namespace d3d11
 					| BGFX_CAPS_VERTEX_ATTRIB_UINT10
 					| (getIntelExtensions(m_device)
 						? BGFX_CAPS_FRAGMENT_ORDERING
-						| BGFX_CAPS_TEXTURE_DIRECT_ACCESS
 						: 0)
 					| BGFX_CAPS_SWAP_CHAIN
 					| BGFX_CAPS_DRAW_INDIRECT
