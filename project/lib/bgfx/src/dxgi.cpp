@@ -424,6 +424,7 @@ namespace bgfx
 				: (uint16_t)m_adapterDesc.VendorId
 				;
 			_caps.deviceId = (uint16_t)m_adapterDesc.DeviceId;
+			wcstombs(g_deviceName, m_adapterDesc.Description, BX_COUNTOF(g_deviceName) - 1);
 		}
 
 		return true;

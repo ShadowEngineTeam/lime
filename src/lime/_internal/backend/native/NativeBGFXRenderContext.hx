@@ -1368,6 +1368,15 @@ class NativeBGFXRenderContext
 		return null;
 	}
 
+	public function getDeviceName():String
+	{
+		#if (lime_cffi && lime_bgfx && !macro)
+		return NativeCFFI.lime_bgfx_get_device_name();
+		#end
+
+		return null;
+	}
+
 	public function getSupportedRenderers():Array<BGFXRendererType>
 	{
 		#if (lime_cffi && lime_bgfx && !macro)

@@ -823,6 +823,11 @@ class BGFX
 		return context.getRendererName(type);
 	}
 
+	public static inline function getDeviceName():String
+	{
+		return context.getDeviceName();
+	}
+
 	public static inline function getSupportedRenderers():Array<BGFXRendererType>
 	{
 		return context.getSupportedRenderers();

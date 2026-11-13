@@ -309,6 +309,7 @@ namespace bgfx
 	bx::AllocatorI* g_allocator = NULL;
 
 	Caps g_caps;
+	char g_deviceName[256] = "";
 
 #if BGFX_CONFIG_MULTITHREADED
 	static BX_THREAD_LOCAL uint32_t s_threadIndex(0);
@@ -4592,6 +4593,11 @@ namespace bgfx
 	{
 		BX_ASSERT(_type < RendererType::Count, "Invalid renderer type %d.", _type);
 		return s_rendererCreator[_type].name;
+	}
+
+	const char* getDeviceName()
+	{
+		return g_deviceName;
 	}
 
 	PlatformData::PlatformData()

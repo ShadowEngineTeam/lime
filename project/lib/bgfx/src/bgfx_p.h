@@ -679,6 +679,7 @@ namespace bgfx
 	extern CallbackI* g_callback;
 	extern bx::AllocatorI* g_allocator;
 	extern Caps g_caps;
+	extern char g_deviceName[256];
 	struct Frame;
 	void formatViewName(char* _out, const Frame* _frame, ViewId _view, const bx::StringView& _type);
 	const char* getViewName(const Frame* _frame, ViewId _view);
