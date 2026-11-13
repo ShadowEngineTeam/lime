@@ -1,0 +1,16 @@
+4f023e210f1ab9989d24fe2c86c1370a27badd27 (libsdl-org/SDL_image, the commit FunkinCrew/lime pins)
+
+No local changes. Left out: the prebuilt DLLs in VisualC/external/optional. Some files have CRLF
+line endings here.
+
+external/ holds SDL_image's submodules at the commits it pins (only libwebp is built, see
+sdl_image-files.xml), without their .git* files:
+  aom      d59e64a7e71faefdea541ed6d68efbc88f8b9226 (libsdl-org/aom)
+  dav1d    a6b395b472c2b1911a49936840e18535b071c1bd (libsdl-org/dav1d)
+  jpeg     191c46e84624aa9e0ed49b33efa86bebcdaf11e2 (libsdl-org/jpeg)
+  libavif  ee829431ceaed31a34b7e1420f7f18180e7eae23 (libsdl-org/libavif)
+  libjxl   961b5e0f3cc66ecf21ac1b1fe15d64fe504d19d4 (libsdl-org/libjxl)
+  libpng   c6d485422a9248843de1ee2323bff94fae8f381e (libsdl-org/libpng)
+  libtiff  9a51cfd52c32d0b0b8ff718387e4290cab887d5e (libsdl-org/libtiff)
+  libwebp  0b4545ee8210ff72ec47ab1ad56c2e7460663d11 (libsdl-org/libwebp)
+  zlib     f8b0a209e95431395ac6e32c0066f0ce437c03a5 (libsdl-org/zlib)

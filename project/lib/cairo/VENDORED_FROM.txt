@@ -1,0 +1,4 @@
+74755964edef651691d5cd36ff140108298e4e6e (gitlab.freedesktop.org/cairo/cairo, the commit FunkinCrew/lime pins)
+
+No local changes. Left out: doc/tutorial Makefiles, subprojects/libpng.wrap and the
+cairo-script-interpreter .pc.in files. Some files have CRLF line endings here.
