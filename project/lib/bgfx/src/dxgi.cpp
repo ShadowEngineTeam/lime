@@ -319,11 +319,19 @@ namespace bgfx
 						_caps.gpu[ii].deviceId = (uint16_t)desc.DeviceId;
 						++_caps.numGPUs;
 
+						// WARP is listed as the Microsoft Basic Render Driver adapter
+						const bool warp = true
+							&& BGFX_PCI_ID_SOFTWARE_RASTERIZER == _caps.vendorId
+							&& BGFX_PCI_ID_MICROSOFT == desc.VendorId
+							&& 0x8c == desc.DeviceId
+							;
+
 						if (NULL == m_adapter)
 						{
-							if ( (BGFX_PCI_ID_NONE != _caps.vendorId ||             0 != _caps.deviceId)
+							if (warp
+							|| ( (BGFX_PCI_ID_NONE != _caps.vendorId ||             0 != _caps.deviceId)
 							&&   (BGFX_PCI_ID_NONE == _caps.vendorId || desc.VendorId == _caps.vendorId)
-							&&   (               0 == _caps.deviceId || desc.DeviceId == _caps.deviceId) )
+							&&   (               0 == _caps.deviceId || desc.DeviceId == _caps.deviceId) ) )
 							{
 								m_adapter = adapter;
 								m_adapter->AddRef();
