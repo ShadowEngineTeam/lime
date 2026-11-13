@@ -50,6 +50,9 @@
 
 		<compilerflag value="-Iinclude" />
 
+		<!-- HXCPP_NO_SEGV_HANDLING drops hxcpp's -EHs -->
+		<compilerflag value="/EHsc" if="isMsvc" />
+
 		<section if="apple">
 
 			<compilerflag value="-fobjc-arc" />
@@ -321,7 +324,6 @@
 
 			<section>
 
-				<files id="native-toolkit-bx-3rdparty" />
 				<files id="native-toolkit-bx" />
 
 			</section>

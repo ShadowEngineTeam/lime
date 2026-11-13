@@ -89,12 +89,4 @@
 
 	</files>
 
-	<files id="native-toolkit-bx-3rdparty" cxx_standard="20">
-
-		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx/3rdparty/catch" />
-
-		<file name="${NATIVE_TOOLKIT_PATH}/bx/3rdparty/catch/catch_amalgamated.cpp" />
-
-	</files>
-
 </xml>
