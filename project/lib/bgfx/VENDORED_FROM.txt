@@ -35,6 +35,3 @@ Local changes on top of that commit (keep them when re-vendoring):
   on the vendor driver), Linux with EGL.
 - bgfx-files.xml builds bgfx with BGFX_CONFIG_VIDEO=0, so src/video_*.cpp only build their stubs. Lime has
   no binding for bgfx's hardware video decoding.
-- src/renderer_vk.cpp: without vsync, a swap chain takes VK_PRESENT_MODE_MAILBOX_KHR when the surface has
-  no VK_PRESENT_MODE_IMMEDIATE_KHR. MAILBOX counted as a vsync mode, so such a surface fell back to FIFO
-  and stayed at the display's refresh rate with vsync off.
