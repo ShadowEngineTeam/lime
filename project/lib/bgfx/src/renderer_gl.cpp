@@ -7935,15 +7935,10 @@ namespace bgfx { namespace gl
 
 		if (0 != m_id)
 		{
-			// On the heap: a shader can be larger than the render thread's stack
-			char* temp      = NULL;
-			char* constTemp = NULL;
-			char* ndcTemp   = NULL;
-
 			if (0 != bx::strCmp(code, "#version", 8) )
 			{
 				const int32_t tempLen = code.getLength() + (4<<10);
-				temp = (char*)bx::alloc(g_allocator, tempLen);
+				char* temp = (char*)BX_STACK_ALLOC(tempLen);
 				bx::StaticMemoryBlockWriter writer(temp, tempLen);
 
 				if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES) )
@@ -7981,15 +7976,16 @@ namespace bgfx { namespace gl
 
 			{
 				const int32_t constTempLen = code.getLength() + 128;
-				constTemp = (char*)bx::alloc(g_allocator, constTempLen);
+				char* constTemp = (char*)BX_STACK_ALLOC(constTempLen);
 				code = patchNdcConstant(code, constTemp, constTempLen);
 
 #if BGFX_CONFIG_GL_NORMALIZE_NDC_CONVENTIONS
+				char* ndcTemp = NULL;
 				if (GL_VERTEX_SHADER   == m_type
 				||  GL_FRAGMENT_SHADER == m_type)
 				{
 					const int32_t ndcTempLen = code.getLength() + (4<<10);
-					ndcTemp = (char*)bx::alloc(g_allocator, ndcTempLen);
+					ndcTemp = (char*)BX_STACK_ALLOC(ndcTempLen);
 					code = patchNdcConventions(code, m_type, ndcTemp, ndcTempLen);
 				}
 #endif // BGFX_CONFIG_GL_NORMALIZE_NDC_CONVENTIONS
@@ -8034,10 +8030,6 @@ namespace bgfx { namespace gl
 
 				BX_TRACE("ANGLE source (len: %d):\n%s\n####", len, source);
 			}
-
-			bx::free(g_allocator, ndcTemp);
-			bx::free(g_allocator, constTemp);
-			bx::free(g_allocator, temp);
 		}
 	}
 
