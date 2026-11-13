@@ -2412,6 +2412,20 @@ namespace lime
 		bgfx::reset(__resetFlags, &__swapChain);
 	}
 
+	bool BGFXBindings::SetVSync(bool vsync)
+	{
+		if (!__initialized) return false;
+
+		__resetFlags = vsync ? (__resetFlags | BGFX_RESET_VSYNC) : (__resetFlags & ~BGFX_RESET_VSYNC);
+		bgfx::reset(__resetFlags, &__swapChain);
+
+#if defined(IPHONE) || defined(HX_MACOS)
+		configureMetalLayer(vsync);
+#endif
+
+		return true;
+	}
+
 	// Clean up any required resources
 	void BGFXBindings::Shutdown()
 	{

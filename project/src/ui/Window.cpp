@@ -228,6 +228,9 @@ namespace lime
 				{
 					bgfxRenderer = true;
 
+					if (flags & WINDOW_FLAG_VSYNC)
+						SetVSyncMode(WINDOW_VSYNC_ON);
+
 					currentApplication->RegisterWindow(this);
 
 					return;
@@ -577,6 +580,12 @@ namespace lime
 
 	bool Window::SetVSyncMode(int mode)
 	{
+#ifdef LIME_BGFX
+		// bgfx has no adaptive vsync
+		if (bgfxRenderer)
+			return BGFXBindings::SetVSync(mode != WINDOW_VSYNC_OFF);
+#endif
+
 		return SDL_GL_SetSwapInterval(mode);
 	}
 
