@@ -1,8 +1,12 @@
-9bfbd6493b48a15238f2d1374a718ec026524515 (bkaradzic/bimg, vendored whole)
+9bfbd6493b48a15238f2d1374a718ec026524515 (bkaradzic/bimg)
 
 Local changes on top of that commit (keep them when re-vendoring):
 - 3rdparty/astc-encoder/source/astcenc_vecmathlib_sse_4.h: popcount uses __builtin_popcountll on
   32-bit x86, where _mm_popcnt_u64 does not exist (the build failed with -m32 -march=haswell).
 - 3rdparty/astc-encoder/source/astcenc_vecmathlib_avx2_8.h: the 8-byte load uses _mm_loadl_epi64,
-  and 3rdparty/etcpak/ProcessRGB.cpp has 32-bit stand-ins for _mm_cvtsi64_si128, _mm_cvtsi128_si64
-  and _mm_extract_epi64, so both build for 32-bit x86 with AVX2 (MSVC -arch:AVX2).
+  so it builds for 32-bit x86 with AVX2 (MSVC -arch:AVX2).
+
+Left out, as bgfx only parses DDS/KTX/PVR containers and decodes their formats (src/image.cpp): the image
+loading and encoding API (include/bimg/decode.h, include/bimg/encode.h, src/image_decode.cpp,
+src/image_decode_wic.cpp, src/image_encode.cpp, src/image_cubemap_filter.cpp) and every 3rdparty library
+other than astc-encoder. astc-encoder is built decode-only (ASTCENC_DECOMPRESS_ONLY).

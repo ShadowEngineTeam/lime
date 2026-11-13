@@ -98,6 +98,8 @@
 			<compilerflag value="-DBGFX_CONFIG_MAX_FRAME_BUFFERS=8192" />
 			<compilerflag value="-DBGFX_CONFIG_MAX_UNIFORMS=2048" />
 
+			<compilerflag value="-DBGFX_CONFIG_VIDEO=0" />
+
 		</section>
 
 		<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/bgfx.cpp" />
@@ -128,11 +130,6 @@
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_nvn.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_vk.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_webgpu.cpp" />
-
-			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/video_d3d11.cpp" />
-			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/video_d3d12.cpp" />
-			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/video_vk.cpp" />
-			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/video_mtl.cpp" />
 
 		</section>
 
@@ -236,6 +233,8 @@
 			<compilerflag value="-DBGFX_CONFIG_MAX_TEXTURES=16384" />
 			<compilerflag value="-DBGFX_CONFIG_MAX_FRAME_BUFFERS=8192" />
 			<compilerflag value="-DBGFX_CONFIG_MAX_UNIFORMS=2048" />
+
+			<compilerflag value="-DBGFX_CONFIG_VIDEO=0" />
 
 		</section>
 
