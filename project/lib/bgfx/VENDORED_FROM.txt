@@ -22,3 +22,5 @@ Local changes on top of that commit (keep them when re-vendoring):
   renderer runs on (the DXGI adapter description, the Vulkan device name, GL_RENDERER, the Metal
   device name or the WebGPU adapter's device). It is empty for Noop and the console renderers. bgfx
   itself only exposes the PCI ids.
+- src/bgfx.cpp: caps.limits.maxTextureSize is raised to 16384 when the renderer reports less. A
+  renderer that reports 16384 or more keeps its own value.

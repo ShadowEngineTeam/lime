@@ -3942,6 +3942,7 @@ namespace bgfx
 					_cmdbuf.read(init);
 
 					m_renderCtx = rendererCreate(init);
+					g_caps.limits.maxTextureSize = bx::max<uint32_t>(g_caps.limits.maxTextureSize, 16384);
 
 					m_rendererInitialized = NULL != m_renderCtx;
 
