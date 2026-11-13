@@ -1,0 +1,3 @@
+0145a6248c2171bb6c4e03fb54fe016b5123e37e (xiph/opus, the commit FunkinCrew/lime pins)
+
+No local changes. Left out: .gitattributes, .gitignore, update_version and celt/dump_modes/Makefile.
