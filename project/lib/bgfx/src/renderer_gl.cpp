@@ -2376,7 +2376,7 @@ namespace bgfx { namespace gl
 				}
 			}
 
-			// Lime: report a CPU implementation the way the other renderers do, so that it can
+			// Report a CPU implementation the way the other renderers do, so that it can
 			// be turned down. The OpenGL vendor string does not tell them apart.
 			{
 				static const char* s_softwareRenderers[] =
@@ -6961,7 +6961,7 @@ namespace bgfx { namespace gl
 				, getName( (TextureFormat::Enum)m_textureFormat)
 				);
 
-			// Lime: a compressed mip is decoded in whole blocks, so it can be larger than the
+			// A compressed mip is decoded in whole blocks, so it can be larger than the
 			// texture level it is for. The buffer is sized for the mip, see below.
 			uint8_t* temp = NULL;
 			uint32_t tempSize = 0;
