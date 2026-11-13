@@ -1534,14 +1534,12 @@ namespace lime
 		// channels=stereo
 		device.playback.channels = 2;
 
-		// period_size=480, periods=2
-		device.periodSizeInFrames = 480;
-		device.periods = 2;
+		// Disable Fixed Sized Callback (For optimization)
+		device.noFixedSizedCallback = MA_TRUE;
 
 		// SDL_HINT_AUDIO_DEVICE_STREAM_ROLE = "Game" (Application.cpp, removed with SDL audio)
 		device.wasapi.usage = ma_wasapi_usage_games;
 		device.aaudio.usage = ma_aaudio_usage_game;
-		device.aaudio.performanceMode = ma_aaudio_performance_mode_low_latency;
 
 		// let AAudio pick its burst size, forcing 480 frames per callback crackles once it falls back to the legacy path (Bluetooth A2DP)
 		device.aaudio.noSetBufferCapacity = MA_TRUE;
@@ -1553,11 +1551,8 @@ namespace lime
 		device.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_none;
 #endif
 
-		// OpenAL Soft's WASAPI/AAudio backends never used hardware offload, AAudio asked for an exclusive stream first (the system may still grant shared)
+		// OpenAL Soft's WASAPI backend never used hardware offload
 		device.wasapi.noHardwareOffloading = MA_TRUE;
-#if defined(ANDROID)
-		device.playback.shareMode = ma_share_mode_exclusive;
-#endif
 
 		// alsa/mmap=true  -> miniaudio enables MMap unless told otherwise.
 		device.alsa.noMMap = MA_FALSE;
@@ -1590,15 +1585,8 @@ namespace lime
 		config.channels = val_int(val_field(pConfig, val_id("channels")));
 		config.sampleRate = val_int(val_field(pConfig, val_id("sampleRate")));
 
-		// 0 keeps the defaults set above
-		const int periods = val_int(val_field(pConfig, val_id("periods")));
-		const int periodSizeInFrames = val_int(val_field(pConfig, val_id("periodSizeInFrames")));
-
-		if (periods > 0)
-			config.deviceConfig.periods = periods;
-
-		if (periodSizeInFrames > 0)
-			config.deviceConfig.periodSizeInFrames = periodSizeInFrames;
+		config.deviceConfig.periods = val_int(val_field(pConfig, val_id("periods")));
+		config.deviceConfig.periodSizeInFrames = val_int(val_field(pConfig, val_id("periodSizeInFrames")));
 
 		config.spatializationVolumeSmoothTimeInFrames = val_int(val_field(pConfig, val_id("spatializationVolumeSmoothTimeInFrames")));
 		config.spatializationVolumeSmoothTimeInMilliseconds = val_int(val_field(pConfig, val_id("spatializationVolumeSmoothTimeInMilliseconds")));
