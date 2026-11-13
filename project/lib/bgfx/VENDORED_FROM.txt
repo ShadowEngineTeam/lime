@@ -37,3 +37,6 @@ Local changes on top of that commit (keep them when re-vendoring):
   no binding for bgfx's hardware video decoding.
 - src/dxgi.cpp: asking for BGFX_PCI_ID_SOFTWARE_RASTERIZER picks the Microsoft Basic Render Driver adapter
   (WARP). No adapter has that vendor id, so bgfx fell back to the first adapter, the GPU, and dropped WARP.
+- src/renderer_gl.cpp: ProgramGL::init only uses the program interface query on desktop OpenGL, and starts the
+  name lengths at 0. An OpenGL ES context on Windows can list ARB_program_interface_query, the query then fails
+  and the uninitialized lengths sized a stack allocation that overflowed the stack.

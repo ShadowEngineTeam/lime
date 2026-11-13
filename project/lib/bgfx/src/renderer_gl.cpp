@@ -5980,9 +5980,11 @@ namespace bgfx { namespace gl
 		GL_CHECK(glBindFragDataLocation(m_id, 0, "bgfx_FragColor") );
 #endif // BGFX_CONFIG_RENDERER_OPENGL
 
-		GLint max0, max1;
+		GLint max0 = 0, max1 = 0;
 
+		// OpenGL ES 3.0 has no program interface query, even where the driver lists the ARB extensions
 		bool piqSupported = true
+			&& !BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES)
 			&& s_extension[Extension::ARB_program_interface_query     ].m_supported
 			&& s_extension[Extension::ARB_shader_storage_buffer_object].m_supported
 			;
