@@ -29,7 +29,6 @@
 
 				<section>
 
-					<compilerflag value="-D_HAS_EXCEPTIONS=0" />
 					<compilerflag value="-D_SCL_SECURE=0" />
 					<compilerflag value="-D_SECURE_SCL=0" />
 					<compilerflag value="-D_SCL_SECURE_NO_WARNINGS" />
@@ -46,7 +45,6 @@
 				</section>
 
 				<compilerflag value="/Ob2" />
-				<compilerflag value="/EHs-c-" />
 				<compilerflag value="-D__SSE4_1__" unless="HXCPP_ARM64" />
 
 				<section>
@@ -129,8 +127,6 @@
 				</section>
 
 				<compilerflag value="/Ob2" />
-				<!-- match glslang and spirv-tools, or std::system_error differs at link time (C4743) -->
-				<compilerflag value="/EHsc" />
 				<compilerflag value="-D__SSE4_1__" unless="HXCPP_ARM64" />
 					<!-- <compilerflag value="/experimental:c11atomics" /> -->
 
