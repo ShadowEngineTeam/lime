@@ -1,0 +1,30 @@
+38dfb78f7fe2e74ef11d9fd52840636299195326 (FunkinCrew/SDL, the commit FunkinCrew/lime pins)
+
+Left out: the HLSL sources in src/render/gpu/shaders (the compiled headers are kept), the CMake
+package files under Xcode/SDL/pkg-support and build-scripts/pkg-support. src/video/qnx/SDL_qnx.h
+is named sdl_qnx.h here. Some files have CRLF line endings here.
+
+Local changes on top of that commit (keep them when re-vendoring):
+- Android draw scale. The SDL_ANDROID_DRAW_SCALE hint (0.5 to 1.0) renders into a smaller buffer
+  that Android scales up. It is ignored in multi-window mode, DeX and on Chromebooks.
+  src/video/android/SDL_androidvideo.c/.h: Android_GetDrawScale and Android_ShouldUseDrawScale;
+    Android_SendResize sizes the buffer and the window from the scale.
+  src/video/android/SDL_androidwindow.c: Android_CreateWindow sizes the window from the scale.
+  src/video/SDL_egl.c: SDL_EGL_CreateSurface keeps the scaled buffer size instead of passing 0, 0
+    to ANativeWindow_setBuffersGeometry.
+  src/video/android/SDL_androidmouse.c, SDL_androidpen.c: absolute pointer positions are scaled
+    to match.
+  src/core/android/SDL_android.c/.h, android-project/.../SDLActivity.java:
+    Android_JNI_IsInMultiWindowMode (SDLActivity.isInMultiWindowModeJNI).
+- Android surface loss. src/video/android/SDL_androidwindow.h has surface_valid, cleared in
+  onNativeSurfaceDestroyed and set again in onNativeSurfaceChanged (src/core/android/SDL_android.c).
+  Android_GLES_SwapWindow (src/video/android/SDL_androidgl.c) skips presenting while it is false,
+  so eglSwapBuffers cannot block on an abandoned BufferQueue and stall the pause handshake.
+- src/video/SDL_egl.c: on Android, a GLES driver bundled in the app (libGLESv2_mesa.so,
+  libGLESv1_CM_mesa.so) is loaded before the system one, and EGL then comes from libEGL_mesa.so.
+- src/process/posix/SDL_posixprocess.c: below Android API 29 (no posix_spawn) processes are
+  started with fork and exec. The posix_spawn path also frees process->internal when it fails.
+- src/video/SDL_video.c: Wayland comes before X11 in the video driver list (the
+  Wayland_preferred_bootstrap entry is gone), and SDL_ShowMessageBox logs the title and message on iOS.
+- src/video/uikit/SDL_uikitmessagebox.m: below iOS 26, where the blocking message box freezes,
+  the message box is shown without blocking and SDL_ShowMessageBox returns the default button.

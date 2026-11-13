@@ -3,9 +3,14 @@
 Local additions (NOT part of upstream miniaudio):
   extras/resamplers/bsinc/  OpenAL Soft `bsinc24` resampler backport, LGPL-2.0+ (see COPYING there).
                             Table output verified bit-identical to OpenAL Soft's gBSinc24.
+  extras/limiters/mastering/ OpenAL Soft's output limiter (core/mastering.cpp) backport, LGPL-2.0+.
 
 Local patches to miniaudio.h (re-apply when updating):
   OpenSL|ES: in multi-threaded mode the buffer queue callbacks process directly (like AAudio) instead of going
              through ma_device_state_async, whose one-period buffer zero-fills when a non-fast AudioTrack
              (Bluetooth A2DP) drains several buffers back to back. Adds ma_device_wakeup__opensl so stop/uninit
              can wake the audio thread.
+  WASAPI:    the stream category is always set to Media (MA_AudioCategory_Media, as OpenAL Soft's WASAPI
+             backend does); hardware offloading is still only enabled when allowed and supported.
+  Atomics:   ma_atomic_compare_and_swap_64 casts to an 8-byte aligned type for __atomic_compare_exchange_n,
+             so 32-bit x86 keeps it inline instead of calling libatomic.

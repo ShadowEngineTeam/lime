@@ -1,0 +1,9 @@
+Generated with glad 2.0.8 (https://glad.sh), C generator, no options - not part of FunkinCrew/lime
+
+include/glad/gl.h, src/gl.c:
+  --api='gl:compatibility=4.6' --extensions='GL_APPLE_vertex_array_object,GL_ARB_draw_instanced,GL_ARB_instanced_arrays,GL_ARB_texture_compression,GL_ARB_texture_compression_bptc,GL_ARB_texture_compression_rgtc,GL_ARB_vertex_array_object,GL_EXT_draw_instanced,GL_EXT_framebuffer_blit,GL_EXT_framebuffer_multisample,GL_EXT_framebuffer_object,GL_EXT_texture_compression_rgtc,GL_EXT_texture_compression_s3tc,GL_KHR_blend_equation_advanced,GL_KHR_blend_equation_advanced_coherent,GL_KHR_texture_compression_astc_hdr,GL_KHR_texture_compression_astc_ldr,GL_KHR_texture_compression_astc_sliced_3d,GL_S3_s3tc'
+
+include/glad/gles2.h, src/gles2.c:
+  --api='gles2=3.2' --extensions='GL_ANGLE_texture_compression_dxt3,GL_ANGLE_texture_compression_dxt5,GL_EXT_draw_instanced,GL_EXT_texture_compression_astc_decode_mode,GL_EXT_texture_compression_bptc,GL_EXT_texture_compression_dxt1,GL_EXT_texture_compression_rgtc,GL_EXT_texture_compression_s3tc,GL_EXT_texture_compression_s3tc_srgb,GL_KHR_blend_equation_advanced,GL_KHR_blend_equation_advanced_coherent,GL_KHR_texture_compression_astc_hdr,GL_KHR_texture_compression_astc_ldr,GL_KHR_texture_compression_astc_sliced_3d,GL_NV_texture_compression_s3tc_update,GL_OES_texture_compression_astc'
+
+The exact command lines are in the header comment of each file. Regenerate rather than edit.
