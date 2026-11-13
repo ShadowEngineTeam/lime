@@ -2351,10 +2351,6 @@ namespace lime
 		SDL_GetWindowSizeInPixels(sdlWindow, (int *)&init.swapChain.width, (int *)&init.swapChain.height);
 
 		init.swapChain.formatColor = defaultBackbufferFormat;
-
-		// Without vsync, a window has to be able to draw faster than the display: with two back buffers the
-		// compositor holds one until the next refresh, so presenting waits for it
-		init.swapChain.numBackBuffers = 3;
 		// init.swapChain.maxFrameLatency = 3;
 
 #if defined(IPHONE) || defined(HX_MACOS)
