@@ -1534,6 +1534,7 @@ class NativeCFFI
 	private static var lime_bgfx_set_vertex_buffer_name = new cpp.Callable<cpp.Object->String->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_set_vertex_buffer_name", "osv", false));
 	private static var lime_bgfx_get_renderer_type = new cpp.Callable<Void->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_get_renderer_type", "i", false));
 	private static var lime_bgfx_get_renderer_name = new cpp.Callable<Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_bgfx_get_renderer_name", "io", false));
+	private static var lime_bgfx_get_device_name = new cpp.Callable<Void->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_bgfx_get_device_name", "o", false));
 	private static var lime_bgfx_get_supported_renderers = new cpp.Callable<Void->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_bgfx_get_supported_renderers", "o", false));
 	private static var lime_bgfx_alloc = new cpp.Callable<Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_bgfx_alloc", "io", false));
 	private static var lime_bgfx_copy = new cpp.Callable<lime.utils.DataPointer->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_bgfx_copy", "dio", false));
@@ -1698,6 +1699,7 @@ class NativeCFFI
 	private static var lime_bgfx_set_vertex_buffer_name = CFFI.load("lime", "lime_bgfx_set_vertex_buffer_name", 2);
 	private static var lime_bgfx_get_renderer_type = CFFI.load("lime", "lime_bgfx_get_renderer_type", 0);
 	private static var lime_bgfx_get_renderer_name = CFFI.load("lime", "lime_bgfx_get_renderer_name", 1);
+	private static var lime_bgfx_get_device_name = CFFI.load("lime", "lime_bgfx_get_device_name", 0);
 	private static var lime_bgfx_get_supported_renderers = CFFI.load("lime", "lime_bgfx_get_supported_renderers", 0);
 	private static var lime_bgfx_alloc = CFFI.load("lime", "lime_bgfx_alloc", 1);
 	private static var lime_bgfx_copy = CFFI.load("lime", "lime_bgfx_copy", 2);

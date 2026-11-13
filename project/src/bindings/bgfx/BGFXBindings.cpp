@@ -1854,6 +1854,11 @@ namespace lime
 		return alloc_string(bgfx::getRendererName((bgfx::RendererType::Enum)type));
 	}
 
+	value lime_bgfx_get_device_name()
+	{
+		return alloc_string(bgfx::getDeviceName());
+	}
+
 	value lime_bgfx_get_supported_renderers()
 	{
 		bgfx::RendererType::Enum types[bgfx::RendererType::Count];
@@ -2071,6 +2076,7 @@ namespace lime
 	DEFINE_PRIME2v(lime_bgfx_set_vertex_buffer_name);
 	DEFINE_PRIME0(lime_bgfx_get_renderer_type);
 	DEFINE_PRIME1(lime_bgfx_get_renderer_name);
+	DEFINE_PRIME0(lime_bgfx_get_device_name);
 	DEFINE_PRIME0(lime_bgfx_get_supported_renderers);
 	DEFINE_PRIME1(lime_bgfx_alloc);
 	DEFINE_PRIME2(lime_bgfx_copy);

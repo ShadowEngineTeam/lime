@@ -2550,6 +2550,12 @@ namespace bgfx
 	///
 	const char* getRendererName(RendererType::Enum _type);
 
+	/// Returns name of the device the renderer runs on, as its driver reports it.
+	///
+	/// @returns Name of device, empty before `bgfx::init`.
+	///
+	const char* getDeviceName();
+
 	/// Fill bgfx::Init struct with default values, before using it to initialize the library.
 	///
 	/// @param[in] _init Pointer to structure to be initialized. See: `bgfx::Init` for more info.

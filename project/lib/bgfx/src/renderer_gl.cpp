@@ -2348,6 +2348,7 @@ namespace bgfx { namespace gl
 
 			m_vendor      = getGLString(GL_VENDOR);
 			m_renderer    = getGLString(GL_RENDERER);
+			bx::strCopy(g_deviceName, BX_COUNTOF(g_deviceName), m_renderer);
 			m_version     = getGLString(GL_VERSION);
 			m_glslVersion = getGLString(GL_SHADING_LANGUAGE_VERSION);
 

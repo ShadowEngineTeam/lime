@@ -17,3 +17,7 @@ Local changes on top of that commit (keep them when re-vendoring):
 - src/bgfx.cpp: parseAttrTo reads its number with plain loops instead of bx::strFind, strCopy and
   fromString. Those measure a string up to INT32_MAX; inlined on a stack buffer, clang 23 could not
   link the 32-bit x86 Linux build with ThinLTO ("64-bit offset calculated but target is 32-bit").
+- include/bgfx/bgfx.h, src/bgfx.cpp, src/bgfx_p.h, src/dxgi.cpp, src/renderer_gl.cpp, src/renderer_mtl.cpp,
+  src/renderer_vk.cpp: bgfx::getDeviceName returns the name of the device the renderer runs on (the
+  DXGI adapter description, the Vulkan device name, GL_RENDERER or the Metal device name). bgfx
+  itself only exposes the PCI ids.

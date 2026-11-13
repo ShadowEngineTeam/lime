@@ -998,6 +998,8 @@ static_assert(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNames
 				|| m_device->supportsFamily(MTL::GPUFamilyApple7)
 				;
 
+			bx::strCopy(g_deviceName, BX_COUNTOF(g_deviceName), utf8String(m_device->name() ) );
+
 			g_caps.numGPUs = 1;
 			g_caps.gpu[0].vendorId = g_caps.vendorId;
 			g_caps.gpu[0].deviceId = g_caps.deviceId;

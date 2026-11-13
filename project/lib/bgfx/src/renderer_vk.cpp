@@ -1875,6 +1875,7 @@ VK_IMPORT_INSTANCE
 
 				g_caps.vendorId = uint16_t(m_deviceProperties.vendorID);
 				g_caps.deviceId = uint16_t(m_deviceProperties.deviceID);
+				bx::strCopy(g_deviceName, BX_COUNTOF(g_deviceName), m_deviceProperties.deviceName);
 
 				BX_TRACE("Using physical device %d: %s", physicalDeviceIdx, m_deviceProperties.deviceName);
 
