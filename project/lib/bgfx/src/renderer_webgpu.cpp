@@ -1420,6 +1420,7 @@ WGPU_IMPORT
 
 						g_caps.vendorId = bx::narrowCast<uint16_t>(adapterInfo.vendorID);
 						g_caps.deviceId = bx::narrowCast<uint16_t>(adapterInfo.deviceID);
+						bx::strCopy(g_deviceName, BX_COUNTOF(g_deviceName), toStringView(0 != adapterInfo.device.length ? adapterInfo.device : adapterInfo.description) );
 					}
 
 					BX_TRACE("");
