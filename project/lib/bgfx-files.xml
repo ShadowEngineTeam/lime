@@ -131,6 +131,11 @@
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_vk.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/renderer_webgpu.cpp" />
 
+			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/video_d3d11.cpp" />
+			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/video_d3d12.cpp" />
+			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/video_vk.cpp" />
+			<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/video_mtl.cpp" />
+
 		</section>
 
 		<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/shader.cpp" />
