@@ -1,0 +1,12 @@
+Not vendored: lime's own configuration headers for the libraries in project/lib.
+Differences from FunkinCrew/lime's project/lib/custom:
+
+- pixman/pixman-config.h: the x86 SIMD paths (MMX, SSE2, SSSE3) are only enabled on x86 builds,
+  not on Windows ARM64 or Linux ARMv7, and 64-bit Linux on ARM64 gets the same settings as x86-64.
+- sdl/include/SDL_build_config.h: HAVE_STRLCAT and HAVE_STRLCPY are off on Linux, HAVE_WCSLCAT and
+  HAVE_WCSLCPY are off on Linux, Android needs API 28 instead of 24 for iconv, and SDL_VIDEO_METAL
+  is on for macOS and iOS.
+- sdl/wayland-protocols/: the client protocol sources for SDL's Wayland driver, generated with
+  wayland-scanner 1.24.0. FunkinCrew/lime builds them from sdl/wayland-generated-protocols instead.
+- zlib/: zconf.h, zlib.h, zlib_name_mangling.h and gzread_mangle.h generated from zlib-ng
+  (../zlib), which replaces madler/zlib.

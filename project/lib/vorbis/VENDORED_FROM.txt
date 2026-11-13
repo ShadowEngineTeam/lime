@@ -1,0 +1,3 @@
+1b75110b5a2754ba1931d82dd83cb822b266a21d (xiph/vorbis, the commit FunkinCrew/lime pins)
+
+No local changes. Left out: symbian/config.h. Some files have CRLF line endings here.

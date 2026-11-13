@@ -1,0 +1,5 @@
+e15d0078380d0619615176fe4c6ceede55fe534e (zlib-ng/zlib-ng develop, 2.3.90) - FunkinCrew/lime uses madler/zlib instead
+
+No local changes apart from file modes (configure, test/abicheck.sh, tools/config.sub and the
+arch/s390/self-hosted-builder scripts are not executable here). The headers lime builds against
+(zconf.h, zlib.h, zlib_name_mangling.h, gzread_mangle.h) are generated into ../custom/zlib.
