@@ -28,3 +28,8 @@ Local changes on top of that commit (keep them when re-vendoring):
   so textures are not created through Intel's direct access extension. That path maps its staging
   copy without checking it was created, and crashed in ID3D11DeviceContext::Map at startup when the
   driver refused it. Nothing in Lime or OpenFL uses bgfx::getDirectAccessPtr.
+- src/renderer_gles.h, src/renderer_gles.cpp, src/glcontext_gles.cpp (added), src/bgfx.cpp: on Windows and
+  Linux the GL renderer is built a second time as OpenGL ES 3.0, in namespace bgfx::gles, and bgfx.cpp
+  creates the OpenGL ES renderer from it. bgfx builds renderer_gl.cpp as either OpenGL or OpenGL ES, so
+  desktop otherwise has no OpenGL ES. Windows creates the context with WGL (WGL_EXT_create_context_es_profile
+  on the vendor driver), Linux with EGL.

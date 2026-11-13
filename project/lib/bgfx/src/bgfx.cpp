@@ -625,7 +625,7 @@ namespace bgfx
 
 	static uint8_t parseAttrTo(char*& _ptr, char _to, uint8_t _default)
 	{
-		// Lime: read the (at most two digit) number by hand. bx's string functions measure a
+		// Read the (at most two digit) number by hand. bx's string functions measure a
 		// string of unknown length up to INT32_MAX; inlined here on a stack buffer, that made
 		// clang 23 fail on 32-bit x86 with link-time optimisation ("64-bit offset calculated but
 		// target is 32-bit").
@@ -3648,6 +3648,9 @@ namespace bgfx
 	BGFX_RENDERER_CONTEXT(mtl);
 	BGFX_RENDERER_CONTEXT(nvn);
 	BGFX_RENDERER_CONTEXT(gl);
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX
+	BGFX_RENDERER_CONTEXT(gles);
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX
 	BGFX_RENDERER_CONTEXT(vk);
 	BGFX_RENDERER_CONTEXT(wgpu);
 
@@ -3676,7 +3679,11 @@ namespace bgfx
 		{ noop::rendererCreate,   noop::rendererDestroy,   BGFX_RENDERER_NOOP_NAME,       false                             }, // Noop
 #endif // BX_PLATFORM_OSX || BX_PLATFORM_IOS || BX_PLATFORM_VISIONOS
 		{ nvn::rendererCreate,    nvn::rendererDestroy,    BGFX_RENDERER_NVN_NAME,        !!BGFX_CONFIG_RENDERER_NVN        }, // NVN
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX
+		{ gles::rendererCreate,   gles::rendererDestroy,   "OpenGL ES 3.0",               true                              }, // OpenGLES
+#else
 		{ gl::rendererCreate,     gl::rendererDestroy,     BGFX_RENDERER_OPENGL_NAME,     !!BGFX_CONFIG_RENDERER_OPENGLES   }, // OpenGLES
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX
 		{ gl::rendererCreate,     gl::rendererDestroy,     BGFX_RENDERER_OPENGL_NAME,     !!BGFX_CONFIG_RENDERER_OPENGL     }, // OpenGL
 		{ vk::rendererCreate,     vk::rendererDestroy,     BGFX_RENDERER_VULKAN_NAME,     !!BGFX_CONFIG_RENDERER_VULKAN     }, // Vulkan
 		{ wgpu::rendererCreate,   wgpu::rendererDestroy,   BGFX_RENDERER_WEBGPU_NAME,     !!BGFX_CONFIG_RENDERER_WEBGPU     }, // WebGPU
