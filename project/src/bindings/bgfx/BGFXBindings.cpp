@@ -1001,6 +1001,9 @@ namespace lime
 		options.inputFilePath = inputFilePath;
 		options.readFile = shaderReadFile;
 
+		// Without it shaderc builds Direct3D shaders with D3DCOMPILE_SKIP_OPTIMIZATION
+		options.optimize = true;
+
 		if (includeDirs && *includeDirs)
 		{
 			options.includeDirs.push_back(includeDirs);
