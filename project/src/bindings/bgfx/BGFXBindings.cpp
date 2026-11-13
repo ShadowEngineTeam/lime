@@ -2117,15 +2117,6 @@ namespace lime
 
 #undef DEFINE_BGFX_DESTROY
 
-	int BGFXBindings::GetDefaultRendererType()
-	{
-#if defined(IPHONE) || defined(HX_MACOS)
-		return bgfx::RendererType::Metal;
-#else
-		return bgfx::RendererType::Vulkan;
-#endif
-	}
-
 	int BGFXBindings::GetRendererType(const char *name)
 	{
 		struct NamedRenderer
@@ -2164,7 +2155,7 @@ namespace lime
 			return "unknown";
 		}
 
-		// bgfx gives its two OpenGL renderers one name, that of the one it was built with
+		// bgfx's OpenGL names carry a version ("OpenGL 4.3"), and where it builds one GL renderer both share it
 		if (rendererType == bgfx::RendererType::OpenGL) return "OpenGL";
 		if (rendererType == bgfx::RendererType::OpenGLES) return "OpenGL ES";
 
