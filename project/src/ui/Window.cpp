@@ -155,39 +155,44 @@ namespace lime
 			return window;
 		};
 
-		std::vector<std::string> entries = rendererTable();
-		bool softwareLast = false;
-
-		for (size_t i = 0; i < entries.size();)
-		{
-			if (entries[i] == "software")
-			{
-				softwareLast = true;
-				entries.erase(entries.begin() + i);
-			}
-			else
-			{
-				++i;
-			}
-		}
-
 #ifdef LIME_BGFX
 		struct RendererChoice
 		{
 			int rendererType;
 			std::string name;
+			bool software;
 		};
 
 		std::vector<RendererChoice> choices;
 
-		for (size_t i = 0; i < entries.size(); ++i)
+		// "software" renders on the CPU: WARP on Windows, then a CPU Vulkan device (lavapipe, SwiftShader),
+		// then Mesa's llvmpipe on OpenGL
+		auto addSoftware = [&choices]()
 		{
-			const int rendererType = BGFXBindings::GetRendererType(entries[i].c_str());
+#if !defined(__APPLE__)
+#if defined(HX_WINDOWS)
+			choices.push_back({BGFXBindings::GetRendererType("d3d11"), "software (d3d11)", true});
+#endif
+			choices.push_back({BGFXBindings::GetRendererType("vulkan"), "software (vulkan)", true});
+			choices.push_back({BGFXBindings::GetRendererType("opengl"), "software (opengl)", true});
+			choices.push_back({BGFXBindings::GetRendererType("opengles"), "software (opengles)", true});
+#endif
+		};
+
+		for (const std::string &entry : rendererTable())
+		{
+			if (entry == "software")
+			{
+				addSoftware();
+				continue;
+			}
+
+			const int rendererType = BGFXBindings::GetRendererType(entry.c_str());
 
 			if (rendererType >= 0)
-				choices.push_back({rendererType, entries[i]});
+				choices.push_back({rendererType, entry, false});
 			else
-				SDL_Log("LIME_BGFX_PLATFORM: \"%s\" is not a renderer, skipping it\n", entries[i].c_str());
+				SDL_Log("LIME_BGFX_PLATFORM: \"%s\" is not a renderer, skipping it\n", entry.c_str());
 		}
 
 		const bool fromTable = !choices.empty();
@@ -195,35 +200,31 @@ namespace lime
 		if (!fromTable)
 		{
 #if defined(__APPLE__)
-			choices.push_back({BGFXBindings::GetRendererType("metal"), "metal"});
+			choices.push_back({BGFXBindings::GetRendererType("metal"), "metal", false});
 #else
-			choices.push_back({BGFXBindings::GetRendererType("vulkan"), "vulkan"});
-			choices.push_back({BGFXBindings::GetRendererType("opengl"), "opengl"});
-			choices.push_back({BGFXBindings::GetRendererType("opengles"), "opengles"});
+			choices.push_back({BGFXBindings::GetRendererType("vulkan"), "vulkan", false});
+			choices.push_back({BGFXBindings::GetRendererType("opengl"), "opengl", false});
+			choices.push_back({BGFXBindings::GetRendererType("opengles"), "opengles", false});
 #endif
-			softwareLast = true;
+			addSoftware();
 		}
 
 		std::string failures;
+		bool fallbackLogged = false;
 
-		for (size_t i = 0; i < choices.size() * (softwareLast ? 2 : 1); ++i)
+		for (const RendererChoice &choice : choices)
 		{
-			const bool software = i >= choices.size();
-			RendererChoice choice = choices[i % choices.size()];
-
-			if (software)
+			if (choice.software && !fromTable && !fallbackLogged)
 			{
-				if (i == choices.size())
-					SDL_Log("No renderer started on real hardware, falling back to software rendering\n");
-
-				choice.name += " (software)";
+				SDL_Log("No renderer started on real hardware, falling back to software rendering\n");
+				fallbackLogged = true;
 			}
 
 			sdlWindow = createWindow(sdlWindowFlags, true);
 
 			if (sdlWindow)
 			{
-				if (BGFXBindings::Init(sdlWindow, choice.rendererType, software))
+				if (BGFXBindings::Init(sdlWindow, choice.rendererType, choice.software))
 				{
 					bgfxRenderer = true;
 
@@ -253,6 +254,22 @@ namespace lime
 
 		showRendererError(NULL, fromTable ? "None of the renderers in LIME_BGFX_PLATFORM could start" : "Could not start a renderer");
 #else
+		std::vector<std::string> entries = rendererTable();
+		bool softwareLast = false;
+
+		for (size_t i = 0; i < entries.size();)
+		{
+			if (entries[i] == "software")
+			{
+				softwareLast = true;
+				entries.erase(entries.begin() + i);
+			}
+			else
+			{
+				++i;
+			}
+		}
+
 		if (!entries.empty())
 		{
 			SDL_Log("LIME_BGFX_PLATFORM: this build renders with OpenGL, not bgfx. The renderers it names only switch the software fallback off, unless \"software\" is one of them\n");

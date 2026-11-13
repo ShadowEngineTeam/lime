@@ -2289,7 +2289,7 @@ namespace lime
 
 	static bgfx::TextureFormat::Enum defaultBackbufferFormat = bgfx::TextureFormat::BGRA8;
 
-	bool BGFXBindings::Init(SDL_Window *sdlWindow, int rendererType, bool allowSoftware)
+	bool BGFXBindings::Init(SDL_Window *sdlWindow, int rendererType, bool software)
 	{
 		if (rendererType < 0 || rendererType >= bgfx::RendererType::Count)
 		{
@@ -2322,6 +2322,17 @@ namespace lime
 		// to Direct3D, its own OpenGL renderer or the one that draws nothing
 		init.type = (bgfx::RendererType::Enum)rendererType;
 		init.fallback = false;
+
+		// A CPU device: WARP on Direct3D, a CPU Vulkan device (lavapipe, SwiftShader), Mesa's llvmpipe on OpenGL
+		if (software)
+		{
+			init.vendorId = BGFX_PCI_ID_SOFTWARE_RASTERIZER;
+
+#if defined(HX_LINUX)
+			if (rendererType == bgfx::RendererType::OpenGL || rendererType == bgfx::RendererType::OpenGLES)
+				SDL_setenv_unsafe("LIBGL_ALWAYS_SOFTWARE", "1", 1);
+#endif
+		}
 
 		// Get native window/display handles from SDL
 		init.swapChain.nwh = getNativeWindowHandle(sdlWindow);
@@ -2356,7 +2367,14 @@ namespace lime
 			return false;
 		}
 
-		if (!allowSoftware && isSoftwareDevice())
+		if (software && !isSoftwareDevice())
+		{
+			Shutdown();
+			SDL_SetError("there is no software %s device", GetRendererName(rendererType));
+			return false;
+		}
+
+		if (!software && isSoftwareDevice())
 		{
 			Shutdown();
 			SDL_SetError("the only %s device is a software one", GetRendererName(rendererType));

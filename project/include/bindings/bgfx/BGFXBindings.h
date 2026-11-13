@@ -14,7 +14,7 @@ namespace lime
 
 		// Starts bgfx on the window with this renderer only. It does not try another one when
 		// that fails, and unless `allowSoftware` is set it also fails on a software device.
-		static bool Init(SDL_Window *sdlWindow, int rendererType, bool allowSoftware);
+		static bool Init(SDL_Window *sdlWindow, int rendererType, bool software);
 
 		// The renderer bgfx starts on when none is asked for: Metal on Apple, Vulkan elsewhere.
 		static int GetDefaultRendererType();
