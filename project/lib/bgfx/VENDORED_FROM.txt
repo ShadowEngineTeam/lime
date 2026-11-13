@@ -33,5 +33,5 @@ Local changes on top of that commit (keep them when re-vendoring):
   creates the OpenGL ES renderer from it. bgfx builds renderer_gl.cpp as either OpenGL or OpenGL ES, so
   desktop otherwise has no OpenGL ES. Windows creates the context with WGL (WGL_EXT_create_context_es_profile
   on the vendor driver), Linux with EGL.
-- bgfx-files.xml builds bgfx with BGFX_CONFIG_VIDEO=0 and leaves out src/video_*.cpp. Lime has no binding
-  for bgfx's hardware video decoding.
+- bgfx-files.xml builds bgfx with BGFX_CONFIG_VIDEO=0, so src/video_*.cpp only build their stubs. Lime has
+  no binding for bgfx's hardware video decoding.

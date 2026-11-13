@@ -136,6 +136,7 @@
 			<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_mathlib_softfloat.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_mathlib.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_partition_tables.cpp" />
+			<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_percentile_tables.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_quantization.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_symbolic_physical.cpp" />
 			<file name="${NATIVE_TOOLKIT_PATH}/bimg/3rdparty/astc-encoder/source/astcenc_weight_quant_xfer_tables.cpp" />
