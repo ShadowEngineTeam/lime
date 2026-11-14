@@ -21,34 +21,10 @@ namespace lime
 
 	double drawScale = 1.0;
 
-	static const char *setting(const char *name)
-	{
-		const char *value = SDL_getenv_unsafe(name);
-
-		if (value == NULL || value[0] == '\0')
-		{
-			value = SDL_GetHint(name);
-		}
-
-		if (value == NULL || value[0] == '\0')
-		{
-			const std::string prefixed = std::string("SDL_") + name;
-			value = SDL_GetHint(prefixed.c_str());
-		}
-
-		return (value != NULL && value[0] != '\0') ? value : NULL;
-	}
-
-	static bool envEnabled(const char *name)
-	{
-		const char *value = setting(name);
-		return value != NULL && value[0] != '0';
-	}
-
 	static std::vector<std::string> rendererTable()
 	{
 		std::vector<std::string> entries;
-		const char *table = setting("LIME_BGFX_PLATFORM");
+		const char *table = SDL_GetHint("SDL_LIME_BGFX_RENDERER");
 
 		if (table == NULL)
 			return entries;
@@ -192,7 +168,7 @@ namespace lime
 			if (rendererType >= 0)
 				choices.push_back({rendererType, entry, false});
 			else
-				SDL_Log("LIME_BGFX_PLATFORM: \"%s\" is not a renderer, skipping it\n", entry.c_str());
+				SDL_Log("SDL_LIME_BGFX_RENDERER: \"%s\" is not a renderer, skipping it\n", entry.c_str());
 		}
 
 		const bool fromTable = !choices.empty();
@@ -255,7 +231,7 @@ namespace lime
 
 		SDL_SetError("%s", failures.c_str());
 
-		showRendererError(NULL, fromTable ? "None of the renderers in LIME_BGFX_PLATFORM could start" : "Could not start a renderer");
+		showRendererError(NULL, fromTable ? "None of the renderers in SDL_LIME_BGFX_RENDERER could start" : "Could not start a renderer");
 #else
 		std::vector<std::string> entries = rendererTable();
 		bool softwareLast = false;
@@ -275,7 +251,7 @@ namespace lime
 
 		if (!entries.empty())
 		{
-			SDL_Log("LIME_BGFX_PLATFORM: this build renders with OpenGL, not bgfx. The renderers it names only switch the software fallback off, unless \"software\" is one of them\n");
+			SDL_Log("SDL_LIME_BGFX_RENDERER: this build renders with OpenGL, not bgfx. The renderers it names only switch the software fallback off, unless \"software\" is one of them\n");
 		}
 
 		auto startOpenGL = [&]() -> bool
@@ -430,7 +406,7 @@ namespace lime
 				{SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 2, 1, (SDL_GLContextFlag)0},
 			};
 
-			const bool compatOnly = envEnabled("LIME_GL_COMPAT");
+			const bool compatOnly = SDL_GetHintBoolean("SDL_LIME_GL_COMPAT", false);
 
 			for (size_t i = compatOnly ? 2 : 0; i < SDL_arraysize(contextRequests); ++i)
 			{
