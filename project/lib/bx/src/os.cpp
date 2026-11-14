@@ -33,11 +33,9 @@
 #		include <dlfcn.h> // dlopen, dlclose, dlsym
 #	endif // !BX_PLATFORM_PS4 && !BX_PLATFORM_PS5
 
-#	if BX_PLATFORM_ANDROID
-#		include <stdio.h>  // fopen
-#		include <sys/mman.h>
-#	elif   BX_PLATFORM_LINUX \
-		|| BX_PLATFORM_RPI
+#	if BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_LINUX   \
+	|| BX_PLATFORM_RPI
 #		include <stdio.h>  // fopen
 #		include <sys/mman.h>
 #		include <sys/syscall.h>
@@ -144,7 +142,8 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return ::GetCurrentThreadId();
-#elif  BX_PLATFORM_LINUX \
+#elif  BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_RPI
 		return (pid_t)::syscall(SYS_gettid);
 #elif  BX_PLATFORM_IOS \
@@ -565,12 +564,24 @@ namespace bx
 			}
 
 			uint32_t effectiveProtect = protect;
+
 			if (0 == effectiveProtect)
 			{
-				effectiveProtect = (Memory::Commit == (state & Memory::Commit) ) ? Memory::ProtectReadWrite : Memory::ProtectNone;
+				effectiveProtect = (Memory::Commit == (state & Memory::Commit) )
+					? Memory::ProtectReadWrite
+					: Memory::ProtectNone
+					;
 			}
 
-			int32_t mmapFlags = MAP_ANON | MAP_PRIVATE;
+			int32_t mmapFlags = 0
+				| MAP_ANON
+				| MAP_PRIVATE
+				;
+
+#	ifdef MAP_NORESERVE
+			mmapFlags |= Memory::ProtectNone == effectiveProtect ? MAP_NORESERVE : 0;
+#	endif // MAP_NORESERVE
+
 #	if BX_PLATFORM_LINUX
 			if (0 != (page & Memory::PageHuge) )
 			{
@@ -610,10 +621,8 @@ namespace bx
 			return result;
 		}
 
-		// Reconfigure existing region.
 		if (0 != (state & Memory::Decommit) )
 		{
-			// Drop physical pages, then revoke access so use-after-free faults.
 			madvise(_address, _size, MADV_DONTNEED);
 			const int32_t prot = (0 != protect) ? toPosixProt(protect) : PROT_NONE;
 			if (0 != mprotect(_address, _size, prot) )
@@ -650,6 +659,7 @@ namespace bx
 		}
 
 		return _address;
+
 #elif BX_PLATFORM_WINDOWS
 		if (NULL == _address)
 		{
@@ -689,7 +699,6 @@ namespace bx
 			return result;
 		}
 
-		// Reconfigure existing region.
 		if (0 != (state & Memory::Decommit) )
 		{
 			if (!VirtualFree(_address, _size, MEM_DECOMMIT) )

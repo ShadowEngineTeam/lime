@@ -1,4 +1,4 @@
-f7947b40842b8e3e249e425f60fe82d42630cc47 (bkaradzic/bx, vendored whole)
+57548da89a07771c5b0f8a6711149be70e08a329 (bkaradzic/bx, vendored whole)
 
 Local changes on top of that commit (keep them when re-vendoring):
 - src/thread.cpp: the MSVC thread naming __try/__except lives in its own function, setThreadNameSeh.
