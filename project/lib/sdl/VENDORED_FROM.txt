@@ -1,4 +1,4 @@
-38dfb78f7fe2e74ef11d9fd52840636299195326 (FunkinCrew/SDL, the commit FunkinCrew/lime pins)
+59790280fcdbe9e0b7b87246b45d7ecfdeecdcf9 (FunkinCrew/SDL, the commit FunkinCrew/lime pins)
 
 Left out: the HLSL sources in src/render/gpu/shaders (the compiled headers are kept), the CMake
 package files under Xcode/SDL/pkg-support and build-scripts/pkg-support. src/video/qnx/SDL_qnx.h
