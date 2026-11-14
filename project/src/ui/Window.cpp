@@ -136,8 +136,7 @@ namespace lime
 				{SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 2, 1, (SDL_GLContextFlag)0},
 			};
 
-			const char *forceCompat = SDL_getenv("LIME_GL_COMPAT");
-			const bool compatOnly = forceCompat != NULL && forceCompat[0] != '\0' && forceCompat[0] != '0';
+			const bool compatOnly = SDL_GetHintBoolean("SDL_LIME_GL_COMPAT", false);
 
 			for (size_t i = compatOnly ? 2 : 0; i < SDL_arraysize(contextRequests); ++i)
 			{
