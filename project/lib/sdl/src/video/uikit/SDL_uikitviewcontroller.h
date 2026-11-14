@@ -47,10 +47,12 @@
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection;
 
-- (void)setAnimationCallback:(int)interval
+- (void)setAnimationCallback:(float)frameRate
                     callback:(void (*)(void *))callback
                callbackParam:(void *)callbackParam;
+- (void)setAnimationFrameRate:(float)frameRate;
 
+- (void)applyFrameRate;
 - (void)startAnimation;
 - (void)stopAnimation;
 
