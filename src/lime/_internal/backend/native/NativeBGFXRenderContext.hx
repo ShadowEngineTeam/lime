@@ -11,6 +11,7 @@ import lime.graphics.bgfx.*;
 import lime.math.Matrix4;
 import lime.utils.ArrayBufferView;
 import lime.utils.DataPointer;
+import lime.utils.UInt8Array;
 import lime.utils.Float32Array;
 import lime.utils.Int32Array;
 import lime.utils.UInt32Array;
@@ -692,7 +693,8 @@ class NativeBGFXRenderContext
 	public function setViewTransform(id:Int, view:Matrix4, proj:Matrix4):Void
 	{
 		#if (lime_cffi && lime_bgfx && !macro)
-		NativeCFFI.lime_bgfx_set_view_transform(id, DataPointer.fromArrayBufferView((view : Float32Array)), DataPointer.fromArrayBufferView((proj : Float32Array)));
+		NativeCFFI.lime_bgfx_set_view_transform(id, DataPointer.fromArrayBufferView((view : Float32Array)),
+			DataPointer.fromArrayBufferView((proj : Float32Array)));
 		#end
 	}
 
@@ -835,7 +837,8 @@ class NativeBGFXRenderContext
 	public function reset(flags:Int = 0, ?swapChain:BGFXSwapChain):Void
 	{
 		#if (lime_cffi && lime_bgfx && !macro)
-		NativeCFFI.lime_bgfx_reset(flags, swapChain, swapChain != null && swapChain.window != null ? swapChain.window.__backend.handle : null);
+		NativeCFFI.lime_bgfx_reset(flags, swapChain, swapChain != null
+			&& swapChain.window != null ? swapChain.window.__backend.handle : null);
 		#end
 	}
 
@@ -1429,7 +1432,8 @@ class NativeBGFXRenderContext
 	public function topologyConvert(conversion:BGFXTopologyConvert, dst:ArrayBufferView, dstSize:Int, indices:ArrayBufferView, numIndices:Int, index32:Bool):Int
 	{
 		#if (lime_cffi && lime_bgfx && !macro)
-		return NativeCFFI.lime_bgfx_topology_convert(conversion, DataPointer.fromArrayBufferView(dst), dstSize, DataPointer.fromArrayBufferView(indices), numIndices, index32);
+		return NativeCFFI.lime_bgfx_topology_convert(conversion, DataPointer.fromArrayBufferView(dst), dstSize, DataPointer.fromArrayBufferView(indices),
+			numIndices, index32);
 		#end
 
 		return 0;
@@ -1439,15 +1443,25 @@ class NativeBGFXRenderContext
 			vertices:ArrayBufferView, stride:Int, indices:ArrayBufferView, numIndices:Int, index32:Bool):Void
 	{
 		#if (lime_cffi && lime_bgfx && !macro)
-		NativeCFFI.lime_bgfx_topology_sort_tri_list(sort, DataPointer.fromArrayBufferView(dst), dstSize, DataPointer.fromArrayBufferView(dir), DataPointer.fromArrayBufferView(pos), DataPointer.fromArrayBufferView(vertices), stride,
-			DataPointer.fromArrayBufferView(indices), numIndices, index32);
+		NativeCFFI.lime_bgfx_topology_sort_tri_list(sort, DataPointer.fromArrayBufferView(dst), dstSize, DataPointer.fromArrayBufferView(dir),
+			DataPointer.fromArrayBufferView(pos), DataPointer.fromArrayBufferView(vertices), stride, DataPointer.fromArrayBufferView(indices), numIndices,
+			index32);
 		#end
 	}
 
-	public function requestScreenShot(handle:BGFXFrameBuffer, filePath:String):Void
+	public function requestScreenShot(handle:BGFXFrameBuffer, filePath:String, ?callback:BGFXScreenShot->Void):Void
 	{
 		#if (lime_cffi && lime_bgfx && !macro)
-		NativeCFFI.lime_bgfx_request_screen_shot(handle, filePath);
+		if (callback == null)
+		{
+			NativeCFFI.lime_bgfx_request_screen_shot(handle, filePath, null, null);
+			return;
+		}
+
+		NativeCFFI.lime_bgfx_request_screen_shot(handle, filePath, Bytes.alloc(0), function(screenShot:BGFXScreenShot):Void
+		{
+			haxe.MainLoop.runInMainThread(callback.bind(screenShot));
+		});
 		#end
 	}
 

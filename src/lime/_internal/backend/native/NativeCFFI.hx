@@ -1543,7 +1543,7 @@ class NativeCFFI
 	private static var lime_bgfx_vertex_convert = new cpp.Callable<cpp.Object->lime.utils.DataPointer->cpp.Object->lime.utils.DataPointer->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_vertex_convert", "ododiv", false));
 	private static var lime_bgfx_topology_convert = new cpp.Callable<Int->lime.utils.DataPointer->Int->lime.utils.DataPointer->Int->Bool->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_topology_convert", "ididibi", false));
 	private static var lime_bgfx_topology_sort_tri_list = new cpp.Callable<Int->lime.utils.DataPointer->Int->lime.utils.DataPointer->lime.utils.DataPointer->lime.utils.DataPointer->Int->lime.utils.DataPointer->Int->Bool->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_topology_sort_tri_list", "ididddidibv", false));
-	private static var lime_bgfx_request_screen_shot = new cpp.Callable<cpp.Object->String->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_request_screen_shot", "osv", false));
+	private static var lime_bgfx_request_screen_shot = new cpp.Callable<cpp.Object->String->cpp.Object->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_request_screen_shot", "osoov", false));
 	#elseif neko
 	private static var lime_bgfx_render_frame = CFFI.load("lime", "lime_bgfx_render_frame", 0);
 	private static var lime_bgfx_set_debug = CFFI.load("lime", "lime_bgfx_set_debug", 3);
@@ -1708,7 +1708,7 @@ class NativeCFFI
 	private static var lime_bgfx_vertex_convert = CFFI.load("lime", "lime_bgfx_vertex_convert", 5);
 	private static var lime_bgfx_topology_convert = CFFI.load("lime", "lime_bgfx_topology_convert", -1);
 	private static var lime_bgfx_topology_sort_tri_list = CFFI.load("lime", "lime_bgfx_topology_sort_tri_list", -1);
-	private static var lime_bgfx_request_screen_shot = CFFI.load("lime", "lime_bgfx_request_screen_shot", 2);
+	private static var lime_bgfx_request_screen_shot = CFFI.load("lime", "lime_bgfx_request_screen_shot", 4);
 	#end
 	#end
 	#if (lime_cffi && !macro && lime_harfbuzz)
