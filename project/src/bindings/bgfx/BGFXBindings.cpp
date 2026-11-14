@@ -2213,6 +2213,7 @@ namespace lime
 			{"d3d12", bgfx::RendererType::Direct3D12},
 			{"opengl", bgfx::RendererType::OpenGL},
 			{"opengles", bgfx::RendererType::OpenGLES},
+			{"noop", bgfx::RendererType::Noop},
 		};
 
 		if (name)
