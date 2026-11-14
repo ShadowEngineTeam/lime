@@ -58,11 +58,14 @@
 
 			<compilerflag value="-msse4.2" if="iphonesim" unless="HXCPP_ARM64" />
 
+			<compilerflag value="-DBIMG_CONFIG_ENCODE_WIC=0" />
+
 		</section>
 
 		<section>
 
 			<file name="${NATIVE_TOOLKIT_PATH}/bimg/src/image.cpp" />
+			<file name="${NATIVE_TOOLKIT_PATH}/bimg/src/image_encode_wic.cpp" />
 
 		</section>
 
