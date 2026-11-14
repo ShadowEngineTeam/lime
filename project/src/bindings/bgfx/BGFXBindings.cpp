@@ -21,12 +21,13 @@
 #include <system/ValuePointer.h>
 #include <ui/Window.h>
 #include <utils/ArrayBufferView.h>
+#include <utils/Bytes.h>
 #include <utils/HaxeResource.h>
 #include <vector>
 
 #if defined(IPHONE) || defined(HX_MACOS)
-#include <SDL3/SDL_metal.h>
 #import <QuartzCore/QuartzCore.h>
+#include <SDL3/SDL_metal.h>
 #endif
 
 namespace lime
@@ -57,7 +58,53 @@ namespace lime
 		std::vector<uint8_t> m_buffer;
 	};
 
-#ifdef HXCPP_DEBUG
+	struct BGFXScreenShotRequest
+	{
+		std::string filePath;
+		AutoGCRoot *data;
+		AutoGCRoot *callback;
+	};
+
+	static std::vector<BGFXScreenShotRequest> s_screenShotRequests;
+	static Mutex s_screenShotRequestsMutex;
+
+	struct BGFXScreenShotData
+	{
+		BGFXScreenShotRequest request;
+		uint32_t width;
+		uint32_t height;
+		uint32_t pitch;
+		bgfx::TextureFormat::Enum format;
+		bool yflip;
+		std::vector<uint8_t> data;
+	};
+
+	static void SDLCALL screenShotMainThreadCallback(void *userdata)
+	{
+		auto *screenShotData = static_cast<BGFXScreenShotData *>(userdata);
+
+		{
+			Bytes bytes(screenShotData->request.data->get());
+			bytes.Resize((int)screenShotData->data.size());
+			memcpy(bytes.b, screenShotData->data.data(), screenShotData->data.size());
+		}
+
+		value screenShot = alloc_empty_object();
+		alloc_field(screenShot, val_id("filePath"), alloc_string(screenShotData->request.filePath.c_str()));
+		alloc_field(screenShot, val_id("width"), alloc_int((int)screenShotData->width));
+		alloc_field(screenShot, val_id("height"), alloc_int((int)screenShotData->height));
+		alloc_field(screenShot, val_id("pitch"), alloc_int((int)screenShotData->pitch));
+		alloc_field(screenShot, val_id("format"), alloc_int((int)screenShotData->format));
+		alloc_field(screenShot, val_id("data"), screenShotData->request.data->get());
+		alloc_field(screenShot, val_id("yflip"), alloc_bool(screenShotData->yflip));
+
+		val_call1(screenShotData->request.callback->get(), screenShot);
+
+		delete screenShotData->request.data;
+		delete screenShotData->request.callback;
+		delete screenShotData;
+	}
+
 	class BGFXCallback : public bgfx::CallbackI
 	{
 	  public:
@@ -69,9 +116,11 @@ namespace lime
 
 		void traceVargs(const char *_filePath, uint16_t _line, const char *_format, va_list _argList) override
 		{
+#ifdef HXCPP_DEBUG
 			char message[2048];
 			vsnprintf(message, sizeof(message), _format, _argList);
 			SDL_Log("[BGFX] %s", message);
+#endif
 		}
 
 		void profilerBegin(const char *, uint32_t, const char *, uint16_t) override {}
@@ -80,7 +129,33 @@ namespace lime
 		uint32_t cacheReadSize(uint64_t) override { return 0; }
 		bool cacheRead(uint64_t, void *, uint32_t) override { return false; }
 		void cacheWrite(uint64_t, const void *, uint32_t) override {}
-		void screenShot(const char *, uint32_t, uint32_t, uint32_t, bgfx::TextureFormat::Enum, const void *, uint32_t, bool) override {}
+
+		void screenShot(const char *_filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, bgfx::TextureFormat::Enum _format, const void *_data, uint32_t _size, bool _yflip) override
+		{
+			BGFXScreenShotRequest request = {};
+
+			s_screenShotRequestsMutex.Lock();
+
+			for (auto it = s_screenShotRequests.begin(); it != s_screenShotRequests.end(); it++)
+			{
+				if (it->filePath == _filePath)
+				{
+					request = *it;
+					s_screenShotRequests.erase(it);
+					break;
+				}
+			}
+
+			s_screenShotRequestsMutex.Unlock();
+
+			if (!request.callback) return;
+
+			const uint8_t *data = (const uint8_t *)_data;
+			auto *screenShotData = new BGFXScreenShotData{request, _width, _height, _pitch, _format, _yflip, std::vector<uint8_t>(data, data + _size)};
+
+			SDL_RunOnMainThread(screenShotMainThreadCallback, screenShotData, false);
+		}
+
 		void captureBegin(uint32_t, uint32_t, uint32_t, bgfx::TextureFormat::Enum, bool) override {}
 		void captureEnd() override {}
 		void captureFrame(const void *, uint32_t) override {}
@@ -91,7 +166,6 @@ namespace lime
 	};
 
 	static BGFXCallback s_bgfxCallback;
-#endif
 
 	std::map<void *, void *> bgfxObjectPtrs;
 	std::vector<void *> gc_bgfx_ptr;
@@ -942,7 +1016,6 @@ namespace lime
 		return alloc_null();
 	}
 
-
 	static bool shaderReadFile(const char *path, std::string &out, void *)
 	{
 		size_t size = 0;
@@ -1198,7 +1271,6 @@ namespace lime
 		region.depth = (uint16_t)valFieldToInt(object, "depth", 0);
 		return region;
 	}
-
 
 #if defined(IPHONE) || defined(HX_MACOS)
 	SDL_MetalView mtlView = NULL;
@@ -1925,7 +1997,7 @@ namespace lime
 	}
 
 
-	void lime_bgfx_request_screen_shot(value handle, HxString filePath)
+	void lime_bgfx_request_screen_shot(value handle, HxString filePath, value data, value callback)
 	{
 		bgfx::FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
 
@@ -1934,7 +2006,16 @@ namespace lime
 			fbh = *(bgfx::FrameBufferHandle *)val_data(handle);
 		}
 
-		bgfx::requestScreenShot(fbh, hxs_utf8(filePath, nullptr));
+		const char *path = hxs_utf8(filePath, nullptr);
+
+		if (!val_is_null(data) && !val_is_null(callback))
+		{
+			s_screenShotRequestsMutex.Lock();
+			s_screenShotRequests.push_back({path, new AutoGCRoot(data), new AutoGCRoot(callback)});
+			s_screenShotRequestsMutex.Unlock();
+		}
+
+		bgfx::requestScreenShot(fbh, path);
 	}
 
 	DEFINE_PRIME0(lime_bgfx_render_frame);
@@ -2088,7 +2169,7 @@ namespace lime
 	DEFINE_PRIME5v(lime_bgfx_vertex_convert);
 	DEFINE_PRIME6(lime_bgfx_topology_convert);
 	DEFINE_PRIME10v(lime_bgfx_topology_sort_tri_list);
-	DEFINE_PRIME2v(lime_bgfx_request_screen_shot);
+	DEFINE_PRIME4v(lime_bgfx_request_screen_shot);
 
 #define DEFINE_BGFX_DESTROY(name, HandleType)                                                                                                                                                                                                                                                                                                                                                                                                                                                                      \
 	void lime_bgfx_destroy_##name(value handle)                                                                                                                                                                                                                                                                                                                                                                                                                                                                    \
@@ -2307,7 +2388,8 @@ namespace lime
 		}
 
 		// Sets the renderer to run on the main thread
-		// bgfx::renderFrame();
+		if (SDL_GetHintBoolean("SDL_LIME_BGFX_NO_RENDER_THREAD", false))
+			bgfx::renderFrame();
 
 		// Setup bgfx init struct
 		bgfx::Init init;
@@ -2333,10 +2415,7 @@ namespace lime
 		init.swapChain.ndt = getNativeDisplayHandle(sdlWindow);
 		init.platformData.type = getNativeWindowHandleType(sdlWindow);
 
-// Enable BGFX logging for debug
-#ifdef HXCPP_DEBUG
 		init.callback = &s_bgfxCallback;
-#endif
 
 		// Set resolution
 		SDL_GetWindowSizeInPixels(sdlWindow, (int *)&init.swapChain.width, (int *)&init.swapChain.height);
@@ -2382,7 +2461,8 @@ namespace lime
 
 	void BGFXBindings::ResetWindow(int width, int height)
 	{
-		if (!__initialized) return;
+		if (!__initialized)
+			return;
 
 		int w = width;
 		int h = height;

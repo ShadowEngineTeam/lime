@@ -914,9 +914,9 @@ class BGFX
 		context.setVertexBufferName(handle, name);
 	}
 
-	public static inline function requestScreenShot(handle:BGFXFrameBuffer, filePath:String):Void
+	public static inline function requestScreenShot(handle:BGFXFrameBuffer, filePath:String, ?callback:BGFXScreenShot->Void):Void
 	{
-		context.requestScreenShot(handle, filePath);
+		context.requestScreenShot(handle, filePath, callback);
 	}
 
 	public static inline function vertexPack(input:ArrayBufferView, inputNormalized:Bool, attrib:BGFXAttrib, layout:BGFXVertexLayout, data:ArrayBufferView,
