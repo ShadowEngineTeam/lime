@@ -1,4 +1,4 @@
-9bfbd6493b48a15238f2d1374a718ec026524515 (bkaradzic/bimg)
+77bebb28e12956bfced82bb2cf7c19ac5735b6c8 (bkaradzic/bimg)
 
 Local changes on top of that commit (keep them when re-vendoring):
 - 3rdparty/astc-encoder/source/astcenc_vecmathlib_sse_4.h: popcount uses __builtin_popcountll on

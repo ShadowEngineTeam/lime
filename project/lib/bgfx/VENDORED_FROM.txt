@@ -1,19 +1,12 @@
-9af322003a0a638796160713fb33b78a74b8c348 (FunkinCrew/bgfx, vendored: include, src, 3rdparty, tools/shaderc)
+b41c6ca9fd8d6c42f20a8c4757a7a55998a9cac2 (FunkinCrew/bgfx funkin, vendored: include, src, 3rdparty, tools/shaderc)
 
 Left out, as nothing in bgfx-files.xml builds or includes them: examples, bindings, docs, scripts,
 tools/bin and the tools other than shaderc.
 
 Local changes on top of that commit (keep them when re-vendoring):
-- src/renderer_vk.cpp: TextureVK::create tells the buffer-to-image copy the row length of a
-  CPU-decoded (emulated) compressed mip, which is rounded up to whole blocks. Without it a
-  texture whose size is not a multiple of the block size came out sheared.
 - src/renderer_gl.cpp: the OpenGL renderer sets caps.vendorId to BGFX_PCI_ID_SOFTWARE_RASTERIZER when
   GL_RENDERER names a CPU implementation (llvmpipe, SwiftShader, GDI Generic...). Lime uses it to
   refuse software renderers; the vendor string alone does not tell them apart.
-- src/renderer_gl.cpp: TextureGL::create sizes the buffer for a CPU-decoded (emulated) compressed mip
-  from the mip, which is rounded up to whole blocks, and gives OpenGL its row length. The buffer was
-  sized from the texture, so a texture whose size is not a multiple of the block size overflowed it
-  (heap corruption, "free(): invalid pointer") and would have come out sheared.
 - src/bgfx.cpp: parseAttrTo reads its number with plain loops instead of bx::strFind, strCopy and
   fromString. Those measure a string up to INT32_MAX; inlined on a stack buffer, clang 23 could not
   link the 32-bit x86 Linux build with ThinLTO ("64-bit offset calculated but target is 32-bit").

@@ -389,17 +389,28 @@ TEST_CASE("strFind matches a byte loop", "[string]")
 	{
 		const int32_t offset  = int32_t(rng.gen() % 16);
 		const int32_t len     = int32_t(rng.gen() % 301);
-		const int32_t findLen = int32_t(rng.gen() % 5);
+		const int32_t findLen = 0 == ii%4
+			? int32_t(rng.gen() % 41)
+			: int32_t(rng.gen() % 5)
+			;
 
 		for (int32_t jj = 0; jj < len; ++jj)
 		{
 			buffer[offset + jj] = char('a' + rng.gen() % 3);
 		}
 
-		char find[4];
+		char find[40];
 		for (int32_t jj = 0; jj < findLen; ++jj)
 		{
 			find[jj] = char('a' + rng.gen() % 3);
+		}
+
+		if (0 < findLen
+		&&  findLen <= len
+		&&  0 == rng.gen() % 2)
+		{
+			const int32_t at = int32_t(rng.gen() % uint32_t(len - findLen + 1) );
+			bx::memCopy(&buffer[offset + at], find, findLen);
 		}
 
 		const char* str = &buffer[offset];
@@ -709,8 +720,150 @@ TEST_CASE("fromString rejects malformed", "[string]")
 	}
 
 	double d = 0.0;
-	REQUIRE(bx::fromString(&d, "12abc") );
+	REQUIRE(!bx::fromString(&d, "12abc") );
 	REQUIRE(d == 12.0);
+}
+
+TEST_CASE("fromString whole string", "[string]")
+{
+	double d = 0.0;
+
+	REQUIRE( bx::fromString(&d, "1.5e3") );   REQUIRE(d == 1500.0);
+	REQUIRE( bx::fromString(&d, " 1.5 \t") ); REQUIRE(d == 1.5);
+	REQUIRE(!bx::fromString(&d, "1.5e3x") );  REQUIRE(d == 1500.0);
+	REQUIRE(!bx::fromString(&d, "2e") );      REQUIRE(d == 2.0);
+	REQUIRE(!bx::fromString(&d, "1 2") );     REQUIRE(d == 1.0);
+
+	float f = 0.0f;
+	REQUIRE( bx::fromString(&f, "0.25") );    REQUIRE(f == 0.25f);
+	REQUIRE(!bx::fromString(&f, "0.25f") );   REQUIRE(f == 0.25f);
+}
+
+TEST_CASE("fromString integer", "[string]")
+{
+	long long ll = 1234;
+
+	REQUIRE(bx::fromString(&ll, "0") );        REQUIRE(0 == ll);
+	REQUIRE(bx::fromString(&ll, "123") );      REQUIRE(123 == ll);
+	REQUIRE(bx::fromString(&ll, "-123") );     REQUIRE(-123 == ll);
+	REQUIRE(bx::fromString(&ll, "+7") );       REQUIRE(7 == ll);
+	REQUIRE(bx::fromString(&ll, " \t42") );    REQUIRE(42 == ll);
+	REQUIRE(bx::fromString(&ll, "42 \n") );    REQUIRE(42 == ll);
+	REQUIRE(bx::fromString(&ll, "007") );      REQUIRE(7 == ll);
+
+	REQUIRE(!bx::fromString(&ll, "12abc") );   REQUIRE(12 == ll);
+	REQUIRE(!bx::fromString(&ll, "4u") );      REQUIRE(4 == ll);
+	REQUIRE(!bx::fromString(&ll, "1 2") );     REQUIRE(1 == ll);
+	REQUIRE(!bx::fromString(&ll, "0x10") );    REQUIRE(0 == ll);
+	REQUIRE(!bx::fromString(&ll, "1.5") );     REQUIRE(1 == ll);
+
+	uint32_t u32 = 0;
+	REQUIRE(!bx::fromString(&u32, "7b") );     REQUIRE(7 == u32);
+
+	int8_t i8 = 0;
+	REQUIRE(!bx::fromString(&i8, "300x") );    REQUIRE(127 == i8);
+}
+
+TEST_CASE("fromString integer rejects malformed", "[string]")
+{
+	const char* bad[] = { "", "abc", "+", "-", "x1", "   ", "- 1", "+-1", ".5" };
+
+	for (const char* str : bad)
+	{
+		long long ll = 1234;
+		REQUIRE(!bx::fromString(&ll, str) );
+		REQUIRE(0 == ll);
+
+		unsigned long long ull = 1234;
+		REQUIRE(!bx::fromString(&ull, str) );
+		REQUIRE(0 == ull);
+
+		int32_t i32 = 1234;
+		REQUIRE(!bx::fromString(&i32, str) );
+		REQUIRE(0 == i32);
+
+		uint8_t u8 = 123;
+		REQUIRE(!bx::fromString(&u8, str) );
+		REQUIRE(0 == u8);
+	}
+
+	const char* digits = "123";
+	long long ll = 1234;
+	REQUIRE(!bx::fromString(&ll, bx::StringView(digits, 0) ) );
+}
+
+TEST_CASE("fromString integer stays in view", "[string]")
+{
+	const char digits[] = { '1', '2', '3', '4' };
+
+	long long ll = 0;
+
+	REQUIRE(bx::fromString(&ll, bx::StringView(digits, 2) ) );
+	REQUIRE(12 == ll);
+
+	REQUIRE(bx::fromString(&ll, bx::StringView(digits, 4) ) );
+	REQUIRE(1234 == ll);
+
+	uint32_t u32 = 0;
+	REQUIRE(bx::fromString(&u32, bx::StringView(digits, 3) ) );
+	REQUIRE(123 == u32);
+}
+
+TEST_CASE("fromString integer range", "[string]")
+{
+	long long ll = 0;
+
+	REQUIRE( bx::fromString(&ll,  "9223372036854775807") ); REQUIRE(INT64_MAX == ll);
+	REQUIRE( bx::fromString(&ll, "-9223372036854775808") ); REQUIRE(INT64_MIN == ll);
+	REQUIRE(!bx::fromString(&ll,  "9223372036854775808") ); REQUIRE(INT64_MAX == ll);
+	REQUIRE(!bx::fromString(&ll, "-9223372036854775809") ); REQUIRE(INT64_MIN == ll);
+	REQUIRE(!bx::fromString(&ll,  "99999999999999999999999999") ); REQUIRE(INT64_MAX == ll);
+	REQUIRE(!bx::fromString(&ll, "-99999999999999999999999999") ); REQUIRE(INT64_MIN == ll);
+
+	unsigned long long ull = 0;
+
+	REQUIRE( bx::fromString(&ull, "18446744073709551615") ); REQUIRE(UINT64_MAX == ull);
+	REQUIRE(!bx::fromString(&ull, "18446744073709551616") ); REQUIRE(UINT64_MAX == ull);
+	REQUIRE(!bx::fromString(&ull, "99999999999999999999999999") ); REQUIRE(UINT64_MAX == ull);
+	REQUIRE( bx::fromString(&ull, "9223372036854775808") );  REQUIRE(UINT64_C(9223372036854775808) == ull);
+	REQUIRE(!bx::fromString(&ull, "-1") );                   REQUIRE(0 == ull);
+	REQUIRE( bx::fromString(&ull, "-0") );                   REQUIRE(0 == ull);
+	REQUIRE( bx::fromString(&ull, "+5") );                   REQUIRE(5 == ull);
+
+	int8_t i8 = 0;
+	REQUIRE( bx::fromString(&i8, "127") );  REQUIRE( 127 == i8);
+	REQUIRE( bx::fromString(&i8, "-128") ); REQUIRE(-128 == i8);
+	REQUIRE(!bx::fromString(&i8, "128") );  REQUIRE( 127 == i8);
+	REQUIRE(!bx::fromString(&i8, "-129") ); REQUIRE(-128 == i8);
+
+	uint8_t u8 = 0;
+	REQUIRE( bx::fromString(&u8, "255") );  REQUIRE(255 == u8);
+	REQUIRE(!bx::fromString(&u8, "256") );  REQUIRE(255 == u8);
+	REQUIRE(!bx::fromString(&u8, "-1") );   REQUIRE(0 == u8);
+
+	int16_t i16 = 0;
+	REQUIRE( bx::fromString(&i16, "-32768") ); REQUIRE(INT16_MIN == i16);
+	REQUIRE(!bx::fromString(&i16, "32768") );  REQUIRE(INT16_MAX == i16);
+
+	uint16_t u16 = 0;
+	REQUIRE( bx::fromString(&u16, "65535") ); REQUIRE(UINT16_MAX == u16);
+	REQUIRE(!bx::fromString(&u16, "65536") ); REQUIRE(UINT16_MAX == u16);
+
+	int32_t i32 = 0;
+	REQUIRE( bx::fromString(&i32, "-2147483648") ); REQUIRE(INT32_MIN == i32);
+	REQUIRE(!bx::fromString(&i32, "2147483648") );  REQUIRE(INT32_MAX == i32);
+	REQUIRE(!bx::fromString(&i32, "99999999999999999999999999") ); REQUIRE(INT32_MAX == i32);
+
+	uint32_t u32 = 0;
+	REQUIRE( bx::fromString(&u32, "4294967295") ); REQUIRE(UINT32_MAX == u32);
+	REQUIRE(!bx::fromString(&u32, "4294967296") ); REQUIRE(UINT32_MAX == u32);
+
+	long l = 0;
+	REQUIRE( bx::fromString(&l, "-2147483648") ); REQUIRE(-2147483647L - 1 == l);
+
+	unsigned long ul = 0;
+	REQUIRE( bx::fromString(&ul, "4294967295") ); REQUIRE(4294967295UL == ul);
+	REQUIRE(!bx::fromString(&ul, "-1") );         REQUIRE(0 == ul);
 }
 
 TEST_CASE("fromString float rounds once", "[string]")
@@ -1100,6 +1253,8 @@ TEST_CASE("0terminated", "[string]")
 	REQUIRE(2 == st.getLength() );
 }
 
+static_assert(bx::isTriviallyCopyable<bx::FixedString64>(), "FixedStringT must be trivially copyable.");
+
 TEST_CASE("FixedStringT", "[string]")
 {
 	bx::FixedString64 fs64("1389");
@@ -1381,4 +1536,66 @@ TEST_CASE("strFind-bench", "[.][!benchmark]")
 		haystack[len - 2] = 'a';
 		haystack[len - 1] = 'a';
 	}
+
+	std::string lines;
+
+	for (uint32_t ii = 0; ii < 1024; ++ii)
+	{
+		char tmp[64];
+		const int32_t len = bx::snprintf(tmp, sizeof(tmp), "\tfloat4 value%u = input%u;\n", ii, ii);
+		lines.append(tmp, size_t(len) );
+	}
+
+	const std::string dense(lines, 0, lines.find("value16 ") - 8);
+	const bx::StringView denseView(dense.c_str(), int32_t(dense.size() ) );
+
+	BENCHMARK("bx::strFind dense 16 lines")
+	{
+		int32_t num = 0;
+
+		for (bx::StringView found = bx::strFind(denseView, "float4"); !found.isEmpty(); found = bx::strFind(bx::StringView(found.getTerm(), denseView.getTerm() ), "float4") )
+		{
+			++num;
+		}
+
+		return num;
+	};
+
+	BENCHMARK("std::string::find dense 16 lines")
+	{
+		int32_t num = 0;
+
+		for (size_t pos = dense.find("float4"); std::string::npos != pos; pos = dense.find("float4", pos + 6) )
+		{
+			++num;
+		}
+
+		return num;
+	};
+
+	const bx::StringView linesView(lines.c_str(), int32_t(lines.size() ) );
+
+	BENCHMARK("bx::strFind 1024 lines")
+	{
+		return bx::strFind(linesView, "value1023 =").getPtr();
+	};
+
+	BENCHMARK("std::string::find 1024 lines")
+	{
+		return lines.find("value1023 =");
+	};
+
+	std::string fff(4096, 'f');
+	fff.replace(4096 - 8, 6, "float4");
+	const bx::StringView fffView(fff.c_str(), int32_t(fff.size() ) );
+
+	BENCHMARK("bx::strFind 4096 f")
+	{
+		return bx::strFind(fffView, "float4").getPtr();
+	};
+
+	BENCHMARK("std::string::find 4096 f")
+	{
+		return fff.find("float4");
+	};
 }

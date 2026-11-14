@@ -430,16 +430,35 @@ namespace bimg
 		}
 	}
 
-	BX_NO_INLINE void imageCheckerboard(void* _dst, uint32_t _width, uint32_t _height, uint32_t _step, uint32_t _0, uint32_t _1)
+	static void imageCheckerboard(void* _dst, uint32_t _width, uint32_t _height, uint32_t _dstPitch, uint32_t _step, uint32_t _0, uint32_t _1)
 	{
-		uint32_t* dst = (uint32_t*)_dst;
-		for (uint32_t yy = 0; yy < _height; ++yy)
+		uint8_t* dst = (uint8_t*)_dst;
+		for (uint32_t yy = 0; yy < _height; ++yy, dst += _dstPitch)
 		{
+			uint32_t* row = (uint32_t*)dst;
 			for (uint32_t xx = 0; xx < _width; ++xx)
 			{
-				uint32_t abgr = ( (xx/_step)&1) ^ ( (yy/_step)&1) ? _1 : _0;
-				*dst++ = abgr;
+				row[xx] = ( (xx/_step)&1) ^ ( (yy/_step)&1) ? _1 : _0;
 			}
+		}
+	}
+
+	BX_NO_INLINE void imageCheckerboard(void* _dst, uint32_t _width, uint32_t _height, uint32_t _step, uint32_t _0, uint32_t _1)
+	{
+		imageCheckerboard(_dst, _width, _height, _width*4, _step, _0, _1);
+	}
+
+	static void imageCopyBlock(uint8_t* _dst, uint32_t _dstPitch, const void* _block, uint32_t _xx, uint32_t _yy, uint32_t _width, uint32_t _height, uint32_t _texelSize)
+	{
+		const uint32_t width  = bx::min<uint32_t>(4, _width  - _xx*4);
+		const uint32_t height = bx::min<uint32_t>(4, _height - _yy*4);
+
+		const uint8_t* src = (const uint8_t*)_block;
+		uint8_t* dst = &_dst[_yy*4*_dstPitch + _xx*4*_texelSize];
+
+		for (uint32_t ii = 0; ii < height; ++ii)
+		{
+			bx::memCopy(&dst[ii*_dstPitch], &src[ii*4*_texelSize], width*_texelSize);
 		}
 	}
 
@@ -1293,7 +1312,7 @@ namespace bimg
 
 		for (uint32_t ii = 0; ii < size; ++ii)
 		{
-			float rgba[4];
+			float rgba[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 			_unpack(rgba, &src[ii*_bpp/8]);
 			_pack(&dst[ii*_bpp/8], rgba);
 		}
@@ -1310,7 +1329,7 @@ namespace bimg
 			{
 				for (uint32_t xx = 0; xx < _width; ++xx)
 				{
-					float rgba[4];
+					float rgba[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 					_unpack(rgba, &src[xx*_srcBpp/8]);
 					_pack(&dst[xx*_dstBpp/8], rgba);
 				}
@@ -1581,9 +1600,9 @@ namespace bimg
 		return uint8_t(result.u32);
 	}
 
-	static void decodeBlockDxt(uint8_t _dst[16*4], const uint8_t _src[8])
+	[[maybe_unused]] static void decodeBlockDxt(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_BC2 || BIMG_CONFIG_DECODE_BC3) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_BC2 || BIMG_CONFIG_DECODE_BC3) )
 		{
 			return;
 		}
@@ -1617,9 +1636,9 @@ namespace bimg
 		}
 	}
 
-	static void decodeBlockDxt1(uint8_t _dst[16*4], const uint8_t _src[8])
+	[[maybe_unused]] static void decodeBlockDxt1(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_BC1 || BIMG_CONFIG_DECODE_BC2 || BIMG_CONFIG_DECODE_BC3) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_BC1 || BIMG_CONFIG_DECODE_BC2 || BIMG_CONFIG_DECODE_BC3) )
 		{
 			return;
 		}
@@ -1675,7 +1694,7 @@ namespace bimg
 
 	static void decodeBlockDxt23A(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_BC2) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_BC2) )
 		{
 			return;
 		}
@@ -1689,7 +1708,7 @@ namespace bimg
 
 	static void decodeBlockDxt45A(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_BC3 || BIMG_CONFIG_DECODE_BC4 || BIMG_CONFIG_DECODE_BC5) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_BC3 || BIMG_CONFIG_DECODE_BC4 || BIMG_CONFIG_DECODE_BC5) )
 		{
 			return;
 		}
@@ -2069,7 +2088,7 @@ namespace bimg
 
 	static void decodeBlockBc6h(uint16_t _dst[16*3], const uint8_t _src[16], bool _signed)
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_BC6) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_BC6) )
 		{
 			return;
 		}
@@ -2494,7 +2513,7 @@ namespace bimg
 
 	static void decodeBlockBc6h(float _dst[16*4], const uint8_t _src[16])
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_BC6) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_BC6) )
 		{
 			return;
 		}
@@ -2545,9 +2564,9 @@ namespace bimg
 		{ 2, 6, 0, 0, 5, 5, 1, 0, { 2, 0 } }, // 7
 	};
 
-	static void decodeBlockBc7(uint8_t _dst[16*4], const uint8_t _src[16])
+	[[maybe_unused]] static void decodeBlockBc7(uint8_t _dst[16*4], const uint8_t _src[16])
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_BC7) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_BC7) )
 		{
 			return;
 		}
@@ -2743,12 +2762,16 @@ namespace bimg
 	//
 	static void decodeBlockATC(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_ATC) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_ATC) )
 		{
 			return;
 		}
 
 		uint8_t colors[4*4];
+		colors[ 3] = 255;
+		colors[ 7] = 255;
+		colors[11] = 255;
+		colors[15] = 255;
 
 		uint32_t c0 = _src[0] | (_src[1] << 8);
 		uint32_t c1 = _src[2] | (_src[3] << 8);
@@ -3050,9 +3073,9 @@ namespace bimg
 		}
 	}
 
-	static void decodeBlockEtc12(uint8_t _dst[16*4], const uint8_t _src[8])
+	[[maybe_unused]] static void decodeBlockEtc12(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_ETC1 || BIMG_CONFIG_DECODE_ETC2) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_ETC1 || BIMG_CONFIG_DECODE_ETC2) )
 		{
 			return;
 		}
@@ -3204,9 +3227,9 @@ namespace bimg
 		}
 	}
 
-	static void decodeBlockEtc2Rgb8A1(uint8_t _dst[16*4], const uint8_t _src[8])
+	[[maybe_unused]] static void decodeBlockEtc2Rgb8A1(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_ETC2) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_ETC2) )
 		{
 			return;
 		}
@@ -3333,7 +3356,7 @@ namespace bimg
 
 	void decodeBlockEtc2Alpha(uint8_t _dst[16 * 4], const uint8_t _src[8])
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_ETC2))
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_ETC2))
 		{
 			return;
 		}
@@ -3360,7 +3383,7 @@ namespace bimg
 	template<bool SignedT>
 	static void decodeBlockEac(uint8_t _dst[16*4], const uint8_t _src[8], uint32_t _byteOffset)
 	{
-		if (!BX_ENABLED(BIMG_CONFIG_DECODE_ETC2) )
+		if constexpr (!BX_ENABLED(BIMG_CONFIG_DECODE_ETC2) )
 		{
 			return;
 		}
@@ -6059,15 +6082,15 @@ namespace bimg
 		const uint8_t* src = (const uint8_t*)_src;
 		uint8_t* dst = (uint8_t*)_dst;
 
-		uint32_t width  = _width/4;
-		uint32_t height = _height/4;
+		uint32_t width  = (_width  + 3)/4;
+		uint32_t height = (_height + 3)/4;
 
 		uint8_t temp[16*4];
 
 		switch (_srcFormat)
 		{
 		case TextureFormat::BC1:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_BC1) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_BC1) )
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
 				{
@@ -6076,23 +6099,19 @@ namespace bimg
 						decodeBlockDxt1(temp, src);
 						src += 8;
 
-						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "BC1 decoder is disabled (BIMG_CONFIG_DECODE_BC1).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC2:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_BC2) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_BC2) )
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
 				{
@@ -6103,23 +6122,19 @@ namespace bimg
 						decodeBlockDxt(temp, src);
 						src += 8;
 
-						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "BC2 decoder is disabled (BIMG_CONFIG_DECODE_BC2).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC3:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_BC3) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_BC3) )
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
 				{
@@ -6130,24 +6145,20 @@ namespace bimg
 						decodeBlockDxt(temp, src);
 						src += 8;
 
-						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "BC3 decoder is disabled (BIMG_CONFIG_DECODE_BC3).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC4:
 		case TextureFormat::BC4S:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_BC4) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_BC4) )
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
 				{
@@ -6163,24 +6174,20 @@ namespace bimg
 							temp[ii*4+3] = 255;
 						}
 
-						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "BC4 decoder is disabled (BIMG_CONFIG_DECODE_BC4).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC5:
 		case TextureFormat::BC5S:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_BC5) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_BC5) )
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
 				{
@@ -6197,24 +6204,20 @@ namespace bimg
 							temp[ii*4+3] = 255;
 						}
 
-						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "BC5 decoder is disabled (BIMG_CONFIG_DECODE_BC5).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC6H:
 		case TextureFormat::BC6HU:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_BC6) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_BC6) )
 			{
 				ImageContainer* rgba32f = imageAlloc(_allocator
 					, TextureFormat::RGBA32F
@@ -6235,12 +6238,12 @@ namespace bimg
 			else
 			{
 				BX_WARN(false, "BC6 decoder is disabled (BIMG_CONFIG_DECODE_BC6).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC7:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_BC7) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_BC7) )
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
 				{
@@ -6249,24 +6252,20 @@ namespace bimg
 						decodeBlockBc7(temp, src);
 						src += 16;
 
-						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "BC7 decoder is disabled (BIMG_CONFIG_DECODE_BC7).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::ETC1:
 		case TextureFormat::ETC2:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_ETC1 || BIMG_CONFIG_DECODE_ETC2) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_ETC1 || BIMG_CONFIG_DECODE_ETC2) )
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
 				{
@@ -6275,23 +6274,19 @@ namespace bimg
 						decodeBlockEtc12(temp, src);
 						src += 8;
 
-						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "ETC1/ETC2 decoder is disabled (BIMG_CONFIG_DECODE_ETC1/ETC2).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::ETC2A:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_ETC2))
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_ETC2))
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
 				{
@@ -6302,23 +6297,19 @@ namespace bimg
 
 						src += 16;
 
-						uint8_t* block = &dst[yy*_dstPitch * 4 + xx * 16];
-						bx::memCopy(&block[0 * _dstPitch], &temp[0], 16);
-						bx::memCopy(&block[1 * _dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2 * _dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3 * _dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "ETC2 decoder is disabled (BIMG_CONFIG_DECODE_ETC2).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00));
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00));
 			}
 			break;
 
 		case TextureFormat::ETC2A1:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_ETC2) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_ETC2) )
 			{
 				for (uint32_t yy = 0; yy < height; ++yy)
 				{
@@ -6327,24 +6318,20 @@ namespace bimg
 						decodeBlockEtc2Rgb8A1(temp, src);
 						src += 8;
 
-						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "ETC2A1 decoder is disabled (BIMG_CONFIG_DECODE_ETC2).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffff0000) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xffff0000) );
 			}
 			break;
 
 		case TextureFormat::EACR11:
 		case TextureFormat::EACR11S:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_ETC2) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_ETC2) )
 			{
 				const bool sign = TextureFormat::EACR11S == _srcFormat;
 
@@ -6371,24 +6358,20 @@ namespace bimg
 
 						src += 8;
 
-						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "EAC decoder is disabled (BIMG_CONFIG_DECODE_ETC2).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ffff) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ffff) );
 			}
 			break;
 
 		case TextureFormat::EACRG11:
 		case TextureFormat::EACRG11S:
-			if (BX_ENABLED(BIMG_CONFIG_DECODE_ETC2) )
+			if constexpr (BX_ENABLED(BIMG_CONFIG_DECODE_ETC2) )
 			{
 				const bool sign = TextureFormat::EACRG11S == _srcFormat;
 
@@ -6417,29 +6400,25 @@ namespace bimg
 
 						src += 16;
 
-						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 					}
 				}
 			}
 			else
 			{
 				BX_WARN(false, "EAC decoder is disabled (BIMG_CONFIG_DECODE_ETC2).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ffff) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ffff) );
 			}
 			break;
 
 		case TextureFormat::PTC12:
 			BX_WARN(false, "PTC12 decoder is not implemented.");
-			imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffff00ff) );
+			imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xffff00ff) );
 			break;
 
 		case TextureFormat::PTC12A:
 			BX_WARN(false, "PTC12A decoder is not implemented.");
-			imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
+			imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
 			break;
 
 		case TextureFormat::PTC14:
@@ -6449,11 +6428,7 @@ namespace bimg
 				{
 					decodeBlockPtc14(temp, src, xx, yy, width, height);
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 				}
 			}
 			break;
@@ -6465,23 +6440,19 @@ namespace bimg
 				{
 					decodeBlockPtc14A(temp, src, xx, yy, width, height);
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 				}
 			}
 			break;
 
 		case TextureFormat::PTC22:
 			BX_WARN(false, "PTC22 decoder is not implemented.");
-			imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff00ff00), UINT32_C(0xff0000ff) );
+			imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff00ff00), UINT32_C(0xff0000ff) );
 			break;
 
 		case TextureFormat::PTC24:
 			BX_WARN(false, "PTC24 decoder is not implemented.");
-			imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffffff) );
+			imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xffffffff) );
 			break;
 
 		case TextureFormat::ATC:
@@ -6492,11 +6463,7 @@ namespace bimg
 					decodeBlockATC(temp, src);
 					src += 8;
 
-					uint8_t* block = &dst[(yy*_dstPitch+xx*4)*4];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 				}
 			}
 			break;
@@ -6506,16 +6473,11 @@ namespace bimg
 			{
 				for (uint32_t xx = 0; xx < width; ++xx)
 				{
+					decodeBlockATC(temp, src + 8);
 					decodeBlockDxt23A(temp+3, src);
-					src += 8;
-					decodeBlockATC(temp, src);
-					src += 8;
+					src += 16;
 
-					uint8_t* block = &dst[(yy*_dstPitch+xx*4)*4];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 				}
 			}
 			break;
@@ -6525,16 +6487,11 @@ namespace bimg
 			{
 				for (uint32_t xx = 0; xx < width; ++xx)
 				{
+					decodeBlockATC(temp, src + 8);
 					decodeBlockDxt45A(temp+3, src);
-					src += 8;
-					decodeBlockATC(temp, src);
-					src += 8;
+					src += 16;
 
-					uint8_t* block = &dst[(yy*_dstPitch+xx*4)*4];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					imageCopyBlock(dst, _dstPitch, temp, xx, yy, _width, _height, 4);
 				}
 			}
 			break;
@@ -6582,7 +6539,7 @@ namespace bimg
 				{
 					// Failed to convert, just make ugly red-yellow checkerboard texture.
 					BX_WARN(false, "Decoder for %s is not implemented.", getName(_srcFormat) );
-					imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xffff0000), UINT32_C(0xffffff00) );
+					imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xffff0000), UINT32_C(0xffffff00) );
 				}
 			}
 			break;
@@ -6641,7 +6598,7 @@ namespace bimg
 					if (status != ASTCENC_SUCCESS)
 					{
 						BX_TRACE("astc error in config init %s", astcenc_get_error_string(status));
-						imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
+						imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
 						break;
 					}
 
@@ -6651,9 +6608,15 @@ namespace bimg
 					if (status != ASTCENC_SUCCESS)
 					{
 						BX_TRACE("astc error in context alloc %s", astcenc_get_error_string(status));
-						imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
+						imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
 						break;
 					}
+
+					const uint32_t tightPitch = _width*4;
+					void* imageData = tightPitch == _dstPitch
+						? _dst
+						: bx::alloc(_allocator, tightPitch*_height)
+						;
 
 					//Put image data into an astcenc_image
 					astcenc_image image{};
@@ -6661,7 +6624,7 @@ namespace bimg
 					image.dim_y     = _height;
 					image.dim_z     = 1;
 					image.data_type = ASTCENC_TYPE_U8;
-					image.data      = &_dst;
+					image.data      = &imageData;
 
 					const uint64_t size = imageGetSize(NULL, _width, _height, 0, false, false, 1, _srcFormat);
 
@@ -6685,27 +6648,38 @@ namespace bimg
 					if (status != ASTCENC_SUCCESS)
 					{
 						BX_TRACE("astc error in compress image %s", astcenc_get_error_string(status));
-						imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
+						imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
 
 						astcenc_context_free(context);
+
+						if (imageData != _dst)
+						{
+							bx::free(_allocator, imageData);
+						}
+
 						break;
 					}
 
 					astcenc_context_free(context);
+
+					if (imageData != _dst)
+					{
+						bx::memCopy(_dst, _dstPitch, imageData, tightPitch, tightPitch, _height);
+						bx::free(_allocator, imageData);
+					}
 			}
 #else
 			{
 				BX_WARN(false, "ASTC decoder is disabled (BIMG_CONFIG_DECODE_ASTC).");
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+				imageCheckerboard(_dst, _width, _height, _dstPitch, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 #endif
 			break;
 
 		default:
 			{
-				const uint32_t srcPitch = _width * 4;
 				imageDecodeToBgra8(_allocator, _dst, _src, _width, _height, _dstPitch, _srcFormat);
-				imageSwizzleBgra8(_dst, _dstPitch, _width, _height, _dst, srcPitch);
+				imageSwizzleBgra8(_dst, _dstPitch, _width, _height, _dst, _dstPitch);
 			}
 			break;
 		}
@@ -6782,16 +6756,17 @@ namespace bimg
 
 		const uint32_t srcBpp   = s_imageBlockInfo[_srcFormat].bitsPerPixel;
 		const uint32_t srcPitch = _width*srcBpp/8;
+		const uint32_t srcSlice = uint32_t(imageGetSize(NULL, _width, _height, 1, false, false, 1, _srcFormat) );
 
-		for (uint32_t zz = 0; zz < _depth; ++zz, src += _height*srcPitch, dst += _height*_dstPitch)
+		for (uint32_t zz = 0; zz < _depth; ++zz, src += srcSlice, dst += _height*_dstPitch)
 		{
 			switch (_srcFormat)
 			{
 			case TextureFormat::BC5:
 			case TextureFormat::BC5S:
 				{
-					uint32_t width  = _width/4;
-					uint32_t height = _height/4;
+					uint32_t width  = (_width  + 3)/4;
+					uint32_t height = (_height + 3)/4;
 
 					const uint8_t* srcData = src;
 
@@ -6806,18 +6781,17 @@ namespace bimg
 							decodeBlockDxt45A(temp+1, srcData);
 							srcData += 8;
 
+							float tmp[16*4];
+
 							for (uint32_t ii = 0; ii < 16; ++ii)
 							{
-								float nx = temp[ii*4+2]*2.0f/255.0f - 1.0f;
-								float ny = temp[ii*4+1]*2.0f/255.0f - 1.0f;
-
-								const uint32_t offset = (yy*4 + ii/4)*_width*16 + (xx*4 + ii%4)*16;
-								float* block = (float*)&dst[offset];
-								block[0] = nx;
-								block[1] = ny;
-								block[2] = 0.0f;
-								block[3] = 1.0f;
+								tmp[ii*4+0] = temp[ii*4+2]*2.0f/255.0f - 1.0f;
+								tmp[ii*4+1] = temp[ii*4+1]*2.0f/255.0f - 1.0f;
+								tmp[ii*4+2] = 0.0f;
+								tmp[ii*4+3] = 1.0f;
 							}
+
+							imageCopyBlock(dst, _dstPitch, tmp, xx, yy, _width, _height, 16);
 						}
 					}
 				}
@@ -6826,8 +6800,8 @@ namespace bimg
 			case TextureFormat::BC6H:
 			case TextureFormat::BC6HU:
 				{
-					uint32_t width  = _width/4;
-					uint32_t height = _height/4;
+					uint32_t width  = (_width  + 3)/4;
+					uint32_t height = (_height + 3)/4;
 
 					const uint8_t* srcData = src;
 
@@ -6839,18 +6813,14 @@ namespace bimg
 							decodeBlockBc6h(tmp, srcData);
 							srcData += 16;
 
-							uint8_t* block = (uint8_t*)&dst[yy*_dstPitch*4 + xx*64];
-							bx::memCopy(&block[0*_dstPitch], &tmp[ 0], 64);
-							bx::memCopy(&block[1*_dstPitch], &tmp[16], 64);
-							bx::memCopy(&block[2*_dstPitch], &tmp[32], 64);
-							bx::memCopy(&block[3*_dstPitch], &tmp[48], 64);
+							imageCopyBlock(dst, _dstPitch, tmp, xx, yy, _width, _height, 16);
 						}
 					}
 				}
 				break;
 
 			case TextureFormat::RGBA32F:
-				bx::memCopy(dst, src, _dstPitch*_height);
+				bx::memCopy(dst, _dstPitch, src, srcPitch, bx::min(srcPitch, _dstPitch), _height);
 				break;
 
 			default:
@@ -6859,7 +6829,10 @@ namespace bimg
 					uint64_t size = imageGetSize(NULL, _width, _height, 0, false, false, 1, TextureFormat::RGBA8);
 					void* temp = bx::alloc(_allocator, size_t(size) );
 					imageDecodeToRgba8(_allocator, temp, src, _width, _height, _width*4, _srcFormat);
-					imageRgba8ToRgba32f(dst, _width, _height, _width*4, temp);
+					for (uint32_t yy = 0; yy < _height; ++yy)
+					{
+						imageRgba8ToRgba32f(&dst[yy*_dstPitch], _width, 1, _width*4, (const uint8_t*)temp + yy*_width*4);
+					}
 					bx::free(_allocator, temp);
 				}
 				else
@@ -7115,6 +7088,61 @@ namespace bimg
 		return total;
 	}
 
+	struct ImageWriteFormat
+	{
+		TextureFormat::Enum m_format;
+		uint8_t m_bytes;
+		uint8_t m_bgr[3];
+		uint8_t m_rgba[4];
+	};
+
+	static const ImageWriteFormat* imageWriteFormat(TextureFormat::Enum _format)
+	{
+		static const ImageWriteFormat s_formats[] =
+		{
+			{ TextureFormat::R8,    1, { 0, 0, 0 }, { 0, 0, 0, 0 } },
+			{ TextureFormat::RGBA8, 4, { 2, 1, 0 }, { 0, 1, 2, 3 } },
+			{ TextureFormat::BGRA8, 4, { 0, 1, 2 }, { 2, 1, 0, 3 } },
+		};
+
+		for (const ImageWriteFormat& format : s_formats)
+		{
+			if (format.m_format == _format)
+			{
+				return &format;
+			}
+		}
+
+		return NULL;
+	}
+
+	static int32_t writeTexels(bx::WriterI* _writer, const uint8_t* _src, uint32_t _width, uint32_t _srcBytes, const uint8_t* _channels, uint32_t _numChannels, bx::Error* _err)
+	{
+		constexpr uint32_t kBatch = 256;
+		uint8_t batch[kBatch*4];
+
+		int32_t total = 0;
+
+		for (uint32_t left = _width; 0 < left && _err->isOk(); )
+		{
+			const uint32_t count = bx::min(left, kBatch);
+			uint8_t* dst = batch;
+
+			for (uint32_t xx = 0; xx < count; ++xx, _src += _srcBytes)
+			{
+				for (uint32_t cc = 0; cc < _numChannels; ++cc)
+				{
+					*dst++ = _src[_channels[cc] ];
+				}
+			}
+
+			total += bx::write(_writer, batch, int32_t(count*_numChannels), _err);
+			left  -= count;
+		}
+
+		return total;
+	}
+
 	template<typename Ty>
 	class HashWriter : public bx::WriterI
 	{
@@ -7150,16 +7178,20 @@ namespace bimg
 	{
 		BX_ERROR_SCOPE(_err);
 
-		switch (_format)
-		{
-		case TextureFormat::R8:
-		case TextureFormat::RGBA8:
-		case TextureFormat::BGRA8:
-			break;
+		const ImageWriteFormat* format = imageWriteFormat(_format);
 
-		default:
+		if (NULL == format)
+		{
 			BX_ERROR_SET(_err, BIMG_ERROR, "PNG: Unsupported texture format.");
 			return 0;
+		}
+
+		const int32_t written = imageEncodeWic(_writer, WicContainer::Png, _width, _height, _srcPitch, _src, _format, _yflip, _err);
+
+		if (0 != written
+		||  !_err->isOk() )
+		{
+			return written;
 		}
 
 		const bool grayscale = TextureFormat::R8    == _format;
@@ -7173,7 +7205,8 @@ namespace bimg
 		total += bx::write(&writerC, "IHDR", _err);
 		total += bx::write(&writerC, bx::toBigEndian(_width),  _err);
 		total += bx::write(&writerC, bx::toBigEndian(_height), _err);
-		total += bx::write(&writerC, "\x08\x06", _err);
+		total += bx::write(&writerC, uint8_t(8), _err);
+		total += bx::write(&writerC, uint8_t(grayscale ? 0 : 6), _err);
 		total += bx::writeRep(&writerC, 0, 3, _err);
 		total += bx::write(_writer, bx::toBigEndian(writerC.end() ), _err);
 
@@ -7208,18 +7241,7 @@ namespace bimg
 
 			if (bgra)
 			{
-				for (uint32_t xx = 0; xx < _width; ++xx)
-				{
-					const uint8_t* texel = &data[xx*4];
-					const uint8_t bb = texel[0];
-					const uint8_t gg = texel[1];
-					const uint8_t rr = texel[2];
-					const uint8_t aa = texel[3];
-					total += bx::write(&writerA, rr, _err);
-					total += bx::write(&writerA, gg, _err);
-					total += bx::write(&writerA, bb, _err);
-					total += bx::write(&writerA, aa, _err);
-				}
+				total += writeTexels(&writerA, data, _width, format->m_bytes, format->m_rgba, 4, _err);
 			}
 			else
 			{
@@ -7235,6 +7257,64 @@ namespace bimg
 		writerC.begin();
 		total += bx::write(&writerC, "IEND", _err);
 		total += bx::write(_writer,  bx::toBigEndian(writerC.end() ), _err);
+
+		return total;
+	}
+
+	int32_t imageWriteBmp(bx::WriterI* _writer, uint32_t _width, uint32_t _height, uint32_t _srcPitch, const void* _src, TextureFormat::Enum _format, bool _yflip, bx::Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		const ImageWriteFormat* format = imageWriteFormat(_format);
+
+		if (NULL == format)
+		{
+			BX_ERROR_SET(_err, BIMG_ERROR, "BMP: Unsupported texture format.");
+			return 0;
+		}
+
+		const int32_t written = imageEncodeWic(_writer, WicContainer::Bmp, _width, _height, _srcPitch, _src, _format, _yflip, _err);
+
+		if (0 != written
+		||  !_err->isOk() )
+		{
+			return written;
+		}
+
+		const uint32_t row  = _width*3;
+		const uint32_t pad  = bx::alignUp(row, 4) - row;
+		const uint32_t size = (row + pad)*_height;
+
+		int32_t total = 0;
+		total += bx::write(_writer, "BM", _err);
+		total += bx::write(_writer, bx::toLittleEndian<uint32_t>(54 + size), _err);
+		total += bx::writeRep(_writer, 0, 4, _err);
+		total += bx::write(_writer, bx::toLittleEndian<uint32_t>(54), _err);
+
+		total += bx::write(_writer, bx::toLittleEndian<uint32_t>(40), _err);
+		total += bx::write(_writer, bx::toLittleEndian(_width),  _err);
+		total += bx::write(_writer, bx::toLittleEndian(_height), _err);
+		total += bx::write(_writer, bx::toLittleEndian<uint16_t>(1),  _err);
+		total += bx::write(_writer, bx::toLittleEndian<uint16_t>(24), _err);
+		total += bx::writeRep(_writer, 0, 4, _err);
+		total += bx::write(_writer, bx::toLittleEndian(size), _err);
+		total += bx::writeRep(_writer, 0, 16, _err);
+
+		const uint8_t* data = (const uint8_t*)_src;
+		int32_t step = int32_t(_srcPitch);
+
+		if (!_yflip)
+		{
+			data += _srcPitch*_height - _srcPitch;
+			step = -step;
+		}
+
+		for (uint32_t yy = 0; yy < _height && _err->isOk(); ++yy)
+		{
+			total += writeTexels(_writer, data, _width, format->m_bytes, format->m_bgr, 3, _err);
+			total += bx::writeRep(_writer, 0, int32_t(pad), _err);
+			data  += step;
+		}
 
 		return total;
 	}
