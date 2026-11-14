@@ -10,3 +10,6 @@ Left out, as bgfx only parses DDS/KTX/PVR containers and decodes their formats (
 loading and encoding API (include/bimg/decode.h, include/bimg/encode.h, src/image_decode.cpp,
 src/image_decode_wic.cpp, src/image_encode.cpp, src/image_cubemap_filter.cpp) and every 3rdparty library
 other than astc-encoder. astc-encoder is built decode-only (ASTCENC_DECOMPRESS_ONLY).
+src/image_encode_wic.cpp is kept because image.cpp's PNG and BMP writers call imageEncodeWic. bimg-files.xml
+builds it with BIMG_CONFIG_ENCODE_WIC=0, so it is the stub that returns 0 and the writers use their own
+encoder; src/image_wic.h is left out with it.
