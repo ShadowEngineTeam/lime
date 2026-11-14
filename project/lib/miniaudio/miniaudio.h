@@ -42089,13 +42089,18 @@ static ma_bool32 ma_device_end_interruption__coreaudio(ma_device* pDevice, ma_de
 
 static ma_result ma_device_prepare_start_nolock__coreaudio(ma_device_state_coreaudio* pState, ma_bool32 isInterruptionRecovery, ma_uint32* pInterruptionGeneration)
 {
-    if (pState->isInterrupted) {
-        return MA_NO_DATA_AVAILABLE;
-    }
+    if (isInterruptionRecovery) {
+        if (pState->isInterrupted) {
+            return MA_NO_DATA_AVAILABLE;
+        }
 
-    if (isInterruptionRecovery && !pState->canResumeAfterInterruption) {
-        pState->isInterruptionRecoveryPending = MA_FALSE;
-        return MA_DEVICE_NOT_STARTED;
+        if (!pState->canResumeAfterInterruption) {
+            pState->isInterruptionRecoveryPending = MA_FALSE;
+            return MA_DEVICE_NOT_STARTED;
+        }
+    } else {
+        pState->isInterrupted = MA_FALSE;
+        pState->canResumeAfterInterruption = MA_TRUE;
     }
 
     *pInterruptionGeneration = pState->interruptionGeneration;
