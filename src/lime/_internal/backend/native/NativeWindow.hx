@@ -456,7 +456,7 @@ class NativeWindow
 				#if (!macro && lime_cffi && lime_bgfx)
 				parent.context.bgfx.requestScreenShot(null, 'lime-read-pixels-${nextReadPixelsID++}', function(screenShot:BGFXScreenShot):Void
 				{
-					callback((function():Image {
+					function processScreenshot():Image {
 						final format:Null<PixelFormat> = switch (screenShot.format)
 							{
 								case RGBA8: RGBA32;
@@ -494,7 +494,8 @@ class NativeWindow
 						}
 
 						return image;
-					})());
+					}
+					callback(processScreenshot());
 				});
 				#else
 				callback(null);
