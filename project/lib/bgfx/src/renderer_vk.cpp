@@ -10299,6 +10299,24 @@ VK_DESTROY
 			}
 		}
 
+		// Without IMMEDIATE (most Android drivers), MAILBOX is the mode that does not block on vsync
+		if (UINT32_MAX == idx
+		&&  !_vsync)
+		{
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_presentMode) && UINT32_MAX == idx; ++ii)
+			{
+				for (uint32_t jj = 0; jj < numPresentModes; ++jj)
+				{
+					if (VK_PRESENT_MODE_MAILBOX_KHR == s_presentMode[ii].mode
+					&&  VK_PRESENT_MODE_MAILBOX_KHR == presentModes[jj])
+					{
+						idx = ii;
+						break;
+					}
+				}
+			}
+		}
+
 		if (UINT32_MAX == idx)
 		{
 			idx = 0;

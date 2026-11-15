@@ -33,3 +33,7 @@ Local changes on top of that commit (keep them when re-vendoring):
 - src/renderer_gl.cpp: ShaderGL::create patches the shader source in heap memory, not on the stack. The
   source can be over a megabyte (SPIR-V Cross output after shaderc inlines everything), which overflowed
   the render thread's 1 MB stack on Windows.
+- src/renderer_vk.cpp: findPresentMode falls back to VK_PRESENT_MODE_MAILBOX_KHR for vsync off when the
+  surface has no VK_PRESENT_MODE_IMMEDIATE_KHR. bgfx only counts IMMEDIATE as a mode without vsync, and most
+  Android drivers offer FIFO and MAILBOX only, so turning vsync off kept FIFO and the frame rate stayed
+  locked to the display.
