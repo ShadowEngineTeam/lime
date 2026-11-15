@@ -16,9 +16,6 @@
 #if defined(IPHONE) || defined(HX_MACOS)
 #define MA_NO_RUNTIME_LINKING
 #endif
-#ifdef HX_WINDOWS
-#define MA_WASAPI_NO_LOW_LATENCY_SHARED_MODE
-#endif
 #if defined(ANDROID) && !defined(MA_NO_AAUDIO)
 // sdk < 30 -> opensl, otherwise aaudio
 #define MA_AAUDIO_MIN_ANDROID_SDK_VERSION 30
@@ -1540,6 +1537,7 @@ namespace lime
 		// SDL_HINT_AUDIO_DEVICE_STREAM_ROLE = "Game" (Application.cpp, removed with SDL audio)
 		device.wasapi.usage = ma_wasapi_usage_games;
 		device.aaudio.usage = ma_aaudio_usage_game;
+		device.aaudio.performanceMode = ma_aaudio_performance_mode_low_latency;
 
 		// let AAudio pick its burst size, forcing 480 frames per callback crackles once it falls back to the legacy path (Bluetooth A2DP)
 		device.aaudio.noSetBufferCapacity = MA_TRUE;
