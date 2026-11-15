@@ -1356,7 +1356,8 @@ namespace lime
 
 	static bool __initialized = false;
 
-	static uint32_t __resetFlags = BGFX_RESET_NONE;
+	// Present right after rendering instead of before the next frame
+	static uint32_t __resetFlags = BGFX_RESET_FLIP_AFTER_RENDER;
 
 	static bgfx::SwapChain __swapChain;
 
@@ -2422,6 +2423,7 @@ namespace lime
 		SDL_GetWindowSizeInPixels(sdlWindow, (int *)&init.swapChain.width, (int *)&init.swapChain.height);
 
 		init.swapChain.formatColor = defaultBackbufferFormat;
+		init.reset = __resetFlags;
 		// init.swapChain.maxFrameLatency = 3;
 
 #if defined(IPHONE) || defined(HX_MACOS)
