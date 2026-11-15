@@ -178,7 +178,11 @@ namespace lime
 #if defined(__APPLE__)
 			choices.push_back({BGFXBindings::GetRendererType("metal"), "metal", false});
 #else
+#if defined(HX_WINDOWS)
+			choices.push_back({BGFXBindings::GetRendererType("d3d11"), "d3d11", false});
+#else
 			choices.push_back({BGFXBindings::GetRendererType("vulkan"), "vulkan", false});
+#endif
 			choices.push_back({BGFXBindings::GetRendererType("opengl"), "opengl", false});
 			choices.push_back({BGFXBindings::GetRendererType("opengles"), "opengles", false});
 #endif
