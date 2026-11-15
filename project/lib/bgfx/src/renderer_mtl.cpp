@@ -5638,8 +5638,13 @@ static_assert(BX_COUNTOF(s_accessNames) == Access::Count, "Invalid s_accessNames
 			}
 			else
 			{
-				m_presentSemaphore.wait();
+				const bool aquired = m_presentSemaphore.wait(100);
 				m_drawable = m_metalLayer->nextDrawable();
+
+				if (m_drawable == NULL && aquired)
+				{
+					m_presentSemaphore.post();
+				}
 			}
 
 			if (m_drawable != NULL)
