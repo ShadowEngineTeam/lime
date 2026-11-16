@@ -1,4 +1,5 @@
-51304abb34c92955b7d39556157f2342d5c8e1d1 (FunkinCrew/miniaudio, vendored: miniaudio.h + extras/decoders/{libopus,libvorbis})
+51304abb34c92955b7d39556157f2342d5c8e1d1 (FunkinCrew/miniaudio, vendored: miniaudio.h + extras/decoders/{libopus,libvorbis}
+                                          + extras/nodes/{ltrim,reverb,vocoder} without the examples)
 
 Local additions (NOT part of upstream miniaudio):
   extras/resamplers/bsinc/  OpenAL Soft `bsinc24` resampler backport, LGPL-2.0+ (see COPYING there).
