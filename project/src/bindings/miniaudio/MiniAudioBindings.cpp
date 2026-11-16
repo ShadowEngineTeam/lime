@@ -1736,6 +1736,7 @@ namespace lime
 
 		config.deviceConfig.periods = val_int(val_field(pConfig, val_id("periods")));
 		config.deviceConfig.periodSizeInFrames = val_int(val_field(pConfig, val_id("periodSizeInFrames")));
+		config.deviceConfig.periodSizeInMilliseconds = val_int(val_field(pConfig, val_id("periodSizeInMilliseconds")));
 
 		config.spatializationVolumeSmoothTimeInFrames = val_int(val_field(pConfig, val_id("spatializationVolumeSmoothTimeInFrames")));
 		config.spatializationVolumeSmoothTimeInMilliseconds = val_int(val_field(pConfig, val_id("spatializationVolumeSmoothTimeInMilliseconds")));
