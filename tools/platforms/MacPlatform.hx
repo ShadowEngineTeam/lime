@@ -14,6 +14,7 @@ import lime.tools.Icon;
 import lime.tools.IconHelper;
 import lime.tools.Orientation;
 import lime.tools.PlatformTarget;
+import lime.tools.PlistHelper;
 import lime.tools.ProjectHelper;
 
 import sys.FileSystem;
@@ -316,7 +317,12 @@ class MacPlatform extends PlatformTarget
 			context.APP_BUNDLE_ICON_NAME = "icon";
 		}
 
-		System.copyFileTemplate(project.templatePaths, "mac/Info.plist", targetDirectory + "/bin/" + project.app.file + ".app/Contents/Info.plist", context);
+		var infoPlist = applicationDirectory + "/Contents/Info.plist";
+
+		System.copyFileTemplate(project.templatePaths, "mac/Info.plist", infoPlist, context);
+
+		PlistHelper.mergePlists(project.workingDirectory, applicationDirectory + "/Contents", infoPlist);
+
 		System.copyFileTemplate(project.templatePaths, "mac/Entitlements.plist",
 			targetDirectory
 			+ "/bin/"
