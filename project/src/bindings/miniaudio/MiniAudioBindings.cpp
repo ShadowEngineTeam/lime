@@ -16,6 +16,10 @@
 #if defined(IPHONE) || defined(HX_MACOS)
 #define MA_NO_RUNTIME_LINKING
 #endif
+#ifdef HX_WINDOWS
+// OpenAL Soft's WASAPI backend opened shared streams with IAudioClient::Initialize
+#define MA_WASAPI_NO_LOW_LATENCY_SHARED_MODE
+#endif
 #if defined(ANDROID) && !defined(MA_NO_AAUDIO)
 // sdk < 30 -> opensl, otherwise aaudio
 #define MA_AAUDIO_MIN_ANDROID_SDK_VERSION 30
@@ -1682,6 +1686,10 @@ namespace lime
 		// channels=stereo
 		device.playback.channels = 2;
 
+		// period_size=480, periods=2
+		device.periodSizeInFrames = 480;
+		device.periods = 2;
+
 		// Disable Fixed Sized Callback (For optimization)
 		device.noFixedSizedCallback = MA_TRUE;
 
@@ -1700,8 +1708,11 @@ namespace lime
 		device.contextConfig.coreaudio.sessionCategory = ma_ios_session_category_none;
 #endif
 
-		// OpenAL Soft's WASAPI backend never used hardware offload
+		// OpenAL Soft's WASAPI/AAudio backends never used hardware offload, AAudio asked for an exclusive stream first (the system may still grant shared)
 		device.wasapi.noHardwareOffloading = MA_TRUE;
+#if defined(ANDROID)
+		device.playback.shareMode = ma_share_mode_exclusive;
+#endif
 
 		// alsa/mmap=true  -> miniaudio enables MMap unless told otherwise.
 		device.alsa.noMMap = MA_FALSE;
@@ -1734,9 +1745,22 @@ namespace lime
 		config.channels = val_int(val_field(pConfig, val_id("channels")));
 		config.sampleRate = val_int(val_field(pConfig, val_id("sampleRate")));
 
-		config.deviceConfig.periods = val_int(val_field(pConfig, val_id("periods")));
-		config.deviceConfig.periodSizeInFrames = val_int(val_field(pConfig, val_id("periodSizeInFrames")));
-		config.deviceConfig.periodSizeInMilliseconds = val_int(val_field(pConfig, val_id("periodSizeInMilliseconds")));
+		// 0 keeps the defaults set above
+		const int periods = val_int(val_field(pConfig, val_id("periods")));
+		const int periodSizeInFrames = val_int(val_field(pConfig, val_id("periodSizeInFrames")));
+		const int periodSizeInMilliseconds = val_int(val_field(pConfig, val_id("periodSizeInMilliseconds")));
+
+		if (periods > 0)
+			config.deviceConfig.periods = periods;
+
+		if (periodSizeInFrames > 0)
+			config.deviceConfig.periodSizeInFrames = periodSizeInFrames;
+
+		if (periodSizeInMilliseconds > 0)
+		{
+			config.deviceConfig.periodSizeInFrames = 0;
+			config.deviceConfig.periodSizeInMilliseconds = periodSizeInMilliseconds;
+		}
 
 		config.spatializationVolumeSmoothTimeInFrames = val_int(val_field(pConfig, val_id("spatializationVolumeSmoothTimeInFrames")));
 		config.spatializationVolumeSmoothTimeInMilliseconds = val_int(val_field(pConfig, val_id("spatializationVolumeSmoothTimeInMilliseconds")));
