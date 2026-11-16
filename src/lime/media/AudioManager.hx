@@ -65,7 +65,6 @@ class AudioManager
 
 			#if !android
 			// Period Config
-			config.periodSizeInMilliseconds = 20;
 			config.periods = 4;
 			#end
 
