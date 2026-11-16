@@ -1696,6 +1696,7 @@ namespace lime
 		// SDL_HINT_AUDIO_DEVICE_STREAM_ROLE = "Game" (Application.cpp, removed with SDL audio)
 		device.wasapi.usage = ma_wasapi_usage_games;
 		device.aaudio.usage = ma_aaudio_usage_game;
+		device.aaudio.contentType = ma_aaudio_content_type_sonification;
 		device.aaudio.performanceMode = ma_aaudio_performance_mode_low_latency;
 
 		// let AAudio pick its burst size, forcing 480 frames per callback crackles once it falls back to the legacy path (Bluetooth A2DP)
