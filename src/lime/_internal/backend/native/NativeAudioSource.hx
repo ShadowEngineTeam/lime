@@ -124,6 +124,9 @@ class NativeAudioSource
 				for (rb in postRingBuffers)
 					handle.add_ring_buffer(rb, true);
 
+				handle.set_on_pre_process_enabled(preRingBuffers.length > 0);
+				handle.set_on_process_enabled(postRingBuffers.length > 0);
+
 				if (!activeSources.contains(this))
 					activeSources.push(this);
 
@@ -175,7 +178,10 @@ class NativeAudioSource
 		preRingBuffers.push(rb);
 
 		if (handle != null)
+		{
 			handle.add_ring_buffer(rb, false);
+			handle.set_on_pre_process_enabled(true);
+		}
 	}
 
 	public function removePreRingBuffer(rb:MAAudioRingBuffer):Void
@@ -186,7 +192,10 @@ class NativeAudioSource
 		preRingBuffers.remove(rb);
 
 		if (handle != null)
+		{
 			handle.remove_ring_buffer(rb, false);
+			handle.set_on_pre_process_enabled(preRingBuffers.length > 0);
+		}
 	}
 
 	public function addPostRingBuffer(rb:MAAudioRingBuffer):Void
@@ -197,7 +206,10 @@ class NativeAudioSource
 		postRingBuffers.push(rb);
 
 		if (handle != null)
+		{
 			handle.add_ring_buffer(rb, true);
+			handle.set_on_process_enabled(true);
+		}
 	}
 
 	public function removePostRingBuffer(rb:MAAudioRingBuffer):Void
@@ -208,7 +220,10 @@ class NativeAudioSource
 		postRingBuffers.remove(rb);
 
 		if (handle != null)
+		{
 			handle.remove_ring_buffer(rb, true);
+			handle.set_on_process_enabled(postRingBuffers.length > 0);
+		}
 	}
 
 	// Event Handlers
