@@ -1,16 +1,16 @@
 #include <hx/CFFIPrime.h>
 #include <string.h>
-#include <system/ValuePointer.h>
+#include <system/CFFI.h>
 #include <utils/Bytes.h>
 #include <utils/HaxeResource.h>
 
 namespace lime
 {
 
-	static ValuePointer *listNamesMethod = 0;
-	static ValuePointer *getBytesMethod = 0;
+	static AutoGCRoot *listNamesMethod = 0;
+	static AutoGCRoot *getBytesMethod = 0;
 
-	void HaxeResource::Init(ValuePointer *inListNamesMethod, ValuePointer *inGetBytesMethod)
+	void HaxeResource::Init(AutoGCRoot *inListNamesMethod, AutoGCRoot *inGetBytesMethod)
 	{
 		if (listNamesMethod)
 			delete listNamesMethod;
@@ -28,7 +28,7 @@ namespace lime
 		if (!getBytesMethod || !name)
 			return false;
 
-		value result = (value)getBytesMethod->Call((void *)alloc_string(name));
+		value result = val_call1(getBytesMethod->get(), alloc_string(name));
 		if (!result || val_is_null(result))
 			return false;
 
@@ -57,7 +57,7 @@ namespace lime
 		if (!listNamesMethod)
 			return names;
 
-		value result = (value)listNamesMethod->Call();
+		value result = val_call0(listNamesMethod->get());
 		if (!result || val_is_null(result))
 			return names;
 

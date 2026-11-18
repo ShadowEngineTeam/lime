@@ -190,7 +190,7 @@ namespace lime
 
 	void lime_haxe_resource_init(value listNames, value getBytes)
 	{
-		HaxeResource::Init(val_is_null(listNames) ? NULL : new ValuePointer(listNames), val_is_null(getBytes) ? NULL : new ValuePointer(getBytes));
+		HaxeResource::Init(val_is_null(listNames) ? NULL : new AutoGCRoot(listNames), val_is_null(getBytes) ? NULL : new AutoGCRoot(getBytes));
 	}
 
 	int lime_bytes_read_file(HxString path, value bytes)
