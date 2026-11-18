@@ -16,6 +16,14 @@ Local changes on top of that commit (keep them when re-vendoring):
     to match.
   src/core/android/SDL_android.c/.h, android-project/.../SDLActivity.java:
     Android_JNI_IsInMultiWindowMode (SDLActivity.isInMultiWindowModeJNI).
+- Render scale (FunkinCrew/SDL 2156aadcf, from FunkinCrew/lime kade-github/ios-renderscale).
+  include/SDL3/SDL_hints.h: SDL_HINT_ANDROID_MAX_PIXEL_SCALE and SDL_HINT_IOS_MAX_PIXEL_SCALE.
+  src/video/uikit/SDL_uikitvideo.m/.h: UIKit_GetPixelScale caps the screen's native scale and the
+    hint callback updates open windows; SDL_uikitmetalview.m, SDL_uikitopengles.m and
+    SDL_uikitwindow.m use it.
+  src/video/android/SDL_androidvideo.c: Android_GetDrawScale takes the smaller of
+    SDL_ANDROID_DRAW_SCALE and SDL_HINT_ANDROID_MAX_PIXEL_SCALE / screen density, and both hints
+    resize the window when they change. The rest of the Android side stays as the draw scale above.
 - Android surface loss. src/video/android/SDL_androidwindow.h has surface_valid, cleared in
   onNativeSurfaceDestroyed and set again in onNativeSurfaceChanged (src/core/android/SDL_android.c).
   Android_GLES_SwapWindow (src/video/android/SDL_androidgl.c) skips presenting while it is false,
