@@ -1,4 +1,5 @@
 #include <system/CFFI.h>
+#include <SDL3/SDL.h>
 #include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
 #include <utils/File.h>
@@ -52,19 +53,58 @@ namespace lime
 		return result;
 	}
 
+	struct ma_log_job
+	{
+		AutoGCRoot *root;
+		int level;
+		char *message;
+	};
+
+	static void ma_log_job_free(ma_log_job *job)
+	{
+		SDL_free(job->message);
+		SDL_free(job);
+	}
+
+	static void ma_log_job_run(void *data)
+	{
+		ma_log_job *job = (ma_log_job *)data;
+
+		value callback = job->root->get();
+
+		if (!val_is_null(callback))
+		{
+			val_call2(callback, alloc_int(job->level), alloc_string(job->message));
+		}
+
+		ma_log_job_free(job);
+	}
+
 	void lime_ma_log_callback_proc(void *pUserData, ma_uint32 level, const char *pMessage)
 	{
 		AutoGCRoot *root = (AutoGCRoot *)pUserData;
 
-		if (root)
+		value callback = root ? root->get() : NULL;
+
+		if (!callback || val_is_null(callback))
 		{
-			int base = 0;
+			return;
+		}
 
-			gc_set_top_of_stack(&base, true);
+		ma_log_job *job = (ma_log_job *)SDL_malloc(sizeof(ma_log_job));
 
-			val_call2(root->get(), alloc_int(level), alloc_string(pMessage));
+		if (!job)
+		{
+			return;
+		}
 
-			gc_set_top_of_stack(0, true);
+		job->root = root;
+		job->level = (int)level;
+		job->message = SDL_strdup(pMessage ? pMessage : "");
+
+		if (!SDL_RunOnMainThread(ma_log_job_run, job, false))
+		{
+			ma_log_job_free(job);
 		}
 	}
 
@@ -1611,13 +1651,15 @@ namespace lime
 		if (!data)
 			return;
 
-		if (data->onProcess)
+		value callback = data->onProcess ? data->onProcess->get() : NULL;
+
+		if (callback && !val_is_null(callback))
 		{
 			int base = 0;
 
 			gc_set_top_of_stack(&base, true);
 
-			val_call2(data->onProcess->get(), CFFIPointer(pFramesOut, NULL), alloc_int64(frameCount));
+			val_call2(callback, CFFIPointer(pFramesOut, NULL), alloc_int64(frameCount));
 
 			gc_set_top_of_stack(0, true);
 		}
@@ -1696,6 +1738,7 @@ namespace lime
 		// SDL_HINT_AUDIO_DEVICE_STREAM_ROLE = "Game" (Application.cpp, removed with SDL audio)
 		device.wasapi.usage = ma_wasapi_usage_games;
 		device.aaudio.usage = ma_aaudio_usage_game;
+		device.aaudio.contentType = ma_aaudio_content_type_sonification;
 		device.aaudio.performanceMode = ma_aaudio_performance_mode_low_latency;
 
 		// let AAudio pick its burst size, forcing 480 frames per callback crackles once it falls back to the legacy path (Bluetooth A2DP)

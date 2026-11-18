@@ -113,8 +113,8 @@ namespace lime
 
 	void lime_application_event_manager_register(value callback, value eventObject)
 	{
-		ApplicationEvent::callback = new ValuePointer(callback);
-		ApplicationEvent::eventObject = new ValuePointer(eventObject);
+		ApplicationEvent::callback = new AutoGCRoot(callback);
+		ApplicationEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	int lime_application_alert(value application, int type, HxString message, HxString title, value buttons)
@@ -252,8 +252,8 @@ namespace lime
 
 	void lime_clipboard_event_manager_register(value callback, value eventObject)
 	{
-		ClipboardEvent::callback = new ValuePointer(callback);
-		ClipboardEvent::eventObject = new ValuePointer(eventObject);
+		ClipboardEvent::callback = new AutoGCRoot(callback);
+		ClipboardEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	value lime_clipboard_get_text()
@@ -303,15 +303,15 @@ namespace lime
 
 	void lime_drop_event_manager_register(value callback, value eventObject)
 	{
-		DropEvent::callback = new ValuePointer(callback);
-		DropEvent::eventObject = new ValuePointer(eventObject);
+		DropEvent::callback = new AutoGCRoot(callback);
+		DropEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	void lime_file_dialog_open_directory(value window, HxString title, value callback, HxString defaultPath, bool allowMultiple)
 	{
 		Window *targetWindow = window ? (Window *)val_data(window) : nullptr;
 		const char *targetTitle = hxs_utf8(title, nullptr);
-		ValuePointer *targetCallback = new ValuePointer(callback);
+		AutoGCRoot *targetCallback = new AutoGCRoot(callback);
 		const char *targetDefaultPath = hxs_utf8(defaultPath, nullptr);
 
 		FileDialog::OpenDirectory(
@@ -326,7 +326,7 @@ namespace lime
 						val_array_set_i(files, i, alloc_string(filelist[i]));
 					}
 
-					targetCallback->Call(files);
+					val_call1(targetCallback->get(), files);
 
 					delete targetCallback;
 				}
@@ -338,7 +338,7 @@ namespace lime
 	{
 		Window *targetWindow = window ? (Window *)val_data(window) : nullptr;
 		const char *targetTitle = hxs_utf8(title, nullptr);
-		ValuePointer *targetCallback = new ValuePointer(callback);
+		AutoGCRoot *targetCallback = new AutoGCRoot(callback);
 		const char *targetDefaultPath = hxs_utf8(defaultPath, nullptr);
 
 		int targetCount = 0;
@@ -372,7 +372,7 @@ namespace lime
 						val_array_set_i(files, i, alloc_string(filelist[i]));
 					}
 
-					targetCallback->Call(files, alloc_int(filter));
+					val_call2(targetCallback->get(), files, alloc_int(filter));
 
 					delete targetCallback;
 				}
@@ -384,7 +384,7 @@ namespace lime
 	{
 		Window *targetWindow = window ? (Window *)val_data(window) : nullptr;
 		const char *targetTitle = hxs_utf8(title, nullptr);
-		ValuePointer *targetCallback = new ValuePointer(callback);
+		AutoGCRoot *targetCallback = new AutoGCRoot(callback);
 		const char *targetDefaultPath = hxs_utf8(defaultPath, nullptr);
 
 		int targetCount = 0;
@@ -411,7 +411,7 @@ namespace lime
 			[targetCallback](const char *const *filelist, int filecount, int filter) {
 				if (targetCallback)
 				{
-					targetCallback->Call((filelist && filelist[0]) ? alloc_string(filelist[0]) : alloc_null(), alloc_int(filter));
+					val_call2(targetCallback->get(), (filelist && filelist[0]) ? alloc_string(filelist[0]) : alloc_null(), alloc_int(filter));
 
 					delete targetCallback;
 				}
@@ -657,8 +657,8 @@ namespace lime
 
 	void lime_gamepad_event_manager_register(value callback, value eventObject)
 	{
-		GamepadEvent::callback = new ValuePointer(callback);
-		GamepadEvent::eventObject = new ValuePointer(eventObject);
+		GamepadEvent::callback = new AutoGCRoot(callback);
+		GamepadEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	value lime_gamepad_get_device_guid(int id)
@@ -783,8 +783,8 @@ namespace lime
 
 	void lime_joystick_event_manager_register(value callback, value eventObject)
 	{
-		JoystickEvent::callback = new ValuePointer(callback);
-		JoystickEvent::eventObject = new ValuePointer(eventObject);
+		JoystickEvent::callback = new AutoGCRoot(callback);
+		JoystickEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	value lime_joystick_get_device_guid(int id)
@@ -846,8 +846,8 @@ namespace lime
 
 	void lime_key_event_manager_register(value callback, value eventObject)
 	{
-		KeyEvent::callback = new ValuePointer(callback);
-		KeyEvent::eventObject = new ValuePointer(eventObject);
+		KeyEvent::callback = new AutoGCRoot(callback);
+		KeyEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	bool lime_lzma_compress(value buffer, value bytes)
@@ -870,14 +870,14 @@ namespace lime
 
 	void lime_mouse_event_manager_register(value callback, value eventObject)
 	{
-		MouseEvent::callback = new ValuePointer(callback);
-		MouseEvent::eventObject = new ValuePointer(eventObject);
+		MouseEvent::callback = new AutoGCRoot(callback);
+		MouseEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	void lime_orientation_event_manager_register(value callback, value eventObject)
 	{
-		OrientationEvent::callback = new ValuePointer(callback);
-		OrientationEvent::eventObject = new ValuePointer(eventObject);
+		OrientationEvent::callback = new AutoGCRoot(callback);
+		OrientationEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	bool lime_png_decode_bytes(value data, value buffer)
@@ -1148,14 +1148,14 @@ namespace lime
 
 	void lime_render_event_manager_register(value callback, value eventObject)
 	{
-		RenderEvent::callback = new ValuePointer(callback);
-		RenderEvent::eventObject = new ValuePointer(eventObject);
+		RenderEvent::callback = new AutoGCRoot(callback);
+		RenderEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	void lime_sensor_event_manager_register(value callback, value eventObject)
 	{
-		SensorEvent::callback = new ValuePointer(callback);
-		SensorEvent::eventObject = new ValuePointer(eventObject);
+		SensorEvent::callback = new AutoGCRoot(callback);
+		SensorEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	bool lime_system_get_allow_screen_timeout()
@@ -1372,20 +1372,20 @@ namespace lime
 
 	void lime_text_event_manager_register(value callback, value eventObject)
 	{
-		TextEvent::callback = new ValuePointer(callback);
-		TextEvent::eventObject = new ValuePointer(eventObject);
+		TextEvent::callback = new AutoGCRoot(callback);
+		TextEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	void lime_touch_event_manager_register(value callback, value eventObject)
 	{
-		TouchEvent::callback = new ValuePointer(callback);
-		TouchEvent::eventObject = new ValuePointer(eventObject);
+		TouchEvent::callback = new AutoGCRoot(callback);
+		TouchEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	void lime_gesture_event_manager_register(value callback, value eventObject)
 	{
-		GestureEvent::callback = new ValuePointer(callback);
-		GestureEvent::eventObject = new ValuePointer(eventObject);
+		GestureEvent::callback = new AutoGCRoot(callback);
+		GestureEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	int lime_window_alert(value window, int type, HxString message, HxString title, value buttons)
@@ -1439,8 +1439,8 @@ namespace lime
 
 	void lime_window_event_manager_register(value callback, value eventObject)
 	{
-		WindowEvent::callback = new ValuePointer(callback);
-		WindowEvent::eventObject = new ValuePointer(eventObject);
+		WindowEvent::callback = new AutoGCRoot(callback);
+		WindowEvent::eventObject = new AutoGCRoot(eventObject);
 	}
 
 	void lime_window_focus(value window)
