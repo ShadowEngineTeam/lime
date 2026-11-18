@@ -1,4 +1,5 @@
 #include <system/CFFI.h>
+#include <SDL3/SDL.h>
 #include <system/CFFIPointer.h>
 #include <utils/Bytes.h>
 #include <utils/File.h>
@@ -1650,13 +1651,15 @@ namespace lime
 		if (!data)
 			return;
 
-		if (data->onProcess)
+		value callback = data->onProcess ? data->onProcess->get() : NULL;
+
+		if (callback && !val_is_null(callback))
 		{
 			int base = 0;
 
 			gc_set_top_of_stack(&base, true);
 
-			val_call2(data->onProcess->get(), CFFIPointer(pFramesOut, NULL), alloc_int64(frameCount));
+			val_call2(callback, CFFIPointer(pFramesOut, NULL), alloc_int64(frameCount));
 
 			gc_set_top_of_stack(0, true);
 		}
