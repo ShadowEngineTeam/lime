@@ -18,7 +18,6 @@
 #include <string>
 #include <system/CFFIPointer.h>
 #include <system/Mutex.h>
-#include <system/ValuePointer.h>
 #include <ui/Window.h>
 #include <utils/ArrayBufferView.h>
 #include <utils/Bytes.h>
