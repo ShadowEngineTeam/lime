@@ -24,6 +24,10 @@
 #include <utils/HaxeResource.h>
 #include <vector>
 
+#if defined(ANDROID)
+#include <android/native_window.h>
+#endif
+
 #if defined(IPHONE) || defined(HX_MACOS)
 #import <QuartzCore/QuartzCore.h>
 #include <SDL3/SDL_metal.h>
@@ -381,6 +385,9 @@ namespace lime
 
 	int lime_bgfx_frame(int flags)
 	{
+		if (!BGFXBindings::SyncWindow())
+			return 0;
+
 		return bgfx::frame(flags);
 	}
 
@@ -1359,6 +1366,30 @@ namespace lime
 	static uint32_t __resetFlags = BGFX_RESET_FLIP_AFTER_RENDER;
 
 	static bgfx::SwapChain __swapChain;
+
+#if defined(ANDROID)
+	// SDL releases its window when the surface is destroyed, so bgfx keeps a reference of its own.
+	// The previous one is kept too, since the render thread can still use it until it takes the reset.
+	static ANativeWindow *__heldWindow = NULL;
+	static ANativeWindow *__previousWindow = NULL;
+
+	static void holdWindow(void *nwh)
+	{
+		ANativeWindow *window = (ANativeWindow *)nwh;
+
+		if (window == __heldWindow)
+			return;
+
+		if (window)
+			ANativeWindow_acquire(window);
+
+		if (__previousWindow)
+			ANativeWindow_release(__previousWindow);
+
+		__previousWindow = __heldWindow;
+		__heldWindow = window;
+	}
+#endif
 
 	void lime_bgfx_reset(int flags, value swapChain, value window)
 	{
@@ -2432,6 +2463,10 @@ namespace lime
 
 		__swapChain = init.swapChain;
 
+#if defined(ANDROID)
+		holdWindow(init.swapChain.nwh);
+#endif
+
 		// Init bgfx with the config
 		__initialized = bgfx::init(init);
 
@@ -2479,6 +2514,7 @@ namespace lime
 // Update the VK surface
 #if defined(ANDROID)
 		__swapChain.nwh = getNativeWindowHandle(defaultWindow);
+		holdWindow(__swapChain.nwh);
 #endif
 
 		bgfx::reset(__resetFlags, &__swapChain);
@@ -2498,6 +2534,25 @@ namespace lime
 		return true;
 	}
 
+	bool BGFXBindings::SyncWindow()
+	{
+#if defined(ANDROID)
+		if (!__initialized || !defaultWindow)
+			return true;
+
+		void *nwh = getNativeWindowHandle(defaultWindow);
+
+		// No surface while in the background, and a new one after it
+		if (!nwh)
+			return false;
+
+		if (nwh != __swapChain.nwh)
+			ResetWindow(0, 0);
+#endif
+
+		return true;
+	}
+
 	// Clean up any required resources
 	void BGFXBindings::Shutdown()
 	{
@@ -2506,6 +2561,17 @@ namespace lime
 			bgfx::shutdown();
 			__initialized = false;
 		}
+
+#if defined(ANDROID)
+		if (__previousWindow)
+			ANativeWindow_release(__previousWindow);
+
+		if (__heldWindow)
+			ANativeWindow_release(__heldWindow);
+
+		__previousWindow = NULL;
+		__heldWindow = NULL;
+#endif
 
 // Destroy the metal view
 #if defined(IPHONE) || defined(HX_MACOS)
