@@ -56,6 +56,8 @@
 			<section if="HXCPP_ARM64">
 
 				<compilerflag value="-DARM_CRC32" />
+				<compilerflag value="-DARM_CRC32_INTRIN" unless="isMsvc" />
+				<compilerflag value="-DHAVE_ARM_ACLE_H" unless="isMsvc" />
 				<compilerflag value="-DARM_NEON_DOTPROD" />
 				<compilerflag value="-DARM_PMULL_EOR3" />
 
