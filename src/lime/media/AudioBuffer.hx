@@ -193,7 +193,7 @@ class AudioBuffer
 		#if (lime_cffi && lime_miniaudio && !macro)
 		if (__localThreadPool == null)
 		{
-			__localThreadPool = new ThreadPool(0, 2);
+			__localThreadPool = new ThreadPool(0, 1);
 			__localThreadPool.onComplete.add(localThreadPool_onComplete);
 			__localThreadPool.onError.add(localThreadPool_onError);
 		}
@@ -224,7 +224,7 @@ class AudioBuffer
 		#if (lime_cffi && lime_miniaudio && !macro)
 		if (__localThreadPool == null)
 		{
-			__localThreadPool = new ThreadPool(0, 2);
+			__localThreadPool = new ThreadPool(0, 1);
 			__localThreadPool.onComplete.add(localThreadPool_onComplete);
 			__localThreadPool.onError.add(localThreadPool_onError);
 		}
