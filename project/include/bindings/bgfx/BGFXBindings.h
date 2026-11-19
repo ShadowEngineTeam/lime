@@ -25,6 +25,9 @@ namespace lime
 
 		static void ResetWindow(int width, int height);
 
+		// Points bgfx at the window's current surface. False while there is none to render to.
+		static bool SyncWindow();
+
 		static bool SetVSync(bool vsync);
 
 		static void Shutdown();
