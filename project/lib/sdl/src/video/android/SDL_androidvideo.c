@@ -95,6 +95,10 @@ static void SDLCALL Android_Video_InternalHintCallback(
 
 static void SDLCALL Android_DrawScaleHintChanged(void *userdata, const char *name, const char *oldValue, const char *newValue)
 {
+    if (SDL_strcmp(oldValue ? oldValue : "", newValue ? newValue : "") == 0) {
+        return;
+    }
+
     Android_LockActivityMutex();
 
     if (Android_Window) {

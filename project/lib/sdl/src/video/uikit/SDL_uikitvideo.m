@@ -171,6 +171,10 @@ CGFloat UIKit_GetPixelScale(UIScreen *screen)
 
 static void SDLCALL UIKit_PixelScaleHintChanged(void *userdata, const char *name, const char *oldValue, const char *newValue)
 {
+    if (SDL_strcmp(oldValue ? oldValue : "", newValue ? newValue : "") == 0) {
+        return;
+    }
+
     SDL_VideoDevice *_this = (SDL_VideoDevice *)userdata;
 
     @autoreleasepool {
