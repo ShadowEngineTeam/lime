@@ -12597,6 +12597,21 @@ IMPLEMENTATION
     #include <unistd.h> 
 #endif
 
+#if defined(MA_DOS)
+    #include <dos.h>        /* For delay(). */
+
+    /* DJGPP hides delay() in strict ANSI and POSIX modes. */
+    #if defined(__DJGPP__) && (defined(__STRICT_ANSI__) || defined(_POSIX_SOURCE))
+        #if defined(__cplusplus)
+        extern "C" {
+        #endif
+        void delay(unsigned int milliseconds);
+        #if defined(__cplusplus)
+        }
+        #endif
+    #endif
+#endif
+
 /* For fstat(), etc. */
 #if defined(MA_XBOX_NXDK)
     #include <stat.h>       /* Suggestion for NXDK: Add a sys/stat.h wrapper for compatibility. */
@@ -12958,6 +12973,13 @@ static void ma_sleep__posix(ma_uint32 milliseconds)
 }
 #endif
 
+#ifdef MA_DOS
+static void ma_sleep__dos(ma_uint32 milliseconds)
+{
+    delay(milliseconds);
+}
+#endif
+
 static MA_INLINE void ma_sleep(ma_uint32 milliseconds)
 {
 #ifdef MA_WIN32
@@ -12965,6 +12987,9 @@ static MA_INLINE void ma_sleep(ma_uint32 milliseconds)
 #endif
 #ifdef MA_POSIX
     ma_sleep__posix(milliseconds);
+#endif
+#ifdef MA_DOS
+    ma_sleep__dos(milliseconds);
 #endif
 }
 #endif
@@ -14316,6 +14341,7 @@ MA_API ma_result ma_wfopen(FILE** ppFile, const wchar_t* pFilePath, const wchar_
     #else
     {
         /* Getting here means there is no way to open the file with a wide character string. */
+        (void)pAllocationCallbacks;
         *ppFile = NULL;
     }
     #endif
@@ -20949,6 +20975,8 @@ MA_API ma_handle ma_dlopen(ma_log* pLog, const char* filename)
                     handle = (ma_handle)LoadPackagedLibrary(filenameW, 0);
                 }
             #endif
+        #elif defined(__COSMOPOLITAN__)
+            handle = (ma_handle)cosmo_dlopen(filename, RTLD_NOW);
         #else
             handle = (ma_handle)dlopen(filename, RTLD_NOW);
         #endif
@@ -20980,6 +21008,10 @@ MA_API void ma_dlclose(ma_log* pLog, ma_handle handle)
         #ifdef MA_WIN32
         {
             FreeLibrary((HMODULE)handle);
+        }
+        #elif defined(__COSMOPOLITAN__)
+        {
+            cosmo_dlclose((void*)handle);
         }
         #else
         {
@@ -21025,7 +21057,14 @@ MA_API ma_proc ma_dlsym(ma_log* pLog, ma_handle handle, const char* symbol)
                 #pragma GCC diagnostic push
                 #pragma GCC diagnostic ignored "-Wpedantic"
             #endif
-                proc = (ma_proc)dlsym((void*)handle, symbol);
+                #if defined(__COSMOPOLITAN__)
+                    proc = (ma_proc)cosmo_dlsym((void*)handle, symbol);
+                    if (proc != NULL) {
+                        proc = (ma_proc)cosmo_dltramp((void*)proc);
+                    }
+                #else
+                    proc = (ma_proc)dlsym((void*)handle, symbol);
+                #endif
             #if (defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))) || defined(__clang__)
                 #pragma GCC diagnostic pop
             #endif
@@ -22188,6 +22227,11 @@ static void ma_normalize_descriptor__null(ma_device_descriptor* pDescriptor, ma_
 
     pDescriptor->periodSizeInFrames = periodSizeInFrames;
     pDescriptor->periodCount        = 1;
+
+    /* DOS time updates are about 55 ms apart. Use a longer period to avoid discarding missed periods. */
+    #if defined(MA_DOS)
+    pDescriptor->periodSizeInFrames = ma_max(pDescriptor->periodSizeInFrames, ma_calculate_buffer_size_in_frames_from_milliseconds(100, pDescriptor->sampleRate));
+    #endif
 }
 
 static ma_result ma_device_init__null(ma_device* pDevice, const void* pDeviceBackendConfig, ma_device_descriptor* pDescriptorPlayback, ma_device_descriptor* pDescriptorCapture, void** ppDeviceState)
@@ -23737,7 +23781,7 @@ static ma_result ma_context_get_device_info_from_IAudioClient__wasapi(ma_context
                 if (SUCCEEDED(hr)) {
                     /* The format returned by PKEY_AudioEngine_DeviceFormat is supported. */
                     ma_add_native_data_format_to_device_info_from_WAVEFORMATEX(pWF, ma_share_mode_exclusive, pInfo);
-                } else {
+                } else if (hr != MA_AUDCLNT_E_EXCLUSIVE_MODE_NOT_ALLOWED) {
                     /*
                     The format returned by PKEY_AudioEngine_DeviceFormat is not supported, so fall back to a search. We assume the channel
                     count returned by MA_PKEY_AudioEngine_DeviceFormat is valid and correct. For simplicity we're only returning one format.
@@ -23780,6 +23824,10 @@ static ma_result ma_context_get_device_info_from_IAudioClient__wasapi(ma_context
                             wf.nAvgBytesPerSec = wf.nBlockAlign * wf.nSamplesPerSec;
 
                             hr = ma_IAudioClient_IsFormatSupported(pAudioClient, MA_AUDCLNT_SHAREMODE_EXCLUSIVE, (MA_WAVEFORMATEX*)&wf, NULL);
+                            if (hr == MA_AUDCLNT_E_EXCLUSIVE_MODE_NOT_ALLOWED) {
+                                break;
+                            }
+
                             if (SUCCEEDED(hr)) {
                                 ma_add_native_data_format_to_device_info_from_WAVEFORMATEX((MA_WAVEFORMATEX*)&wf, ma_share_mode_exclusive, pInfo);
                                 found = MA_TRUE;
@@ -23787,14 +23835,16 @@ static ma_result ma_context_get_device_info_from_IAudioClient__wasapi(ma_context
                             }
                         }
 
-                        if (found) {
+                        if (found || hr == MA_AUDCLNT_E_EXCLUSIVE_MODE_NOT_ALLOWED) {
                             break;
                         }
                     }
 
+                    /*
                     if (!found) {
-                        ma_log_postf(ma_context_get_log(pContext), MA_LOG_LEVEL_WARNING, "[WASAPI] Failed to find suitable device format for device info retrieval.");
+                        ma_log_postf(ma_context_get_log(pContext), MA_LOG_LEVEL_DEBUG, "[WASAPI] Failed to find suitable exclusive mode format for device info retrieval.");
                     }
+                    */
                 }
             } else {
                 ma_log_postf(ma_context_get_log(pContext), MA_LOG_LEVEL_WARNING, "[WASAPI] Failed to retrieve device format for device info retrieval.");
@@ -54971,6 +55021,26 @@ MA_API ma_result ma_device_init(const ma_device_config* pConfig, ma_device* pDev
     }
     #endif
 
+    /*
+    The Cosmopolitan build requires single threaded mode. It's because of threading and thread-local
+    storage. When Cosmo creates a thread it does so with its own thread-local state. When a host
+    library, such as PulseAudio, executes on that thread and calls the host C runtime, such as
+    glibc, that expects its own thread-local state which Cosmo did not initialize for that thread.
+    This can result in a crash.
+
+    To work around this, we enforce single threaded mode with Cosmo builds, and all miniaudio context
+    and device functions, include functions that call into them like ma_engine, should be called from
+    the main thread.
+    */
+    #if defined(__COSMOPOLITAN__)
+    {
+        if (threadingMode != MA_THREADING_MODE_SINGLE_THREADED) {
+            ma_log_post(ma_context_get_log(pContext), MA_LOG_LEVEL_ERROR, "[Cosmo] Use single-threaded mode and call context and device functions on the main thread.\n");
+            return MA_INVALID_OPERATION;
+        }
+    }
+    #endif
+
     /* Check that we have our callbacks defined. */
     if (pContext->pVTable->onDeviceInit == NULL) {
         return MA_INVALID_OPERATION;
@@ -77171,7 +77241,8 @@ typedef enum
     MA_DR_MP3_METADATA_TYPE_ID3V2,
     MA_DR_MP3_METADATA_TYPE_APE,
     MA_DR_MP3_METADATA_TYPE_XING,
-    MA_DR_MP3_METADATA_TYPE_VBRI
+    MA_DR_MP3_METADATA_TYPE_VBRI,
+    MA_DR_MP3_METADATA_TYPE_LYRICS3V2
 } ma_dr_mp3_metadata_type;
 typedef struct
 {
@@ -80780,10 +80851,7 @@ MA_API ma_result ma_decoder_init_vfs(ma_vfs* pVFS, const char* pFilePath, const 
         return result;
     }
 
-    result = ma_decoder_init__internal(&config, pDecoder);
-    if (result == MA_SUCCESS) {
-        result = ma_decoder__postinit(&config, pDecoder);
-    }
+    result = ma_decoder_init__internal(&config, pDecoder);   /* This will also do the post-initialization. */
 
     /* If we failed to initialize a decoder make sure our file handle is closed. */
     if (result != MA_SUCCESS) {
@@ -80842,10 +80910,7 @@ MA_API ma_result ma_decoder_init_vfs_w(ma_vfs* pVFS, const wchar_t* pFilePath, c
         return result;
     }
 
-    result = ma_decoder_init__internal(&config, pDecoder);
-    if (result == MA_SUCCESS) {
-        result = ma_decoder__postinit(&config, pDecoder);
-    }
+    result = ma_decoder_init__internal(&config, pDecoder);   /* This will also do the post-initialization. */
 
     /* If we failed to initialize a decoder make sure our file handle is closed. */
     if (result != MA_SUCCESS) {
@@ -84158,6 +84223,31 @@ static ma_uint32 ma_resource_manager_data_buffer_node_next_execution_order(ma_re
     return ma_atomic_fetch_add_32(&pDataBufferNode->executionCounter, 1);
 }
 
+static ma_result ma_resource_manager_data_buffer_node_post_page_job(ma_resource_manager* pResourceManager, ma_resource_manager_data_buffer_node* pDataBufferNode, ma_job* pJob)
+{
+    ma_result result;
+
+    /* This function should be called synchronously, usually between ma_resource_manager_data_buffer_bst_lock() and ma_resource_manager_data_buffer_bst_unlock(). */
+
+    /*
+    A free job may have been posted while the previous page was decoding. In this case the node
+    result will have been set to something other than MA_BUSY.
+    */
+    result = ma_resource_manager_data_buffer_node_result(pDataBufferNode);
+    if (result != MA_BUSY) {
+        return result;
+    }
+
+    pJob->order = ma_resource_manager_data_buffer_node_next_execution_order(pDataBufferNode);
+
+    result = ma_resource_manager_post_job(pResourceManager, pJob);
+    if (result != MA_SUCCESS) {
+        ma_atomic_fetch_sub_32(&pDataBufferNode->executionCounter, 1);
+    }
+
+    return result;
+}
+
 static ma_result ma_resource_manager_data_buffer_node_init_supply_encoded(ma_resource_manager* pResourceManager, ma_resource_manager_data_buffer_node* pDataBufferNode, const char* pFilePath, const wchar_t* pFilePathW)
 {
     ma_result result;
@@ -84196,7 +84286,7 @@ static ma_result ma_resource_manager_data_buffer_node_init_supply_decoded(ma_res
 
     MA_ASSERT(pResourceManager != NULL);
     MA_ASSERT(pDataBufferNode  != NULL);
-    MA_ASSERT(ppDecoder         != NULL);
+    MA_ASSERT(ppDecoder        != NULL);
     MA_ASSERT(pFilePath != NULL || pFilePathW != NULL);
 
     *ppDecoder = NULL;  /* For safety. */
@@ -84722,9 +84812,10 @@ static ma_result ma_resource_manager_data_buffer_node_unacquire(ma_resource_mana
             }
         }
     }
-    ma_resource_manager_data_buffer_bst_unlock(pResourceManager);
 
 stage2:
+    ma_resource_manager_data_buffer_bst_unlock(pResourceManager);
+
     if (result != MA_SUCCESS) {
         return result;
     }
@@ -84738,11 +84829,17 @@ stage2:
             /* The sound is still loading. We need to delay the freeing of the node to a safe time. */
             ma_job job;
 
-            /* We need to mark the node as unavailable for the sake of the resource manager worker threads. */
-            ma_atomic_exchange_i32(&pDataBufferNode->result, MA_UNAVAILABLE);
-
             job = ma_job_init(MA_JOB_TYPE_RESOURCE_MANAGER_FREE_DATA_BUFFER_NODE);
-            job.order = ma_resource_manager_data_buffer_node_next_execution_order(pDataBufferNode);
+
+            /* Prevent a page job from being posted after the free job. */
+            ma_resource_manager_data_buffer_bst_lock(pResourceManager);
+            {
+                /* We need to mark the node as unavailable for the sake of the resource manager worker threads. */
+                ma_atomic_exchange_i32(&pDataBufferNode->result, MA_UNAVAILABLE);
+                job.order = ma_resource_manager_data_buffer_node_next_execution_order(pDataBufferNode);
+            }
+            ma_resource_manager_data_buffer_bst_unlock(pResourceManager);
+
             job.data.resourceManager.freeDataBufferNode.pResourceManager = pResourceManager;
             job.data.resourceManager.freeDataBufferNode.pDataBufferNode  = pDataBufferNode;
 
@@ -86028,6 +86125,9 @@ MA_API ma_result ma_resource_manager_data_stream_init_ex(ma_resource_manager* pR
         MA_ZERO_OBJECT(&notifications);
     }
 
+    /* Streams have no notion of a done stage. Only the init fence is used. */
+    notifications.done.pFence = NULL;
+
     dataSourceConfig = ma_data_source_config_init();
     dataSourceConfig.pVTable = &ma_gDataSourceVTable_ResourceManagerDataStream;
 
@@ -87133,15 +87233,23 @@ static ma_result ma_job_process__resource_manager__load_data_buffer_node(ma_job*
         Note that if an error occurred at an earlier point, this section will have been skipped.
         */
         pageDataBufferNodeJob = ma_job_init(MA_JOB_TYPE_RESOURCE_MANAGER_PAGE_DATA_BUFFER_NODE);
-        pageDataBufferNodeJob.order = ma_resource_manager_data_buffer_node_next_execution_order(pDataBufferNode);
         pageDataBufferNodeJob.data.resourceManager.pageDataBufferNode.pResourceManager  = pResourceManager;
         pageDataBufferNodeJob.data.resourceManager.pageDataBufferNode.pDataBufferNode   = pDataBufferNode;
         pageDataBufferNodeJob.data.resourceManager.pageDataBufferNode.pDecoder          = pDecoder;
         pageDataBufferNodeJob.data.resourceManager.pageDataBufferNode.pDoneNotification = pJob->data.resourceManager.loadDataBufferNode.pDoneNotification;
         pageDataBufferNodeJob.data.resourceManager.pageDataBufferNode.pDoneFence        = pJob->data.resourceManager.loadDataBufferNode.pDoneFence;
 
+        /* WAIT_INIT executes this job inside the data buffer BST lock. */
+        if ((pJob->data.resourceManager.loadDataBufferNode.flags & MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_WAIT_INIT) == 0) {
+            ma_resource_manager_data_buffer_bst_lock(pResourceManager);
+        }
+
         /* The job has been set up so it can now be posted. */
-        result = ma_resource_manager_post_job(pResourceManager, &pageDataBufferNodeJob);
+        result = ma_resource_manager_data_buffer_node_post_page_job(pResourceManager, pDataBufferNode, &pageDataBufferNodeJob);
+
+        if ((pJob->data.resourceManager.loadDataBufferNode.flags & MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_WAIT_INIT) == 0) {
+            ma_resource_manager_data_buffer_bst_unlock(pResourceManager);
+        }
 
         /*
         When we get here, we want to make sure the result code is set to MA_BUSY. The reason for
@@ -87150,7 +87258,10 @@ static ma_result ma_job_process__resource_manager__load_data_buffer_node(ma_job*
         is set to MA_BUSY.
         */
         if (result != MA_SUCCESS) {
-            ma_log_postf(ma_resource_manager_get_log(pResourceManager), MA_LOG_LEVEL_ERROR, "Failed to post MA_JOB_TYPE_RESOURCE_MANAGER_PAGE_DATA_BUFFER_NODE job. %s.", ma_result_description(result));
+            if (result != MA_UNAVAILABLE) {
+                ma_log_postf(ma_resource_manager_get_log(pResourceManager), MA_LOG_LEVEL_ERROR, "Failed to post MA_JOB_TYPE_RESOURCE_MANAGER_PAGE_DATA_BUFFER_NODE job. %s.", ma_result_description(result));
+            }
+
             ma_decoder_uninit(pDecoder);
             ma_free(pDecoder, &pResourceManager->config.allocationCallbacks);
         } else {
@@ -87272,9 +87383,12 @@ static ma_result ma_job_process__resource_manager__page_data_buffer_node(ma_job*
     if (result == MA_SUCCESS) {
         ma_job newJob;
         newJob = *pJob; /* Everything is the same as the input job, except the execution order. */
-        newJob.order = ma_resource_manager_data_buffer_node_next_execution_order(pDataBufferNode);   /* We need a fresh execution order. */
 
-        result = ma_resource_manager_post_job(pResourceManager, &newJob);
+        ma_resource_manager_data_buffer_bst_lock(pResourceManager);
+        {
+            result = ma_resource_manager_data_buffer_node_post_page_job(pResourceManager, pDataBufferNode, &newJob);
+        }
+        ma_resource_manager_data_buffer_bst_unlock(pResourceManager);
 
         /* Since the sound isn't yet fully decoded we want the status to be set to busy. */
         if (result == MA_SUCCESS) {
@@ -95732,15 +95846,16 @@ MA_PRIVATE ma_bool32 ma_dr_wav_init__internal(ma_dr_wav* pWav, ma_dr_wav_chunk_p
     ma_uint64 aiffFrameCount = 0;
     ma_int64 fileSize = 0;
     ma_bool32 hasKnownFileSize = MA_FALSE;
+    ma_bool32 isDataChunkSizeUnknown = MA_FALSE;
     cursor = 0;
     sequential = (flags & MA_DR_WAV_SEQUENTIAL) != 0;
     isProcessingMetadata = !sequential && ((flags & MA_DR_WAV_WITH_METADATA) != 0);
-    if (isProcessingMetadata && pWav->onTell != NULL && pWav->onSeek != NULL) {
-        if (pWav->onSeek(pWav->pUserData, 0, MA_DR_WAV_SEEK_END)) {
-            if (pWav->onTell(pWav->pUserData, &fileSize)) {
-                hasKnownFileSize = MA_TRUE;
-            }
-            pWav->onSeek(pWav->pUserData, 0, MA_DR_WAV_SEEK_SET);
+    if (!sequential && pWav->onTell != NULL) {
+        if (pWav->onSeek(pWav->pUserData, 0, MA_DR_WAV_SEEK_END) && pWav->onTell(pWav->pUserData, &fileSize) && fileSize >= 0) {
+            hasKnownFileSize = MA_TRUE;
+        }
+        if (!pWav->onSeek(pWav->pUserData, 0, MA_DR_WAV_SEEK_SET)) {
+            return MA_FALSE;
         }
     }
     MA_DR_WAV_ZERO_OBJECT(&fmt);
@@ -95965,7 +96080,8 @@ MA_PRIVATE ma_bool32 ma_dr_wav_init__internal(ma_dr_wav* pWav, ma_dr_wav_chunk_p
             if (pWav->container != ma_dr_wav_container_rf64) {
                 dataChunkSize = chunkSize;
             }
-            if (sequential || !isProcessingMetadata) {
+            isDataChunkSizeUnknown = (pWav->container == ma_dr_wav_container_riff || pWav->container == ma_dr_wav_container_rifx) && dataChunkSize == 0xFFFFFFFF;
+            if (sequential || !isProcessingMetadata || isDataChunkSizeUnknown) {
                 break;
             } else {
                 chunkSize += header.paddingSize;
@@ -95989,13 +96105,15 @@ MA_PRIVATE ma_bool32 ma_dr_wav_init__internal(ma_dr_wav* pWav, ma_dr_wav_chunk_p
                 chunkSize -= 4;
                 sampleCountFromFactChunk = ma_dr_wav_bytes_to_u32_ex(sampleCount, pWav->container);
             } else if (pWav->container == ma_dr_wav_container_w64) {
-                if (chunkSize < 8) {
+                ma_uint8 sampleCount[8];
+                if (chunkSize < sizeof(sampleCount)) {
                     return MA_FALSE;
                 }
-                if (ma_dr_wav__on_read(pWav->onRead, pWav->pUserData, &sampleCountFromFactChunk, 8, &cursor) != 8) {
+                if (ma_dr_wav__on_read(pWav->onRead, pWav->pUserData, sampleCount, sizeof(sampleCount), &cursor) != sizeof(sampleCount)) {
                     return MA_FALSE;
                 }
-                chunkSize -= 8;
+                chunkSize -= sizeof(sampleCount);
+                sampleCountFromFactChunk = ma_dr_wav_bytes_to_u64(sampleCount);
             } else if (pWav->container == ma_dr_wav_container_rf64) {
             }
             chunkSize += header.paddingSize;
@@ -96152,16 +96270,32 @@ MA_PRIVATE ma_bool32 ma_dr_wav_init__internal(ma_dr_wav* pWav, ma_dr_wav_chunk_p
     if ((pWav->container == ma_dr_wav_container_riff || pWav->container == ma_dr_wav_container_rifx) && translatedFormatTag != MA_DR_WAVE_FORMAT_ADPCM) {
         sampleCountFromFactChunk = 0;
     }
-    if (!sequential) {
-        if (!ma_dr_wav__seek_from_start(pWav->onSeek, pWav->dataChunkDataPos, pWav->pUserData)) {
+    if (hasKnownFileSize) {
+        ma_uint64 bytesAvailable;
+        if (pWav->dataChunkDataPos > (ma_uint64)fileSize) {
             return MA_FALSE;
         }
-        cursor = pWav->dataChunkDataPos;
+        bytesAvailable = (ma_uint64)fileSize - pWav->dataChunkDataPos;
+        if (isDataChunkSizeUnknown || dataChunkSize > bytesAvailable) {
+            dataChunkSize = bytesAvailable;
+        }
+    } else if (isDataChunkSizeUnknown && !sequential) {
+        dataChunkSize = 0;
+        for (;;) {
+            ma_uint8 temp[4096];
+            size_t bytesRead;
+            bytesRead = pWav->onRead(pWav->pUserData, temp, sizeof(temp));
+            dataChunkSize += bytesRead;
+            if (bytesRead < sizeof(temp)) {
+                break;
+            }
+        }
     }
     if (isProcessingMetadata && metadataParser.metadataCount > 0) {
         if (ma_dr_wav__seek_from_start(pWav->onSeek, metadataStartPos, pWav->pUserData) == MA_FALSE) {
             return MA_FALSE;
         }
+        cursor = metadataStartPos;
         result = ma_dr_wav__metadata_alloc(&metadataParser, &pWav->allocationCallbacks);
         if (result != MA_SUCCESS) {
             return MA_FALSE;
@@ -96186,29 +96320,7 @@ MA_PRIVATE ma_bool32 ma_dr_wav_init__internal(ma_dr_wav* pWav, ma_dr_wav_chunk_p
         pWav->pMetadata     = metadataParser.pMetadata;
         pWav->metadataCount = (ma_uint32)metadataParser.metadataCursor;
     }
-    if (pWav->onTell != NULL && pWav->onSeek != NULL) {
-        if (pWav->onSeek(pWav->pUserData, 0, MA_DR_WAV_SEEK_END) == MA_TRUE) {
-            ma_int64 fileSize;
-            if (pWav->onTell(pWav->pUserData, &fileSize)) {
-                if (dataChunkSize + pWav->dataChunkDataPos > (ma_uint64)fileSize) {
-                    dataChunkSize = (ma_uint64)fileSize - pWav->dataChunkDataPos;
-                }
-            }
-        } else {
-        }
-    }
-    if (dataChunkSize == 0xFFFFFFFF && (pWav->container == ma_dr_wav_container_riff || pWav->container == ma_dr_wav_container_rifx) && pWav->isSequentialWrite == MA_FALSE) {
-        dataChunkSize = 0;
-        for (;;) {
-            ma_uint8 temp[4096];
-            size_t bytesRead = pWav->onRead(pWav->pUserData, temp, sizeof(temp));
-            dataChunkSize += bytesRead;
-            if (bytesRead < sizeof(temp)) {
-                break;
-            }
-        }
-    }
-    if (ma_dr_wav__seek_from_start(pWav->onSeek, pWav->dataChunkDataPos, pWav->pUserData) == MA_FALSE) {
+    if (!sequential && !ma_dr_wav__seek_from_start(pWav->onSeek, pWav->dataChunkDataPos, pWav->pUserData)) {
         ma_dr_wav_free(pWav->pMetadata, &pWav->allocationCallbacks);
         return MA_FALSE;
     }
@@ -96946,6 +97058,9 @@ MA_PRIVATE ma_bool32 ma_dr_wav__on_tell_stdio(void* pUserData, ma_int64* pCursor
 #else
     result = ftell(pFileStdio);
 #endif
+    if (result < 0) {
+        return MA_FALSE;
+    }
     *pCursor = result;
     return MA_TRUE;
 }
@@ -98218,14 +98333,19 @@ MA_API void ma_dr_wav_u8_to_s16(ma_int16* pOut, const ma_uint8* pIn, size_t samp
         pOut[i] = (short)r;
     }
 }
+static MA_INLINE ma_int32 ma_dr_wav__s24_to_s32(const ma_uint8* pIn)
+{
+    if (ma_dr_wav__is_little_endian()) {
+        return (ma_int32)(((ma_uint32)pIn[0] << 8) | ((ma_uint32)pIn[1] << 16) | ((ma_uint32)pIn[2] << 24));
+    } else {
+        return (ma_int32)(((ma_uint32)pIn[2] << 8) | ((ma_uint32)pIn[1] << 16) | ((ma_uint32)pIn[0] << 24));
+    }
+}
 MA_API void ma_dr_wav_s24_to_s16(ma_int16* pOut, const ma_uint8* pIn, size_t sampleCount)
 {
-    int r;
     size_t i;
     for (i = 0; i < sampleCount; ++i) {
-        int x = ((int)(((unsigned int)(((const ma_uint8*)pIn)[i*3+0]) << 8) | ((unsigned int)(((const ma_uint8*)pIn)[i*3+1]) << 16) | ((unsigned int)(((const ma_uint8*)pIn)[i*3+2])) << 24)) >> 8;
-        r = x >> 8;
-        pOut[i] = (short)r;
+        pOut[i] = (ma_int16)(ma_dr_wav__s24_to_s32(pIn + i*3) >> 16);
     }
 }
 MA_API void ma_dr_wav_s32_to_s16(ma_int16* pOut, const ma_int32* pIn, size_t sampleCount)
@@ -98572,12 +98692,7 @@ MA_API void ma_dr_wav_s24_to_f32(float* pOut, const ma_uint8* pIn, size_t sample
         return;
     }
     for (i = 0; i < sampleCount; ++i) {
-        double x;
-        ma_uint32 a = ((ma_uint32)(pIn[i*3+0]) <<  8);
-        ma_uint32 b = ((ma_uint32)(pIn[i*3+1]) << 16);
-        ma_uint32 c = ((ma_uint32)(pIn[i*3+2]) << 24);
-        x = (double)((ma_int32)(a | b | c) >> 8);
-        *pOut++ = (float)(x * 0.00000011920928955078125);
+        *pOut++ = (float)(ma_dr_wav__s24_to_s32(pIn + i*3) / 2147483648.0);
     }
 }
 MA_API void ma_dr_wav_s32_to_f32(float* pOut, const ma_int32* pIn, size_t sampleCount)
@@ -98906,11 +99021,7 @@ MA_API void ma_dr_wav_s24_to_s32(ma_int32* pOut, const ma_uint8* pIn, size_t sam
         return;
     }
     for (i = 0; i < sampleCount; ++i) {
-        unsigned int s0 = pIn[i*3 + 0];
-        unsigned int s1 = pIn[i*3 + 1];
-        unsigned int s2 = pIn[i*3 + 2];
-        ma_int32 sample32 = (ma_int32)((s0 << 8) | (s1 << 16) | (s2 << 24));
-        *pOut++ = sample32;
+        *pOut++ = ma_dr_wav__s24_to_s32(pIn + i*3);
     }
 }
 MA_API void ma_dr_wav_f32_to_s32(ma_int32* pOut, const float* pIn, size_t sampleCount)
@@ -99770,8 +99881,12 @@ static MA_INLINE ma_uint32 ma_dr_flac__be2host_32(ma_uint32 n)
 }
 static MA_INLINE ma_uint32 ma_dr_flac__be2host_32_ptr_unaligned(const void* pData)
 {
-    const ma_uint8* pNum = (ma_uint8*)pData;
-    return *(pNum) << 24 | *(pNum+1) << 16 | *(pNum+2) << 8 | *(pNum+3);
+    const ma_uint8* pData8 = (const ma_uint8*)pData;
+    return
+        (ma_uint32)pData8[0] << 24 |
+        (ma_uint32)pData8[1] << 16 |
+        (ma_uint32)pData8[2] <<  8 |
+        (ma_uint32)pData8[3] <<  0;
 }
 static MA_INLINE ma_uint64 ma_dr_flac__be2host_64(ma_uint64 n)
 {
@@ -99789,8 +99904,12 @@ static MA_INLINE ma_uint32 ma_dr_flac__le2host_32(ma_uint32 n)
 }
 static MA_INLINE ma_uint32 ma_dr_flac__le2host_32_ptr_unaligned(const void* pData)
 {
-    const ma_uint8* pNum = (ma_uint8*)pData;
-    return *pNum | *(pNum+1) << 8 |  *(pNum+2) << 16 | *(pNum+3) << 24;
+    const ma_uint8* pData8 = (const ma_uint8*)pData;
+    return
+        (ma_uint32)pData8[0] <<  0 |
+        (ma_uint32)pData8[1] <<  8 |
+        (ma_uint32)pData8[2] << 16 |
+        (ma_uint32)pData8[3] << 24;
 }
 static MA_INLINE ma_uint32 ma_dr_flac__unsynchsafe_32(ma_uint32 n)
 {
@@ -107952,7 +108071,7 @@ MA_API const char* ma_dr_mp3_version_string(void)
 #if !defined(MA_DR_MP3_ONLY_SIMD) && (defined(__ARM_NEON) || defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC))
 #define MA_DR_MP3_ONLY_SIMD
 #endif
-#if ((defined(_MSC_VER) && _MSC_VER >= 1400) && defined(_M_X64)) || ((defined(__i386) || defined(_M_IX86) || defined(__i386__) || defined(__x86_64__)) && ((defined(_M_IX86_FP) && _M_IX86_FP == 2) || defined(__SSE2__)))
+#if (((defined(_MSC_VER) && _MSC_VER >= 1400) && defined(_M_X64)) || ((defined(__i386) || defined(_M_IX86) || defined(__i386__) || defined(__x86_64__)) && ((defined(_M_IX86_FP) && _M_IX86_FP == 2) || defined(__SSE2__)))) && !defined(_M_ARM64EC)
 #if defined(_MSC_VER)
 #include <intrin.h>
 #endif
@@ -108071,6 +108190,9 @@ static __inline__ __attribute__((always_inline)) ma_int32 ma_dr_mp3_clip_int16_a
 #endif
 #ifndef MA_DR_MP3_MOVE_MEMORY
 #define MA_DR_MP3_MOVE_MEMORY(dst, src, sz) memmove((dst), (src), (sz))
+#endif
+#ifndef MA_DR_MP3_CMP_MEMORY
+#define MA_DR_MP3_CMP_MEMORY(src1, src2, sz) memcmp((src1), (src2), (sz))
 #endif
 #ifndef MA_DR_MP3_ZERO_MEMORY
 #define MA_DR_MP3_ZERO_MEMORY(p, sz) memset((p), 0, (sz))
@@ -108748,14 +108870,15 @@ static void ma_dr_mp3_L3_stereo_top_band(const float *right, const ma_uint8 *sfb
 static void ma_dr_mp3_L3_stereo_process(float *left, const ma_uint8 *ist_pos, const ma_uint8 *sfb, const ma_uint8 *hdr, int max_band[3], int mpeg2_sh)
 {
     static const float g_pan[7*2] = { 0,1,0.21132487f,0.78867513f,0.36602540f,0.63397460f,0.5f,0.5f,0.63397460f,0.36602540f,0.78867513f,0.21132487f,1,0 };
-    unsigned i, max_pos = MA_DR_MP3_HDR_TEST_MPEG1(hdr) ? 7 : 64;
+    const ma_uint8 mpeg1 = MA_DR_MP3_HDR_TEST_MPEG1(hdr);
+    unsigned i, max_pos = mpeg1 ? 7 : 64;
     for (i = 0; sfb[i]; i++)
     {
         unsigned ipos = ist_pos[i];
         if ((int)i > max_band[i % 3] && ipos < max_pos)
         {
             float kl, kr, s = MA_DR_MP3_HDR_TEST_MS_STEREO(hdr) ? 1.41421356f : 1;
-            if (MA_DR_MP3_HDR_TEST_MPEG1(hdr))
+            if (mpeg1)
             {
                 kl = g_pan[2*ipos];
                 kr = g_pan[2*ipos + 1];
@@ -109409,6 +109532,18 @@ static void ma_dr_mp3d_synth_granule(float *qmf_state, float *grbuf, int nbands,
         MA_DR_MP3_COPY_MEMORY(qmf_state, lins + nbands*64, sizeof(float)*15*64);
     }
 }
+static int ma_dr_mp3_hdr_is_null(const ma_uint8 *hdr)
+{
+    return !hdr[0] && !hdr[1] && !hdr[2] && !hdr[3];
+}
+static int ma_dr_mp3_hdr_is_id3v1(const ma_uint8 *hdr, int bytes_left)
+{
+    return 128 == bytes_left && !MA_DR_MP3_CMP_MEMORY(hdr, "TAG", 3);
+}
+static int ma_dr_mp3_hdr_is_null_or_tag(const ma_uint8 *hdr, int bytes_left)
+{
+    return ma_dr_mp3_hdr_is_null(hdr) || ma_dr_mp3_hdr_is_id3v1(hdr, bytes_left);
+}
 static int ma_dr_mp3d_match_frame(const ma_uint8 *hdr, int mp3_bytes, int frame_bytes)
 {
     int i, nmatch;
@@ -109416,6 +109551,8 @@ static int ma_dr_mp3d_match_frame(const ma_uint8 *hdr, int mp3_bytes, int frame_
     {
         i += ma_dr_mp3_hdr_frame_bytes(hdr + i, frame_bytes) + ma_dr_mp3_hdr_padding(hdr + i);
         if (i + MA_DR_MP3_HDR_SIZE > mp3_bytes)
+            return nmatch > 0;
+        if (ma_dr_mp3_hdr_is_null_or_tag(hdr + i, mp3_bytes - i))
             return nmatch > 0;
         if (!ma_dr_mp3_hdr_compare(hdr, hdr + i))
             return 0;
@@ -109466,6 +109603,7 @@ MA_API int ma_dr_mp3dec_decode_frame(ma_dr_mp3dec *dec, const ma_uint8 *mp3, int
     int i = 0, igr, frame_size = 0, success = 1;
     const ma_uint8 *hdr;
     ma_dr_mp3_bs bs_frame[1];
+    MA_DR_MP3_ZERO_MEMORY(dec->scratch.ist_pos, sizeof(dec->scratch.ist_pos));
     info->layer = 0;
     if (mp3_bytes > 4 && dec->header[0] == 0xff && ma_dr_mp3_hdr_compare(dec->header, mp3))
     {
@@ -109510,7 +109648,7 @@ MA_API int ma_dr_mp3dec_decode_frame(ma_dr_mp3dec *dec, const ma_uint8 *mp3, int
         {
             for (igr = 0; igr < (MA_DR_MP3_HDR_TEST_MPEG1(hdr) ? 2 : 1); igr++, pcm = MA_DR_MP3_OFFSET_PTR(pcm, sizeof(ma_dr_mp3d_sample_t)*576*info->channels))
             {
-                MA_DR_MP3_ZERO_MEMORY(dec->scratch.grbuf[0], 576*2*sizeof(float));
+                MA_DR_MP3_ZERO_MEMORY(dec->scratch.grbuf, sizeof(dec->scratch.grbuf));
                 ma_dr_mp3_L3_decode(dec, &dec->scratch, dec->scratch.gr_info + igr*info->channels, info->channels);
                 ma_dr_mp3d_synth_granule(dec->qmf_state, dec->scratch.grbuf[0], 18, info->channels, (ma_dr_mp3d_sample_t*)pcm, dec->scratch.syn[0]);
             }
@@ -109526,7 +109664,7 @@ MA_API int ma_dr_mp3dec_decode_frame(ma_dr_mp3dec *dec, const ma_uint8 *mp3, int
             return ma_dr_mp3_hdr_frame_samples(hdr);
         }
         ma_dr_mp3_L12_read_scale_info(hdr, bs_frame, sci);
-        MA_DR_MP3_ZERO_MEMORY(dec->scratch.grbuf[0], 576*2*sizeof(float));
+        MA_DR_MP3_ZERO_MEMORY(dec->scratch.grbuf, sizeof(dec->scratch.grbuf));
         for (i = 0, igr = 0; igr < 3; igr++)
         {
             if (12 == (i += ma_dr_mp3_L12_dequantize_granule(dec->scratch.grbuf[0] + i, bs_frame, sci, info->layer | 1)))
@@ -109534,7 +109672,7 @@ MA_API int ma_dr_mp3dec_decode_frame(ma_dr_mp3dec *dec, const ma_uint8 *mp3, int
                 i = 0;
                 ma_dr_mp3_L12_apply_scf_384(sci, sci->scf + igr, dec->scratch.grbuf[0]);
                 ma_dr_mp3d_synth_granule(dec->qmf_state, dec->scratch.grbuf[0], 12, info->channels, (ma_dr_mp3d_sample_t*)pcm, dec->scratch.syn[0]);
-                MA_DR_MP3_ZERO_MEMORY(dec->scratch.grbuf[0], 576*2*sizeof(float));
+                MA_DR_MP3_ZERO_MEMORY(dec->scratch.grbuf, sizeof(dec->scratch.grbuf));
                 pcm = MA_DR_MP3_OFFSET_PTR(pcm, sizeof(ma_dr_mp3d_sample_t)*384*info->channels);
             }
             if (bs_frame->pos > bs_frame->limit)
@@ -109562,14 +109700,7 @@ MA_API void ma_dr_mp3dec_f32_to_s16(const float *in, ma_int16 *out, size_t num_s
         ma_dr_mp3_f4 s16min = MA_DR_MP3_VSET(-32768.0f);
         __m128i pcm8 = _mm_packs_epi32(_mm_cvtps_epi32(_mm_max_ps(_mm_min_ps(a, s16max), s16min)),
                                         _mm_cvtps_epi32(_mm_max_ps(_mm_min_ps(b, s16max), s16min)));
-        out[i  ] = (ma_int16)_mm_extract_epi16(pcm8, 0);
-        out[i+1] = (ma_int16)_mm_extract_epi16(pcm8, 1);
-        out[i+2] = (ma_int16)_mm_extract_epi16(pcm8, 2);
-        out[i+3] = (ma_int16)_mm_extract_epi16(pcm8, 3);
-        out[i+4] = (ma_int16)_mm_extract_epi16(pcm8, 4);
-        out[i+5] = (ma_int16)_mm_extract_epi16(pcm8, 5);
-        out[i+6] = (ma_int16)_mm_extract_epi16(pcm8, 6);
-        out[i+7] = (ma_int16)_mm_extract_epi16(pcm8, 7);
+        _mm_storeu_si128( (__m128i *)(&out[i]), pcm8 );
 #else
         int16x4_t pcma, pcmb;
         a = MA_DR_MP3_VADD(a, MA_DR_MP3_VSET(0.5f));
@@ -109971,54 +110102,113 @@ static ma_bool32 ma_dr_mp3_init_internal(ma_dr_mp3* pMP3, ma_dr_mp3_read_proc on
             ma_int64 streamLen;
             int streamEndOffset = 0;
             if (onTell(pUserData, &streamLen)) {
-                if (streamLen > 128) {
-                    char id3[3];
-                    if (onSeek(pUserData, streamEndOffset - 128, MA_DR_MP3_SEEK_END)) {
-                        if (onRead(pUserData, id3, 3) == 3 && id3[0] == 'T' && id3[1] == 'A' && id3[2] == 'G') {
-                            streamEndOffset -= 128;
-                            streamLen       -= 128;
-                            if (onMeta != NULL) {
-                                ma_uint8 tag[128];
-                                tag[0] = 'T'; tag[1] = 'A'; tag[2] = 'G';
-                                if (onRead(pUserData, tag + 3, 125) == 125) {
-                                    ma_dr_mp3__on_meta(pMP3, MA_DR_MP3_METADATA_TYPE_ID3V1, tag, 128);
+                for (;;) {
+                    ma_int64 streamLenBeforeTags = streamLen;
+                    if (streamLen > 128 && streamEndOffset >= INT_MIN + 128) {
+                        char id3[3];
+                        if (onSeek(pUserData, streamEndOffset - 128, MA_DR_MP3_SEEK_END)) {
+                            if (onRead(pUserData, id3, 3) == 3 && id3[0] == 'T' && id3[1] == 'A' && id3[2] == 'G') {
+                                streamEndOffset -= 128;
+                                streamLen       -= 128;
+                                if (onMeta != NULL) {
+                                    ma_uint8 tag[128];
+                                    tag[0] = 'T'; tag[1] = 'A'; tag[2] = 'G';
+                                    if (onRead(pUserData, tag + 3, 125) == 125) {
+                                        ma_dr_mp3__on_meta(pMP3, MA_DR_MP3_METADATA_TYPE_ID3V1, tag, 128);
+                                    }
                                 }
+                            } else {
                             }
                         } else {
                         }
                     } else {
                     }
-                } else {
-                }
-                if (streamLen > 32) {
-                    char ape[32];
-                    if (onSeek(pUserData, streamEndOffset - 32, MA_DR_MP3_SEEK_END)) {
-                        if (onRead(pUserData, ape, 32) == 32 && ape[0] == 'A' && ape[1] == 'P' && ape[2] == 'E' && ape[3] == 'T' && ape[4] == 'A' && ape[5] == 'G' && ape[6] == 'E' && ape[7] == 'X') {
-                            ma_uint32 tagSize =
-                                ((ma_uint32)ape[24] << 0)  |
-                                ((ma_uint32)ape[25] << 8)  |
-                                ((ma_uint32)ape[26] << 16) |
-                                ((ma_uint32)ape[27] << 24);
-                            if (32 + tagSize < streamLen) {
-                                streamEndOffset -= 32 + tagSize;
-                                streamLen       -= 32 + tagSize;
-                                if (onMeta != NULL) {
-                                    if (onSeek(pUserData, streamEndOffset, MA_DR_MP3_SEEK_END)) {
-                                        size_t apeTagSize = (size_t)tagSize + 32;
-                                        ma_uint8* pTagData = (ma_uint8*)ma_dr_mp3_malloc(apeTagSize, pAllocationCallbacks);
-                                        if (pTagData != NULL) {
-                                            if (onRead(pUserData, pTagData, apeTagSize) == apeTagSize) {
-                                                ma_dr_mp3__on_meta(pMP3, MA_DR_MP3_METADATA_TYPE_APE, pTagData, apeTagSize);
+                    if (streamLen > 32 && streamEndOffset >= INT_MIN + 32) {
+                        ma_uint8 ape[32];
+                        if (onSeek(pUserData, streamEndOffset - 32, MA_DR_MP3_SEEK_END)) {
+                            if (onRead(pUserData, ape, 32) == 32 && ape[0] == 'A' && ape[1] == 'P' && ape[2] == 'E' && ape[3] == 'T' && ape[4] == 'A' && ape[5] == 'G' && ape[6] == 'E' && ape[7] == 'X') {
+                                ma_uint32 apeVersion;
+                                ma_uint32 tagSize;
+                                ma_int64 totalTagSize;
+                                apeVersion =
+                                    ((ma_uint32)ape[8]  << 0)  |
+                                    ((ma_uint32)ape[9]  << 8)  |
+                                    ((ma_uint32)ape[10] << 16) |
+                                    ((ma_uint32)ape[11] << 24);
+                                tagSize =
+                                    ((ma_uint32)ape[12] << 0)  |
+                                    ((ma_uint32)ape[13] << 8)  |
+                                    ((ma_uint32)ape[14] << 16) |
+                                    ((ma_uint32)ape[15] << 24);
+                                totalTagSize = tagSize;
+                                if (apeVersion >= 2000 && (ape[23] & 0x80) != 0) {
+                                    totalTagSize += 32;
+                                }
+                                if (tagSize >= 32 && totalTagSize < streamLen && totalTagSize <= (ma_int64)streamEndOffset - INT_MIN) {
+                                    streamEndOffset = (int)(streamEndOffset - totalTagSize);
+                                    streamLen -= totalTagSize;
+                                    if (onMeta != NULL) {
+                                        if (onSeek(pUserData, streamEndOffset, MA_DR_MP3_SEEK_END)) {
+                                            size_t apeTagSize = (size_t)totalTagSize;
+                                            ma_uint8* pTagData;
+                                            pTagData = (ma_uint8*)ma_dr_mp3_malloc(apeTagSize, pAllocationCallbacks);
+                                            if (pTagData != NULL) {
+                                                if (onRead(pUserData, pTagData, apeTagSize) == apeTagSize) {
+                                                    ma_dr_mp3__on_meta(pMP3, MA_DR_MP3_METADATA_TYPE_APE, pTagData, apeTagSize);
+                                                }
+                                                ma_dr_mp3_free(pTagData, pAllocationCallbacks);
                                             }
-                                            ma_dr_mp3_free(pTagData, pAllocationCallbacks);
+                                        }
+                                    }
+                                } else {
+                                }
+                            }
+                        }
+                    } else {
+                    }
+                    if (streamLen > 15 && streamEndOffset >= INT_MIN + 15) {
+                        ma_uint8 footer[15];
+                        if (onSeek(pUserData, streamEndOffset - (int)sizeof(footer), MA_DR_MP3_SEEK_END)) {
+                            if (onRead(pUserData, footer, sizeof(footer)) == sizeof(footer) && MA_DR_MP3_CMP_MEMORY(footer + 6, "LYRICS200", 9) == 0) {
+                                ma_uint32 tagSize = 0;
+                                ma_uint32 totalTagSize;
+                                int i;
+                                for (i = 0; i < 6; i += 1) {
+                                    if (footer[i] < '0' || footer[i] > '9') {
+                                        break;
+                                    }
+                                    tagSize = tagSize * 10 + (footer[i] - '0');
+                                }
+                                totalTagSize = tagSize + sizeof(footer);
+                                if (i == 6 && tagSize >= 11 && totalTagSize < streamLen && totalTagSize <= (ma_int64)streamEndOffset - INT_MIN) {
+                                    ma_uint8 header[11];
+                                    int tagOffset;
+                                    tagOffset = streamEndOffset - (int)totalTagSize;
+                                    if (onSeek(pUserData, tagOffset, MA_DR_MP3_SEEK_END)) {
+                                        if (onRead(pUserData, header, sizeof(header)) == sizeof(header) && MA_DR_MP3_CMP_MEMORY(header, "LYRICSBEGIN", sizeof(header)) == 0) {
+                                            streamEndOffset = tagOffset;
+                                            streamLen -= totalTagSize;
+                                            if (onMeta != NULL) {
+                                                ma_uint8* pTagData;
+                                                pTagData = (ma_uint8*)ma_dr_mp3_malloc(totalTagSize, pAllocationCallbacks);
+                                                if (pTagData != NULL) {
+                                                    MA_DR_MP3_COPY_MEMORY(pTagData, header, sizeof(header));
+                                                    if (onRead(pUserData, pTagData + sizeof(header), totalTagSize - sizeof(header)) == totalTagSize - sizeof(header)) {
+                                                        ma_dr_mp3__on_meta(pMP3, MA_DR_MP3_METADATA_TYPE_LYRICS3V2, pTagData, totalTagSize);
+                                                    }
+                                                    ma_dr_mp3_free(pTagData, pAllocationCallbacks);
+                                                }
+                                            }
                                         }
                                     }
                                 }
-                            } else {
                             }
                         }
+                    } else {
                     }
-                } else {
+                    if (streamLen == streamLenBeforeTags) {
+                        break;
+                    }
                 }
                 if (!onSeek(pUserData, 0, MA_DR_MP3_SEEK_SET)) {
                     return MA_FALSE;
