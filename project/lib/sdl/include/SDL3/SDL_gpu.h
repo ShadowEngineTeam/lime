@@ -1572,7 +1572,7 @@ typedef struct SDL_GPUIndirectDrawCommand
 /**
  * A structure specifying the parameters of an indexed indirect draw command.
  *
- * Note that the `first_vertex` and `first_instance` parameters are NOT
+ * Note that the `first_offset` and `first_instance` parameters are NOT
  * compatible with built-in vertex/instance ID variables in shaders (for
  * example, SV_VertexID); GPU APIs and shader languages do not define these
  * built-in variables consistently, so if your shader depends on them, the
@@ -3900,7 +3900,7 @@ extern SDL_DECLSPEC void SDLCALL SDL_BindGPUFragmentStorageBuffers(
  *
  * You must not call this function before binding a graphics pipeline.
  *
- * Note that the `first_vertex` and `first_instance` parameters are NOT
+ * Note that the `first_offset` and `first_instance` parameters are NOT
  * compatible with built-in vertex/instance ID variables in shaders (for
  * example, SV_VertexID); GPU APIs and shader languages do not define these
  * built-in variables consistently, so if your shader depends on them, the
@@ -4270,6 +4270,13 @@ extern SDL_DECLSPEC SDL_GPUCopyPass * SDLCALL SDL_BeginGPUCopyPass(
  * You must align the data in the transfer buffer to a multiple of the texel
  * size of the texture format.
  *
+ * **WARNING**: On some older/integrated hardware, Direct3D 12 requires
+ * texture data row pitch to be 256 byte aligned, and offsets to be aligned to
+ * 512 bytes. If they are not, SDL will make a temporary copy of the data that
+ * is properly aligned, but this adds overhead to the transfer process. Apps
+ * can avoid this by aligning their data appropriately, or using a different
+ * GPU backend than Direct3D 12.
+ *
  * \param copy_pass a copy pass handle.
  * \param source the source transfer buffer with image layout information.
  * \param destination the destination texture region.
@@ -4361,6 +4368,13 @@ extern SDL_DECLSPEC void SDLCALL SDL_CopyGPUBufferToBuffer(
  *
  * This data is not guaranteed to be copied until the command buffer fence is
  * signaled.
+ *
+ * **WARNING**: On some older/integrated hardware, Direct3D 12 requires
+ * texture data row pitch to be 256 byte aligned, and offsets to be aligned to
+ * 512 bytes. If they are not, SDL will make a temporary copy of the data that
+ * is properly aligned, but this adds overhead to the transfer process. Apps
+ * can avoid this by aligning their data appropriately, or using a different
+ * GPU backend than Direct3D 12.
  *
  * \param copy_pass a copy pass handle.
  * \param source the source texture region.

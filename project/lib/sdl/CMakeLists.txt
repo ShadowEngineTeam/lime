@@ -13,12 +13,6 @@ else()
   set(SDL3_MAINPROJECT OFF)
 endif()
 
-# Add UTF-8 encoding support for MSVC compiler.
-# This ensures that the MSVC compiler interprets source files as UTF-8 encoded,
-# which is useful for projects containing non-ASCII characters in source files.
-add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
-add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
-
 # By default, configure SDL3 in RelWithDebInfo configuration
 if(SDL3_MAINPROJECT)
   get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
@@ -1177,6 +1171,9 @@ if(SDL_LIBC)
     sdl_link_dependency(math LIBS m)
     list(APPEND CMAKE_REQUIRED_LIBRARIES m)
   endif()
+  if(UNIX)
+    list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_LARGEFILE64_SOURCE=1)
+  endif()
   foreach(_FN IN LISTS symbols_to_check)
     string(TOUPPER ${_FN} _UPPER)
     set(LIBC_HAS_VAR "LIBC_HAS_${_UPPER}")
@@ -2317,6 +2314,8 @@ elseif(UNIX AND NOT (APPLE OR RISCOS OR HAIKU OR CYGWIN))
     sdl_sources(
       "${SDL3_SOURCE_DIR}/src/core/linux/SDL_evdev_capabilities.c"
       "${SDL3_SOURCE_DIR}/src/core/linux/SDL_evdev_capabilities.h"
+      "${SDL3_SOURCE_DIR}/src/core/linux/SDL_sysfs.c"
+      "${SDL3_SOURCE_DIR}/src/core/linux/SDL_sysfs.h"
       "${SDL3_SOURCE_DIR}/src/core/linux/SDL_threadprio.c"
       "${SDL3_SOURCE_DIR}/src/core/linux/SDL_ubuntu_touch.c"
     )
@@ -2758,6 +2757,13 @@ elseif(APPLE)
   # TODO: rework this all for proper macOS, iOS and Darwin support
 
   # !!! FIXME: all the `if(IOS OR TVOS OR VISIONOS)` checks should get merged into one variable, so we're ready for the next platform (or just WatchOS).
+
+  if(MACOS)
+    sdl_glob_sources(
+      "${SDL3_SOURCE_DIR}/src/core/macos/*.c"
+      "${SDL3_SOURCE_DIR}/src/core/macos/*.h"
+    )
+  endif()
 
   # We always need these libs on macOS at the moment.
   # !!! FIXME: we need Carbon for some very old API calls in
@@ -3750,6 +3756,9 @@ if (SDL_DIALOG)
   sdl_sources(${SDL3_SOURCE_DIR}/src/dialog/SDL_dialog_utils.c)
   if(ANDROID)
     sdl_sources(${SDL3_SOURCE_DIR}/src/dialog/android/SDL_androiddialog.c)
+    set(HAVE_SDL_DIALOG TRUE)
+  elseif(EMSCRIPTEN)
+    sdl_sources(${SDL3_SOURCE_DIR}/src/dialog/emscripten/SDL_emscriptendialog.c)
     set(HAVE_SDL_DIALOG TRUE)
   elseif(UNIX AND NOT (APPLE OR RISCOS OR HAIKU OR CYGWIN))
     sdl_sources(${SDL3_SOURCE_DIR}/src/dialog/unix/SDL_unixdialog.c)

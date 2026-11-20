@@ -41,6 +41,13 @@ typedef struct
     float HDR_headroom;
 } SDL_HDROutputProperties;
 
+typedef enum
+{
+    SDL_WINDOW_FRAMEBUFFER_NONE,
+    SDL_WINDOW_FRAMEBUFFER_NATIVE,
+    SDL_WINDOW_FRAMEBUFFER_TEXTURE
+} SDL_WindowFramebufferType;
+
 // Define the SDL window structure, corresponding to toplevel windows
 struct SDL_Window
 {
@@ -97,6 +104,7 @@ struct SDL_Window
 
     float opacity;
 
+    SDL_WindowFramebufferType framebuffer_type;
     SDL_Surface *surface;
     bool surface_valid;
 
@@ -108,6 +116,7 @@ struct SDL_Window
     bool constrain_popup;
     bool is_destroying;
     bool is_dropping; // drag/drop in progress, expecting SDL_SendDropComplete().
+    bool is_live_resizing;
 
     int safe_inset_left;
     int safe_inset_right;
@@ -413,7 +422,6 @@ struct SDL_VideoDevice
     /* * * */
     // Data common to all drivers
     SDL_ThreadID thread;
-    bool checked_texture_framebuffer;
     bool suspend_screensaver;
     void *wakeup_window;
     int num_displays;
@@ -603,6 +611,9 @@ extern void SDL_OnWindowMoved(SDL_Window *window);
 extern void SDL_OnWindowResized(SDL_Window *window);
 extern void SDL_CheckWindowPixelSizeChanged(SDL_Window *window);
 extern void SDL_OnWindowPixelSizeChanged(SDL_Window *window);
+extern void SDL_StartWindowLiveResize(SDL_Window *window);
+extern void SDL_StopWindowLiveResize(SDL_Window *window);
+extern bool SDL_IsWindowLiveResizing(SDL_Window *window);
 extern void SDL_OnWindowLiveResizeUpdate(SDL_Window *window);
 extern void SDL_OnWindowMinimized(SDL_Window *window);
 extern void SDL_OnWindowMaximized(SDL_Window *window);
@@ -612,6 +623,7 @@ extern void SDL_OnWindowLeave(SDL_Window *window);
 extern void SDL_OnWindowFocusGained(SDL_Window *window);
 extern void SDL_OnWindowFocusLost(SDL_Window *window);
 extern void SDL_OnWindowDisplayChanged(SDL_Window *window);
+extern void SDL_OnWindowFullscreenChanged(SDL_Window *window);
 extern void SDL_UpdateWindowGrab(SDL_Window *window);
 extern bool SDL_UpdateFullscreenMode(SDL_Window *window, SDL_FullscreenOp fullscreen, bool commit);
 extern SDL_Window *SDL_GetToplevelForKeyboardFocus(void);
@@ -626,6 +638,7 @@ extern SDL_TextInputType SDL_GetTextInputType(SDL_PropertiesID props);
 extern SDL_Capitalization SDL_GetTextInputCapitalization(SDL_PropertiesID props);
 extern bool SDL_GetTextInputAutocorrect(SDL_PropertiesID props);
 extern bool SDL_GetTextInputMultiline(SDL_PropertiesID props);
+extern int SDL_GetTextInputKeyboardMargin(SDL_PropertiesID props);
 
 extern void SDL_SendScreenKeyboardShown(void);
 extern void SDL_SendScreenKeyboardHidden(void);

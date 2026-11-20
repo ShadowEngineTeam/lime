@@ -30,6 +30,7 @@
 extern "C"
 {
 #include "../hidapi/SDL_hidapijoystick_c.h"
+#include "../../core/windows/SDL_hid.h"
 }
 
 enum
@@ -492,6 +493,12 @@ static bool GAMEINPUT_JoystickPrepareDevice(SDL_JoystickDevice *device)
     if (!device->name) {
         return false;
     }
+
+#if GAMEINPUT_API_VERSION >= 4
+    GUID container_id;
+    data->device->GetContainerId(&container_id);
+    device->container_id = WIN_GetContainerIDString(&container_id);
+#endif
     return true;
 }
 
@@ -1328,6 +1335,8 @@ static bool GAMEINPUT_JoystickGetGamepadMapping(SDL_JoystickDevice *device, SDL_
 SDL_JoystickDriver SDL_GAMEINPUT_JoystickDriver =
 {
     GAMEINPUT_JoystickInit,
+    NULL, // InitUpdates
+    NULL, // QuitUpdates
     GAMEINPUT_JoystickQueryDevices,
     NULL, // DetectDevices
     GAMEINPUT_JoystickPrepareDevice,

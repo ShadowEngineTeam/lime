@@ -120,7 +120,6 @@ typedef struct
 
 #undef _guarded
 
-static SDL_GUID s_zeroGUID;
 static GamepadMapping_t *s_pSupportedGamepads SDL_GUARDED_BY(SDL_joystick_lock) = NULL;
 static GamepadMapping_t *s_pDefaultMapping SDL_GUARDED_BY(SDL_joystick_lock) = NULL;
 static GamepadMapping_t *s_pXInputMapping SDL_GUARDED_BY(SDL_joystick_lock) = NULL;
@@ -217,6 +216,7 @@ static const struct SDL_GamepadBlacklistWords SDL_gamepad_blacklist_words[] = {
     {"Mouse ",          GAMEPAD_BLACKLIST_BEGIN}, // "Mouse passthrough"
     {" Pen",            GAMEPAD_BLACKLIST_END}, // "Wacom One by Wacom S Pen"
     {" Finger",         GAMEPAD_BLACKLIST_END}, // "Wacom HID 495F Finger"
+    {" Consumer Control", GAMEPAD_BLACKLIST_END}, // "PG-9083S Consumer Control"
     {" System Control", GAMEPAD_BLACKLIST_END}, // "hid-over-i2c 0107 System Control"
     {" LED ",           GAMEPAD_BLACKLIST_ANYWHERE}, // "ASRock LED Controller"
     {" Thelio ",        GAMEPAD_BLACKLIST_ANYWHERE}, // "System76 Thelio Io 2"
@@ -1193,9 +1193,9 @@ static GamepadMapping_t *SDL_CreateMappingForHIDAPIGamepad(SDL_GUID guid)
             const bool map_nunchuck_left_side = true;
 
             if (map_nunchuck_left_side) {
-                SDL_strlcat(mapping_string, "a:b0,b:b1,back:b4,dpdown:b12,dpleft:b13,dpright:b14,dpup:b11,guide:b5,leftshoulder:b9,lefttrigger:a4,leftx:a0,lefty:a1,start:b6,x:b2,y:b3,", sizeof(mapping_string));
+                SDL_strlcat(mapping_string, "a:b0,b:b1,back:b4,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b5,leftshoulder:b9,lefttrigger:a4,leftx:a0,lefty:a1,start:b6,x:b2,y:b3,", sizeof(mapping_string));
             } else {
-                SDL_strlcat(mapping_string, "a:b0,b:b1,back:b4,dpdown:b12,dpleft:b13,dpright:b14,dpup:b11,guide:b5,rightshoulder:b9,righttrigger:a4,rightx:a0,righty:a1,start:b6,x:b2,y:b3,", sizeof(mapping_string));
+                SDL_strlcat(mapping_string, "a:b0,b:b1,back:b4,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b5,rightshoulder:b9,righttrigger:a4,rightx:a0,righty:a1,start:b6,x:b2,y:b3,", sizeof(mapping_string));
             }
         } break;
         default:
@@ -1370,7 +1370,7 @@ static GamepadMapping_t *SDL_PrivateMatchGamepadMappingForGUID(SDL_GUID guid, bo
     for (mapping = s_pSupportedGamepads; mapping; mapping = mapping->next) {
         SDL_GUID mapping_guid;
 
-        if (SDL_memcmp(&mapping->guid, &s_zeroGUID, sizeof(mapping->guid)) == 0) {
+        if (SDL_IsZeroGUID(&mapping->guid)) {
             continue;
         }
 
@@ -1405,7 +1405,7 @@ static GamepadMapping_t *SDL_PrivateMatchGamepadMappingForGUID(SDL_GUID guid, bo
 /*
  * Helper function to scan the mappings database for a gamepad with the specified GUID
  */
-static GamepadMapping_t *SDL_PrivateGetGamepadMappingForGUID(SDL_GUID guid, bool adding_mapping)
+static GamepadMapping_t *SDL_PrivateFindGamepadMappingForGUID(SDL_GUID guid)
 {
     GamepadMapping_t *mapping;
 
@@ -1413,11 +1413,6 @@ static GamepadMapping_t *SDL_PrivateGetGamepadMappingForGUID(SDL_GUID guid, bool
     mapping = SDL_PrivateMatchGamepadMappingForGUID(guid, true, true);
     if (mapping) {
         return mapping;
-    }
-
-    if (adding_mapping) {
-        // We didn't find an existing mapping
-        return NULL;
     }
 
     // Try without CRC match
@@ -1438,6 +1433,34 @@ static GamepadMapping_t *SDL_PrivateGetGamepadMappingForGUID(SDL_GUID guid, bool
             return mapping;
         }
     }
+    return NULL;
+}
+
+static GamepadMapping_t *SDL_PrivateGetGamepadMappingForGUID(SDL_GUID guid, bool adding_mapping)
+{
+    GamepadMapping_t *mapping;
+
+    if (adding_mapping) {
+        return SDL_PrivateMatchGamepadMappingForGUID(guid, true, true);
+    }
+
+    mapping = SDL_PrivateFindGamepadMappingForGUID(guid);
+    if (mapping) {
+        return mapping;
+    }
+
+#ifdef SDL_JOYSTICK_IOKIT
+    // IOKit used to report Bluetooth gamepads on the USB bus, so fall back to existing mappings for those
+    if (SDL_GetJoystickGUIDBus(guid) == SDL_HARDWARE_BUS_BLUETOOTH && guid.data[14] == 0) {
+        SDL_GUID usb_guid = guid;
+
+        SDL_SetJoystickGUIDBus(&usb_guid, SDL_HARDWARE_BUS_USB);
+        mapping = SDL_PrivateFindGamepadMappingForGUID(usb_guid);
+        if (mapping) {
+            return mapping;
+        }
+    }
+#endif
 
 #ifdef SDL_JOYSTICK_XINPUT
     if (SDL_IsJoystickXInput(guid)) {
@@ -2783,7 +2806,7 @@ char **SDL_GetGamepadMappings(int *count)
     SDL_LockJoysticks();
 
     for (GamepadMapping_t *mapping = s_pSupportedGamepads; mapping; mapping = mapping->next) {
-        if (SDL_memcmp(&mapping->guid, &s_zeroGUID, sizeof(mapping->guid)) == 0) {
+        if (SDL_IsZeroGUID(&mapping->guid)) {
             continue;
         }
         num_mappings++;
@@ -2797,7 +2820,7 @@ char **SDL_GetGamepadMappings(int *count)
     } else {
         int i = 0;
         for (GamepadMapping_t *mapping = s_pSupportedGamepads; mapping; mapping = mapping->next) {
-            if (SDL_memcmp(&mapping->guid, &s_zeroGUID, sizeof(mapping->guid)) == 0) {
+            if (SDL_IsZeroGUID(&mapping->guid)) {
                 continue;
             }
 
@@ -2894,7 +2917,7 @@ bool SDL_SetGamepadMapping(SDL_JoystickID instance_id, const char *mapping)
     SDL_GUID guid = SDL_GetJoystickGUIDForID(instance_id);
     bool result = false;
 
-    CHECK_PARAM(SDL_memcmp(&guid, &s_zeroGUID, sizeof(guid)) == 0) {
+    CHECK_PARAM(SDL_IsZeroGUID(&guid)) {
         return SDL_InvalidParamError("instance_id");
     }
 
