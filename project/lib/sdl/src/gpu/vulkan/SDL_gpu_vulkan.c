@@ -4794,7 +4794,7 @@ static Uint32 VULKAN_INTERNAL_CreateSwapchain(
     swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     swapchainCreateInfo.queueFamilyIndexCount = 0;
     swapchainCreateInfo.pQueueFamilyIndices = NULL;
-#ifdef SDL_PLATFORM_ANDROID
+#if defined(SDL_PLATFORM_ANDROID) || defined(SDL_PLATFORM_OPENHARMONY)
     swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
 #else
     swapchainCreateInfo.preTransform = swapchainSupportDetails.capabilities.currentTransform;
@@ -9970,7 +9970,8 @@ static bool VULKAN_ClaimWindow(
         }
 
         Uint32 createSwapchainResult = VULKAN_INTERNAL_CreateSwapchain(renderer, windowData);
-        if (createSwapchainResult == 1) {
+        if (createSwapchainResult == 1 ||
+            createSwapchainResult == VULKAN_INTERNAL_TRY_AGAIN) {
             SDL_SetPointerProperty(SDL_GetWindowProperties(window), WINDOW_PROPERTY_DATA, windowData);
 
             SDL_LockMutex(renderer->windowLock);
@@ -9987,9 +9988,10 @@ static bool VULKAN_ClaimWindow(
 
             SDL_AddWindowEventWatch(SDL_WINDOW_EVENT_WATCH_NORMAL, VULKAN_INTERNAL_OnWindowResize, window);
 
-            return true;
-        } else if (createSwapchainResult == VULKAN_INTERNAL_TRY_AGAIN) {
-            windowData->needsSwapchainRecreate = true;
+            if (createSwapchainResult == VULKAN_INTERNAL_TRY_AGAIN) {
+                // We successfully claimed the window, but we'll need to recreate the swap chain
+                windowData->needsSwapchainRecreate = true;
+            }
             return true;
         } else {
             // Failed to create swapchain, destroy surface and free data
@@ -12119,8 +12121,8 @@ static bool VULKAN_INTERNAL_GetDeviceRank(
     bool isConformant;
 
     VkPhysicalDeviceType deviceType;
+    VkPhysicalDeviceProperties2KHR physicalDeviceProperties;
     if (physicalDeviceExtensions->KHR_driver_properties || physicalDeviceExtensions->MSFT_layered_driver) {
-        VkPhysicalDeviceProperties2KHR physicalDeviceProperties;
         VkPhysicalDeviceDriverPropertiesKHR physicalDeviceDriverProperties = { 0 };
         VkPhysicalDeviceLayeredDriverPropertiesMSFT physicalDeviceLayeredDriverProperties = { 0 };
         void** ppNext = &physicalDeviceProperties.pNext;
@@ -12170,11 +12172,10 @@ static bool VULKAN_INTERNAL_GetDeviceRank(
             deviceType = physicalDeviceProperties.properties.deviceType;
         }
     } else {
-        VkPhysicalDeviceProperties physicalDeviceProperties;
         renderer->vkGetPhysicalDeviceProperties(
             physicalDevice,
-            &physicalDeviceProperties);
-        deviceType = physicalDeviceProperties.deviceType;
+            &physicalDeviceProperties.properties);
+        deviceType = physicalDeviceProperties.properties.deviceType;
         isConformant = true; // We can't check this, so just assume it's conformant
     }
 
@@ -12193,6 +12194,7 @@ static bool VULKAN_INTERNAL_GetDeviceRank(
      * -flibit
      */
     if (!isConformant) {
+        SDL_LogWarn(SDL_LOG_CATEGORY_GPU, "Device %s is not Vulkan-conformant, skipping", physicalDeviceProperties.properties.deviceName);
         return 0;
     }
 
@@ -12529,6 +12531,10 @@ static Uint8 VULKAN_INTERNAL_DeterminePhysicalDevice(VulkanRenderer *renderer, V
         renderer->vkGetPhysicalDeviceProperties(
             renderer->physicalDevice,
             &renderer->physicalDeviceProperties.properties);
+    }
+
+    if (renderer->physicalDeviceProperties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU) {
+        SDL_LogWarn(SDL_LOG_CATEGORY_GPU, "Selected Vulkan device is CPU-based, this is rarely intentional");
     }
 
     renderer->vkGetPhysicalDeviceMemoryProperties(

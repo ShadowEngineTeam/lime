@@ -301,10 +301,16 @@ extern SDL_DECLSPEC SDL_Renderer * SDLCALL SDL_CreateRenderer(SDL_Window *window
  *   renderer, optional.
  * - `SDL_PROP_RENDERER_CREATE_GPU_SHADERS_SPIRV_BOOLEAN`: the app is able to
  *   provide SPIR-V shaders to SDL_GPURenderState, optional.
+ * - `SDL_PROP_RENDERER_CREATE_GPU_SHADERS_DXBC_BOOLEAN`: the app is able to
+ *   provide DXBC shaders to SDL_GPURenderState, optional.
  * - `SDL_PROP_RENDERER_CREATE_GPU_SHADERS_DXIL_BOOLEAN`: the app is able to
  *   provide DXIL shaders to SDL_GPURenderState, optional.
  * - `SDL_PROP_RENDERER_CREATE_GPU_SHADERS_MSL_BOOLEAN`: the app is able to
  *   provide MSL shaders to SDL_GPURenderState, optional.
+ * - `SDL_PROP_RENDERER_CREATE_GPU_SHADERS_METALLIB_BOOLEAN`: the app is able
+ *   to provide metallib shaders to SDL_GPURenderState, optional.
+ * - `SDL_PROP_RENDERER_CREATE_GPU_SHADERS_PRIVATE_BOOLEAN`: the app is able
+ *   to provide shaders for an NDA'd platform to SDL_GPURenderState, optional.
  *
  * With the metal renderer:
  *
@@ -353,8 +359,11 @@ extern SDL_DECLSPEC SDL_Renderer * SDLCALL SDL_CreateRendererWithProperties(SDL_
 #define SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER                       "SDL.renderer.create.present_vsync"
 #define SDL_PROP_RENDERER_CREATE_GPU_DEVICE_POINTER                         "SDL.renderer.create.gpu.device"
 #define SDL_PROP_RENDERER_CREATE_GPU_SHADERS_SPIRV_BOOLEAN                  "SDL.renderer.create.gpu.shaders_spirv"
+#define SDL_PROP_RENDERER_CREATE_GPU_SHADERS_DXBC_BOOLEAN                   "SDL.renderer.create.gpu.shaders_dxbc"
 #define SDL_PROP_RENDERER_CREATE_GPU_SHADERS_DXIL_BOOLEAN                   "SDL.renderer.create.gpu.shaders_dxil"
 #define SDL_PROP_RENDERER_CREATE_GPU_SHADERS_MSL_BOOLEAN                    "SDL.renderer.create.gpu.shaders_msl"
+#define SDL_PROP_RENDERER_CREATE_GPU_SHADERS_METALLIB_BOOLEAN               "SDL.renderer.create.gpu.shaders_metallib"
+#define SDL_PROP_RENDERER_CREATE_GPU_SHADERS_PRIVATE_BOOLEAN                "SDL.renderer.create.gpu.shaders_private"
 #define SDL_PROP_RENDERER_CREATE_METAL_DEVICE_POINTER                       "SDL.renderer.create.metal.device"
 #define SDL_PROP_RENDERER_CREATE_METAL_COMMAND_QUEUE_POINTER                "SDL.renderer.create.metal.command_queue"
 #define SDL_PROP_RENDERER_CREATE_VULKAN_INSTANCE_POINTER                    "SDL.renderer.create.vulkan.instance"
@@ -3189,6 +3198,49 @@ extern SDL_DECLSPEC bool SDLCALL SDL_SetDefaultTextureScaleMode(SDL_Renderer *re
  * \sa SDL_SetDefaultTextureScaleMode
  */
 extern SDL_DECLSPEC bool SDLCALL SDL_GetDefaultTextureScaleMode(SDL_Renderer *renderer, SDL_ScaleMode *scale_mode);
+
+/**
+ * Load a BMP, PNG or JPEG image from a seekable SDL data stream.
+ *
+ * The new texture should be freed with SDL_DestroyTexture(). Not doing so
+ * will result in a memory leak.
+ *
+ * \param renderer the renderer to use.
+ * \param src the data stream for the texture.
+ * \param closeio if true, calls SDL_CloseIO() on `src` before returning, even
+ *                in the case of an error.
+ * \returns a pointer to a new SDL_Texture structure or NULL on failure; call
+ *          SDL_GetError() for more information.
+ *
+ * \threadsafety It is safe to call this function from any thread.
+ *
+ * \since This function is available since SDL 3.6.0.
+ *
+ * \sa SDL_DestroyTexture
+ * \sa SDL_LoadTexture
+ */
+extern SDL_DECLSPEC SDL_Texture * SDLCALL SDL_LoadTexture_IO(SDL_Renderer *renderer, SDL_IOStream *src, bool closeio);
+
+/**
+ * Load a BMP, PNG or JPEG image from a file.
+ *
+ * The new texture should be freed with SDL_DestroyTexture(). Not doing so
+ * will result in a memory leak.
+ *
+ * \param renderer the renderer to use.
+ * \param file the file to load.
+ * \returns a pointer to a new SDL_Texture structure or NULL on failure; call
+ *          SDL_GetError() for more information.
+ *
+ * \threadsafety It is safe to call this function from any thread.
+ *
+ * \since This function is available since SDL 3.6.0.
+ *
+ * \sa SDL_DestroyTexture
+ * \sa SDL_LoadTexture_IO
+ */
+extern SDL_DECLSPEC SDL_Texture * SDLCALL SDL_LoadTexture(SDL_Renderer *renderer, const char *file);
+
 
 /**
  * A structure specifying the parameters of a GPU render state.

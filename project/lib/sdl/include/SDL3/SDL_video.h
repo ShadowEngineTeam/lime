@@ -1192,6 +1192,14 @@ extern SDL_DECLSPEC SDL_Window ** SDLCALL SDL_GetWindows(int *count);
  * If SDL_WINDOW_METAL is specified on an OS that does not support Metal,
  * SDL_CreateWindow() will fail.
  *
+ * If SDL_WINDOW_TRANSPARENT is specified, the window contents are composited
+ * with the desktop using premultiplied alpha, so the color channels must
+ * already be multiplied by alpha. For example, white at 50% opacity is (128,
+ * 128, 128, 128), not (255, 255, 255, 128). With SDL_Renderer, clearing to
+ * transparent black and drawing with SDL_BLENDMODE_BLEND produces
+ * premultiplied output, but colors written with SDL_BLENDMODE_NONE or used
+ * with SDL_RenderClear() must be premultiplied by the application.
+ *
  * If you intend to use this window with an SDL_Renderer, you should use
  * SDL_CreateWindowAndRenderer() instead of this function, to avoid window
  * flicker.
@@ -3522,7 +3530,7 @@ extern SDL_DECLSPEC void SDLCALL SDL_EGL_SetAttributeCallbacks(SDL_EGLAttribArra
  *
  * Adaptive vsync is implemented for some glX drivers with
  * GLX_EXT_swap_control_tear, and for some Windows drivers with
- * WGL_EXT_swap_control_tear.
+ * WGL_EXT_swap_control_tear. With EGL, EGL_EXT_swap_tearing_hint can be used.
  *
  * Read more on the Khronos wiki:
  * https://www.khronos.org/opengl/wiki/Swap_Interval#Adaptive_Vsync

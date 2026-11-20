@@ -6610,8 +6610,8 @@ static bool D3D12_SupportsSwapchainComposition(
         SET_STRING_ERROR_AND_RETURN("Must claim window before querying swapchain composition support!", false);
     }
 
-    // Check the color space support if necessary
-    if (swapchainComposition != SDL_GPU_SWAPCHAINCOMPOSITION_SDR) {
+    // Assume that SDR and scRGB will be supported by the compositor
+    if (swapchainComposition == SDL_GPU_SWAPCHAINCOMPOSITION_HDR10_ST2084) {
         IDXGISwapChain3_CheckColorSpaceSupport(
             windowData->swapchain,
             SwapchainCompositionToColorSpace[swapchainComposition],
@@ -6889,11 +6889,13 @@ static bool D3D12_INTERNAL_ResizeSwapchain(
     }
 
     // Resize the swapchain
+    int width, height;
+    SDL_GetWindowSizeInPixels(windowData->window, &width, &height);
     HRESULT res = IDXGISwapChain_ResizeBuffers(
         windowData->swapchain,
         0, // Keep buffer count the same
-        0, // use client window width
-        0, // use client window height
+        (UINT)width,
+        (UINT)height,
         DXGI_FORMAT_UNKNOWN, // Keep the old format
         renderer->supportsTearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
     CHECK_D3D12_ERROR_AND_RETURN("Could not resize swapchain buffers", false);
@@ -6968,9 +6970,13 @@ static bool D3D12_INTERNAL_CreateSwapchain(
     // Min swapchain image count is 2
     windowData->swapchainTextureCount = SDL_clamp(renderer->allowedFramesInFlight, 2, 3);
 
+    // Use the window size rather than the client area, which is empty while minimized
+    int width, height;
+    SDL_GetWindowSizeInPixels(windowData->window, &width, &height);
+
     // Initialize the swapchain buffer descriptor
-    swapchainDesc.Width = 0;  // use client window width
-    swapchainDesc.Height = 0; // use client window height
+    swapchainDesc.Width = (UINT)width;
+    swapchainDesc.Height = (UINT)height;
     swapchainDesc.Format = swapchainFormat;
     swapchainDesc.SampleDesc.Count = 1;
     swapchainDesc.SampleDesc.Quality = 0;
@@ -7018,10 +7024,13 @@ static bool D3D12_INTERNAL_CreateSwapchain(
     CHECK_D3D12_ERROR_AND_RETURN("Could not create IDXGISwapChain3", false);
 
     if (swapchainComposition != SDL_GPU_SWAPCHAINCOMPOSITION_SDR) {
-        // Support already verified if we hit this block
-        IDXGISwapChain3_SetColorSpace1(
+        res = IDXGISwapChain3_SetColorSpace1(
             swapchain3,
             SwapchainCompositionToColorSpace[swapchainComposition]);
+        if (FAILED(res)) {
+            IDXGISwapChain3_Release(swapchain3);
+        }
+        CHECK_D3D12_ERROR_AND_RETURN("Could not set swapchain color space", false);
     }
 
     /*

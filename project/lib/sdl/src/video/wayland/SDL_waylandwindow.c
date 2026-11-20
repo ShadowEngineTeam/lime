@@ -38,18 +38,20 @@
 #include "SDL_waylandcolor.h"
 
 #include "alpha-modifier-v1-client-protocol.h"
-#include "xdg-shell-client-protocol.h"
-#include "xdg-decoration-unstable-v1-client-protocol.h"
-#include "idle-inhibit-unstable-v1-client-protocol.h"
-#include "xdg-activation-v1-client-protocol.h"
-#include "viewporter-client-protocol.h"
-#include "fractional-scale-v1-client-protocol.h"
-#include "xdg-foreign-unstable-v2-client-protocol.h"
-#include "xdg-dialog-v1-client-protocol.h"
-#include "frog-color-management-v1-client-protocol.h"
-#include "xdg-toplevel-icon-v1-client-protocol.h"
 #include "color-management-v1-client-protocol.h"
+#include "commit-timing-v1-client-protocol.h"
+#include "fifo-v1-client-protocol.h"
+#include "fractional-scale-v1-client-protocol.h"
+#include "frog-color-management-v1-client-protocol.h"
+#include "idle-inhibit-unstable-v1-client-protocol.h"
+#include "viewporter-client-protocol.h"
+#include "xdg-activation-v1-client-protocol.h"
+#include "xdg-decoration-unstable-v1-client-protocol.h"
+#include "xdg-dialog-v1-client-protocol.h"
+#include "xdg-foreign-unstable-v2-client-protocol.h"
 #include "xdg-session-management-v1-client-protocol.h"
+#include "xdg-shell-client-protocol.h"
+#include "xdg-toplevel-icon-v1-client-protocol.h"
 #include "xdg-toplevel-tag-v1-client-protocol.h"
 
 #ifdef HAVE_LIBDECOR_H
@@ -376,7 +378,7 @@ static void ConfigureWindowGeometry(SDL_Window *window)
     int viewport_width, viewport_height;
     bool window_size_changed;
     bool buffer_size_changed;
-    const bool is_opaque = !(window->flags & SDL_WINDOW_TRANSPARENT) && window->opacity == 1.0f;
+    const bool is_opaque = !(window->flags & SDL_WINDOW_TRANSPARENT) && (window->opacity == 1.0f || (window->flags & SDL_WINDOW_FULLSCREEN));
 
     if (data->is_fullscreen && window->fullscreen_exclusive) {
         window_width = window->current_fullscreen_mode.w;
@@ -1525,6 +1527,9 @@ static void LibdecorGetMinContentSize(struct libdecor_frame *frame, int *min_w, 
 #elif SDL_LIBDECOR_CHECK_VERSION(0, 2, 0)
     libdecor_frame_get_min_content_size(frame, min_w, min_h);
 #endif
+
+    *min_w = SDL_max(*min_w, 1);
+    *min_h = SDL_max(*min_h, 1);
 }
 
 static void decoration_frame_configure(struct libdecor_frame *frame,
@@ -1547,10 +1552,6 @@ static void decoration_frame_configure(struct libdecor_frame *frame,
 
     static const enum libdecor_window_state tiled_states = (LIBDECOR_WINDOW_STATE_TILED_LEFT | LIBDECOR_WINDOW_STATE_TILED_RIGHT |
                                                             LIBDECOR_WINDOW_STATE_TILED_TOP | LIBDECOR_WINDOW_STATE_TILED_BOTTOM);
-
-    if (wind->shell_surface_status == WAYLAND_SHELL_SURFACE_STATUS_WAITING_FOR_CONFIGURE) {
-        LibdecorGetMinContentSize(frame, &wind->system_limits.min_width, &wind->system_limits.min_height);
-    }
 
     // Window State
     if (libdecor_configuration_get_window_state(configuration, &window_state)) {
@@ -1732,6 +1733,15 @@ static void decoration_frame_configure(struct libdecor_frame *frame,
             }
         }
 
+        /* Libdecor can set arbitrary minimum sizes that don't match the requested minimum size, and there's no
+         * indication when this happens, so the minimum values need to be queried on every configure event.
+         *
+         * For non-resizable windows, this just returns the fixed-size, which can break programmatic resizes.
+         */
+        if (window->flags & SDL_WINDOW_RESIZABLE) {
+            LibdecorGetMinContentSize(frame, &wind->system_limits.min_width, &wind->system_limits.min_height);
+        }
+
         /* Notes on the spec and implementations:
          *
          * - The content limits are only a hint, which the compositor is free to ignore,
@@ -1745,6 +1755,10 @@ static void decoration_frame_configure(struct libdecor_frame *frame,
          *   aspect ratio.
          */
         if (floating) {
+            // Clamp to the system minimums queried earlier, as libdecor sometimes sends sizes below this.
+            wind->requested.logical_width = SDL_max(wind->requested.logical_width, wind->system_limits.min_width);
+            wind->requested.logical_height = SDL_max(wind->requested.logical_height, wind->system_limits.min_height);
+
             if (!wind->scale_to_display) {
                 ApplyGeometryLimits(window,
                                     wind->requested.logical_width, wind->requested.logical_height,
@@ -2500,45 +2514,11 @@ void Wayland_ShowWindow(SDL_VideoDevice *_this, SDL_Window *window)
      * display, because we need to create the decorations before possibly hiding
      * them immediately afterward.
      */
-#ifdef HAVE_LIBDECOR_H
-    if (data->shell_surface_type == WAYLAND_SHELL_SURFACE_TYPE_LIBDECOR) {
-        // Libdecor plugins can enforce minimum window sizes, so adjust if the initial window size is too small.
-        if (window->windowed.w < data->system_limits.min_width ||
-            window->windowed.h < data->system_limits.min_height) {
+    Wayland_SetWindowResizable(_this, window, (window->flags & SDL_WINDOW_RESIZABLE) != 0);
 
-            // Warn if the window frame will be larger than the content surface.
-            SDL_LogWarn(SDL_LOG_CATEGORY_VIDEO,
-                        "Window dimensions (%i, %i) are smaller than the system enforced minimum (%i, %i); window borders will be larger than the content surface.",
-                        window->windowed.w, window->windowed.h, data->system_limits.min_width, data->system_limits.min_height);
-
-            data->current.logical_width = SDL_max(window->windowed.w, data->system_limits.min_width);
-            data->current.logical_height = SDL_max(window->windowed.h, data->system_limits.min_height);
-            CommitLibdecorFrame(window);
-        }
-    }
-#endif
-    Wayland_SetWindowResizable(_this, window, !!(window->flags & SDL_WINDOW_RESIZABLE));
-
-    // We're finally done putting the window together, raise if possible
-    if (c->activation_manager && SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true)) {
-        /* if the process was passed an activation token, use it when showing
-         * the initial window.
-         *
-         * Note that we don't check for empty strings, as that is still
-         * considered a valid activation token!
-         */
-        const char *activation_token = SDL_getenv("XDG_ACTIVATION_TOKEN");
-        if (activation_token) {
-            xdg_activation_v1_activate(c->activation_manager,
-                                       activation_token,
-                                       data->surface);
-
-            // Clear this variable, per the protocol's request
-            SDL_unsetenv_unsafe("XDG_ACTIVATION_TOKEN");
-        } else {
-            // Try to generate an activation token for this window.
-            Wayland_RaiseWindow(_this, window);
-        }
+    // We're finally done putting the window together. Try to raise it, if nothing is requesting otherwise.
+    if (!(window->flags & SDL_WINDOW_NOT_FOCUSABLE) && SDL_GetHintBoolean(SDL_HINT_WINDOW_ACTIVATE_WHEN_SHOWN, true)) {
+        Wayland_RaiseWindow(_this, window);
     } else {
         // Clear the ignored activation token, as it won't be used.
         SDL_unsetenv_unsafe("XDG_ACTIVATION_TOKEN");
@@ -2769,17 +2749,25 @@ void Wayland_RaiseWindow(SDL_VideoDevice *_this, SDL_Window *window)
     SDL_WindowData *wind = window->internal;
 
     if (viddata->activation_manager) {
-        /* Check for an activation token, in case the window is being
-         * raised in response to a system notification.
+        /* Check for an activation token: first from the envvar, then from the
+         * notification system.
          *
-         * Note that we don't check for empty strings, as that is still
-         * considered a valid activation token!
+         * The unsafe getenv/unsetenv must be used here, as the token envvar may
+         * have been set via an out-of-band mechanism at some point after startup,
+         * resulting in the cached version being out-of-date.
+         *
+         * Note that we don't check for empty strings, as that is still considered
+         * a valid activation token!
          */
-        const char *activation_token = SDL_GetNotificationActivationToken();
+        const char *activation_token = SDL_getenv_unsafe("XDG_ACTIVATION_TOKEN");
+        if (!activation_token) {
+            activation_token = SDL_GetNotificationActivationToken();
+        }
         if (activation_token) {
-            xdg_activation_v1_activate(viddata->activation_manager,
-                                       activation_token,
-                                       wind->surface);
+            xdg_activation_v1_activate(viddata->activation_manager, activation_token, wind->surface);
+
+            // Clear this variable, per the protocol's request.
+            SDL_unsetenv_unsafe("XDG_ACTIVATION_TOKEN");
             return;
         }
     }
@@ -2938,6 +2926,10 @@ void Wayland_SetWindowResizable(SDL_VideoDevice *_this, SDL_Window *window, bool
 {
     SDL_WindowData *wind = window->internal;
 
+    // Reset the system limits if libdecor changed them.
+    wind->system_limits.min_width = 1;
+    wind->system_limits.min_height = 1;
+
     /* When changing the resize capability on libdecor windows, the limits must always
      * be reapplied, as when libdecor changes states, it overwrites the values internally.
      */
@@ -3065,6 +3057,28 @@ bool Wayland_ReconfigureWindow(SDL_VideoDevice *_this, SDL_Window *window, SDL_W
         data->shell_surface_type != WAYLAND_SHELL_SURFACE_TYPE_CUSTOM) {
         // Window is already mapped; abort.
         return false;
+    }
+    
+    // Clear any presentation objects when reconfiguring.
+    if (data->presentation.frame_callback) {
+        wl_callback_destroy(data->presentation.frame_callback);
+        data->presentation.frame_callback = NULL;
+    }
+    if (data->presentation.fifo) {
+        wp_fifo_v1_destroy(data->presentation.fifo);
+        data->presentation.fifo = NULL;
+    }
+    if (data->presentation.commit_timer) {
+        wp_commit_timer_v1_destroy(data->presentation.commit_timer);
+        data->presentation.commit_timer = NULL;
+    }
+    if (data->presentation.surface_wrapper) {
+        WAYLAND_wl_proxy_wrapper_destroy(data->presentation.surface_wrapper);
+        data->presentation.surface_wrapper = NULL;
+    }
+    if (data->presentation.queue) {
+        WAYLAND_wl_event_queue_destroy(data->presentation.queue);
+        data->presentation.queue = NULL;
     }
 
     /* The caller guarantees that only one of the GL or Vulkan flags will be set.
@@ -3845,6 +3859,12 @@ void Wayland_DestroyWindow(SDL_VideoDevice *_this, SDL_Window *window)
 
         if (wind->presentation.frame_callback) {
             wl_callback_destroy(wind->presentation.frame_callback);
+        }
+        if (wind->presentation.fifo) {
+            wp_fifo_v1_destroy(wind->presentation.fifo);
+        }
+        if (wind->presentation.commit_timer) {
+            wp_commit_timer_v1_destroy(wind->presentation.commit_timer);
         }
         if (wind->presentation.surface_wrapper) {
             WAYLAND_wl_proxy_wrapper_destroy(wind->presentation.surface_wrapper);

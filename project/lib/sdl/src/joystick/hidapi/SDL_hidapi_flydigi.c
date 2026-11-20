@@ -105,8 +105,8 @@ typedef struct
     float gyroScale[3];
     Uint64 next_heartbeat;
     Uint64 next_status_request;
-    Uint64 last_packet;
-    bool acquired;
+    Uint64 last_input;
+    Uint64 next_reacquire;
     Uint8 low_frequency_rumble;
     Uint8 high_frequency_rumble;
     Uint8 left_trigger_rumble;
@@ -286,6 +286,7 @@ static void HIDAPI_DriverFlydigi_UpdateDeviceIdentity(SDL_HIDAPI_Device *device)
     case SDL_FLYDIGI_VADER4_PRO:
         HIDAPI_SetDeviceName(device, "Flydigi Vader 4 Pro");
         ctx->has_cz = true;
+        ctx->has_trigger_rumble = true;
         ctx->sensors_supported = true;
         ctx->accelScale = SDL_STANDARD_GRAVITY / 256.0f;
         ctx->gyroScale[0] = -DEG2RAD(72000.0f);
@@ -557,17 +558,8 @@ static bool SDL_HIDAPI_Flydigi_SendStatusRequest(SDL_HIDAPI_Device *device)
 
 static void HIDAPI_DriverFlydigi_HandleStatusResponse(SDL_HIDAPI_Device *device, Uint8 *data, int size)
 {
-    SDL_DriverFlydigi_Context *ctx = (SDL_DriverFlydigi_Context *)device->context;
-
     if (data[9] == 1) {
         HIDAPI_DriverFlydigi_SetAvailable(device, true);
-
-        // The Space Station service can stop input while third party apps are still allowed,
-        // so release and re-acquire the controller if it looks like we should be able to.
-        if (device->num_joysticks > 0 && ctx->acquired && data[6] == 0) {
-            SDL_HIDAPI_Flydigi_SendAcquireRequest(device, false);
-            SDL_HIDAPI_Flydigi_SendAcquireRequest(device, true);
-        }
     } else {
         // Click "Allow third-party apps to take over mappings" in the FlyDigi Space Station app
         HIDAPI_DriverFlydigi_SetAvailable(device, false);
@@ -686,6 +678,9 @@ static bool HIDAPI_DriverFlydigi_OpenJoystick(SDL_HIDAPI_Device *device, SDL_Joy
     SDL_AssertJoysticksLocked();
 
     SDL_zeroa(ctx->last_state);
+    ctx->next_heartbeat = 0;
+    ctx->last_input = SDL_GetTicks();
+    ctx->next_reacquire = 0;
     ctx->low_frequency_rumble = 0;
     ctx->high_frequency_rumble = 0;
     ctx->left_trigger_rumble = 0;
@@ -717,6 +712,21 @@ static bool HIDAPI_DriverFlydigi_OpenJoystick(SDL_HIDAPI_Device *device, SDL_Joy
     return true;
 }
 
+static bool HIDAPI_DriverFlydigi_SendRumbleV1(SDL_DriverFlydigi_Context *ctx)
+{
+    SDL_HIDAPI_Device *device = ctx->device;
+    Uint8 rumble_packet[] = { FLYDIGI_V1_CMD_REPORT_ID, FLYDIGI_V1_HAPTIC_COMMAND, 0, 0, 0, 0 };
+    rumble_packet[2] = ctx->low_frequency_rumble;
+    rumble_packet[3] = ctx->high_frequency_rumble;
+    rumble_packet[4] = ctx->left_trigger_rumble;
+    rumble_packet[5] = ctx->right_trigger_rumble;
+
+    if (SDL_HIDAPI_SendRumble(device, rumble_packet, sizeof(rumble_packet)) != sizeof(rumble_packet)) {
+        return SDL_SetError("Couldn't send rumble packet");
+    }
+    return true;
+}
+
 static bool HIDAPI_DriverFlydigi_SendRumbleV2(SDL_DriverFlydigi_Context *ctx)
 {
     SDL_HIDAPI_Device *device = ctx->device;
@@ -737,27 +747,16 @@ static bool HIDAPI_DriverFlydigi_SendRumbleV2(SDL_DriverFlydigi_Context *ctx)
 
 static bool HIDAPI_DriverFlydigi_RumbleJoystick(SDL_HIDAPI_Device *device, SDL_Joystick *joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble)
 {
+    SDL_DriverFlydigi_Context *ctx = (SDL_DriverFlydigi_Context *)device->context;
+
+    ctx->low_frequency_rumble = low_frequency_rumble >> 8;
+    ctx->high_frequency_rumble = high_frequency_rumble >> 8;
+
     if (device->vendor_id == USB_VENDOR_FLYDIGI_V1) {
-        Uint8 rumble_packet[] = { FLYDIGI_V1_CMD_REPORT_ID, FLYDIGI_V1_HAPTIC_COMMAND, 0x00, 0x00 };
-        rumble_packet[2] = low_frequency_rumble >> 8;
-        rumble_packet[3] = high_frequency_rumble >> 8;
-
-        if (SDL_HIDAPI_SendRumble(device, rumble_packet, sizeof(rumble_packet)) != sizeof(rumble_packet)) {
-            return SDL_SetError("Couldn't send rumble packet");
-        }
+        return HIDAPI_DriverFlydigi_SendRumbleV1(ctx);
     } else {
-        Uint8 rumble_packet[] = { FLYDIGI_V2_CMD_REPORT_ID, FLYDIGI_V2_MAGIC1, FLYDIGI_V2_MAGIC2, FLYDIGI_V2_HAPTIC_COMMAND, 6, 0, 0, 0, 0, 0 };
-        rumble_packet[5] = low_frequency_rumble >> 8;
-        rumble_packet[6] = high_frequency_rumble >> 8;
-        if (HIDAPI_DriverFlydigi_UsesUnnumberedReports(device)) {
-            rumble_packet[0] = 0;
-        }
-
-        if (SDL_HIDAPI_SendRumble(device, rumble_packet, sizeof(rumble_packet)) != sizeof(rumble_packet)) {
-            return SDL_SetError("Couldn't send rumble packet");
-        }
+        return HIDAPI_DriverFlydigi_SendRumbleV2(ctx);
     }
-    return true;
 }
 
 static bool HIDAPI_DriverFlydigi_RumbleJoystickTriggers(SDL_HIDAPI_Device *device, SDL_Joystick *joystick, Uint16 left_rumble, Uint16 right_rumble)
@@ -770,7 +769,12 @@ static bool HIDAPI_DriverFlydigi_RumbleJoystickTriggers(SDL_HIDAPI_Device *devic
 
     ctx->left_trigger_rumble = left_rumble >> 8;
     ctx->right_trigger_rumble = right_rumble >> 8;
-    return HIDAPI_DriverFlydigi_SendRumbleV2(ctx);
+
+    if (device->vendor_id == USB_VENDOR_FLYDIGI_V1) {
+        return HIDAPI_DriverFlydigi_SendRumbleV1(ctx);
+    } else {
+        return HIDAPI_DriverFlydigi_SendRumbleV2(ctx);
+    }
 }
 
 static Uint32 HIDAPI_DriverFlydigi_GetJoystickCapabilities(SDL_HIDAPI_Device *device, SDL_Joystick *joystick)
@@ -1071,7 +1075,7 @@ static void HIDAPI_DriverFlydigi_HandleStatusUpdate(SDL_HIDAPI_Device *device, U
     SDL_HIDAPI_Flydigi_SendStatusRequest(device);
 }
 
-static void HIDAPI_DriverFlydigi_HandlePacketV2(SDL_Joystick *joystick, SDL_DriverFlydigi_Context *ctx, Uint8 *data, int size)
+static void HIDAPI_DriverFlydigi_HandlePacketV2(SDL_Joystick *joystick, SDL_DriverFlydigi_Context *ctx, Uint8 *data, int size, Uint64 now)
 {
     if (size > 0 && data[0] != 0x5A) {
         // If first byte is not 0x5A, it must be REPORT_ID, we need to remove it.
@@ -1102,6 +1106,7 @@ static void HIDAPI_DriverFlydigi_HandlePacketV2(SDL_Joystick *joystick, SDL_Driv
         if (joystick) {
             HIDAPI_DriverFlydigi_HandleStatePacketV2(joystick, ctx, data, size);
         }
+        ctx->last_input = now;
         break;
     default:
         // We don't recognize this command, ignore it
@@ -1124,15 +1129,10 @@ static bool HIDAPI_DriverFlydigi_UpdateDevice(SDL_HIDAPI_Device *device)
     if (device->vendor_id == USB_VENDOR_FLYDIGI_V2) {
         if (joystick) {
             if (!ctx->next_heartbeat || now >= ctx->next_heartbeat) {
-                if (SDL_HIDAPI_Flydigi_SendAcquireRequest(device, true)) {
-                    ctx->acquired = true;
-                }
+                SDL_HIDAPI_Flydigi_SendAcquireRequest(device, true);
                 SDL_HIDAPI_Flydigi_SendInfoRequest(device);
                 SDL_HIDAPI_Flydigi_SendStatusRequest(device);
                 ctx->next_heartbeat = now + FLYDIGI_ACQUIRE_CONTROLLER_HEARTBEAT_TIME;
-
-                // Time the input timeout from the heartbeat so we don't send it again before the replies arrive
-                ctx->last_packet = now;
             }
         } else if (device->num_joysticks == 0 && !device->unavailable) {
             // We don't know yet whether we can use the controller, and the status reply might have been lost
@@ -1148,20 +1148,22 @@ static bool HIDAPI_DriverFlydigi_UpdateDevice(SDL_HIDAPI_Device *device)
 #ifdef DEBUG_FLYDIGI_PROTOCOL
         HIDAPI_DumpPacket("Flydigi packet: size = %d", data, size);
 #endif
-        ctx->last_packet = now;
-
         if (device->vendor_id == USB_VENDOR_FLYDIGI_V1) {
             HIDAPI_DriverFlydigi_HandlePacketV1(joystick, ctx, data, size);
         } else {
-            HIDAPI_DriverFlydigi_HandlePacketV2(joystick, ctx, data, size);
+            HIDAPI_DriverFlydigi_HandlePacketV2(joystick, ctx, data, size, now);
         }
     }
 
-    if (device->vendor_id == USB_VENDOR_FLYDIGI_V2) {
-        // If we haven't gotten a packet in a while, check to make sure we can still acquire it
-        const int INPUT_TIMEOUT_MS = 100;
-        if (now >= (ctx->last_packet + INPUT_TIMEOUT_MS)) {
-            ctx->next_heartbeat = now;
+    if (device->vendor_id == USB_VENDOR_FLYDIGI_V2 && joystick) {
+        // The Space Station service can stop input while third party apps are still allowed,
+        // and acquiring again doesn't restore it, so release and re-acquire the controller.
+        const int REACQUIRE_TIMEOUT_MS = 1000;
+        const int REACQUIRE_INTERVAL_MS = 2000;
+        if (now >= (ctx->last_input + REACQUIRE_TIMEOUT_MS) && now >= ctx->next_reacquire) {
+            SDL_HIDAPI_Flydigi_SendAcquireRequest(device, false);
+            SDL_HIDAPI_Flydigi_SendAcquireRequest(device, true);
+            ctx->next_reacquire = now + REACQUIRE_INTERVAL_MS;
         }
     }
 
