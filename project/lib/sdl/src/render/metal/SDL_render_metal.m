@@ -23,6 +23,7 @@
 #ifdef SDL_VIDEO_RENDER_METAL
 
 #include "../SDL_sysrender.h"
+#include "../../video/SDL_sysvideo.h" // For SDL_IsWindowLiveResizing()
 #include "../../video/SDL_pixels_c.h"
 #include "../../video/SDL_yuv_c.h"
 
@@ -1132,8 +1133,7 @@ static bool METAL_LockTexture(SDL_Renderer *renderer, SDL_Texture *texture,
             if (!SDL_CalculateYUVSize(texture->format, rect->w, rect->h, &size, &calculated_pitch)) {
                 return false;
             }
-        } else
-        {
+        } else {
             calculated_pitch = SDL_BYTESPERPIXEL(texture->format) * rect->w;
             size = rect->h * calculated_pitch;
         }
@@ -1160,7 +1160,6 @@ static void METAL_UnlockTexture(SDL_Renderer *renderer, SDL_Texture *texture)
         id<MTLBlitCommandEncoder> blitcmd;
         SDL_Rect rect = texturedata.lockedrect;
         int pitch = SDL_BYTESPERPIXEL(texture->format) * rect.w;
-        SDL_Rect UVrect = { rect.x / 2, rect.y / 2, (rect.w + 1) / 2, (rect.h + 1) / 2 };
 
         if (texturedata.lockedbuffer == nil) {
             return;
@@ -1192,7 +1191,20 @@ static void METAL_UnlockTexture(SDL_Renderer *renderer, SDL_Texture *texture)
             id<MTLTexture> firstplane = texture->format == SDL_PIXELFORMAT_YV12 ? texturedata.mtltextureV : texturedata.mtltextureU;
             id<MTLTexture> secondplane = texture->format == SDL_PIXELFORMAT_YV12 ? texturedata.mtltextureU : texturedata.mtltextureV;
             const int bpp = SDL_BYTESPERPIXEL(texture->format);
-            const int UVpitch = ((pitch / bpp + 1) / 2) * bpp;
+            int UVpitch;
+            SDL_Rect UVrect;
+
+            if (texture->format == SDL_PIXELFORMAT_I444 ||
+                texture->format == SDL_PIXELFORMAT_I4FL) {
+                UVpitch = pitch;
+                UVrect = rect;
+            } else {
+                UVpitch = ((pitch / bpp + 1) / 2) * bpp;
+                UVrect.x = rect.x / 2;
+                UVrect.y = rect.y / 2;
+                UVrect.w = (rect.w + 1) / 2;
+                UVrect.h = (rect.h + 1) / 2;
+            }
 
             [blitcmd copyFromBuffer:texturedata.lockedbuffer
                        sourceOffset:rect.h * pitch
@@ -1218,6 +1230,7 @@ static void METAL_UnlockTexture(SDL_Renderer *renderer, SDL_Texture *texture)
         if (texturedata.nv12) {
             const int bpp = SDL_BYTESPERPIXEL(texture->format);
             const int UVpitch = ((pitch / bpp + 1) / 2) * 2 * bpp;
+            SDL_Rect UVrect = { rect.x / 2, rect.y / 2, (rect.w + 1) / 2, (rect.h + 1) / 2 };
 
             [blitcmd copyFromBuffer:texturedata.lockedbuffer
                        sourceOffset:rect.h * pitch
@@ -2250,6 +2263,8 @@ static bool METAL_RenderPresent(SDL_Renderer *renderer)
 
         [data.mtlcmdencoder endEncoding];
 
+        id<CAMetalDrawable> transactionDrawable = nil;
+
         // If we don't have a drawable to present, don't try to present it.
         //  But we'll still try to commit the command buffer in case it was already enqueued.
         if (ready) {
@@ -2267,11 +2282,32 @@ static bool METAL_RenderPresent(SDL_Renderer *renderer)
 #endif
             {
                 SDL_assert(data.mtlbackbuffer != nil);
-                [data.mtlcmdbuffer presentDrawable:data.mtlbackbuffer];
+                BOOL presentWithTransaction = NO;
+                if (SDL_IsWindowLiveResizing(renderer->window) && SDL_IsMainThread()) {
+                    // During a live resize we render synchronously from the window
+                    // resize, so present with the Core Animation transaction to have
+                    // the new frame show up in the same update as the new window size.
+                    presentWithTransaction = YES;
+                }
+                if (data.mtllayer.presentsWithTransaction != presentWithTransaction) {
+                    data.mtllayer.presentsWithTransaction = presentWithTransaction;
+                }
+                if (presentWithTransaction) {
+                    transactionDrawable = data.mtlbackbuffer;
+                } else {
+                    [data.mtlcmdbuffer presentDrawable:data.mtlbackbuffer];
+                }
             }
         }
 
         [data.mtlcmdbuffer commit];
+
+        if (transactionDrawable) {
+            // The drawable has to be presented after the work is scheduled,
+            // so it's part of the current Core Animation transaction.
+            [data.mtlcmdbuffer waitUntilScheduled];
+            [transactionDrawable present];
+        }
 
         data.mtlcmdencoder = nil;
         data.mtlcmdbuffer = nil;

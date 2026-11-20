@@ -71,7 +71,7 @@ extern void SDL_SetupAudioResampler(void);
 /* Backends should call this as devices are added to the system (such as
    a USB headset being plugged in), and should also be called for
    for every device found during DetectDevices(). */
-extern SDL_AudioDevice *SDL_AddAudioDevice(bool recording, const char *name, const char *unique_id, const SDL_AudioSpec *spec, void *handle);
+extern SDL_AudioDevice *SDL_AddAudioDevice(bool recording, const char *name, const char *container_id, const char *unique_id, const SDL_AudioSpec *spec, void *handle);
 
 /* Backends should call this if an opened audio device is lost.
    This can happen due to i/o errors, or a device being unplugged, etc. */
@@ -158,6 +158,7 @@ typedef struct SDL_AudioDriverImpl
     void (*ThreadInit)(SDL_AudioDevice *device);   // Called by audio thread at start
     void (*ThreadDeinit)(SDL_AudioDevice *device); // Called by audio thread at end
     bool (*WaitDevice)(SDL_AudioDevice *device);
+    void (*UnblockWaitDevice)(SDL_AudioDevice *device);
     bool (*PlayDevice)(SDL_AudioDevice *device, const Uint8 *buffer, int buflen); // buffer and buflen are always from GetDeviceBuf, passed here for convenience.
     Uint8 *(*GetDeviceBuf)(SDL_AudioDevice *device, int *buffer_size);
     bool (*WaitRecordingDevice)(SDL_AudioDevice *device);
@@ -297,6 +298,7 @@ struct SDL_AudioDevice
 
     // These are, initially, set from current_audio, but we might swap them out with Zombie versions on disconnect/failure.
     bool (*WaitDevice)(SDL_AudioDevice *device);
+    void (*UnblockWaitDevice)(SDL_AudioDevice *device);
     bool (*PlayDevice)(SDL_AudioDevice *device, const Uint8 *buffer, int buflen);
     Uint8 *(*GetDeviceBuf)(SDL_AudioDevice *device, int *buffer_size);
     bool (*WaitRecordingDevice)(SDL_AudioDevice *device);
@@ -305,6 +307,9 @@ struct SDL_AudioDevice
 
     // human-readable name of the device. ("SoundBlaster Pro 16")
     char *name;
+
+    // the container ID of this device, used to match associated controllers or other devices, optional.
+    char *container_id;
 
     // unique, platform-specific, backend-specific string to identify this specific device.
     // It needs to survive between runs of the program, but ideally it survives reboots and

@@ -226,6 +226,11 @@ void Android_OnMouse(SDL_Window *window, int state, int action, float x, float y
         return;
     }
 
+    // We don't get mouse hotplug notifications, so register the mouse the
+    // first time we see input from it. This makes the mouse ID reported in
+    // relative mode valid for SDL_GetMouseNameForID() and SDL_GetMice().
+    SDL_AddMouse(SDL_DEFAULT_MOUSE_ID, NULL);
+
     // The draw scale shrinks the window/framebuffer (see SDL_androidwindow.c), but
     // mouse coordinates arrive in full-surface View pixels. Scale absolute positions
     // into the same space so the pointer matches what's rendered. Relative-mode deltas

@@ -7,6 +7,7 @@ Differences from FunkinCrew/lime's project/lib/custom:
   HAVE_WCSLCPY are off on Linux, Android needs API 28 instead of 24 for iconv, and SDL_VIDEO_METAL
   is on for macOS and iOS.
 - sdl/wayland-protocols/: the client protocol sources for SDL's Wayland driver, generated with
-  wayland-scanner 1.24.0. FunkinCrew/lime builds them from sdl/wayland-generated-protocols instead.
+  wayland-scanner 1.24.0 (commit-timing-v1, fifo-v1 and presentation-time with 1.22.0). FunkinCrew/lime
+  builds them from sdl/wayland-generated-protocols instead.
 - zlib/: zconf.h, zlib.h, zlib_name_mangling.h and gzread_mangle.h generated from zlib-ng
   (../zlib), which replaces madler/zlib.

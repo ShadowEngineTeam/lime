@@ -150,7 +150,7 @@ class AudioBuffer
 		}
 
 		#if (lime_cffi && lime_miniaudio && !macro)
-		return __createFromMADecoder(MADecoder.init_memory(bytes, MADecoderConfig.init(F32, 0, 0)), stream);
+		return __createFromMADecoder(MADecoder.init_memory(bytes, MADecoderConfig.init(stream ? UNKNOWN : F32, 0, 0)), stream);
 		#else
 		return null;
 		#end
@@ -171,7 +171,7 @@ class AudioBuffer
 		}
 
 		#if (lime_cffi && lime_miniaudio && !macro)
-		return __createFromMADecoder(MADecoder.init_file(path, MADecoderConfig.init(F32, 0, 0)), stream);
+		return __createFromMADecoder(MADecoder.init_file(path, MADecoderConfig.init(stream ? UNKNOWN : F32, 0, 0)), stream);
 		#else
 		return null;
 		#end
