@@ -214,4 +214,13 @@ extern void WIN_QuitDeviceNotification(void);
 
 extern WCHAR *WIN_GetHIDDeviceInterfaces(ULONG *length);
 
+// Format a container ID as a Windows GUID string
+extern char *WIN_GetContainerIDString(const GUID *container_id);
+
+// Get the container ID for a device interface path, e.g. a HID device path
+extern char *WIN_GetContainerIDFromInterfacePath(const char *path);
+
+// Return true if this path uses the xinputhid filter driver
+extern bool WIN_IsXInputHIDInterfacePath(const char *path);
+
 #endif // SDL_hid_h_

@@ -52,6 +52,15 @@ extern bool SDL_JoysticksInitialized(void);
 // Return whether the joystick system is shutting down
 extern bool SDL_JoysticksQuitting(void);
 
+// Return whether the joystick update thread is running
+extern bool SDL_JoystickUpdateThreadRunning(void);
+
+// Return the current polling interval for the joystick update thread
+extern int SDL_GetJoystickAsyncUpdateInterval(void);
+
+// Wake up the joystick update thread
+extern void SDL_WakeJoystickUpdateThread(void);
+
 // Return whether the joysticks are currently locked
 extern bool SDL_JoysticksLocked(void);
 
@@ -103,6 +112,9 @@ extern SDL_GUID SDL_CreateJoystickGUID(Uint16 bus, Uint16 vendor, Uint16 product
 
 // Function to create a GUID for a joystick based on the name, with no VID/PID information
 extern SDL_GUID SDL_CreateJoystickGUIDForName(const char *name);
+
+// Function to set the bus field of a joystick GUID
+extern void SDL_SetJoystickGUIDBus(SDL_GUID *guid, Uint16 bus);
 
 // Function to set the vendor field of a joystick GUID
 extern void SDL_SetJoystickGUIDVendor(SDL_GUID *guid, Uint16 vendor);

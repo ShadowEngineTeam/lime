@@ -55,6 +55,7 @@
 // local variables
 static bool coinitialized = false;
 static LPDIRECTINPUT8 dinput = NULL;
+static HMODULE dinput_module = NULL;
 static bool DINPUT_handle_xinput = false;
 
 typedef struct DINPUT_CachedDevice
@@ -253,8 +254,6 @@ const DIDATAFORMAT SDL_c_dfDIJoystick2 = {
     SDL_arraysize(dfDIJoystick2),
     dfDIJoystick2
 };
-
-static void DINPUT_JoystickQuit(void);
 
 // Convert a DirectInput return code to a text message
 static bool SetDIerror(const char *function, HRESULT code)
@@ -574,9 +573,53 @@ static void SortDevObjects(SDL_Joystick *joystick)
     }
 }
 
+bool SDL_DINPUT_JoystickAcquireExclusive(SDL_Joystick *joystick)
+{
+    LPDIRECTINPUTDEVICE8 device = joystick->hwdata->InputDevice;
+    DIPROPDWORD dipdw;
+    HRESULT result;
+
+    if (joystick->hwdata->exclusive) {
+        return true;
+    }
+
+    // The cooperative level can only be changed while the device isn't acquired
+    IDirectInputDevice8_Unacquire(device);
+
+    result = IDirectInputDevice8_SetCooperativeLevel(device, SDL_HelperWindow, DISCL_EXCLUSIVE | DISCL_BACKGROUND);
+    if (FAILED(result)) {
+        return SetDIerror("IDirectInputDevice8::SetCooperativeLevel", result);
+    }
+
+    // Turn on auto-centering for a ForceFeedback device (until told otherwise)
+    SDL_zero(dipdw);
+    dipdw.diph.dwSize = sizeof(DIPROPDWORD);
+    dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+    dipdw.diph.dwObj = 0;
+    dipdw.diph.dwHow = DIPH_DEVICE;
+    dipdw.dwData = DIPROPAUTOCENTER_ON;
+    IDirectInputDevice8_SetProperty(device, DIPROP_AUTOCENTER, &dipdw.diph);
+
+    result = IDirectInputDevice8_Acquire(device);
+    if (FAILED(result)) {
+        SetDIerror("IDirectInputDevice8::Acquire", result);
+
+        // Go back to shared access so input keeps working
+        IDirectInputDevice8_SetCooperativeLevel(device, SDL_HelperWindow, DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
+        return false;
+    }
+
+    joystick->hwdata->exclusive = true;
+    return true;
+}
+
 static bool DINPUT_JoystickInitRumble(SDL_Joystick *joystick, Sint16 magnitude)
 {
     HRESULT result;
+
+    if (!SDL_DINPUT_JoystickAcquireExclusive(joystick)) {
+        return false;
+    }
 
     // Reset and then enable actuators
     result = IDirectInputDevice8_SendForceFeedbackCommand(joystick->hwdata->InputDevice, DISFFC_RESET);
@@ -604,6 +647,8 @@ static bool DINPUT_JoystickInitRumble(SDL_Joystick *joystick, Sint16 magnitude)
     result = IDirectInputDevice8_CreateEffect(joystick->hwdata->InputDevice, &GUID_Sine,
                                               joystick->hwdata->ffeffect, &joystick->hwdata->ffeffect_ref, NULL);
     if (FAILED(result)) {
+        FreeRumbleEffectData(joystick->hwdata->ffeffect);
+        joystick->hwdata->ffeffect = NULL;
         return SetDIerror("IDirectInputDevice8::CreateEffect", result);
     }
     return true;
@@ -775,43 +820,6 @@ static void UpdateDINPUTJoystickState_Buffered(SDL_Joystick *joystick)
 
 static bool DINPUT_JoystickInit(void)
 {
-    HRESULT result;
-    HINSTANCE instance;
-
-    if (!SDL_GetHintBoolean(SDL_HINT_JOYSTICK_DIRECTINPUT, true)) {
-        // In some environments, IDirectInput8_Initialize / _EnumDevices can take a minute even with no controllers.
-        dinput = NULL;
-        return true;
-    }
-
-    result = WIN_CoInitialize();
-    if (FAILED(result)) {
-        DINPUT_JoystickQuit();
-        return SetDIerror("CoInitialize", result);
-    }
-    coinitialized = true;
-
-    result = CoCreateInstance(&CLSID_DirectInput8, NULL, CLSCTX_INPROC_SERVER,
-                              &IID_IDirectInput8, (LPVOID *)&dinput);
-
-    if (FAILED(result)) {
-        DINPUT_JoystickQuit();
-        return SetDIerror("CoCreateInstance", result);
-    }
-
-    // Because we used CoCreateInstance, we need to Initialize it, first.
-    instance = GetModuleHandle(NULL);
-    if (!instance) {
-        DINPUT_JoystickQuit();
-        return SDL_SetError("GetModuleHandle() failed with error code %" SDL_PRIuULONG ".", GetLastError());
-    }
-    result = IDirectInput8_Initialize(dinput, instance, DIRECTINPUT_VERSION);
-
-    if (FAILED(result)) {
-        DINPUT_JoystickQuit();
-        return SetDIerror("IDirectInput::Initialize", result);
-    }
-
     // Check to see whether DirectInput should handle XInput devices
     // Normally XInput or GameInput drivers will handle them
     if (SDL_XINPUT_Enabled() ||
@@ -857,6 +865,69 @@ static void UpdateCachedDevices(void)
     SDL_free(DINPUT_cached_interfaces);
     DINPUT_cached_interfaces = HID_interfaces;
     DINPUT_cached_interfaces_length = HID_interfaces_length;
+}
+
+static void DINPUT_JoystickQuitUpdates(void)
+{
+    if (dinput != NULL) {
+        IDirectInput8_Release(dinput);
+        dinput = NULL;
+    }
+
+    if (coinitialized) {
+        WIN_CoUninitialize();
+        coinitialized = false;
+    }
+}
+
+// DirectInput initialization can take a long time, so it's done on the update thread
+static void DINPUT_JoystickInitUpdates(void)
+{
+    HRESULT result;
+    HINSTANCE instance;
+
+    if (!SDL_GetHintBoolean(SDL_HINT_JOYSTICK_DIRECTINPUT, true)) {
+        // In some environments, IDirectInput8_Initialize / _EnumDevices can take a minute even with no controllers.
+        return;
+    }
+
+    result = WIN_CoInitialize();
+    if (FAILED(result)) {
+        SetDIerror("CoInitialize", result);
+        return;
+    }
+    coinitialized = true;
+
+    result = CoCreateInstance(&CLSID_DirectInput8, NULL, CLSCTX_INPROC_SERVER,
+                              &IID_IDirectInput8, (LPVOID *)&dinput);
+    if (FAILED(result)) {
+        SetDIerror("CoCreateInstance", result);
+        DINPUT_JoystickQuitUpdates();
+        return;
+    }
+
+    // Open joysticks are closed after this thread uninitializes COM, so keep DirectInput loaded until the driver quits
+    if (!dinput_module) {
+        GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCWSTR)dinput->lpVtbl, &dinput_module);
+    }
+
+    // Because we used CoCreateInstance, we need to Initialize it, first.
+    instance = GetModuleHandle(NULL);
+    if (!instance) {
+        SDL_SetError("GetModuleHandle() failed with error code %" SDL_PRIuULONG ".", GetLastError());
+        DINPUT_JoystickQuitUpdates();
+        return;
+    }
+
+    result = IDirectInput8_Initialize(dinput, instance, DIRECTINPUT_VERSION);
+    if (FAILED(result)) {
+        SetDIerror("IDirectInput::Initialize", result);
+        DINPUT_JoystickQuitUpdates();
+        return;
+    }
+
+    // Do the initial enumeration without holding the joystick lock, the first query will use the cached devices
+    UpdateCachedDevices();
 }
 
 static SDL_JoystickDevice *CreateDInputDevice(const DINPUT_CachedDevice *entry)
@@ -948,6 +1019,8 @@ static bool DINPUT_JoystickPrepareDevice(SDL_JoystickDevice *device)
         return false;
     }
 
+    device->container_id = WIN_GetContainerIDFromInterfacePath(device->path);
+
 #ifdef SDL_HAPTIC_DINPUT
     SDL_DINPUT_HapticMaybeAddDevice(&device->internal->dxdevice);
 #endif
@@ -983,12 +1056,10 @@ static bool DINPUT_JoystickOpen(SDL_Joystick *joystick, SDL_JoystickDevice *devi
         goto error;
     }
 
-    /* Acquire shared access. Exclusive access is required for forces,
-     * though. */
+    // Use shared access until force feedback is needed
     result =
         IDirectInputDevice8_SetCooperativeLevel(joystick->hwdata->InputDevice, SDL_HelperWindow,
-                                                DISCL_EXCLUSIVE |
-                                                    DISCL_BACKGROUND);
+                                                DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
     if (FAILED(result)) {
         SetDIerror("IDirectInputDevice8::SetCooperativeLevel", result);
         goto error;
@@ -1016,46 +1087,6 @@ static bool DINPUT_JoystickOpen(SDL_Joystick *joystick, SDL_JoystickDevice *devi
 
     // Force capable?
     if (joystick->hwdata->Capabilities.dwFlags & DIDC_FORCEFEEDBACK) {
-        result = IDirectInputDevice8_Acquire(joystick->hwdata->InputDevice);
-        if (FAILED(result)) {
-            SetDIerror("IDirectInputDevice8::Acquire", result);
-            goto error;
-        }
-
-        // reset all actuators.
-        result =
-            IDirectInputDevice8_SendForceFeedbackCommand(joystick->hwdata->InputDevice,
-                                                         DISFFC_RESET);
-
-        /* Not necessarily supported, ignore if not supported.
-        if (FAILED(result)) {
-            return SetDIerror("IDirectInputDevice8::SendForceFeedbackCommand", result);
-        }
-        */
-
-        result = IDirectInputDevice8_Unacquire(joystick->hwdata->InputDevice);
-
-        if (FAILED(result)) {
-            SetDIerror("IDirectInputDevice8::Unacquire", result);
-            goto error;
-        }
-
-        /* Turn on auto-centering for a ForceFeedback device (until told
-         * otherwise). */
-        dipdw.diph.dwObj = 0;
-        dipdw.diph.dwHow = DIPH_DEVICE;
-        dipdw.dwData = DIPROPAUTOCENTER_ON;
-
-        result =
-            IDirectInputDevice8_SetProperty(joystick->hwdata->InputDevice,
-                                            DIPROP_AUTOCENTER, &dipdw.diph);
-
-        /* Not necessarily supported, ignore if not supported.
-        if (FAILED(result)) {
-            return SetDIerror("IDirectInputDevice8::SetProperty", result);
-        }
-        */
-
         SDL_SetBooleanProperty(SDL_GetJoystickProperties(joystick), SDL_PROP_JOYSTICK_CAP_RUMBLE_BOOLEAN, true);
     }
 
@@ -1207,19 +1238,16 @@ static void DINPUT_JoystickQuit(void)
 
     FreeCachedDevices();
 
-    if (dinput != NULL) {
-        IDirectInput8_Release(dinput);
-        dinput = NULL;
-    }
-
-    if (coinitialized) {
-        WIN_CoUninitialize();
-        coinitialized = false;
+    if (dinput_module) {
+        FreeLibrary(dinput_module);
+        dinput_module = NULL;
     }
 }
 
 SDL_JoystickDriver SDL_DINPUT_JoystickDriver = {
     .Init = DINPUT_JoystickInit,
+    .InitUpdates = DINPUT_JoystickInitUpdates,
+    .QuitUpdates = DINPUT_JoystickQuitUpdates,
     .QueryDevices = DINPUT_JoystickQueryDevices,
     .PrepareDevice = DINPUT_JoystickPrepareDevice,
     .Open = DINPUT_JoystickOpen,
