@@ -1482,6 +1482,7 @@ class NativeCFFI
 	private static var lime_bgfx_update_texture_3d = new cpp.Callable<cpp.Object->Int->Int->Int->Int->Int->Int->Int->cpp.Object->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_update_texture_3d", "oiiiiiiiov", false));
 	private static var lime_bgfx_update_texture_cube = new cpp.Callable<cpp.Object->Int->Int->Int->Int->Int->Int->Int->cpp.Object->Int->cpp.Void>(cpp.Prime._loadPrime("lime", "lime_bgfx_update_texture_cube", "oiiiiiiioiv", false));
 	private static var lime_bgfx_read_texture = new cpp.Callable<cpp.Object->lime.utils.DataPointer->Int>(cpp.Prime._loadPrime("lime", "lime_bgfx_read_texture", "odi", false));
+	private static var lime_bgfx_decode_to_rgba8 = new cpp.Callable<lime.utils.DataPointer->Int->Int->Int->lime.utils.DataPointer->Bool>(cpp.Prime._loadPrime("lime", "lime_bgfx_decode_to_rgba8", "diiidb", false));
 	private static var lime_bgfx_is_texture_valid = new cpp.Callable<Int->Bool->Int->Int->Int->Int->Bool>(cpp.Prime._loadPrime("lime", "lime_bgfx_is_texture_valid", "ibiiiib", false));
 	private static var lime_bgfx_calc_texture_size = new cpp.Callable<Int->Int->Int->Bool->Bool->Int->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_bgfx_calc_texture_size", "iiibbiio", false));
 	private static var lime_bgfx_create_frame_buffer = new cpp.Callable<Int->Int->Int->Int->Int->cpp.Object>(cpp.Prime._loadPrime("lime", "lime_bgfx_create_frame_buffer", "iiiiio", false));
@@ -1647,6 +1648,7 @@ class NativeCFFI
 	private static var lime_bgfx_update_texture_3d = CFFI.load("lime", "lime_bgfx_update_texture_3d", -1);
 	private static var lime_bgfx_update_texture_cube = CFFI.load("lime", "lime_bgfx_update_texture_cube", -1);
 	private static var lime_bgfx_read_texture = CFFI.load("lime", "lime_bgfx_read_texture", 2);
+	private static var lime_bgfx_decode_to_rgba8 = CFFI.load("lime", "lime_bgfx_decode_to_rgba8", 5);
 	private static var lime_bgfx_is_texture_valid = CFFI.load("lime", "lime_bgfx_is_texture_valid", -1);
 	private static var lime_bgfx_calc_texture_size = CFFI.load("lime", "lime_bgfx_calc_texture_size", -1);
 	private static var lime_bgfx_create_frame_buffer = CFFI.load("lime", "lime_bgfx_create_frame_buffer", 5);

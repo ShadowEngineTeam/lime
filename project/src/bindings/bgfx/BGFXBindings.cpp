@@ -9,6 +9,8 @@
 #endif
 
 #include <bgfx/bgfx.h>
+#include <bimg/bimg.h>
+#include <bx/allocator.h>
 #include <bindings/bgfx/BGFXBindings.h>
 #include <cstring>
 #include <hx/CFFIPrime.h>
@@ -1551,6 +1553,16 @@ namespace lime
 		return (int)bgfx::read(valToTextureRegion(src), (void *)(uintptr_t)data);
 	}
 
+	bool lime_bgfx_decode_to_rgba8(double src, int width, int height, int format, double dst)
+	{
+		if (src == 0 || dst == 0 || width <= 0 || height <= 0 || format < 0 || format >= bimg::TextureFormat::Count)
+			return false;
+
+		static bx::DefaultAllocator allocator;
+		bimg::imageDecodeToRgba8(&allocator, (void *)(uintptr_t)dst, (const void *)(uintptr_t)src, (uint32_t)width, (uint32_t)height, (uint32_t)width * 4, (bimg::TextureFormat::Enum)format);
+		return true;
+	}
+
 	bool lime_bgfx_is_texture_valid(int depth, bool cubeMap, int numLayers, int format, int flagsHi, int flagsLo)
 	{
 		return bgfx::isTextureValid((uint16_t)depth, cubeMap, (uint16_t)numLayers, (bgfx::TextureFormat::Enum)format, mergeUInt64(flagsHi, flagsLo));
@@ -2139,6 +2151,7 @@ namespace lime
 	DEFINE_PRIME9v(lime_bgfx_update_texture_3d);
 	DEFINE_PRIME10v(lime_bgfx_update_texture_cube);
 	DEFINE_PRIME2(lime_bgfx_read_texture);
+	DEFINE_PRIME5(lime_bgfx_decode_to_rgba8);
 	DEFINE_PRIME6(lime_bgfx_is_texture_valid);
 	DEFINE_PRIME7(lime_bgfx_calc_texture_size);
 	DEFINE_PRIME5(lime_bgfx_create_frame_buffer);

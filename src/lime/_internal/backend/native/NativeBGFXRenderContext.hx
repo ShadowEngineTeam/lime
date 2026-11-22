@@ -966,6 +966,16 @@ class NativeBGFXRenderContext
 		#end
 	}
 
+	public function decodeToRGBA8(src:ArrayBufferView, width:Int, height:Int, format:BGFXTextureFormat, dst:ArrayBufferView):Bool
+	{
+		#if (lime_cffi && lime_bgfx && !macro)
+		if (src == null || dst == null || dst.byteLength < width * height * 4) return false;
+		return NativeCFFI.lime_bgfx_decode_to_rgba8(DataPointer.fromArrayBufferView(src), width, height, format, DataPointer.fromArrayBufferView(dst));
+		#end
+
+		return false;
+	}
+
 	public function readTexture(src:BGFXTextureRegion, data:ArrayBufferView):Int
 	{
 		#if (lime_cffi && lime_bgfx && !macro)

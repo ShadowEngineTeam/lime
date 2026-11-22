@@ -522,6 +522,17 @@ class BGFX
 		context.updateTextureCube(handle, layer, side, mip, x, y, width, height, mem, pitch);
 	}
 
+	/**
+		Decodes `width` x `height` pixels of `src`, in `format` (a compressed format such as BC7 or ASTC4x4
+		included), to RGBA8 in `dst`, which needs `width * height * 4` bytes. Runs on the CPU, so it works
+		whether or not the GPU supports the format.
+		@return Whether the pixels were decoded
+	**/
+	public static inline function decodeToRGBA8(src:ArrayBufferView, width:Int, height:Int, format:BGFXTextureFormat, dst:ArrayBufferView):Bool
+	{
+		return context.decodeToRGBA8(src, width, height, format, dst);
+	}
+
 	public static inline function readTexture(src:BGFXTextureRegion, data:ArrayBufferView):Int
 	{
 		return context.readTexture(src, data);
