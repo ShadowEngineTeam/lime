@@ -1,4 +1,4 @@
-b3c84cd7d2498c7e1ed95aaf552525d8c94a2227 (FunkinCrew/miniaudio, vendored: miniaudio.h + extras/decoders/{libopus,libvorbis}
+b44665d6c78fc02bc5040620165281f35e00aaa8 (FunkinCrew/miniaudio, vendored: miniaudio.h + extras/decoders/{libopus,libvorbis}
                                           + extras/nodes/{ltrim,reverb,vocoder} without the examples)
 
 Local additions (NOT part of upstream miniaudio):

@@ -78,6 +78,8 @@ class AudioBuffer
 	#if lime_miniaudio
 	@:noCompletion private static var __localThreadPool:ThreadPool;
 
+	@:noCompletion private var __audioSources:Array<AudioSource>;
+
 	@:noCompletion private var __srcMADecoder:MADecoder;
 	@:noCompletion private var __srcMAAudioBuffer:MAAudioBuffer;
 	@:noCompletion private var __srcMAAudioRingBuffer:MAAudioRingBuffer;
@@ -88,7 +90,12 @@ class AudioBuffer
 	/**
 		Creates a new, empty `AudioBuffer` instance.
 	**/
-	public function new() {}
+	public function new()
+	{
+		#if lime_miniaudio
+		__audioSources = [];
+		#end
+	}
 
 	/**
 		Returns whether this `AudioBuffer` is valid or not.
@@ -112,6 +119,11 @@ class AudioBuffer
 	public function dispose():Void
 	{
 		#if (lime_cffi && lime_miniaudio && !macro)
+		for (source in __audioSources.copy())
+		{
+			source.dispose();
+		}
+
 		if (__srcMADecoder != null)
 		{
 			__srcMADecoder.uninit();

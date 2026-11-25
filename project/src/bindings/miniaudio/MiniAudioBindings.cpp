@@ -1604,7 +1604,6 @@ namespace lime
 
 	struct lime_ma_engine_process_data
 	{
-		AutoGCRoot *onProcess = NULL;
 		ma_mastering_limiter *limiter = NULL;
 	};
 
@@ -1620,9 +1619,6 @@ namespace lime
 		if (data)
 		{
 			engine->pProcessUserData = NULL;
-
-			if (data->onProcess)
-				delete data->onProcess;
 
 			ma_mastering_limiter_destroy(data->limiter);
 
@@ -1650,19 +1646,6 @@ namespace lime
 
 		if (!data)
 			return;
-
-		value callback = data->onProcess ? data->onProcess->get() : NULL;
-
-		if (callback && !val_is_null(callback))
-		{
-			int base = 0;
-
-			gc_set_top_of_stack(&base, true);
-
-			val_call2(callback, CFFIPointer(pFramesOut, NULL), alloc_int64(frameCount));
-
-			gc_set_top_of_stack(0, true);
-		}
 
 		// output-limiter=true, applied last like OpenAL Soft
 		if (data->limiter)
@@ -1813,12 +1796,7 @@ namespace lime
 		config.noDevice = val_bool(val_field(pConfig, val_id("noDevice")));
 		config.noClip = val_bool(val_field(pConfig, val_id("noClip")));
 
-		value onProcess = val_field(pConfig, val_id("onProcess"));
-
 		lime_ma_engine_process_data *processData = new lime_ma_engine_process_data();
-
-		if (!val_is_null(onProcess))
-			processData->onProcess = new AutoGCRoot(onProcess);
 
 		// the limiter needs the device's final format, so hold off starting until it exists
 		const ma_bool32 autoStart = !config.noAutoStart;
@@ -1831,9 +1809,6 @@ namespace lime
 
 		if (ma_engine_init(&config, engine) != MA_SUCCESS)
 		{
-			if (processData->onProcess)
-				delete processData->onProcess;
-
 			ma_mastering_limiter_destroy(processData->limiter);
 
 			delete processData;
