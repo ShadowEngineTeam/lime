@@ -1,3 +1,0 @@
-LZMA SDK 4.65, as FunkinCrew/lime fe97d782e vendors it
-
-No local changes.

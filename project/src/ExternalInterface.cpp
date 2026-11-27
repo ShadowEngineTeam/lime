@@ -45,7 +45,6 @@
 #include <ui/Touch.h>
 #include <ui/Window.h>
 #include <utils/Bytes.h>
-#include <utils/compress/LZMA.h>
 #include <utils/compress/Zlib.h>
 #include <utils/File.h>
 #include <utils/HaxeResource.h>
@@ -803,24 +802,6 @@ namespace lime
 	{
 		KeyEvent::callback = new AutoGCRoot(callback);
 		KeyEvent::eventObject = new AutoGCRoot(eventObject);
-	}
-
-	bool lime_lzma_compress(value buffer, value bytes)
-	{
-		Bytes data(buffer);
-
-		Bytes result(bytes);
-
-		return LZMA::Compress(&data, &result);
-	}
-
-	bool lime_lzma_decompress(value buffer, value bytes)
-	{
-		Bytes data(buffer);
-
-		Bytes result(bytes);
-
-		return LZMA::Decompress(&data, &result);
 	}
 
 	void lime_mouse_event_manager_register(value callback, value eventObject)
@@ -1835,8 +1816,6 @@ namespace lime
 	DEFINE_PRIME1(lime_key_code_from_scan_code);
 	DEFINE_PRIME1(lime_key_code_to_scan_code);
 	DEFINE_PRIME2v(lime_key_event_manager_register);
-	DEFINE_PRIME2(lime_lzma_compress);
-	DEFINE_PRIME2(lime_lzma_decompress);
 	DEFINE_PRIME2v(lime_mouse_event_manager_register);
 	DEFINE_PRIME2v(lime_orientation_event_manager_register);
 	DEFINE_PRIME2(lime_png_decode_bytes);
