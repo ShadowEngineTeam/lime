@@ -1,2 +1,3 @@
 -main Alias
 -cpp obj
+-D HXCPP_OPTIMIZE_LINK
