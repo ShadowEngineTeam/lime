@@ -74,7 +74,7 @@ celt_deemphasis_neon
 	ext	v6.16b, v20.16b, v4.16b, #8
 	ext	v7.16b, v20.16b, v4.16b, #4
 	adrp	x3, LSIG2RES_inv_scale
-	add	x3, x3, PageOffset(LSIG2RES_inv_scale)
+	add	x3, x3, #PageOffset(LSIG2RES_inv_scale)
 	ld1r	{ v24.4s }, [x3]
 	fmul	v0.4s, v5.4s, v1.s[0]
 	mov	v0.s[0], v1.s[0]
@@ -127,7 +127,7 @@ deemphasis_stereo_simple_neon
 	ext	v6.16b, v20.16b, v4.16b, #8
 	ext	v7.16b, v20.16b, v4.16b, #4
 	adrp	x6, LSIG2RES_inv_scale
-	add	x6, x6, PageOffset(LSIG2RES_inv_scale)
+	add	x6, x6, #PageOffset(LSIG2RES_inv_scale)
 	ld1r	{ v24.4s }, [x6]
 	ldp	s28, s29, [x3]
 	fmul	v0.4s, v5.4s, v28.s[0]
