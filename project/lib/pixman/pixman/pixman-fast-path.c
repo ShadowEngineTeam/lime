@@ -1247,6 +1247,15 @@ fast_composite_tiled_repeat (pixman_implementation_t *imp,
 	dest_image->common.extended_format_code, info->dest_flags,
 	&imp, &func);
 
+    /* The general implementation handles NORMAL repeat itself, so let it
+     * composite the whole rectangle at once rather than one scanline and
+     * tile at a time. */
+    if (imp->fallback == NULL)
+    {
+	func (imp, info);
+	return;
+    }
+
     src_bpp = PIXMAN_FORMAT_BPP (src_image->bits.format);
 
     if (src_image->bits.width < REPEAT_MIN_WIDTH		&&
