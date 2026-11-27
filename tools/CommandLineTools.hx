@@ -561,7 +561,6 @@ class CommandLineTools
 		{
 			// var bytes = new ByteArray ();
 			// bytes.writeUTFBytes (words[0]);
-			// bytes.compress (CompressionAlgorithm.LZMA);
 			// Sys.print (bytes.toString ());
 			// File.saveBytes (words[0] + ".compress", bytes);
 		}

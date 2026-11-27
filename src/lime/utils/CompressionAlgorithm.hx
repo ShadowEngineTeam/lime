@@ -4,6 +4,5 @@ enum CompressionAlgorithm
 {
 	DEFLATE;
 	GZIP;
-	LZMA;
 	ZLIB;
 }
