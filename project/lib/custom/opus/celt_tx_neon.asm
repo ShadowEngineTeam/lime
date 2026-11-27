@@ -58,10 +58,10 @@ celt_tx_fft4_fwd_float_neon
 celt_tx_fft8_ns_float_neon
 	ld1	{ v0.4s, v1.4s, v2.4s, v3.4s }, [x2], #64
 	adrp	x5, subadd
-	add	x5, x5, PageOffset(subadd)
+	add	x5, x5, #PageOffset(subadd)
 	ld1	{ v31.4s }, [x5]
 	adrp	x5, tab_8pt
-	add	x5, x5, PageOffset(tab_8pt)
+	add	x5, x5, #PageOffset(tab_8pt)
 	fsub	v17.4s, v1.4s, v3.4s
 	fadd	v3.4s, v1.4s, v3.4s
 	fsub	v16.4s, v0.4s, v2.4s
@@ -104,10 +104,10 @@ celt_tx_fft16_ns_float_neon
 	ld1	{ v0.4s, v1.4s, v2.4s, v3.4s }, [x2], #64
 	ld1	{ v4.4s, v5.4s, v6.4s, v7.4s }, [x2], #64
 	adrp	x5, subadd
-	add	x5, x5, PageOffset(subadd)
+	add	x5, x5, #PageOffset(subadd)
 	ld1	{ v31.4s }, [x5]
 	adrp	x5, tab_8pt
-	add	x5, x5, PageOffset(tab_8pt)
+	add	x5, x5, #PageOffset(tab_8pt)
 	fsub	v17.4s, v1.4s, v3.4s
 	fadd	v3.4s, v1.4s, v3.4s
 	fsub	v16.4s, v0.4s, v2.4s
@@ -161,7 +161,7 @@ celt_tx_fft16_ns_float_neon
 	zip1	v6.2d, v19.2d, v18.2d
 	zip2	v7.2d, v19.2d, v18.2d
 	adrp	x5, tab_16pt
-	add	x5, x5, PageOffset(tab_16pt)
+	add	x5, x5, #PageOffset(tab_16pt)
 	rev64	v16.4s, v4.4s
 	rev64	v17.4s, v6.4s
 	mov	v16.d[0], xzr
@@ -236,13 +236,13 @@ celt_tx_fft_pfa_15xM_ns_float_neon
 	ldr	x28, [x23, #8]
 	lsl	x3, x24, #3
 	adrp	x5, celt_tx_tab_53
-	add	x5, x5, PageOffset(celt_tx_tab_53)
+	add	x5, x5, #PageOffset(celt_tx_tab_53)
 	ld1	{ v28.4s, v29.4s, v30.4s }, [x5]
 	adrp	x5, tab_15pt
-	add	x5, x5, PageOffset(tab_15pt)
+	add	x5, x5, #PageOffset(tab_15pt)
 	ld1	{ v24.4s }, [x5]
 	adrp	x5, subadd
-	add	x5, x5, PageOffset(subadd)
+	add	x5, x5, #PageOffset(subadd)
 	ld1	{ v31.4s }, [x5]
 	dup	v8.2d, v30.d[0]
 	dup	v9.2d, v30.d[1]
@@ -424,7 +424,7 @@ celt_tx_mdct_inv_float_neon
 	ldr	x22, [x0, #16]
 	ldr	x4, [x0, #8]
 	adrp	x5, subadd
-	add	x5, x5, PageOffset(subadd)
+	add	x5, x5, #PageOffset(subadd)
 	ld1	{ v31.4s }, [x5]
 	sub	x5, x21, #1
 	madd	x14, x5, x3, x2
@@ -544,7 +544,7 @@ L_9
 L_8
 	tbz	w7, #0, L_10
 	adrp	x5, subadd
-	add	x5, x5, PageOffset(subadd)
+	add	x5, x5, #PageOffset(subadd)
 	ld1	{ v31.4s }, [x5]
 	add	x9, x9, #8
 	add	x11, x11, #8
@@ -577,11 +577,11 @@ celt_tx_fft32_ns_float_neon
 	stp	d10, d11, [sp, #32]
 	stp	d12, d13, [sp, #16]
 	adrp	x5, subadd
-	add	x5, x5, PageOffset(subadd)
+	add	x5, x5, #PageOffset(subadd)
 	ld1	{ v31.4s }, [x5]
 	mov	w5, #4
 	adrp	x7, celt_tx_tab_32
-	add	x7, x7, PageOffset(celt_tx_tab_32)
+	add	x7, x7, #PageOffset(celt_tx_tab_32)
 	add	x8, x7, x5
 	mov	x9, #-32
 	ld1	{ v0.4s, v1.4s, v2.4s, v3.4s }, [x2], #64
@@ -589,7 +589,7 @@ celt_tx_fft32_ns_float_neon
 	ld1	{ v8.4s, v9.4s, v10.4s, v11.4s }, [x2], #64
 	ld1	{ v12.4s, v13.4s, v14.4s, v15.4s }, [x2], #64
 	adrp	x5, tab_8pt
-	add	x5, x5, PageOffset(tab_8pt)
+	add	x5, x5, #PageOffset(tab_8pt)
 	fadd	v19.4s, v13.4s, v15.4s
 	fadd	v17.4s, v9.4s, v11.4s
 	fadd	v18.4s, v12.4s, v14.4s
@@ -648,7 +648,7 @@ celt_tx_fft32_ns_float_neon
 	fsub	v10.4s, v10.4s, v20.4s
 	fsub	v14.4s, v14.4s, v18.4s
 	adrp	x5, tab_8pt
-	add	x5, x5, PageOffset(tab_8pt)
+	add	x5, x5, #PageOffset(tab_8pt)
 	fsub	v17.4s, v1.4s, v3.4s
 	fadd	v3.4s, v1.4s, v3.4s
 	fsub	v16.4s, v0.4s, v2.4s
@@ -702,7 +702,7 @@ celt_tx_fft32_ns_float_neon
 	zip1	v6.2d, v19.2d, v18.2d
 	zip2	v7.2d, v19.2d, v18.2d
 	adrp	x5, tab_16pt
-	add	x5, x5, PageOffset(tab_16pt)
+	add	x5, x5, #PageOffset(tab_16pt)
 	rev64	v16.4s, v4.4s
 	rev64	v17.4s, v6.4s
 	mov	v16.d[0], xzr
@@ -845,12 +845,12 @@ celt_tx_fft_sr_ns_float_neon
 	ldr	w19, [x0]
 	mov	w20, w19
 	adrp	x5, subadd
-	add	x5, x5, PageOffset(subadd)
+	add	x5, x5, #PageOffset(subadd)
 	ld1	{ v31.4s }, [x5]
 L_11
 	mov	w5, #4
 	adrp	x7, celt_tx_tab_32
-	add	x7, x7, PageOffset(celt_tx_tab_32)
+	add	x7, x7, #PageOffset(celt_tx_tab_32)
 	add	x8, x7, x5
 	mov	x9, #-32
 	ld1	{ v0.4s, v1.4s, v2.4s, v3.4s }, [x2], #64
@@ -860,7 +860,7 @@ L_11
 	ld1	{ v8.4s, v9.4s, v10.4s, v11.4s }, [x2], #64
 	ld1	{ v12.4s, v13.4s, v14.4s, v15.4s }, [x2], #64
 	adrp	x5, tab_8pt
-	add	x5, x5, PageOffset(tab_8pt)
+	add	x5, x5, #PageOffset(tab_8pt)
 	fadd	v19.4s, v13.4s, v15.4s
 	fadd	v17.4s, v9.4s, v11.4s
 	fadd	v18.4s, v12.4s, v14.4s
@@ -919,7 +919,7 @@ L_11
 	fsub	v10.4s, v10.4s, v20.4s
 	fsub	v14.4s, v14.4s, v18.4s
 	adrp	x5, tab_8pt
-	add	x5, x5, PageOffset(tab_8pt)
+	add	x5, x5, #PageOffset(tab_8pt)
 	fsub	v17.4s, v1.4s, v3.4s
 	fadd	v3.4s, v1.4s, v3.4s
 	fsub	v16.4s, v0.4s, v2.4s
@@ -973,7 +973,7 @@ L_11
 	zip1	v5.2d, v19.2d, v18.2d
 	zip2	v7.2d, v19.2d, v18.2d
 	adrp	x5, tab_16pt
-	add	x5, x5, PageOffset(tab_16pt)
+	add	x5, x5, #PageOffset(tab_16pt)
 	rev64	v16.4s, v4.4s
 	rev64	v17.4s, v5.4s
 	mov	v16.d[0], xzr
@@ -1093,7 +1093,7 @@ L_11
 L_12
 	mov	w5, #36
 	adrp	x7, celt_tx_tab_64
-	add	x7, x7, PageOffset(celt_tx_tab_64)
+	add	x7, x7, #PageOffset(celt_tx_tab_64)
 	add	x8, x7, x5
 	mov	x9, #-32
 	mov	x21, #128
@@ -1105,7 +1105,7 @@ L_12
 	ldp	q7, q15, [x2, #32]
 	add	x2, x2, #64
 	adrp	x5, tab_8pt
-	add	x5, x5, PageOffset(tab_8pt)
+	add	x5, x5, #PageOffset(tab_8pt)
 	fsub	v17.4s, v3.4s, v11.4s
 	fadd	v11.4s, v3.4s, v11.4s
 	fsub	v16.4s, v2.4s, v10.4s
@@ -1159,7 +1159,7 @@ L_12
 	zip1	v7.2d, v19.2d, v18.2d
 	zip2	v15.2d, v19.2d, v18.2d
 	adrp	x5, tab_16pt
-	add	x5, x5, PageOffset(tab_16pt)
+	add	x5, x5, #PageOffset(tab_16pt)
 	rev64	v16.4s, v6.4s
 	rev64	v17.4s, v7.4s
 	mov	v16.d[0], xzr
@@ -1198,7 +1198,7 @@ L_12
 	ldp	q21, q23, [x2, #32]
 	add	x2, x2, #64
 	adrp	x5, tab_8pt
-	add	x5, x5, PageOffset(tab_8pt)
+	add	x5, x5, #PageOffset(tab_8pt)
 	fsub	v25.4s, v17.4s, v19.4s
 	fadd	v19.4s, v17.4s, v19.4s
 	fsub	v24.4s, v16.4s, v18.4s
@@ -1252,7 +1252,7 @@ L_12
 	zip1	v21.2d, v27.2d, v26.2d
 	zip2	v23.2d, v27.2d, v26.2d
 	adrp	x5, tab_16pt
-	add	x5, x5, PageOffset(tab_16pt)
+	add	x5, x5, #PageOffset(tab_16pt)
 	rev64	v24.4s, v20.4s
 	rev64	v25.4s, v21.4s
 	mov	v24.d[0], xzr
