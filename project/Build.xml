@@ -22,7 +22,6 @@
 	<set name="LIME_CAIRO" value="1" />
 	<set name="LIME_FREETYPE" value="1" />
 	<set name="LIME_HARFBUZZ" value="1" />
-	<set name="LIME_LZMA" value="1" />
 	<set name="LIME_OGG" value="1" />
 	<set name="LIME_OPUS" value="1" />
 	<set name="LIME_MINIAUDIO" value="1" />
@@ -91,14 +90,6 @@
 
 		</section>
 
-		<section if="LIME_LZMA">
-
-			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/lzma" />
-			<compilerflag value="-DLIME_LZMA" />
-
-			<file name="src/utils/compress/LZMA.cpp" />
-
-		</section>
 
 		<section if="LIME_MINIAUDIO">
 
@@ -250,7 +241,6 @@
 	<include name="lib/freetype-files.xml" />
 	<include name="lib/harfbuzz-files.xml" />
 	<include name="lib/glad-files.xml" />
-	<include name="lib/lzma-files.xml" />
 	<include name="lib/vorbis-files.xml" />
 	<include name="lib/ogg-files.xml" />
 	<include name="lib/opusfile-files.xml" />
@@ -272,7 +262,6 @@
 		<files id="native-toolkit-cairo" if="LIME_CAIRO" />
 		<files id="native-toolkit-freetype" if="LIME_FREETYPE" />
 		<files id="native-toolkit-harfbuzz" if="LIME_HARFBUZZ" />
-		<files id="native-toolkit-lzma" if="LIME_LZMA" />
 		<files id="native-toolkit-vorbis" if="LIME_OGG" />
 		<files id="native-toolkit-ogg" if="LIME_OGG" />
 		<files id="native-toolkit-opusfile" if="LIME_OPUS" />

@@ -78,8 +78,6 @@ class NativeCFFI
 	private static final lime_key_code_from_scan_code = Prime.load("lime", "lime_key_code_from_scan_code", "ii");
 	private static final lime_key_code_to_scan_code = Prime.load("lime", "lime_key_code_to_scan_code", "ii");
 	private static final lime_key_event_manager_register = Prime.load("lime", "lime_key_event_manager_register", "oov");
-	private static final lime_lzma_compress = Prime.load("lime", "lime_lzma_compress", "oob");
-	private static final lime_lzma_decompress = Prime.load("lime", "lime_lzma_decompress", "oob");
 	private static final lime_mouse_event_manager_register = Prime.load("lime", "lime_mouse_event_manager_register", "oov");
 	private static final lime_orientation_event_manager_register = Prime.load("lime", "lime_orientation_event_manager_register", "oov");
 	private static final lime_png_decode_bytes = Prime.load("lime", "lime_png_decode_bytes", "oob");
@@ -243,8 +241,6 @@ class NativeCFFI
 	private static final lime_key_code_from_scan_code = CFFI.load("lime", "lime_key_code_from_scan_code", 1);
 	private static final lime_key_code_to_scan_code = CFFI.load("lime", "lime_key_code_to_scan_code", 1);
 	private static final lime_key_event_manager_register = CFFI.load("lime", "lime_key_event_manager_register", 2);
-	private static final lime_lzma_compress = CFFI.load("lime", "lime_lzma_compress", 2);
-	private static final lime_lzma_decompress = CFFI.load("lime", "lime_lzma_decompress", 2);
 	private static final lime_mouse_event_manager_register = CFFI.load("lime", "lime_mouse_event_manager_register", 2);
 	private static final lime_orientation_event_manager_register = CFFI.load("lime", "lime_orientation_event_manager_register", 2);
 	private static final lime_png_decode_bytes = CFFI.load("lime", "lime_png_decode_bytes", 2);

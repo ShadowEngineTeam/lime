@@ -6,7 +6,6 @@ import haxe.io.BytesData;
 import lime._internal.backend.native.NativeCFFI;
 import lime._internal.format.Deflate;
 import lime._internal.format.GZip;
-import lime._internal.format.LZMA;
 import lime._internal.format.Zlib;
 import lime.app.Future;
 import lime.net.HTTPRequest;
@@ -37,9 +36,6 @@ abstract Bytes(HaxeBytes) from HaxeBytes to HaxeBytes
 			case GZIP:
 				return GZip.compress(this);
 
-			case LZMA:
-				return LZMA.compress(this);
-
 			case ZLIB:
 				return Zlib.compress(this);
 
@@ -57,9 +53,6 @@ abstract Bytes(HaxeBytes) from HaxeBytes to HaxeBytes
 
 			case GZIP:
 				return GZip.decompress(this);
-
-			case LZMA:
-				return LZMA.decompress(this);
 
 			case ZLIB:
 				return Zlib.decompress(this);
