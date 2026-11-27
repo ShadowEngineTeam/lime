@@ -21,8 +21,8 @@ jobs:
       - name: Install Haxe dependencies
         run: |
           haxelib git hxcpp https://github.com/ShadowEngineTeam/libhxcpp --quiet
-          haxelib git format https://github.com/HaxeFoundation/format 9d69fb342d030fa120d2deafafbbffad248332b8 --quiet
-          haxelib git hxp https://github.com/openfl/hxp 47ef5ae6569cb0961761a2fbb416694df067124c --quiet
+          haxelib git format https://github.com/HaxeFoundation/format 6e41f83987139febbb078ca5056c9c2f395e99d9 --quiet
+          haxelib git hxp https://github.com/openfl/hxp 9019664c287ce1322abac47a7317515511cd21ff --quiet
       - name: Configure Lime
         run: haxelib dev lime ${{ github.workspace }}
       - name: Rebuild Lime
