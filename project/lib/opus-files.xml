@@ -2,6 +2,7 @@
 
     <files id="native-toolkit-opus">
 
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/opus" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/opus/celt" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/opus/silk" />
 		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/opus/silk/float" />
