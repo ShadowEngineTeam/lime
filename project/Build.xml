@@ -20,7 +20,6 @@
 	<setenv name="MACOSX_DEPLOYMENT_TARGET" value="12" if="mac" />
 
 	<set name="LIME_CAIRO" value="1" />
-	<set name="LIME_EFSW" value="1" if="windows || mac || linux" />
 	<set name="LIME_FREETYPE" value="1" />
 	<set name="LIME_HARFBUZZ" value="1" />
 	<set name="LIME_LZMA" value="1" />
@@ -109,14 +108,6 @@
 
 		</section>
 
-		<section if="LIME_EFSW">
-
-			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/efsw/include" />
-			<compilerflag value="-DLIME_EFSW" />
-
-			<file name="src/system/FileWatcher.cpp" />
-
-		</section>
 
 		<section if="LIME_FREETYPE">
 
@@ -296,7 +287,6 @@
 	<include name="lib/bimg-files.xml" />
 	<include name="lib/bx-files.xml" />
 	<include name="lib/cairo-files.xml" />
-	<include name="lib/efsw-files.xml" />
 	<include name="lib/freetype-files.xml" />
 	<include name="lib/harfbuzz-files.xml" />
 	<include name="lib/glad-files.xml" />
@@ -341,7 +331,6 @@
 		</section>
 
 		<files id="native-toolkit-cairo" if="LIME_CAIRO" />
-		<files id="native-toolkit-efsw" if="LIME_EFSW" />
 		<files id="native-toolkit-freetype" if="LIME_FREETYPE" />
 		<files id="native-toolkit-harfbuzz" if="LIME_HARFBUZZ" />
 		<files id="native-toolkit-lzma" if="LIME_LZMA" />
