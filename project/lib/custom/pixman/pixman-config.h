@@ -268,9 +268,9 @@
 
 /* use SSSE3 compiler intrinsics */
 #if (defined(HX_WINDOWS) && !defined(HXCPP_ARM64)) || (defined(HX_MACOS) && !defined(HXCPP_ARM64)) || (defined(HX_LINUX) && (!defined(HXCPP_ARM64) && !defined(HXCPP_ARMV7)))
-#define USE_SSE3 1
+#define USE_SSSE3 1
 #else
-/* #undef USE_SSE3 */
+/* #undef USE_SSSE3 */
 #endif
 
 /* use VMX compiler intrinsics */
