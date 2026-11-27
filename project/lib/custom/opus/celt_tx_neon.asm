@@ -58,18 +58,18 @@ celt_tx_fft4_fwd_float_neon
 celt_tx_fft8_ns_float_neon
 	ld1	{ v0.4s, v1.4s, v2.4s, v3.4s }, [x2], #64
 	adrp	x5, subadd
-	add	x5, x5, #PageOffset(subadd)
+	add	x5, x5, subadd
 	ld1	{ v31.4s }, [x5]
 	adrp	x5, tab_8pt
-	add	x5, x5, #PageOffset(tab_8pt)
+	add	x5, x5, tab_8pt
 	fsub	v17.4s, v1.4s, v3.4s
 	fadd	v3.4s, v1.4s, v3.4s
 	fsub	v16.4s, v0.4s, v2.4s
 	fadd	v2.4s, v0.4s, v2.4s
 	ld1	{ v21.4s }, [x5]
-	ext	v20.16b, v3.16b, v3.16b, #12
+	ext8	v20.16b, v3.16b, v3.16b, #12
 	rev64	v20.4s, v20.4s
-	ext	v18.16b, v2.16b, v20.16b, #8
+	ext8	v18.16b, v2.16b, v20.16b, #8
 	mov	v2.d[1], v20.d[1]
 	fsub	v1.4s, v2.4s, v18.4s
 	fadd	v18.4s, v2.4s, v18.4s
@@ -78,7 +78,7 @@ celt_tx_fft8_ns_float_neon
 	dup	v3.2d, v16.d[1]
 	rev64	v20.4s, v1.4s
 	rev64	v3.4s, v3.4s
-	ext	v22.16b, v31.16b, v22.16b, #8
+	ext8	v22.16b, v31.16b, v22.16b, #8
 	zip1	v19.2d, v18.2d, v1.2d
 	zip2	v18.2d, v18.2d, v20.2d
 	fadd	v0.4s, v19.4s, v18.4s
@@ -88,7 +88,7 @@ celt_tx_fft8_ns_float_neon
 	rev64	v20.4s, v17.4s
 	fmla	v17.4s, v20.4s, v31.4s
 	rev64	v20.4s, v17.4s
-	ext	v20.16b, v20.16b, v20.16b, #8
+	ext8	v20.16b, v20.16b, v20.16b, #8
 	fmla	v20.4s, v17.4s, v31.4s
 	fadd	v3.4s, v2.4s, v20.4s
 	fsub	v2.4s, v2.4s, v20.4s
@@ -104,18 +104,18 @@ celt_tx_fft16_ns_float_neon
 	ld1	{ v0.4s, v1.4s, v2.4s, v3.4s }, [x2], #64
 	ld1	{ v4.4s, v5.4s, v6.4s, v7.4s }, [x2], #64
 	adrp	x5, subadd
-	add	x5, x5, #PageOffset(subadd)
+	add	x5, x5, subadd
 	ld1	{ v31.4s }, [x5]
 	adrp	x5, tab_8pt
-	add	x5, x5, #PageOffset(tab_8pt)
+	add	x5, x5, tab_8pt
 	fsub	v17.4s, v1.4s, v3.4s
 	fadd	v3.4s, v1.4s, v3.4s
 	fsub	v16.4s, v0.4s, v2.4s
 	fadd	v2.4s, v0.4s, v2.4s
 	ld1	{ v21.4s }, [x5]
-	ext	v20.16b, v3.16b, v3.16b, #12
+	ext8	v20.16b, v3.16b, v3.16b, #12
 	rev64	v20.4s, v20.4s
-	ext	v18.16b, v2.16b, v20.16b, #8
+	ext8	v18.16b, v2.16b, v20.16b, #8
 	mov	v2.d[1], v20.d[1]
 	fsub	v1.4s, v2.4s, v18.4s
 	fadd	v18.4s, v2.4s, v18.4s
@@ -124,7 +124,7 @@ celt_tx_fft16_ns_float_neon
 	dup	v3.2d, v16.d[1]
 	rev64	v20.4s, v1.4s
 	rev64	v3.4s, v3.4s
-	ext	v22.16b, v31.16b, v22.16b, #8
+	ext8	v22.16b, v31.16b, v22.16b, #8
 	zip1	v19.2d, v18.2d, v1.2d
 	zip2	v18.2d, v18.2d, v20.2d
 	fadd	v0.4s, v19.4s, v18.4s
@@ -134,7 +134,7 @@ celt_tx_fft16_ns_float_neon
 	rev64	v20.4s, v17.4s
 	fmla	v17.4s, v20.4s, v31.4s
 	rev64	v20.4s, v17.4s
-	ext	v20.16b, v20.16b, v20.16b, #8
+	ext8	v20.16b, v20.16b, v20.16b, #8
 	fmla	v20.4s, v17.4s, v31.4s
 	fadd	v3.4s, v2.4s, v20.4s
 	fsub	v2.4s, v2.4s, v20.4s
@@ -161,7 +161,7 @@ celt_tx_fft16_ns_float_neon
 	zip1	v6.2d, v19.2d, v18.2d
 	zip2	v7.2d, v19.2d, v18.2d
 	adrp	x5, tab_16pt
-	add	x5, x5, #PageOffset(tab_16pt)
+	add	x5, x5, tab_16pt
 	rev64	v16.4s, v4.4s
 	rev64	v17.4s, v6.4s
 	mov	v16.d[0], xzr
@@ -236,13 +236,13 @@ celt_tx_fft_pfa_15xM_ns_float_neon
 	ldr	x28, [x23, #8]
 	lsl	x3, x24, #3
 	adrp	x5, celt_tx_tab_53
-	add	x5, x5, #PageOffset(celt_tx_tab_53)
+	add	x5, x5, celt_tx_tab_53
 	ld1	{ v28.4s, v29.4s, v30.4s }, [x5]
 	adrp	x5, tab_15pt
-	add	x5, x5, #PageOffset(tab_15pt)
+	add	x5, x5, tab_15pt
 	ld1	{ v24.4s }, [x5]
 	adrp	x5, subadd
-	add	x5, x5, #PageOffset(subadd)
+	add	x5, x5, subadd
 	ld1	{ v31.4s }, [x5]
 	dup	v8.2d, v30.d[0]
 	dup	v9.2d, v30.d[1]
@@ -265,7 +265,7 @@ L_0
 	add	x8, x1, x7
 	add	x9, x8, x7
 	fsub	v16.4s, v2.4s, v4.4s
-	ext	v26.16b, v0.16b, v0.16b, #8
+	ext8	v26.16b, v0.16b, v0.16b, #8
 	fsub	v17.4s, v3.4s, v5.4s
 	fadd	v27.4s, v0.4s, v26.4s
 	fadd	v2.4s, v2.4s, v4.4s
@@ -273,14 +273,14 @@ L_0
 	fadd	v3.4s, v3.4s, v5.4s
 	rev64	v20.4s, v20.4s
 	rev64	v16.4s, v16.4s
-	ext	v21.16b, v20.16b, v27.16b, #8
+	ext8	v21.16b, v20.16b, v27.16b, #8
 	rev64	v17.4s, v17.4s
 	fadd	v0.4s, v1.4s, v27.4s
 	fadd	v22.4s, v6.4s, v2.4s
 	fmul	v21.4s, v21.4s, v30.4s
 	fadd	v23.4s, v7.4s, v3.4s
 	fmul	v16.4s, v16.4s, v8.4s
-	ext	v26.16b, v21.16b, v21.16b, #8
+	ext8	v26.16b, v21.16b, v21.16b, #8
 	fmul	v17.4s, v17.4s, v8.4s
 	fmla	v21.4s, v26.4s, v24.4s
 	fmla	v6.4s, v2.4s, v9.4s
@@ -290,16 +290,16 @@ L_0
 	fsub	v5.4s, v7.4s, v17.4s
 	fadd	v2.4s, v6.4s, v16.4s
 	fadd	v3.4s, v7.4s, v17.4s
-	ext	v16.16b, v23.16b, v23.16b, #8
-	ext	v17.16b, v5.16b, v5.16b, #8
-	ext	v20.16b, v3.16b, v3.16b, #8
+	ext8	v16.16b, v23.16b, v23.16b, #8
+	ext8	v17.16b, v5.16b, v5.16b, #8
+	ext8	v20.16b, v3.16b, v3.16b, #8
 	fsub	v21.4s, v22.4s, v16.4s
 	fadd	v22.4s, v22.4s, v16.4s
 	fsub	v26.4s, v4.4s, v17.4s
 	fadd	v4.4s, v4.4s, v17.4s
 	fsub	v27.4s, v2.4s, v20.4s
 	fadd	v2.4s, v2.4s, v20.4s
-	ext	v16.16b, v22.16b, v22.16b, #8
+	ext8	v16.16b, v22.16b, v22.16b, #8
 	zip1	v17.2d, v4.2d, v2.2d
 	zip2	v20.2d, v4.2d, v2.2d
 	fadd	v16.4s, v16.4s, v22.4s
@@ -309,24 +309,24 @@ L_0
 	st1	{ v16.d }[0], [x1]
 	st1	{ v17.d }[1], [x8]
 	st1	{ v17.d }[0], [x9]
-	ext	v16.16b, v22.16b, v22.16b, #8
+	ext8	v16.16b, v22.16b, v22.16b, #8
 	mov	v6.16b, v0.16b
-	ext	v17.16b, v21.16b, v21.16b, #8
+	ext8	v17.16b, v21.16b, v21.16b, #8
 	fmul	v7.4s, v21.4s, v29.4s
 	fmla	v6.4s, v22.4s, v25.4s
 	dup	v18.2d, v1.d[0]
 	fmla	v18.4s, v4.4s, v25.4s
 	fmls	v6.4s, v16.4s, v28.4s
-	ext	v16.16b, v4.16b, v4.16b, #8
+	ext8	v16.16b, v4.16b, v4.16b, #8
 	fmla	v7.4s, v17.4s, v10.4s
-	ext	v17.16b, v26.16b, v26.16b, #8
+	ext8	v17.16b, v26.16b, v26.16b, #8
 	fmls	v18.4s, v16.4s, v28.4s
 	fmul	v23.4s, v26.4s, v29.4s
 	dup	v19.2d, v1.d[1]
 	fmla	v19.4s, v2.4s, v25.4s
-	ext	v16.16b, v2.16b, v2.16b, #8
+	ext8	v16.16b, v2.16b, v2.16b, #8
 	fmla	v23.4s, v17.4s, v10.4s
-	ext	v17.16b, v27.16b, v27.16b, #8
+	ext8	v17.16b, v27.16b, v27.16b, #8
 	fmul	v5.4s, v27.4s, v29.4s
 	fmls	v19.4s, v16.4s, v28.4s
 	fmla	v5.4s, v17.4s, v10.4s
@@ -424,7 +424,7 @@ celt_tx_mdct_inv_float_neon
 	ldr	x22, [x0, #16]
 	ldr	x4, [x0, #8]
 	adrp	x5, subadd
-	add	x5, x5, #PageOffset(subadd)
+	add	x5, x5, subadd
 	ld1	{ v31.4s }, [x5]
 	sub	x5, x21, #1
 	madd	x14, x5, x3, x2
@@ -542,9 +542,9 @@ L_9
 	subs	w6, w6, #1
 	b.gt	L_9
 L_8
-	tbz	w7, #0, L_10
+	tbz	x7, #0, L_10
 	adrp	x5, subadd
-	add	x5, x5, #PageOffset(subadd)
+	add	x5, x5, subadd
 	ld1	{ v31.4s }, [x5]
 	add	x9, x9, #8
 	add	x11, x11, #8
@@ -577,11 +577,11 @@ celt_tx_fft32_ns_float_neon
 	stp	d10, d11, [sp, #32]
 	stp	d12, d13, [sp, #16]
 	adrp	x5, subadd
-	add	x5, x5, #PageOffset(subadd)
+	add	x5, x5, subadd
 	ld1	{ v31.4s }, [x5]
 	mov	w5, #4
 	adrp	x7, celt_tx_tab_32
-	add	x7, x7, #PageOffset(celt_tx_tab_32)
+	add	x7, x7, celt_tx_tab_32
 	add	x8, x7, x5
 	mov	x9, #-32
 	ld1	{ v0.4s, v1.4s, v2.4s, v3.4s }, [x2], #64
@@ -589,18 +589,18 @@ celt_tx_fft32_ns_float_neon
 	ld1	{ v8.4s, v9.4s, v10.4s, v11.4s }, [x2], #64
 	ld1	{ v12.4s, v13.4s, v14.4s, v15.4s }, [x2], #64
 	adrp	x5, tab_8pt
-	add	x5, x5, #PageOffset(tab_8pt)
+	add	x5, x5, tab_8pt
 	fadd	v19.4s, v13.4s, v15.4s
 	fadd	v17.4s, v9.4s, v11.4s
 	fadd	v18.4s, v12.4s, v14.4s
 	fadd	v16.4s, v8.4s, v10.4s
 	ld1	{ v23.4s }, [x5]
-	ext	v22.16b, v19.16b, v19.16b, #12
-	ext	v21.16b, v17.16b, v17.16b, #12
+	ext8	v22.16b, v19.16b, v19.16b, #12
+	ext8	v21.16b, v17.16b, v17.16b, #12
 	rev64	v22.4s, v22.4s
 	rev64	v21.4s, v21.4s
-	ext	v19.16b, v18.16b, v22.16b, #8
-	ext	v17.16b, v16.16b, v21.16b, #8
+	ext8	v19.16b, v18.16b, v22.16b, #8
+	ext8	v17.16b, v16.16b, v21.16b, #8
 	mov	v18.d[1], v22.d[1]
 	mov	v21.d[0], v16.d[0]
 	fadd	v22.4s, v18.4s, v19.4s
@@ -626,7 +626,7 @@ celt_tx_fft32_ns_float_neon
 	fsub	v13.4s, v9.4s, v13.4s
 	fadd	v8.4s, v17.4s, v16.4s
 	fsub	v9.4s, v17.4s, v16.4s
-	ext	v24.16b, v31.16b, v24.16b, #8
+	ext8	v24.16b, v31.16b, v24.16b, #8
 	rev64	v11.4s, v11.4s
 	rev64	v15.4s, v15.4s
 	fmul	v19.4s, v20.4s, v23.4s
@@ -639,8 +639,8 @@ celt_tx_fft32_ns_float_neon
 	fmla	v21.4s, v18.4s, v31.4s
 	rev64	v20.4s, v19.4s
 	rev64	v18.4s, v21.4s
-	ext	v20.16b, v20.16b, v20.16b, #8
-	ext	v18.16b, v18.16b, v18.16b, #8
+	ext8	v20.16b, v20.16b, v20.16b, #8
+	ext8	v18.16b, v18.16b, v18.16b, #8
 	fmla	v20.4s, v19.4s, v31.4s
 	fmla	v18.4s, v21.4s, v31.4s
 	fadd	v11.4s, v10.4s, v20.4s
@@ -648,15 +648,15 @@ celt_tx_fft32_ns_float_neon
 	fsub	v10.4s, v10.4s, v20.4s
 	fsub	v14.4s, v14.4s, v18.4s
 	adrp	x5, tab_8pt
-	add	x5, x5, #PageOffset(tab_8pt)
+	add	x5, x5, tab_8pt
 	fsub	v17.4s, v1.4s, v3.4s
 	fadd	v3.4s, v1.4s, v3.4s
 	fsub	v16.4s, v0.4s, v2.4s
 	fadd	v2.4s, v0.4s, v2.4s
 	ld1	{ v21.4s }, [x5]
-	ext	v20.16b, v3.16b, v3.16b, #12
+	ext8	v20.16b, v3.16b, v3.16b, #12
 	rev64	v20.4s, v20.4s
-	ext	v18.16b, v2.16b, v20.16b, #8
+	ext8	v18.16b, v2.16b, v20.16b, #8
 	mov	v2.d[1], v20.d[1]
 	fsub	v1.4s, v2.4s, v18.4s
 	fadd	v18.4s, v2.4s, v18.4s
@@ -665,7 +665,7 @@ celt_tx_fft32_ns_float_neon
 	dup	v3.2d, v16.d[1]
 	rev64	v20.4s, v1.4s
 	rev64	v3.4s, v3.4s
-	ext	v22.16b, v31.16b, v22.16b, #8
+	ext8	v22.16b, v31.16b, v22.16b, #8
 	zip1	v19.2d, v18.2d, v1.2d
 	zip2	v18.2d, v18.2d, v20.2d
 	fadd	v0.4s, v19.4s, v18.4s
@@ -675,7 +675,7 @@ celt_tx_fft32_ns_float_neon
 	rev64	v20.4s, v17.4s
 	fmla	v17.4s, v20.4s, v31.4s
 	rev64	v20.4s, v17.4s
-	ext	v20.16b, v20.16b, v20.16b, #8
+	ext8	v20.16b, v20.16b, v20.16b, #8
 	fmla	v20.4s, v17.4s, v31.4s
 	fadd	v3.4s, v2.4s, v20.4s
 	fsub	v2.4s, v2.4s, v20.4s
@@ -702,7 +702,7 @@ celt_tx_fft32_ns_float_neon
 	zip1	v6.2d, v19.2d, v18.2d
 	zip2	v7.2d, v19.2d, v18.2d
 	adrp	x5, tab_16pt
-	add	x5, x5, #PageOffset(tab_16pt)
+	add	x5, x5, tab_16pt
 	rev64	v16.4s, v4.4s
 	rev64	v17.4s, v6.4s
 	mov	v16.d[0], xzr
@@ -738,8 +738,8 @@ celt_tx_fft32_ns_float_neon
 	fadd	v1.4s, v1.4s, v17.4s
 	ld1	{ v24.4s, v25.4s }, [x8], x9
 	ld1	{ v16.4s, v17.4s }, [x7], #32
-	ext	v18.16b, v24.16b, v24.16b, #8
-	ext	v19.16b, v25.16b, v25.16b, #8
+	ext8	v18.16b, v24.16b, v24.16b, #8
+	ext8	v19.16b, v25.16b, v25.16b, #8
 	trn1	v20.4s, v16.4s, v16.4s
 	trn2	v16.4s, v16.4s, v16.4s
 	trn1	v21.4s, v17.4s, v17.4s
@@ -845,12 +845,12 @@ celt_tx_fft_sr_ns_float_neon
 	ldr	w19, [x0]
 	mov	w20, w19
 	adrp	x5, subadd
-	add	x5, x5, #PageOffset(subadd)
+	add	x5, x5, subadd
 	ld1	{ v31.4s }, [x5]
 L_11
 	mov	w5, #4
 	adrp	x7, celt_tx_tab_32
-	add	x7, x7, #PageOffset(celt_tx_tab_32)
+	add	x7, x7, celt_tx_tab_32
 	add	x8, x7, x5
 	mov	x9, #-32
 	ld1	{ v0.4s, v1.4s, v2.4s, v3.4s }, [x2], #64
@@ -860,18 +860,18 @@ L_11
 	ld1	{ v8.4s, v9.4s, v10.4s, v11.4s }, [x2], #64
 	ld1	{ v12.4s, v13.4s, v14.4s, v15.4s }, [x2], #64
 	adrp	x5, tab_8pt
-	add	x5, x5, #PageOffset(tab_8pt)
+	add	x5, x5, tab_8pt
 	fadd	v19.4s, v13.4s, v15.4s
 	fadd	v17.4s, v9.4s, v11.4s
 	fadd	v18.4s, v12.4s, v14.4s
 	fadd	v16.4s, v8.4s, v10.4s
 	ld1	{ v23.4s }, [x5]
-	ext	v22.16b, v19.16b, v19.16b, #12
-	ext	v21.16b, v17.16b, v17.16b, #12
+	ext8	v22.16b, v19.16b, v19.16b, #12
+	ext8	v21.16b, v17.16b, v17.16b, #12
 	rev64	v22.4s, v22.4s
 	rev64	v21.4s, v21.4s
-	ext	v19.16b, v18.16b, v22.16b, #8
-	ext	v17.16b, v16.16b, v21.16b, #8
+	ext8	v19.16b, v18.16b, v22.16b, #8
+	ext8	v17.16b, v16.16b, v21.16b, #8
 	mov	v18.d[1], v22.d[1]
 	mov	v21.d[0], v16.d[0]
 	fadd	v22.4s, v18.4s, v19.4s
@@ -897,7 +897,7 @@ L_11
 	fsub	v13.4s, v9.4s, v13.4s
 	fadd	v8.4s, v17.4s, v16.4s
 	fsub	v9.4s, v17.4s, v16.4s
-	ext	v24.16b, v31.16b, v24.16b, #8
+	ext8	v24.16b, v31.16b, v24.16b, #8
 	rev64	v11.4s, v11.4s
 	rev64	v15.4s, v15.4s
 	fmul	v19.4s, v20.4s, v23.4s
@@ -910,8 +910,8 @@ L_11
 	fmla	v21.4s, v18.4s, v31.4s
 	rev64	v20.4s, v19.4s
 	rev64	v18.4s, v21.4s
-	ext	v20.16b, v20.16b, v20.16b, #8
-	ext	v18.16b, v18.16b, v18.16b, #8
+	ext8	v20.16b, v20.16b, v20.16b, #8
+	ext8	v18.16b, v18.16b, v18.16b, #8
 	fmla	v20.4s, v19.4s, v31.4s
 	fmla	v18.4s, v21.4s, v31.4s
 	fadd	v11.4s, v10.4s, v20.4s
@@ -919,15 +919,15 @@ L_11
 	fsub	v10.4s, v10.4s, v20.4s
 	fsub	v14.4s, v14.4s, v18.4s
 	adrp	x5, tab_8pt
-	add	x5, x5, #PageOffset(tab_8pt)
+	add	x5, x5, tab_8pt
 	fsub	v17.4s, v1.4s, v3.4s
 	fadd	v3.4s, v1.4s, v3.4s
 	fsub	v16.4s, v0.4s, v2.4s
 	fadd	v2.4s, v0.4s, v2.4s
 	ld1	{ v21.4s }, [x5]
-	ext	v20.16b, v3.16b, v3.16b, #12
+	ext8	v20.16b, v3.16b, v3.16b, #12
 	rev64	v20.4s, v20.4s
-	ext	v18.16b, v2.16b, v20.16b, #8
+	ext8	v18.16b, v2.16b, v20.16b, #8
 	mov	v2.d[1], v20.d[1]
 	fsub	v1.4s, v2.4s, v18.4s
 	fadd	v18.4s, v2.4s, v18.4s
@@ -936,7 +936,7 @@ L_11
 	dup	v3.2d, v16.d[1]
 	rev64	v20.4s, v1.4s
 	rev64	v3.4s, v3.4s
-	ext	v22.16b, v31.16b, v22.16b, #8
+	ext8	v22.16b, v31.16b, v22.16b, #8
 	zip1	v19.2d, v18.2d, v1.2d
 	zip2	v18.2d, v18.2d, v20.2d
 	fadd	v0.4s, v19.4s, v18.4s
@@ -946,7 +946,7 @@ L_11
 	rev64	v20.4s, v17.4s
 	fmla	v17.4s, v20.4s, v31.4s
 	rev64	v20.4s, v17.4s
-	ext	v20.16b, v20.16b, v20.16b, #8
+	ext8	v20.16b, v20.16b, v20.16b, #8
 	fmla	v20.4s, v17.4s, v31.4s
 	fadd	v3.4s, v2.4s, v20.4s
 	fsub	v2.4s, v2.4s, v20.4s
@@ -973,7 +973,7 @@ L_11
 	zip1	v5.2d, v19.2d, v18.2d
 	zip2	v7.2d, v19.2d, v18.2d
 	adrp	x5, tab_16pt
-	add	x5, x5, #PageOffset(tab_16pt)
+	add	x5, x5, tab_16pt
 	rev64	v16.4s, v4.4s
 	rev64	v17.4s, v5.4s
 	mov	v16.d[0], xzr
@@ -1009,8 +1009,8 @@ L_11
 	fadd	v1.4s, v1.4s, v17.4s
 	ld1	{ v24.4s, v25.4s }, [x8], x9
 	ld1	{ v16.4s, v17.4s }, [x7], #32
-	ext	v18.16b, v24.16b, v24.16b, #8
-	ext	v19.16b, v25.16b, v25.16b, #8
+	ext8	v18.16b, v24.16b, v24.16b, #8
+	ext8	v19.16b, v25.16b, v25.16b, #8
 	trn1	v20.4s, v16.4s, v16.4s
 	trn2	v16.4s, v16.4s, v16.4s
 	trn1	v21.4s, v17.4s, v17.4s
@@ -1093,7 +1093,7 @@ L_11
 L_12
 	mov	w5, #36
 	adrp	x7, celt_tx_tab_64
-	add	x7, x7, #PageOffset(celt_tx_tab_64)
+	add	x7, x7, celt_tx_tab_64
 	add	x8, x7, x5
 	mov	x9, #-32
 	mov	x21, #128
@@ -1105,15 +1105,15 @@ L_12
 	ldp	q7, q15, [x2, #32]
 	add	x2, x2, #64
 	adrp	x5, tab_8pt
-	add	x5, x5, #PageOffset(tab_8pt)
+	add	x5, x5, tab_8pt
 	fsub	v17.4s, v3.4s, v11.4s
 	fadd	v11.4s, v3.4s, v11.4s
 	fsub	v16.4s, v2.4s, v10.4s
 	fadd	v10.4s, v2.4s, v10.4s
 	ld1	{ v21.4s }, [x5]
-	ext	v20.16b, v11.16b, v11.16b, #12
+	ext8	v20.16b, v11.16b, v11.16b, #12
 	rev64	v20.4s, v20.4s
-	ext	v18.16b, v10.16b, v20.16b, #8
+	ext8	v18.16b, v10.16b, v20.16b, #8
 	mov	v10.d[1], v20.d[1]
 	fsub	v3.4s, v10.4s, v18.4s
 	fadd	v18.4s, v10.4s, v18.4s
@@ -1122,7 +1122,7 @@ L_12
 	dup	v11.2d, v16.d[1]
 	rev64	v20.4s, v3.4s
 	rev64	v11.4s, v11.4s
-	ext	v22.16b, v31.16b, v22.16b, #8
+	ext8	v22.16b, v31.16b, v22.16b, #8
 	zip1	v19.2d, v18.2d, v3.2d
 	zip2	v18.2d, v18.2d, v20.2d
 	fadd	v2.4s, v19.4s, v18.4s
@@ -1132,7 +1132,7 @@ L_12
 	rev64	v20.4s, v17.4s
 	fmla	v17.4s, v20.4s, v31.4s
 	rev64	v20.4s, v17.4s
-	ext	v20.16b, v20.16b, v20.16b, #8
+	ext8	v20.16b, v20.16b, v20.16b, #8
 	fmla	v20.4s, v17.4s, v31.4s
 	fadd	v11.4s, v10.4s, v20.4s
 	fsub	v10.4s, v10.4s, v20.4s
@@ -1159,7 +1159,7 @@ L_12
 	zip1	v7.2d, v19.2d, v18.2d
 	zip2	v15.2d, v19.2d, v18.2d
 	adrp	x5, tab_16pt
-	add	x5, x5, #PageOffset(tab_16pt)
+	add	x5, x5, tab_16pt
 	rev64	v16.4s, v6.4s
 	rev64	v17.4s, v7.4s
 	mov	v16.d[0], xzr
@@ -1198,15 +1198,15 @@ L_12
 	ldp	q21, q23, [x2, #32]
 	add	x2, x2, #64
 	adrp	x5, tab_8pt
-	add	x5, x5, #PageOffset(tab_8pt)
+	add	x5, x5, tab_8pt
 	fsub	v25.4s, v17.4s, v19.4s
 	fadd	v19.4s, v17.4s, v19.4s
 	fsub	v24.4s, v16.4s, v18.4s
 	fadd	v18.4s, v16.4s, v18.4s
 	ld1	{ v29.4s }, [x5]
-	ext	v28.16b, v19.16b, v19.16b, #12
+	ext8	v28.16b, v19.16b, v19.16b, #12
 	rev64	v28.4s, v28.4s
-	ext	v26.16b, v18.16b, v28.16b, #8
+	ext8	v26.16b, v18.16b, v28.16b, #8
 	mov	v18.d[1], v28.d[1]
 	fsub	v17.4s, v18.4s, v26.4s
 	fadd	v26.4s, v18.4s, v26.4s
@@ -1215,7 +1215,7 @@ L_12
 	dup	v19.2d, v24.d[1]
 	rev64	v28.4s, v17.4s
 	rev64	v19.4s, v19.4s
-	ext	v30.16b, v31.16b, v30.16b, #8
+	ext8	v30.16b, v31.16b, v30.16b, #8
 	zip1	v27.2d, v26.2d, v17.2d
 	zip2	v26.2d, v26.2d, v28.2d
 	fadd	v16.4s, v27.4s, v26.4s
@@ -1225,7 +1225,7 @@ L_12
 	rev64	v28.4s, v25.4s
 	fmla	v25.4s, v28.4s, v31.4s
 	rev64	v28.4s, v25.4s
-	ext	v28.16b, v28.16b, v28.16b, #8
+	ext8	v28.16b, v28.16b, v28.16b, #8
 	fmla	v28.4s, v25.4s, v31.4s
 	fadd	v19.4s, v18.4s, v28.4s
 	fsub	v18.4s, v18.4s, v28.4s
@@ -1252,7 +1252,7 @@ L_12
 	zip1	v21.2d, v27.2d, v26.2d
 	zip2	v23.2d, v27.2d, v26.2d
 	adrp	x5, tab_16pt
-	add	x5, x5, #PageOffset(tab_16pt)
+	add	x5, x5, tab_16pt
 	rev64	v24.4s, v20.4s
 	rev64	v25.4s, v21.4s
 	mov	v24.d[0], xzr
@@ -1288,8 +1288,8 @@ L_12
 	fadd	v17.4s, v17.4s, v25.4s
 	ld1	{ v26.4s, v27.4s }, [x8], x9
 	ldp	q24, q25, [x7], #32
-	ext	v26.16b, v26.16b, v26.16b, #8
-	ext	v27.16b, v27.16b, v27.16b, #8
+	ext8	v26.16b, v26.16b, v26.16b, #8
+	ext8	v27.16b, v27.16b, v27.16b, #8
 	cmp	w19, #64
 	b.eq	L_13
 	rev64	v28.4s, v2.4s
@@ -1377,8 +1377,8 @@ L_12
 	ldp	q16, q17, [x1, #224]
 	ld1	{ v0.4s, v1.4s }, [x8], x9
 	ld1	{ v24.4s, v25.4s }, [x7], #32
-	ext	v26.16b, v0.16b, v0.16b, #8
-	ext	v27.16b, v1.16b, v1.16b, #8
+	ext8	v26.16b, v0.16b, v0.16b, #8
+	ext8	v27.16b, v1.16b, v1.16b, #8
 	trn1	v28.4s, v24.4s, v24.4s
 	trn2	v24.4s, v24.4s, v24.4s
 	trn1	v29.4s, v25.4s, v25.4s
@@ -1457,8 +1457,8 @@ L_12
 	stp	q22, q23, [x1, #480]
 	ret
 L_13
-	mov	x10, v23.d[0]
-	mov	x11, v23.d[1]
+	umov	x10, v23.d[0]
+	umov	x11, v23.d[1]
 	rev64	v28.4s, v2.4s
 	rev64	v29.4s, v16.4s
 	trn2	v30.4s, v27.4s, v27.4s
@@ -1564,8 +1564,8 @@ L_13
 	ldp	q16, q17, [x1, #224]
 	ld1	{ v0.4s, v1.4s }, [x8], x9
 	ld1	{ v24.4s, v25.4s }, [x7], #32
-	ext	v26.16b, v0.16b, v0.16b, #8
-	ext	v27.16b, v1.16b, v1.16b, #8
+	ext8	v26.16b, v0.16b, v0.16b, #8
+	ext8	v27.16b, v1.16b, v1.16b, #8
 	trn1	v28.4s, v24.4s, v24.4s
 	trn2	v24.4s, v24.4s, v24.4s
 	trn1	v29.4s, v25.4s, v25.4s

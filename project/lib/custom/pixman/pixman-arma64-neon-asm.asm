@@ -63,22 +63,22 @@ L_5
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_6
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -285,22 +285,22 @@ L_24
 	ld1	{ v4.h }[1], [x8], #2
 	add	x10, x10, #1
 L_25
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -452,22 +452,22 @@ L_35
 	ld1	{ v0.s }[1], [x4], #4
 	ld1	{ v4.h }[1], [x8], #2
 L_36
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -1041,22 +1041,22 @@ L_81
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_82
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -1179,22 +1179,22 @@ L_97
 	ld1	{ v0.s }[1], [x4], #4
 	add	x10, x10, #1
 L_98
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -1295,22 +1295,22 @@ L_108
 	b.eq	L_109
 	ld1	{ v0.s }[1], [x4], #4
 L_109
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -1447,22 +1447,22 @@ L_120
 	add	x11, x11, x5, lsl #1
 	ldrsb	x15, [x11]
 L_121
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -1577,22 +1577,22 @@ L_135
 	add	x11, x11, x5, lsl #1
 	ldrsb	x15, [x11]
 L_136
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -1675,22 +1675,22 @@ L_145
 	sri	v30.8b, v30.8b, #5
 	sri	v29.8b, v29.8b, #6
 	shrn	v28.8b, v0.8h, #2
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -2626,42 +2626,42 @@ L_268
 	ld1	{ v6.2s, v7.2s }, [x4], #16
 	sub	x0, x0, #4
 L_269
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -2681,22 +2681,22 @@ L_271
 	raddhn	v29.8b, v15.8h, v9.8h
 	raddhn	v30.8b, v16.8h, v10.8h
 	raddhn	v31.8b, v17.8h, v11.8h
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -2775,42 +2775,42 @@ L_285
 	ld1	{ v0.s }[1], [x2], #4
 	ld1	{ v4.s }[1], [x4], #4
 L_286
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -2828,22 +2828,22 @@ L_286
 	raddhn	v29.8b, v15.8h, v9.8h
 	raddhn	v30.8b, v16.8h, v10.8h
 	raddhn	v31.8b, v17.8h, v11.8h
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -2885,42 +2885,42 @@ L_292
 	ld1	{ v0.s }[1], [x2], #4
 	ld1	{ v4.s }[1], [x4], #4
 L_293
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -2938,22 +2938,22 @@ L_293
 	raddhn	v29.8b, v15.8h, v9.8h
 	raddhn	v30.8b, v16.8h, v10.8h
 	raddhn	v31.8b, v17.8h, v11.8h
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -3035,42 +3035,42 @@ L_302
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_303
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -3111,22 +3111,22 @@ L_305
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -3253,42 +3253,42 @@ L_320
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_321
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -3329,22 +3329,22 @@ L_323
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -3433,42 +3433,42 @@ L_331
 	ld1	{ v0.s }[1], [x4], #4
 	ld1	{ v4.s }[1], [x8], #4
 L_332
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -3490,22 +3490,22 @@ L_332
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -3579,42 +3579,42 @@ L_339
 	ld1	{ v6.2s, v7.2s }, [x4], #16
 	sub	x0, x0, #4
 L_340
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -3638,22 +3638,22 @@ L_342
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -3740,42 +3740,42 @@ L_356
 	ld1	{ v0.s }[1], [x2], #4
 	ld1	{ v4.s }[1], [x4], #4
 L_357
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -3797,22 +3797,22 @@ L_357
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -3854,42 +3854,42 @@ L_363
 	ld1	{ v0.s }[1], [x2], #4
 	ld1	{ v4.s }[1], [x4], #4
 L_364
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -3911,22 +3911,22 @@ L_364
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -4011,22 +4011,22 @@ L_373
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_374
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -4063,22 +4063,22 @@ L_376
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -4187,22 +4187,22 @@ L_389
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_390
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -4239,22 +4239,22 @@ L_392
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -4335,22 +4335,22 @@ L_400
 	b.eq	L_401
 	ld1	{ v4.s }[1], [x8], #4
 L_401
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -4372,22 +4372,22 @@ L_401
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -4489,22 +4489,22 @@ L_410
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_411
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -4541,22 +4541,22 @@ L_413
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -4668,22 +4668,22 @@ L_427
 	ld1	{ v0.s }[1], [x8], #4
 	add	x10, x10, #1
 L_428
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -4720,22 +4720,22 @@ L_430
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -4816,22 +4816,22 @@ L_438
 	b.eq	L_439
 	ld1	{ v0.s }[1], [x8], #4
 L_439
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -4853,22 +4853,22 @@ L_439
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -4978,22 +4978,22 @@ L_448
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_449
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -5226,22 +5226,22 @@ L_461
 	ld1	{ v4.h }[1], [x8], #2
 	add	x10, x10, #1
 L_462
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -5433,22 +5433,22 @@ L_472
 	ld1	{ v24.b }[1], [x6], #1
 	ld1	{ v4.h }[1], [x8], #2
 L_473
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -6142,22 +6142,22 @@ L_516
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_517
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -6373,22 +6373,22 @@ L_529
 	ld1	{ v4.h }[1], [x8], #2
 	add	x10, x10, #1
 L_530
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -6564,22 +6564,22 @@ L_540
 	ld1	{ v8.s }[1], [x4], #4
 	ld1	{ v4.h }[1], [x8], #2
 L_541
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -8064,22 +8064,22 @@ L_733
 	rshrn	v29.8b, v9.8h, #8
 	rshrn	v30.8b, v10.8h, #8
 	rshrn	v31.8b, v11.8h, #8
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -8214,22 +8214,22 @@ L_751
 	rshrn	v29.8b, v9.8h, #8
 	rshrn	v30.8b, v10.8h, #8
 	rshrn	v31.8b, v11.8h, #8
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -8323,22 +8323,22 @@ L_760
 	rshrn	v29.8b, v9.8h, #8
 	rshrn	v30.8b, v10.8h, #8
 	rshrn	v31.8b, v11.8h, #8
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -8858,22 +8858,22 @@ L_820
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_821
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -8926,22 +8926,22 @@ L_823
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -9098,22 +9098,22 @@ L_839
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_840
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -9166,22 +9166,22 @@ L_842
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -9286,22 +9286,22 @@ L_850
 	ld1	{ v24.b }[1], [x6], #1
 	ld1	{ v4.s }[1], [x8], #4
 L_851
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -9335,22 +9335,22 @@ L_851
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -10024,42 +10024,42 @@ L_908
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_909
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -10124,22 +10124,22 @@ L_911
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -10309,42 +10309,42 @@ L_923
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_924
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -10409,22 +10409,22 @@ L_926
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -10537,42 +10537,42 @@ L_934
 	ld1	{ v24.s }[1], [x6], #4
 	ld1	{ v4.s }[1], [x8], #4
 L_935
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -10618,22 +10618,22 @@ L_935
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -10743,22 +10743,22 @@ L_944
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_945
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
@@ -11019,22 +11019,22 @@ L_959
 	ld1	{ v4.h }[1], [x8], #2
 	add	x10, x10, #1
 L_960
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
@@ -11226,22 +11226,22 @@ L_970
 	ld1	{ v24.s }[1], [x6], #4
 	ld1	{ v4.h }[1], [x8], #2
 L_971
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
@@ -12784,62 +12784,62 @@ L_1124
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_1125
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -12883,22 +12883,22 @@ L_1127
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -13031,62 +13031,62 @@ L_1139
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_1140
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -13130,22 +13130,22 @@ L_1142
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -13241,62 +13241,62 @@ L_1150
 	ld1	{ v24.s }[1], [x6], #4
 	ld1	{ v4.s }[1], [x8], #4
 L_1151
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -13317,22 +13317,22 @@ L_1151
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -13411,62 +13411,62 @@ L_1158
 	ld1	{ v6.2s, v7.2s }, [x4], #16
 	sub	x0, x0, #4
 L_1159
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -13489,22 +13489,22 @@ L_1161
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -13591,62 +13591,62 @@ L_1172
 	ld1	{ v24.s }[1], [x3], #4
 	ld1	{ v4.s }[1], [x4], #4
 L_1173
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -13667,22 +13667,22 @@ L_1173
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -13727,62 +13727,62 @@ L_1179
 	ld1	{ v24.s }[1], [x3], #4
 	ld1	{ v4.s }[1], [x4], #4
 L_1180
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v24.8b, v25.8b
 	uzp2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v26.8b, v27.8b
 	uzp2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v25.8b, v27.8b
 	uzp2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v24.8b, v26.8b
 	uzp2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -13803,22 +13803,22 @@ L_1180
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -13907,42 +13907,42 @@ L_1189
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_1190
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -13986,22 +13986,22 @@ L_1192
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -14138,42 +14138,42 @@ L_1204
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_1205
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -14217,22 +14217,22 @@ L_1207
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -14332,42 +14332,42 @@ L_1215
 	ld1	{ v27.b }[1], [x6], #1
 	ld1	{ v4.s }[1], [x8], #4
 L_1216
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -14388,22 +14388,22 @@ L_1216
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -14516,22 +14516,22 @@ L_1225
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_1226
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -14571,22 +14571,22 @@ L_1228
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -14710,22 +14710,22 @@ L_1240
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_1241
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -14765,22 +14765,22 @@ L_1243
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -14872,22 +14872,22 @@ L_1251
 	ld1	{ v27.b }[1], [x6], #1
 	ld1	{ v4.s }[1], [x8], #4
 L_1252
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -14908,22 +14908,22 @@ L_1252
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -15027,42 +15027,42 @@ L_1261
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_1262
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -15102,22 +15102,22 @@ L_1264
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -15237,42 +15237,42 @@ L_1276
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_1277
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -15312,22 +15312,22 @@ L_1279
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -15415,42 +15415,42 @@ L_1287
 	ld1	{ v0.s }[1], [x4], #4
 	ld1	{ v4.s }[1], [x8], #4
 L_1288
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -15471,22 +15471,22 @@ L_1288
 	uqadd	v29.8b, v5.8b, v29.8b
 	uqadd	v30.8b, v6.8b, v30.8b
 	uqadd	v31.8b, v7.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -15563,62 +15563,62 @@ L_1295
 	ld1	{ v6.2s, v7.2s }, [x4], #16
 	sub	x0, x0, #4
 L_1296
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v13.8b
 	uzp2	v13.8b, v12.8b, v13.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v14.8b, v15.8b
 	uzp2	v15.8b, v14.8b, v15.8b
 	mov	v14.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v13.8b, v15.8b
 	uzp2	v15.8b, v13.8b, v15.8b
 	mov	v13.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v14.8b
 	uzp2	v14.8b, v12.8b, v14.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -15650,22 +15650,22 @@ L_1298
 	raddhn	v29.8b, v17.8h, v9.8h
 	raddhn	v30.8b, v18.8h, v10.8h
 	raddhn	v31.8b, v19.8h, v11.8h
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -15770,62 +15770,62 @@ L_1309
 	ld1	{ v12.s }[1], [x3], #4
 	ld1	{ v4.s }[1], [x4], #4
 L_1310
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v13.8b
 	uzp2	v13.8b, v12.8b, v13.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v14.8b, v15.8b
 	uzp2	v15.8b, v14.8b, v15.8b
 	mov	v14.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v13.8b, v15.8b
 	uzp2	v15.8b, v13.8b, v15.8b
 	mov	v13.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v14.8b
 	uzp2	v14.8b, v12.8b, v14.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -15855,22 +15855,22 @@ L_1310
 	raddhn	v29.8b, v17.8h, v9.8h
 	raddhn	v30.8b, v18.8h, v10.8h
 	raddhn	v31.8b, v19.8h, v11.8h
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -15915,62 +15915,62 @@ L_1316
 	ld1	{ v12.s }[1], [x3], #4
 	ld1	{ v4.s }[1], [x4], #4
 L_1317
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v13.8b
 	uzp2	v13.8b, v12.8b, v13.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v14.8b, v15.8b
 	uzp2	v15.8b, v14.8b, v15.8b
 	mov	v14.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v13.8b, v15.8b
 	uzp2	v15.8b, v13.8b, v15.8b
 	mov	v13.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v14.8b
 	uzp2	v14.8b, v12.8b, v14.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -16000,22 +16000,22 @@ L_1317
 	raddhn	v29.8b, v17.8h, v9.8h
 	raddhn	v30.8b, v18.8h, v10.8h
 	raddhn	v31.8b, v19.8h, v11.8h
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -16099,42 +16099,42 @@ L_1326
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_1327
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -16187,22 +16187,22 @@ L_1329
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -16348,42 +16348,42 @@ L_1341
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_1342
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -16436,22 +16436,22 @@ L_1344
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -16552,42 +16552,42 @@ L_1352
 	ld1	{ v0.s }[1], [x4], #4
 	ld1	{ v4.s }[1], [x8], #4
 L_1353
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -16621,22 +16621,22 @@ L_1353
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -16741,62 +16741,62 @@ L_1362
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_1363
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v12.8b, v13.8b
 	uzp2	v13.8b, v12.8b, v13.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v14.8b, v15.8b
 	uzp2	v15.8b, v14.8b, v15.8b
 	mov	v14.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v13.8b, v15.8b
 	uzp2	v15.8b, v13.8b, v15.8b
 	mov	v13.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v12.8b, v14.8b
 	uzp2	v14.8b, v12.8b, v14.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -16853,22 +16853,22 @@ L_1365
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -17027,62 +17027,62 @@ L_1377
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_1378
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v12.8b, v13.8b
 	uzp2	v13.8b, v12.8b, v13.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v14.8b, v15.8b
 	uzp2	v15.8b, v14.8b, v15.8b
 	mov	v14.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v13.8b, v15.8b
 	uzp2	v15.8b, v13.8b, v15.8b
 	mov	v13.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v12.8b, v14.8b
 	uzp2	v14.8b, v12.8b, v14.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -17139,22 +17139,22 @@ L_1380
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -17263,62 +17263,62 @@ L_1388
 	ld1	{ v12.s }[1], [x6], #4
 	ld1	{ v4.s }[1], [x8], #4
 L_1389
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v12.8b, v13.8b
 	uzp2	v13.8b, v12.8b, v13.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v14.8b, v15.8b
 	uzp2	v15.8b, v14.8b, v15.8b
 	mov	v14.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v13.8b, v15.8b
 	uzp2	v15.8b, v13.8b, v15.8b
 	mov	v13.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v12.8b, v14.8b
 	uzp2	v14.8b, v12.8b, v14.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -17352,22 +17352,22 @@ L_1389
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -17446,62 +17446,62 @@ L_1396
 	ld1	{ v6.2s, v7.2s }, [x4], #16
 	sub	x0, x0, #4
 L_1397
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v13.8b
 	uzp2	v13.8b, v12.8b, v13.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v14.8b, v15.8b
 	uzp2	v15.8b, v14.8b, v15.8b
 	mov	v14.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v13.8b, v15.8b
 	uzp2	v15.8b, v13.8b, v15.8b
 	mov	v13.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v14.8b
 	uzp2	v14.8b, v12.8b, v14.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -17537,22 +17537,22 @@ L_1399
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -17665,62 +17665,62 @@ L_1410
 	ld1	{ v12.s }[1], [x3], #4
 	ld1	{ v4.s }[1], [x4], #4
 L_1411
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v13.8b
 	uzp2	v13.8b, v12.8b, v13.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v14.8b, v15.8b
 	uzp2	v15.8b, v14.8b, v15.8b
 	mov	v14.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v13.8b, v15.8b
 	uzp2	v15.8b, v13.8b, v15.8b
 	mov	v13.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v14.8b
 	uzp2	v14.8b, v12.8b, v14.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -17754,22 +17754,22 @@ L_1411
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -17814,62 +17814,62 @@ L_1417
 	ld1	{ v12.s }[1], [x3], #4
 	ld1	{ v4.s }[1], [x4], #4
 L_1418
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v13.8b
 	uzp2	v13.8b, v12.8b, v13.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v14.8b, v15.8b
 	uzp2	v15.8b, v14.8b, v15.8b
 	mov	v14.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v13.8b, v15.8b
 	uzp2	v15.8b, v13.8b, v15.8b
 	mov	v13.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v12.8b, v14.8b
 	uzp2	v14.8b, v12.8b, v14.8b
 	mov	v12.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -17903,22 +17903,22 @@ L_1418
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -18007,42 +18007,42 @@ L_1427
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_1428
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -18099,22 +18099,22 @@ L_1430
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -18277,42 +18277,42 @@ L_1442
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_1443
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -18369,22 +18369,22 @@ L_1445
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -18497,42 +18497,42 @@ L_1453
 	ld1	{ v15.b }[1], [x6], #1
 	ld1	{ v4.s }[1], [x8], #4
 L_1454
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -18566,22 +18566,22 @@ L_1454
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -18868,22 +18868,22 @@ L_1492
 L_1493
 L_1494
 	prfm	pldl1keep, [x4, #192]
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v0.8b, v2.8b
 	zip2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v1.8b, v3.8b
 	zip2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v2.8b, v3.8b
 	zip2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v0.8b, v1.8b
 	zip2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
@@ -18945,22 +18945,22 @@ L_1507
 L_1508
 L_1509
 	prfm	pldl1keep, [x4, #192]
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v0.8b, v2.8b
 	zip2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v1.8b, v3.8b
 	zip2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v2.8b, v3.8b
 	zip2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v0.8b, v1.8b
 	zip2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
@@ -19033,22 +19033,22 @@ L_1518
 	mov	v31.8b, v2.8b
 	mov	v2.8b, v0.8b
 	mov	v0.8b, v31.8b
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v0.8b, v2.8b
 	zip2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v1.8b, v3.8b
 	zip2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v2.8b, v3.8b
 	zip2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v0.8b, v1.8b
 	zip2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
@@ -19418,22 +19418,22 @@ L_1561
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_1562
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -19465,22 +19465,22 @@ L_1564
 	raddhn	v30.8b, v11.8h, v8.8h
 	raddhn	v29.8b, v12.8h, v9.8h
 	raddhn	v28.8b, v13.8h, v10.8h
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -19579,22 +19579,22 @@ L_1576
 	ld1	{ v0.s }[1], [x4], #4
 	add	x10, x10, #1
 L_1577
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -19626,22 +19626,22 @@ L_1579
 	raddhn	v30.8b, v11.8h, v8.8h
 	raddhn	v29.8b, v12.8h, v9.8h
 	raddhn	v28.8b, v13.8h, v10.8h
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -19719,22 +19719,22 @@ L_1587
 	b.eq	L_1588
 	ld1	{ v0.s }[1], [x4], #4
 L_1588
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -19751,22 +19751,22 @@ L_1588
 	raddhn	v30.8b, v11.8h, v8.8h
 	raddhn	v29.8b, v12.8h, v9.8h
 	raddhn	v28.8b, v13.8h, v10.8h
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -19868,22 +19868,22 @@ L_1597
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_1598
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -19915,22 +19915,22 @@ L_1600
 	raddhn	v28.8b, v11.8h, v8.8h
 	raddhn	v29.8b, v12.8h, v9.8h
 	raddhn	v30.8b, v13.8h, v10.8h
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -20029,22 +20029,22 @@ L_1612
 	ld1	{ v0.s }[1], [x4], #4
 	add	x10, x10, #1
 L_1613
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -20076,22 +20076,22 @@ L_1615
 	raddhn	v28.8b, v11.8h, v8.8h
 	raddhn	v29.8b, v12.8h, v9.8h
 	raddhn	v30.8b, v13.8h, v10.8h
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -20169,22 +20169,22 @@ L_1623
 	b.eq	L_1624
 	ld1	{ v0.s }[1], [x4], #4
 L_1624
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -20201,22 +20201,22 @@ L_1624
 	raddhn	v28.8b, v11.8h, v8.8h
 	raddhn	v29.8b, v12.8h, v9.8h
 	raddhn	v30.8b, v13.8h, v10.8h
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -22581,22 +22581,22 @@ L_1777
 	add	x10, x10, #4
 	sub	x0, x0, #4
 L_1778
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -22633,22 +22633,22 @@ L_1780
 	raddhn	v29.8b, v15.8h, v9.8h
 	raddhn	v30.8b, v12.8h, v10.8h
 	raddhn	v31.8b, v13.8h, v11.8h
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -22766,22 +22766,22 @@ L_1792
 	ld1	{ v4.s }[1], [x8], #4
 	add	x10, x10, #1
 L_1793
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -22818,22 +22818,22 @@ L_1795
 	raddhn	v29.8b, v15.8h, v9.8h
 	raddhn	v30.8b, v12.8h, v10.8h
 	raddhn	v31.8b, v13.8h, v11.8h
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -22922,22 +22922,22 @@ L_1803
 	ld1	{ v0.b }[1], [x4], #1
 	ld1	{ v4.s }[1], [x8], #4
 L_1804
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -22955,22 +22955,22 @@ L_1804
 	raddhn	v29.8b, v15.8h, v9.8h
 	raddhn	v30.8b, v12.8h, v10.8h
 	raddhn	v31.8b, v13.8h, v11.8h
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x15
-	mov	x15, v16.d[0]
+	umov	x15, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -23110,42 +23110,42 @@ L_1824
 	ld1	{ v6.2s, v7.2s }, [x10], #16
 	sub	x0, x0, #4
 L_1826
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -23169,22 +23169,22 @@ L_1828
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -23275,22 +23275,22 @@ L_1847
 	add	x9, x2, x9, lsl #2
 	ld1	{ v3.s }[0], [x8]
 	ld1	{ v3.s }[1], [x9]
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -23389,22 +23389,22 @@ L_1866
 	add	x9, x2, x9, lsl #2
 	ld1	{ v3.s }[0], [x8]
 	ld1	{ v3.s }[1], [x9]
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -23514,42 +23514,42 @@ L_1888
 	ld1	{ v0.s }[1], [x8]
 	ld1	{ v4.s }[1], [x10], #4
 L_1887
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -23571,22 +23571,22 @@ L_1887
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -23691,42 +23691,42 @@ L_1909
 	ld1	{ v0.s }[1], [x8]
 	ld1	{ v4.s }[1], [x10], #4
 L_1908
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v5.8b
 	uzp2	v5.8b, v4.8b, v5.8b
 	mov	v4.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v6.8b, v7.8b
 	uzp2	v7.8b, v6.8b, v7.8b
 	mov	v6.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v5.8b, v7.8b
 	uzp2	v7.8b, v5.8b, v7.8b
 	mov	v5.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v4.8b, v6.8b
 	uzp2	v6.8b, v4.8b, v6.8b
 	mov	v4.8b, v16.8b
@@ -23748,22 +23748,22 @@ L_1908
 	uqadd	v29.8b, v1.8b, v29.8b
 	uqadd	v30.8b, v2.8b, v30.8b
 	uqadd	v31.8b, v3.8b, v31.8b
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -23888,22 +23888,22 @@ L_1931
 	ld1	{ v5.4h }, [x10], #8
 	sub	x0, x0, #4
 L_1924
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -24028,22 +24028,22 @@ L_1953
 	add	x9, x2, x9, lsl #2
 	ld1	{ v3.s }[0], [x8]
 	ld1	{ v3.s }[1], [x9]
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -24146,22 +24146,22 @@ L_1971
 	add	x9, x2, x9, lsl #2
 	ld1	{ v3.s }[0], [x8]
 	ld1	{ v3.s }[1], [x9]
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -24295,22 +24295,22 @@ L_1995
 	ld1	{ v0.s }[1], [x8]
 	ld1	{ v4.h }[1], [x10], #2
 L_1994
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -24446,22 +24446,22 @@ L_2016
 	ld1	{ v0.s }[1], [x8]
 	ld1	{ v4.h }[1], [x10], #2
 L_2015
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -24616,22 +24616,22 @@ L_2038
 	add	x10, x10, #8
 	sub	x0, x0, #4
 L_2031
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -24735,22 +24735,22 @@ L_2060
 	add	x9, x2, x9, lsl #2
 	ld1	{ v3.s }[0], [x8]
 	ld1	{ v3.s }[1], [x9]
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -24837,22 +24837,22 @@ L_2078
 	add	x9, x2, x9, lsl #2
 	ld1	{ v3.s }[0], [x8]
 	ld1	{ v3.s }[1], [x9]
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -24954,22 +24954,22 @@ L_2099
 	add	x8, x2, x8, lsl #2
 	ld1	{ v0.s }[1], [x8]
 L_2098
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -25081,22 +25081,22 @@ L_2120
 	add	x8, x2, x8, lsl #2
 	ld1	{ v0.s }[1], [x8]
 L_2119
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v16.8b
@@ -25238,22 +25238,22 @@ L_2143
 	shrn	v28.8b, v0.8h, #2
 L_2144
 L_2145
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -25524,22 +25524,22 @@ L_2201
 	sri	v30.8b, v30.8b, #5
 	sri	v29.8b, v29.8b, #6
 	shrn	v28.8b, v0.8h, #2
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -25648,22 +25648,22 @@ L_2222
 	sri	v30.8b, v30.8b, #5
 	sri	v29.8b, v29.8b, #6
 	shrn	v28.8b, v0.8h, #2
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v30.8b
 	zip2	v30.8b, v28.8b, v30.8b
 	mov	v28.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v29.8b, v31.8b
 	zip2	v31.8b, v29.8b, v31.8b
 	mov	v29.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v30.8b, v31.8b
 	zip2	v31.8b, v30.8b, v31.8b
 	mov	v30.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	zip1	v16.8b, v28.8b, v29.8b
 	zip2	v29.8b, v28.8b, v29.8b
 	mov	v28.8b, v16.8b
@@ -25795,22 +25795,22 @@ L_2245
 	ld1	{ v5.4h }, [x10], #8
 	sub	x0, x0, #4
 L_2238
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -25947,22 +25947,22 @@ L_2267
 	add	x9, x2, x9, lsl #2
 	ld1	{ v11.s }[0], [x8]
 	ld1	{ v11.s }[1], [x9]
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -26088,22 +26088,22 @@ L_2285
 	add	x9, x2, x9, lsl #2
 	ld1	{ v11.s }[0], [x8]
 	ld1	{ v11.s }[1], [x9]
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -26241,22 +26241,22 @@ L_2303
 	ld1	{ v24.b }[1], [x6], #1
 	ld1	{ v4.h }[1], [x10], #2
 L_2302
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -26411,22 +26411,22 @@ L_2324
 	ld1	{ v24.b }[1], [x6], #1
 	ld1	{ v4.h }[1], [x10], #2
 L_2323
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v8.8b, v9.8b
 	uzp2	v9.8b, v8.8b, v9.8b
 	mov	v8.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v10.8b, v11.8b
 	uzp2	v11.8b, v10.8b, v11.8b
 	mov	v10.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v9.8b, v11.8b
 	uzp2	v11.8b, v9.8b, v11.8b
 	mov	v9.8b, v16.8b
 	mov	v16.d[0], x30
-	mov	x30, v16.d[0]
+	umov	x30, v16.d[0]
 	uzp1	v16.8b, v8.8b, v10.8b
 	uzp2	v10.8b, v8.8b, v10.8b
 	mov	v8.8b, v16.8b
@@ -27532,22 +27532,22 @@ pixman_scaled_bilinear_scanline_8888_0565_SRC_asm_neon
 	umlal2	v0.4s, v2.8h, v15.h[0]
 	shrn	v0.4h, v0.4s, #14
 	xtn	v0.8b, v0.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -27595,22 +27595,22 @@ L_2440
 	ushr	v15.8h, v12.8h, #9
 	add	v12.8h, v12.8h, v13.8h
 	xtn	v0.8b, v0.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -27683,22 +27683,22 @@ L_2441
 	xtn	v0.8b, v0.8h
 	xtn	v1.8b, v2.8h
 	add	v12.8h, v12.8h, v13.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -27770,22 +27770,22 @@ L_2442
 	xtn	v0.8b, v0.8h
 	xtn	v1.8b, v2.8h
 	add	v12.8h, v12.8h, v13.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -27852,22 +27852,22 @@ L_2442
 	xtn	v0.8b, v0.8h
 	xtn	v1.8b, v2.8h
 	add	v12.8h, v12.8h, v13.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -27937,22 +27937,22 @@ L_2445
 	xtn	v0.8b, v0.8h
 	xtn	v1.8b, v2.8h
 	add	v12.8h, v12.8h, v13.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -28019,22 +28019,22 @@ L_2445
 	xtn	v0.8b, v0.8h
 	xtn	v1.8b, v2.8h
 	add	v12.8h, v12.8h, v13.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -28107,22 +28107,22 @@ L_2443
 	xtn	v0.8b, v0.8h
 	xtn	v1.8b, v2.8h
 	add	v12.8h, v12.8h, v13.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -28164,22 +28164,22 @@ L_2446
 	ushr	v15.8h, v12.8h, #9
 	add	v12.8h, v12.8h, v13.8h
 	xtn	v0.8b, v0.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -28208,22 +28208,22 @@ L_2447
 	umlal2	v0.4s, v2.8h, v15.h[0]
 	shrn	v0.4h, v0.4s, #14
 	xtn	v0.8b, v0.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -28330,22 +28330,22 @@ L_2449
 	sri	v20.8b, v20.8b, #5
 	sri	v3.8b, v3.8b, #6
 	shrn	v2.8b, v11.8h, #2
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v2.8b, v20.8b
 	zip2	v20.8b, v2.8b, v20.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v3.8b, v21.8b
 	zip2	v21.8b, v3.8b, v21.8b
 	mov	v3.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v20.8b, v21.8b
 	zip2	v21.8b, v20.8b, v21.8b
 	mov	v20.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v2.8b, v3.8b
 	zip2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
@@ -28394,25 +28394,25 @@ L_2450
 	add	x5, x5, x6
 	add	x9, x1, x9, lsl #1
 	ld1	{ v9.s }[0], [x8], x13
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v14.8b, v16.8b
 	zip2	v16.8b, v14.8b, v16.8b
 	mov	v14.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[2], [x9], x13
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v20.8b, v17.8b
 	zip2	v17.8b, v20.8b, v17.8b
 	mov	v20.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[1], [x8]
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v16.8b, v17.8b
 	zip2	v17.8b, v16.8b, v17.8b
 	mov	v16.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[3], [x9]
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v14.8b, v20.8b
 	zip2	v20.8b, v14.8b, v20.8b
 	mov	v14.8b, v31.8b
@@ -28424,25 +28424,25 @@ L_2450
 	sri	v25.8b, v25.8b, #6
 	shrn	v24.8b, v9.8h, #2
 	umull	v1.8h, v14.8b, v28.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v24.8b, v26.8b
 	zip2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v31.8b
 	mov	v31.d[0], x12
 	umlal	v1.8h, v20.8b, v29.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v25.8b, v27.8b
 	zip2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v31.8b
 	mov	v31.d[0], x12
 	umull	v11.8h, v16.8b, v28.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v26.8b, v27.8b
 	zip2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v31.8b
 	mov	v31.d[0], x12
 	umlal	v11.8h, v17.8b, v29.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v24.8b, v25.8b
 	zip2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v31.8b
@@ -28503,25 +28503,25 @@ L_2453
 	add	x5, x5, x6
 	add	x9, x1, x9, lsl #1
 	ld1	{ v9.s }[0], [x8], x13
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v14.8b, v16.8b
 	zip2	v16.8b, v14.8b, v16.8b
 	mov	v14.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[2], [x9], x13
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v20.8b, v17.8b
 	zip2	v17.8b, v20.8b, v17.8b
 	mov	v20.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[1], [x8]
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v16.8b, v17.8b
 	zip2	v17.8b, v16.8b, v17.8b
 	mov	v16.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[3], [x9]
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v14.8b, v20.8b
 	zip2	v20.8b, v14.8b, v20.8b
 	mov	v14.8b, v31.8b
@@ -28533,25 +28533,25 @@ L_2453
 	sri	v25.8b, v25.8b, #6
 	shrn	v24.8b, v9.8h, #2
 	umull	v1.8h, v14.8b, v28.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v24.8b, v26.8b
 	zip2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v31.8b
 	mov	v31.d[0], x12
 	umlal	v1.8h, v20.8b, v29.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v25.8b, v27.8b
 	zip2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v31.8b
 	mov	v31.d[0], x12
 	umull	v11.8h, v16.8b, v28.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v26.8b, v27.8b
 	zip2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v31.8b
 	mov	v31.d[0], x12
 	umlal	v11.8h, v17.8b, v29.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v24.8b, v25.8b
 	zip2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v31.8b
@@ -28608,22 +28608,22 @@ L_2451
 	sri	v20.8b, v20.8b, #5
 	sri	v3.8b, v3.8b, #6
 	shrn	v2.8b, v11.8h, #2
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v2.8b, v20.8b
 	zip2	v20.8b, v2.8b, v20.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v3.8b, v21.8b
 	zip2	v21.8b, v3.8b, v21.8b
 	mov	v3.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v20.8b, v21.8b
 	zip2	v21.8b, v20.8b, v21.8b
 	mov	v20.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v2.8b, v3.8b
 	zip2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
@@ -28737,22 +28737,22 @@ pixman_scaled_bilinear_scanline_0565_0565_SRC_asm_neon
 	umlal2	v0.4s, v2.8h, v15.h[0]
 	shrn	v0.4h, v0.4s, #14
 	xtn	v0.8b, v0.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -28791,22 +28791,22 @@ L_2456
 	sri	v20.8b, v20.8b, #5
 	sri	v3.8b, v3.8b, #6
 	shrn	v2.8b, v11.8h, #2
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v2.8b, v20.8b
 	zip2	v20.8b, v2.8b, v20.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v3.8b, v21.8b
 	zip2	v21.8b, v3.8b, v21.8b
 	mov	v3.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v20.8b, v21.8b
 	zip2	v21.8b, v20.8b, v21.8b
 	mov	v20.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v2.8b, v3.8b
 	zip2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
@@ -28826,22 +28826,22 @@ L_2456
 	ushr	v15.8h, v12.8h, #9
 	add	v12.8h, v12.8h, v13.8h
 	xtn	v0.8b, v0.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -28883,25 +28883,25 @@ L_2457
 	add	x5, x5, x6
 	add	x9, x1, x9, lsl #1
 	ld1	{ v9.s }[0], [x8], x13
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v14.8b, v16.8b
 	zip2	v16.8b, v14.8b, v16.8b
 	mov	v14.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[2], [x9], x13
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v20.8b, v17.8b
 	zip2	v17.8b, v20.8b, v17.8b
 	mov	v20.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[1], [x8]
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v16.8b, v17.8b
 	zip2	v17.8b, v16.8b, v17.8b
 	mov	v16.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[3], [x9]
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v14.8b, v20.8b
 	zip2	v20.8b, v14.8b, v20.8b
 	mov	v14.8b, v31.8b
@@ -28913,25 +28913,25 @@ L_2457
 	sri	v25.8b, v25.8b, #6
 	shrn	v24.8b, v9.8h, #2
 	umull	v1.8h, v14.8b, v28.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v24.8b, v26.8b
 	zip2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v31.8b
 	mov	v31.d[0], x12
 	umlal	v1.8h, v20.8b, v29.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v25.8b, v27.8b
 	zip2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v31.8b
 	mov	v31.d[0], x12
 	umull	v11.8h, v16.8b, v28.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v26.8b, v27.8b
 	zip2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v31.8b
 	mov	v31.d[0], x12
 	umlal	v11.8h, v17.8b, v29.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v24.8b, v25.8b
 	zip2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v31.8b
@@ -28965,22 +28965,22 @@ L_2457
 	xtn	v0.8b, v0.8h
 	xtn	v1.8b, v2.8h
 	add	v12.8h, v12.8h, v13.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -29020,25 +29020,25 @@ L_2460
 	add	x5, x5, x6
 	add	x9, x1, x9, lsl #1
 	ld1	{ v9.s }[0], [x8], x13
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v14.8b, v16.8b
 	zip2	v16.8b, v14.8b, v16.8b
 	mov	v14.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[2], [x9], x13
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v20.8b, v17.8b
 	zip2	v17.8b, v20.8b, v17.8b
 	mov	v20.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[1], [x8]
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v16.8b, v17.8b
 	zip2	v17.8b, v16.8b, v17.8b
 	mov	v16.8b, v31.8b
 	mov	v31.d[0], x12
 	ld1	{ v9.s }[3], [x9]
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v14.8b, v20.8b
 	zip2	v20.8b, v14.8b, v20.8b
 	mov	v14.8b, v31.8b
@@ -29050,25 +29050,25 @@ L_2460
 	sri	v25.8b, v25.8b, #6
 	shrn	v24.8b, v9.8h, #2
 	umull	v1.8h, v14.8b, v28.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v24.8b, v26.8b
 	zip2	v26.8b, v24.8b, v26.8b
 	mov	v24.8b, v31.8b
 	mov	v31.d[0], x12
 	umlal	v1.8h, v20.8b, v29.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v25.8b, v27.8b
 	zip2	v27.8b, v25.8b, v27.8b
 	mov	v25.8b, v31.8b
 	mov	v31.d[0], x12
 	umull	v11.8h, v16.8b, v28.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v26.8b, v27.8b
 	zip2	v27.8b, v26.8b, v27.8b
 	mov	v26.8b, v31.8b
 	mov	v31.d[0], x12
 	umlal	v11.8h, v17.8b, v29.8b
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v24.8b, v25.8b
 	zip2	v25.8b, v24.8b, v25.8b
 	mov	v24.8b, v31.8b
@@ -29102,22 +29102,22 @@ L_2460
 	xtn	v0.8b, v0.8h
 	xtn	v1.8b, v2.8h
 	add	v12.8h, v12.8h, v13.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -29153,22 +29153,22 @@ L_2458
 	sri	v20.8b, v20.8b, #5
 	sri	v3.8b, v3.8b, #6
 	shrn	v2.8b, v11.8h, #2
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v2.8b, v20.8b
 	zip2	v20.8b, v2.8b, v20.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v3.8b, v21.8b
 	zip2	v21.8b, v3.8b, v21.8b
 	mov	v3.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v20.8b, v21.8b
 	zip2	v21.8b, v20.8b, v21.8b
 	mov	v20.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	zip1	v31.8b, v2.8b, v3.8b
 	zip2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
@@ -29188,22 +29188,22 @@ L_2458
 	ushr	v15.8h, v12.8h, #9
 	add	v12.8h, v12.8h, v13.8h
 	xtn	v0.8b, v0.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
@@ -29242,22 +29242,22 @@ L_2461
 	umlal2	v0.4s, v2.8h, v15.h[0]
 	shrn	v0.4h, v0.4s, #14
 	xtn	v0.8b, v0.8h
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v1.8b
 	uzp2	v1.8b, v0.8b, v1.8b
 	mov	v0.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v2.8b, v3.8b
 	uzp2	v3.8b, v2.8b, v3.8b
 	mov	v2.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v1.8b, v3.8b
 	uzp2	v3.8b, v1.8b, v3.8b
 	mov	v1.8b, v31.8b
 	mov	v31.d[0], x12
-	mov	x12, v31.d[0]
+	umov	x12, v31.d[0]
 	uzp1	v31.8b, v0.8b, v2.8b
 	uzp2	v2.8b, v0.8b, v2.8b
 	mov	v0.8b, v31.8b
