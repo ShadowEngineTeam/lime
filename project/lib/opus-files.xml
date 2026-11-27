@@ -49,6 +49,34 @@
 
 		</section>
 
+		<section if="HXCPP_ARM64 || HXCPP_ARMV7" unless="HXCPP_NO_ARCH_LEVEL">
+
+			<compilerflag value="-DOPUS_ARM_MAY_HAVE_NEON_INTR" />
+			<compilerflag value="-DOPUS_ARM_PRESUME_NEON_INTR" />
+			<compilerflag value="-DOPUS_ARM_PRESUME_AARCH64_NEON_INTR" if="HXCPP_ARM64" />
+			<compilerflag value="-D__aarch64__" if="isMsvc HXCPP_ARM64" />
+
+			<file name="${NATIVE_TOOLKIT_PATH}/opus/celt/arm/celt_neon_intr.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/opus/celt/arm/pitch_neon_intr.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/opus/celt/arm/celt_mdct_tx.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/opus/celt/celt_tx_tables.c" />
+
+			<file name="${NATIVE_TOOLKIT_PATH}/opus/silk/arm/biquad_alt_neon_intr.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/opus/silk/arm/LPC_inv_pred_gain_neon_intr.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/opus/silk/arm/NSQ_del_dec_neon_intr.c" />
+			<file name="${NATIVE_TOOLKIT_PATH}/opus/silk/arm/NSQ_neon.c" />
+
+			<section if="HXCPP_ARM64">
+
+				<file name="${NATIVE_TOOLKIT_PATH}/opus/celt/arm/celt_neon_aarch64.S" unless="isMsvc" />
+				<file name="${NATIVE_TOOLKIT_PATH}/opus/celt/arm/celt_tx_neon.S" unless="isMsvc" />
+				<file name="${NATIVE_TOOLKIT_PATH}/custom/opus/celt_neon_aarch64.asm" if="isMsvc" />
+				<file name="${NATIVE_TOOLKIT_PATH}/custom/opus/celt_tx_neon.asm" if="isMsvc" />
+
+			</section>
+
+		</section>
+
 		<section>
 
 			<file name="${NATIVE_TOOLKIT_PATH}/opus/celt/bands.c" />
