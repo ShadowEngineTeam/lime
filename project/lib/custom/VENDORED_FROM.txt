@@ -7,6 +7,8 @@ Differences from FunkinCrew/lime's project/lib/custom:
 - pixman/pixman-config.h: the x86 SIMD paths (MMX, SSE2, SSSE3) are only enabled on x86 builds,
   not on Windows ARM64 or Linux ARMv7, and 64-bit Linux on ARM64 gets the same settings as x86-64.
   USE_SSSE3 is spelled as pixman checks it (FunkinCrew/lime has USE_SSE3).
+- pixman/pixman-arma64-neon-asm.asm and pixman-arma64-neon-asm-bilinear.asm: armasm64 versions of
+  pixman's AArch64 NEON assembly for Windows ARM64, made the same way as the opus ones.
 - sdl/include/SDL_build_config.h: HAVE_STRLCAT and HAVE_STRLCPY are off on Linux, HAVE_WCSLCAT and
   HAVE_WCSLCPY are off on Linux, Android needs API 28 instead of 24 for iconv, and SDL_VIDEO_METAL
   is on for macOS and iOS.

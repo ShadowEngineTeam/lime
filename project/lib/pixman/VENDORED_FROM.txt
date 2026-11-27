@@ -1,4 +1,4 @@
-3174212a815d95e46a72cffe3a5d7891f787c57c (gitlab.freedesktop.org/pixman/pixman, the commit FunkinCrew/lime pins)
+b88b92e512a33a222e08352e87ff90a57d33c7b5 (gitlab.freedesktop.org/pixman/pixman master, one commit past the one FunkinCrew/lime pins)
 
 No local changes. The symlinks under .gitlab-ci.d and pixman/pixman-arm-detect-win32.asm are
 plain files holding the link target here.
