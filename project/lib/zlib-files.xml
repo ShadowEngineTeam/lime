@@ -9,6 +9,18 @@
 		<compilerflag value="-DWITH_GZFILEOP" />
 		<compilerflag value="-DWITH_OPTIM" />
 
+		<!-- hxcpp links its own zlib-ng into the same binary -->
+		<section if="emscripten">
+
+			<compilerflag value="-Dalloc_deflate=lime_alloc_deflate" />
+			<compilerflag value="-Dalloc_inflate=lime_alloc_inflate" />
+			<compilerflag value="-Dfree_inflate=lime_free_inflate" />
+			<compilerflag value="-Dcrc32_small=lime_crc32_small" />
+			<compilerflag value="-Dzng_alloc_aligned=lime_zng_alloc_aligned" />
+			<compilerflag value="-Dzng_free_aligned=lime_zng_free_aligned" />
+
+		</section>
+
 		<section unless="isMsvc">
 
 			<compilerflag value="-DHAVE_UNISTD_H" />
