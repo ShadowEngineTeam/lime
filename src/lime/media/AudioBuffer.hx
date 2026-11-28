@@ -151,7 +151,7 @@ class AudioBuffer
 		Creates an `AudioBuffer` from a `Bytes` object.
 
 		@param bytes The `Bytes` object containing the audio data.
-		@param stream Whether to use streaming instead of directly decoding all the audio data.
+		@param stream Whether to use memory streaming instead of directly decoding all the audio data.
 		@return An `AudioBuffer` instance with the decoded audio data.
 	**/
 	public static function fromBytes(bytes:Bytes, ?stream:Bool = false):AudioBuffer
@@ -165,9 +165,6 @@ class AudioBuffer
 		final config:MADecoderConfig = new MADecoderConfig();
 		config.format = F32;
 
-		if (stream)
-			config.sampleRate = AudioManager.engine.get_sample_rate();
-
 		return __createFromMADecoder(MADecoder.init_memory(bytes, config), stream);
 		#else
 		return null;
@@ -178,7 +175,7 @@ class AudioBuffer
 		Creates an `AudioBuffer` from a file.
 
 		@param path The file path to the audio data.
-		@param stream Whether to use streaming instead of directly decoding all the audio data.
+		@param stream Whether to use file streaming instead of directly decoding all the audio data.
 		@return An `AudioBuffer` instance with the audio data loaded from the file.
 	**/
 	public static function fromFile(path:String, ?stream:Bool = false):AudioBuffer
@@ -191,9 +188,6 @@ class AudioBuffer
 		#if (lime_cffi && lime_miniaudio && !macro)
 		final config:MADecoderConfig = new MADecoderConfig();
 		config.format = F32;
-
-		if (stream)
-			config.sampleRate = AudioManager.engine.get_sample_rate();
 
 		return __createFromMADecoder(MADecoder.init_file(path, config), stream);
 		#else
