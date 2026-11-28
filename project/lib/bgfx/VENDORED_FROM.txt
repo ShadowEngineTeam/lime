@@ -40,3 +40,7 @@ Local changes on top of that commit (keep them when re-vendoring):
 - tools/shaderc/shaderc.cpp: the asm.js platform defines BGFX_SHADER_LANGUAGE_WGSL for the wgsl profile
   instead of the GLSL and ESSL defines, the way the other platforms do. Emscripten compiles its shaders
   for WebGPU at runtime.
+- src/renderer_webgpu.cpp: on emscripten, readTexture, readBuffer and requestScreenShot no longer wait for
+  the buffer map in a loop. The browser only maps a buffer after control returns to its event loop, so the
+  loop never ended and froze the page. The map callback (AllowSpontaneous there) copies the data and frees
+  its own state when it fires, a frame or two later, like the frame number bgfx::read returns says.

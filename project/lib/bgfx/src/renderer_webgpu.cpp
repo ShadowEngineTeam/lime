@@ -1891,6 +1891,12 @@ WGPU_IMPORT
 
 		bool s_done;
 
+		// The browser maps buffers on its own, and only after we return to its event loop
+		static constexpr WGPUCallbackMode s_readbackCallbackMode = BX_ENABLED(BX_PLATFORM_EMSCRIPTEN)
+			? WGPUCallbackMode_AllowSpontaneous
+			: WGPUCallbackMode_AllowProcessEvents
+			;
+
 		struct ReadTexture
 		{
 			WGPUBuffer buffer;
@@ -1982,6 +1988,12 @@ WGPU_IMPORT
 
 			wgpuRelease(readTexture.buffer);
 
+			if (NULL == _userdata2)
+			{
+				bx::deleteObject(g_allocator, &readTexture);
+				return;
+			}
+
 			*(bool*)(_userdata2) = true;
 		}
 
@@ -2016,7 +2028,54 @@ WGPU_IMPORT
 
 			wgpuRelease(readBuffer.buffer);
 
+			if (NULL == _userdata2)
+			{
+				bx::deleteObject(g_allocator, &readBuffer);
+				return;
+			}
+
 			*(bool*)(_userdata2) = true;
+		}
+
+		struct ScreenShot
+		{
+			ReadTexture readTexture;
+			TextureFormat::Enum format;
+			bool done;
+			char filePath[bx::kMaxFilePath];
+		};
+
+		static void screenShotCb(WGPUMapAsyncStatus _status, WGPUStringView _message, void* _userdata1, void* _userdata2)
+		{
+			BX_UNUSED(_userdata2);
+
+			ScreenShot* screenShot = (ScreenShot*)_userdata1;
+			const ReadTexture& readTexture = screenShot->readTexture;
+			bool mapped = false;
+
+			readTextureCb(_status, _message, &screenShot->readTexture, &mapped);
+
+			if (WGPUMapAsyncStatus_Success == _status)
+			{
+				g_callback->screenShot(
+					  screenShot->filePath
+					, readTexture.width
+					, readTexture.height
+					, readTexture.dataPitch
+					, screenShot->format
+					, readTexture.data
+					, readTexture.dataPitch*readTexture.height
+					, false
+					);
+			}
+
+			bx::free(g_allocator, readTexture.data);
+
+			screenShot->done = true;
+
+	#if BX_PLATFORM_EMSCRIPTEN
+			bx::deleteObject(g_allocator, screenShot);
+	#endif // BX_PLATFORM_EMSCRIPTEN
 		}
 
 		void readTexture(TextureHandle _handle, void* _data, uint16_t _layer, uint8_t _mip) override
@@ -2132,7 +2191,9 @@ WGPU_IMPORT
 			m_cmd.kick();
 			m_cmd.wait();
 
-			ReadTexture readTexture =
+			// The browser only maps the buffer after we return to its event loop, so on emscripten the
+			// callback fills _data later instead of being waited for
+			ReadTexture* readTexture = BX_NEW(g_allocator, ReadTexture)
 			{
 				.buffer        = readTextureBuffer,
 				.size          = copySize,
@@ -2153,16 +2214,20 @@ WGPU_IMPORT
 				, copySize
 				, {
 					.nextInChain = NULL,
-					.mode        = WGPUCallbackMode_AllowProcessEvents,
+					.mode        = s_readbackCallbackMode,
 					.callback    = readTextureCb,
-					.userdata1   = &readTexture,
-					.userdata2   = &s_done,
+					.userdata1   = readTexture,
+					.userdata2   = BX_ENABLED(BX_PLATFORM_EMSCRIPTEN) ? NULL : &s_done,
 				}) );
 
+	#if !BX_PLATFORM_EMSCRIPTEN
 			while (!s_done)
 			{
 				wgpuInstanceProcessEvents(m_instance);
 			}
+
+			bx::deleteObject(g_allocator, readTexture);
+	#endif // !BX_PLATFORM_EMSCRIPTEN
 		}
 
 		BufferWGPU& getBuffer(Handle _handle)
@@ -2199,7 +2264,7 @@ WGPU_IMPORT
 
 			m_cmd.kick();
 
-			ReadBuffer readBuffer =
+			ReadBuffer* readBuffer = BX_NEW(g_allocator, ReadBuffer)
 			{
 				.buffer = readBufferDst,
 				.size   = _size,
@@ -2213,16 +2278,20 @@ WGPU_IMPORT
 				, _size
 				, {
 					.nextInChain = NULL,
-					.mode        = WGPUCallbackMode_AllowProcessEvents,
+					.mode        = s_readbackCallbackMode,
 					.callback    = readBufferCb,
-					.userdata1   = &readBuffer,
-					.userdata2   = &s_done,
+					.userdata1   = readBuffer,
+					.userdata2   = BX_ENABLED(BX_PLATFORM_EMSCRIPTEN) ? NULL : &s_done,
 				}) );
 
+	#if !BX_PLATFORM_EMSCRIPTEN
 			while (!s_done)
 			{
 				wgpuInstanceProcessEvents(m_instance);
 			}
+
+			bx::deleteObject(g_allocator, readBuffer);
+	#endif // !BX_PLATFORM_EMSCRIPTEN
 		}
 
 		void resizeTexture(TextureHandle _handle, uint16_t _width, uint16_t _height, uint8_t _numMips, uint16_t _numLayers) override
@@ -2401,7 +2470,8 @@ WGPU_IMPORT
 			m_cmd.kick();
 			m_cmd.wait();
 
-			ReadTexture readTexture =
+			ScreenShot* screenShot = BX_NEW(g_allocator, ScreenShot);
+			screenShot->readTexture =
 			{
 				.buffer        = readTextureBuffer,
 				.size          = copySize,
@@ -2414,6 +2484,9 @@ WGPU_IMPORT
 				.stencilPitch  = 0,
 				.texelSize     = uint32_t(bpp/8),
 			};
+			screenShot->format = format;
+			screenShot->done   = false;
+			bx::strCopy(screenShot->filePath, BX_COUNTOF(screenShot->filePath), _filePath);
 
 			WGPU_CHECK(wgpuBufferMapAsync(
 				  readTextureBuffer
@@ -2422,29 +2495,21 @@ WGPU_IMPORT
 				, copySize
 				, {
 					.nextInChain = NULL,
-					.mode        = WGPUCallbackMode_AllowProcessEvents,
-					.callback    = readTextureCb,
-					.userdata1   = &readTexture,
-					.userdata2   = &s_done,
+					.mode        = s_readbackCallbackMode,
+					.callback    = screenShotCb,
+					.userdata1   = screenShot,
+					.userdata2   = NULL,
 				}) );
 
-			while (!s_done)
+			// On emscripten the callback runs once the browser maps the buffer, after we return to its event loop
+	#if !BX_PLATFORM_EMSCRIPTEN
+			while (!screenShot->done)
 			{
 				wgpuInstanceProcessEvents(m_instance);
 			}
 
-			g_callback->screenShot(
-				  _filePath
-				, width
-				, height
-				, dstPitch
-				, format
-				, data
-				, dstPitch*height
-				, false
-				);
-
-			bx::free(g_allocator, data);
+			bx::deleteObject(g_allocator, screenShot);
+	#endif // !BX_PLATFORM_EMSCRIPTEN
 		}
 
 		void invalidateOcclusionQuery(OcclusionQueryHandle _handle) override
