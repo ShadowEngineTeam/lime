@@ -234,8 +234,9 @@
 
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/filesystem/android/SDL_sysfilesystem.c" if="android" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/filesystem/cocoa/SDL_sysfilesystem.m" if="apple" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/filesystem/emscripten/SDL_sysfilesystem.c" if="emscripten" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/filesystem/posix/SDL_sysfsops.c" unless="windows" />
-            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/filesystem/unix/SDL_sysfilesystem.c" unless="android || apple || windows" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/filesystem/unix/SDL_sysfilesystem.c" unless="android || apple || windows || emscripten" />
 
             <section if="windows">
 
@@ -304,6 +305,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/joystick/bsd/SDL_bsdjoystick.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/joystick/darwin/SDL_iokitjoystick.c" if="macos" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/joystick/dummy/SDL_sysjoystick.c" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/joystick/emscripten/SDL_sysjoystick.c" if="emscripten" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/joystick/gdk/SDL_gameinputjoystick.cpp" if="windows" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/joystick/hidapi/SDL_hidapijoystick.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/joystick/hidapi/SDL_hidapi_8bitdo.c" />
@@ -388,6 +390,7 @@
 
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/locale/SDL_locale.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/locale/android/SDL_syslocale.c" if="android" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/locale/emscripten/SDL_syslocale.c" if="emscripten" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/locale/macos/SDL_syslocale.m" if="apple" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/locale/unix/SDL_syslocale.c" if="linux" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/locale/windows/SDL_syslocale.c" if="windows" />
@@ -398,7 +401,9 @@
 
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/main/SDL_main_callbacks.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/main/SDL_runapp.c" />
-            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/main/generic/SDL_sysmain_callbacks.c" unless="iphone" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/main/emscripten/SDL_sysmain_callbacks.c" if="emscripten" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/main/emscripten/SDL_sysmain_runapp.c" if="emscripten" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/main/generic/SDL_sysmain_callbacks.c" unless="iphone || emscripten" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/main/ios/SDL_sysmain_callbacks.m" if="iphone" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/main/windows/SDL_sysmain_runapp.c" if="windows" />
 
@@ -409,6 +414,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/SDL_libusb.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/SDL_url.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/android/SDL_sysurl.c" if="android" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/emscripten/SDL_sysurl.c" if="emscripten" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/ios/SDL_sysurl.m" if="iphone" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/macos/SDL_sysurl.m" if="macos" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/misc/unix/SDL_sysurl.c" if="linux" />
@@ -426,6 +432,7 @@
 
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/power/SDL_power.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/power/android/SDL_syspower.c" if="android" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/power/emscripten/SDL_syspower.c" if="emscripten" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/power/linux/SDL_syspower.c" if="linux" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/power/macos/SDL_syspower.c" if="macos" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/power/uikit/SDL_syspower.m" if="iphone" />
@@ -437,7 +444,7 @@
 
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/process/SDL_process.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/process/dummy/SDL_dummyprocess.c" />
-            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/process/posix/SDL_posixprocess.c" unless="windows" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/process/posix/SDL_posixprocess.c" unless="windows || emscripten" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/process/windows/SDL_windowsprocess.c" if="windows" />
 
         </section>
@@ -455,6 +462,7 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/sensor/android/SDL_androidsensor.c" if="android" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/sensor/coremotion/SDL_coremotionsensor.m" if="apple" unless="appletv" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/sensor/dummy/SDL_dummysensor.c" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/sensor/emscripten/SDL_emscriptensensor.c" if="emscripten" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/sensor/windows/SDL_windowssensor.c" if="windows" />
 
         </section>
@@ -491,7 +499,7 @@
 
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/SDL_thread.c" />
 
-            <section unless="windows">
+            <section unless="windows || emscripten">
 
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/pthread/SDL_syscond.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/pthread/SDL_sysmutex.c" />
@@ -499,6 +507,17 @@
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/pthread/SDL_syssem.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/pthread/SDL_systhread.c" />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/pthread/SDL_systls.c" />
+
+            </section>
+
+            <section if="emscripten">
+
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/generic/SDL_syscond.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/generic/SDL_sysmutex.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/generic/SDL_sysrwlock.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/generic/SDL_syssem.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/generic/SDL_systhread.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/thread/generic/SDL_systls.c" />
 
             </section>
 
@@ -537,9 +556,9 @@
 
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/SDL_tray_utils.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/cocoa/SDL_tray.m" if="macos" />
-            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/dummy/SDL_tray.c" if="android || iphone" />
+            <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/dummy/SDL_tray.c" if="android || iphone || emscripten" />
 
-            <section unless="android || iphone || macos || windows">
+            <section unless="android || iphone || macos || windows || emscripten">
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/unix/SDL_tray.c"  />
                 <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/tray/unix/SDL_dbustray.c"  />
             </section>
@@ -612,6 +631,16 @@
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/dummy/SDL_nullevents.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/dummy/SDL_nullframebuffer.c" />
             <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/dummy/SDL_nullvideo.c" />
+
+            <section if="emscripten">
+
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/emscripten/SDL_emscriptenevents.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/emscripten/SDL_emscriptenframebuffer.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/emscripten/SDL_emscriptenmouse.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/emscripten/SDL_emscriptenopengles.c" />
+                <file name="${NATIVE_TOOLKIT_PATH}/sdl/src/video/emscripten/SDL_emscriptenvideo.c" />
+
+            </section>
 
             <section if="iphone">
 

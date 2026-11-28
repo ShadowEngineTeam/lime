@@ -23,7 +23,7 @@
 
 		</section>
 
-		<section unless="HXCPP_ARM64 || HXCPP_ARMV7 || HXCPP_NO_ARCH_LEVEL || iphone">
+		<section unless="HXCPP_ARM64 || HXCPP_ARMV7 || HXCPP_NO_ARCH_LEVEL || iphone || emscripten">
 
 			<compilerflag value="-DOPUS_X86_MAY_HAVE_SSE" />
 			<compilerflag value="-DOPUS_X86_MAY_HAVE_SSE2" />

@@ -46,6 +46,9 @@ namespace lime
 #ifdef IPHONE
 		static void HandleAppAnimationCallback(void *userdata);
 #endif
+#ifdef EMSCRIPTEN
+		static void HandleMainLoop();
+#endif
 
 		static Application *currentApplication;
 

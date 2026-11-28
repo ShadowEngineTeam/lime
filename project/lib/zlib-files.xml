@@ -34,7 +34,7 @@
 
 		</section>
 
-		<section unless="HXCPP_ARM64 || HXCPP_ARMV7">
+		<section unless="HXCPP_ARM64 || HXCPP_ARMV7 || emscripten">
 
 			<compilerflag value="-DX86_FEATURES" />
 			<compilerflag value="-DX86_HAVE_XSAVE_INTRIN" unless="isMsvc" />
@@ -101,7 +101,7 @@
 
 		</section>
 
-		<section unless="HXCPP_ARM64 || HXCPP_ARMV7">
+		<section unless="HXCPP_ARM64 || HXCPP_ARMV7 || emscripten">
 
 			<section unless="isMsvc">
 

@@ -525,6 +525,25 @@
 #define SDL_VIDEO_OPENGL_ES2 1		/**< OpenGL ES 2.0 support */
 /** @} */
 
+#elif defined(SDL_PLATFORM_EMSCRIPTEN)
+
+/**
+ * @name Emscripten Platform Drivers
+ * @brief Drivers and subsystems enabled for Emscripten (single-threaded).
+ * @{
+ */
+#define HAVE_CLOCK_GETTIME 1		   /**< POSIX clock functions */
+#define SDL_DIALOG_DUMMY 1			   /**< Dummy dialog driver (no native support) */
+#define SDL_FILESYSTEM_EMSCRIPTEN 1	   /**< Emscripten filesystem operations */
+#define SDL_HAPTIC_DUMMY 1			   /**< Dummy haptic driver (no native support) */
+#define SDL_JOYSTICK_EMSCRIPTEN 1	   /**< Emscripten Gamepad API support */
+#define SDL_POWER_EMSCRIPTEN 1		   /**< Emscripten Battery API support */
+#define SDL_SENSOR_EMSCRIPTEN 1		   /**< Emscripten device motion support */
+#define SDL_THREADS_DISABLED 1		   /**< No pthreads */
+#define SDL_TRAY_DUMMY 1			   /**< Dummy system tray driver (not applicable on the web) */
+#define SDL_VIDEO_DRIVER_EMSCRIPTEN 1  /**< Emscripten video driver */
+/** @} */
+
 #elif defined(SDL_PLATFORM_LINUX)
 
 /**
@@ -603,7 +622,9 @@
  * @brief Additional joystick drivers available on all platforms.
  * @{
  */
+#if !defined(SDL_PLATFORM_EMSCRIPTEN)
 #define SDL_JOYSTICK_HIDAPI 1  /**< HIDAPI joystick driver for USB/Bluetooth controllers */
+#endif
 #define SDL_JOYSTICK_VIRTUAL 1 /**< Virtual joystick driver for software-emulated controllers */
 /** @} */
 
@@ -663,8 +684,10 @@
  */
 #if defined(SDL_PLATFORM_WIN32)
 #define SDL_PROCESS_WINDOWS 1 /**< Windows process management */
-#else
+#elif !defined(SDL_PLATFORM_EMSCRIPTEN)
 #define SDL_PROCESS_POSIX 1 /**< POSIX process management */
+#else
+#define SDL_PROCESS_DUMMY 1 /**< No processes on the web */
 #endif
 /** @} */
 
@@ -697,7 +720,7 @@
 #define SDL_THREAD_GENERIC_COND_SUFFIX 1   /**< Generic condition variable implementation */
 #define SDL_THREAD_GENERIC_RWLOCK_SUFFIX 1 /**< Generic read-write lock implementation */
 #define SDL_THREAD_WINDOWS 1			   /**< Windows threading (CreateThread, etc.) */
-#else
+#elif !defined(SDL_PLATFORM_EMSCRIPTEN)
 #define SDL_THREAD_PTHREAD_RECURSIVE_MUTEX 1 /**< Pthread recursive mutex support */
 #define SDL_THREAD_PTHREAD 1				 /**< POSIX threads (pthread) */
 #endif

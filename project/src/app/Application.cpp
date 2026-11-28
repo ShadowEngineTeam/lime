@@ -26,6 +26,11 @@
 #include <unistd.h>
 #endif
 
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#include <hx/CFFI.h>
+#endif
+
 #include <atomic>
 #include <cmath>
 #include <vector>
@@ -200,7 +205,14 @@ namespace lime
 	{
 		Init();
 
-#ifndef IPHONE
+#if defined(EMSCRIPTEN)
+
+		// The browser owns the loop, so update on every animation frame and return
+		emscripten_set_main_loop(HandleMainLoop, 0, false);
+
+		return 0;
+
+#elif !defined(IPHONE)
 
 		while (active)
 		{
@@ -871,7 +883,7 @@ namespace lime
 		frameTime.frame = frameTime.current - frameTime.previous;
 		frameTime.previous = frameTime.current;
 
-#ifndef IPHONE
+#if !defined(IPHONE) && !defined(EMSCRIPTEN)
 		// If the frame was faster than the target frame time, delay to cap FPS
 		if (frameTime.frame < frameTime.target)
 		{
@@ -1011,6 +1023,25 @@ namespace lime
 	void Application::HandleAppAnimationCallback(void *userdata)
 	{
 		currentApplication->Update();
+	}
+#endif
+
+#ifdef EMSCRIPTEN
+	void Application::HandleMainLoop()
+	{
+		// Animation frames start from a new stack, so the GC has to scan up to here
+		int top = 0;
+		gc_set_top_of_stack(&top, false);
+
+		// Animation frames come at the display rate, skip the ones that come before the target frame time
+		if (frameTime.target > 0 && SDL_GetTicksNS() - frameTime.previous + 2000000 < frameTime.target)
+			return;
+
+		if (!currentApplication->Update())
+		{
+			emscripten_cancel_main_loop();
+			currentApplication->Quit();
+		}
 	}
 #endif
 
