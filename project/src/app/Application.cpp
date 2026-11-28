@@ -1033,9 +1033,22 @@ namespace lime
 		int top = 0;
 		gc_set_top_of_stack(&top, false);
 
-		// Animation frames come at the display rate, skip the ones that come before the target frame time
-		if (frameTime.target > 0 && SDL_GetTicksNS() - frameTime.previous + 2000000 < frameTime.target)
-			return;
+		// Animation frames come at the display rate. Run on the one closest to each target frame time, keeping
+		// a running deadline so displays faster than the target still average out to it.
+		static Uint64 lastCallback = 0;
+		static Uint64 nextFrame = 0;
+
+		Uint64 now = SDL_GetTicksNS();
+		Uint64 interval = lastCallback > 0 ? now - lastCallback : 0;
+		lastCallback = now;
+
+		if (frameTime.target > 0)
+		{
+			if (now + interval / 2 < nextFrame)
+				return;
+
+			nextFrame = now > nextFrame + frameTime.target ? now + frameTime.target : nextFrame + frameTime.target;
+		}
 
 		if (!currentApplication->Update())
 		{
