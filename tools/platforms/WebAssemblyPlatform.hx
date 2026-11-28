@@ -169,7 +169,6 @@ class WebAssemblyPlatform extends PlatformTarget
 
 		context.OUTPUT_DIR = targetDirectory;
 		context.CPP_DIR = targetDirectory + "/obj";
-		context.WIN_BACKGROUND = StringTools.hex(project.window.background, 6);
 
 		var contextNDLLs:Array<Dynamic> = context.ndlls;
 
