@@ -103,6 +103,12 @@
 			// The only renderer is WebGPU, there is no WebGL fallback.
 			var unsupported = "This game needs WebGPU. Try a recent version of Chrome, Edge, Firefox or Safari.";
 
+			// Browsers only expose WebGPU to HTTPS and localhost pages
+			if (!window.isSecureContext) {
+				fail ("This page needs HTTPS", "WebGPU only works on HTTPS or localhost pages. Open it through https:// or http://localhost.");
+				return;
+			}
+
 			if (!navigator.gpu) {
 				fail ("Your browser is not supported", unsupported);
 				return;
