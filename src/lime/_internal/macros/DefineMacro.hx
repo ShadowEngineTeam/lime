@@ -15,8 +15,19 @@ class DefineMacro
 
 			var cffi = !Context.defined("nocffi");
 			var mobile = Context.defined("ios") || Context.defined("android");
+			var web = Context.defined("webassembly") || Context.defined("wasm") || Context.defined("emscripten");
 
-			Compiler.define(mobile ? "mobile" : "desktop");
+			if (web)
+			{
+				Compiler.define("webassembly");
+				Compiler.define("wasm");
+				Compiler.define("emscripten");
+				Compiler.define("web");
+			}
+			else
+			{
+				Compiler.define(mobile ? "mobile" : "desktop");
+			}
 
 			if (cffi && Context.defined("cpp"))
 			{

@@ -177,5 +177,9 @@ public function load(uri:String = null):Future<T>
 	public function cancel():Void;
 }
 
+#if emscripten
+private typedef HTTPRequestBackend = lime._internal.backend.emscripten.EmscriptenHTTPRequest;
+#else
 private typedef HTTPRequestBackend = lime._internal.backend.native.NativeHTTPRequest;
+#end
 #end

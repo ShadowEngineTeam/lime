@@ -144,6 +144,9 @@ class HXProject extends Script
 			case WINDOWS, MAC, LINUX:
 				PlatformType.DESKTOP;
 
+			case WEB_ASSEMBLY:
+				PlatformType.WEB;
+
 			default:
 				// TODO: Better handling of platform type for pluggable targets
 				PlatformType.CONSOLE;
@@ -724,6 +727,15 @@ class HXProject extends Script
 				defines.set("cpp", "1");
 				defines.set("mingw", "1");
 			}
+		}
+		else if (target == Platform.WEB_ASSEMBLY)
+		{
+			defines.set("webassembly", "1");
+			defines.set("wasm", "1");
+			defines.set("emscripten", "1");
+			defines.set("targetType", "cpp");
+			defines.set("native", "1");
+			defines.set("cpp", "1");
 		}
 		else if (targetFlags.exists("cpp") || (platformType != PlatformType.WEB))
 		{

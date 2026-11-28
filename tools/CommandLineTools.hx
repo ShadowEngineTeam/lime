@@ -235,6 +235,10 @@ class CommandLineTools
 						case "mac", "macos":
 							target = Platform.MAC;
 
+						case "webassembly", "wasm", "emscripten":
+							target = Platform.WEB_ASSEMBLY;
+							targetFlags.set("webassembly", "");
+
 						default:
 							target = cast targetName.toLowerCase();
 					}
@@ -540,6 +544,9 @@ class CommandLineTools
 				case LINUX:
 					platform = new LinuxPlatform(command, project, targetFlags);
 
+				case WEB_ASSEMBLY:
+					platform = new WebAssemblyPlatform(command, project, targetFlags);
+
 				default:
 			}
 
@@ -823,12 +830,14 @@ class CommandLineTools
 			Log.println("  \x1b[1mlinux\x1b[0m -- Create a Linux application");
 			Log.println("  \x1b[1mmac\x1b[0m -- Create a macOS application");
 			Log.println("  \x1b[1mwindows\x1b[0m -- Create a Windows application");
+			Log.println("  \x1b[1mwebassembly\x1b[0m -- Create a WebAssembly application");
 
 			Log.println("");
 			Log.println(" " + Log.accentColor + "Target Aliases:" + Log.resetColor);
 			Log.println("");
 			Log.println("  \x1b[1mcpp\x1b[0m -- Alias for host platform (using \x1b[1m-cpp\x1b[0m)");
 			Log.println("  \x1b[1mmacos\x1b[0m -- Alias for \x1b[1mmac\x1b[0m");
+			Log.println("  \x1b[1mwasm\x1b[0;3m/\x1b[0m\x1b[1memscripten\x1b[0m -- Alias for \x1b[1mwebassembly\x1b[0m");
 		}
 
 		Log.println("");
@@ -1325,6 +1334,10 @@ class CommandLineTools
 			case "mac", "macos":
 				target = Platform.MAC;
 				overrides.haxedefs.set("macos", "");
+
+			case "webassembly", "wasm", "emscripten":
+				target = Platform.WEB_ASSEMBLY;
+				targetFlags.set("webassembly", "");
 
 			default:
 				target = cast targetName.toLowerCase();

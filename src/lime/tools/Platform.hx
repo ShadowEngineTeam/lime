@@ -7,6 +7,7 @@ enum abstract Platform(String) from hxp.HostPlatform
 	var LINUX = "linux";
 	var MAC = "mac";
 	var WINDOWS = "windows";
+	var WEB_ASSEMBLY = "webassembly";
 	var CUSTOM = null;
 
 	@:op(A == B) @:commutative

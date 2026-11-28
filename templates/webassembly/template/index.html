@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="utf-8">
+
+	<title>::APP_TITLE_HTML::</title>
+
+	<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="mobile-web-app-capable" content="yes">
+
+	::if favicons::::foreach (favicons)::
+	<link rel="::__current__.rel::" type="::__current__.type::" href="::__current__.href::">::end::::end::
+
+	<style>
+		html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #::WIN_BACKGROUND::; }
+		#content { position: absolute; inset: 0; }
+		#canvas { display: block; width: 100%; height: 100%; outline: none; touch-action: none; }
+		#overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: #000000; color: #ffffff; font: 24px sans-serif; text-align: center; user-select: none; -webkit-user-select: none; }
+		#overlay.ready { cursor: pointer; }
+		#overlay small { font-size: 16px; opacity: 0.6; max-width: 80%; }
+		#progress { width: 240px; height: 6px; background: #333333; }
+		#progress > div { width: 0; height: 100%; background: #ffffff; }
+	</style>
+
+</head>
+<body>
+
+	<div id="content">
+		<canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault ()"></canvas>
+	</div>
+
+	<div id="overlay">
+		<span id="status">Loading...</span>
+		<div id="progress"><div></div></div>
+		<small id="detail"></small>
+	</div>
+
+	<script type="text/javascript">
+		(function () {
+
+			var overlay = document.getElementById ("overlay");
+			var status = document.getElementById ("status");
+			var detail = document.getElementById ("detail");
+			var progress = document.getElementById ("progress");
+
+			// Browsers only let audio start after a user gesture, so keep every context resumed on any later one too.
+			var audioContexts = [];
+			["AudioContext", "webkitAudioContext"].forEach (function (name) {
+				var Native = window[name];
+				if (!Native) return;
+				var Tracked = function (options) {
+					var context = new Native (options);
+					audioContexts.push (context);
+					return context;
+				};
+				Tracked.prototype = Native.prototype;
+				window[name] = Tracked;
+			});
+
+			function resumeAudio () {
+				audioContexts.forEach (function (context) {
+					if (context.state !== "running" && context.state !== "closed") context.resume ();
+				});
+			}
+
+			["pointerdown", "keydown", "touchend"].forEach (function (type) {
+				window.addEventListener (type, resumeAudio, true);
+			});
+
+			window.addEventListener ("touchmove", function (event) { event.preventDefault (); }, { passive: false });
+
+			function fail (title, message) {
+				progress.style.display = "none";
+				status.textContent = title;
+				detail.textContent = message;
+			}
+
+			var Module = window.Module = {
+				canvas: document.getElementById ("canvas"),
+				setStatus: function (text) {
+					var match = text.match (/\((\d+(\.\d+)?)\/(\d+)\)/);
+					if (match) progress.firstElementChild.style.width = (100 * parseFloat (match[1]) / parseInt (match[3])) + "%";
+				},
+				onRuntimeInitialized: function () {
+					progress.style.display = "none";
+					status.textContent = "Touch Here to Play";
+					overlay.classList.add ("ready");
+					overlay.addEventListener ("click", function () {
+						overlay.style.display = "none";
+						Module.canvas.focus ();
+						Module.callMain ([]);
+						resumeAudio ();
+					}, { once: true });
+				},
+				onAbort: function (what) {
+					overlay.style.display = "";
+					fail ("Something went wrong", String (what));
+				}
+			};
+
+			function load () {
+				var script = document.createElement ("script");
+				script.src = "./::APP_FILE::.js";
+				script.onerror = function () { fail ("Failed to load", script.src); };
+				document.body.appendChild (script);
+			}
+
+			// The only renderer is WebGPU, there is no WebGL fallback.
+			var unsupported = "This game needs WebGPU. Try a recent version of Chrome, Edge, Firefox or Safari.";
+
+			if (!navigator.gpu) {
+				fail ("Your browser is not supported", unsupported);
+				return;
+			}
+
+			navigator.gpu.requestAdapter ().then (function (adapter) {
+				if (adapter) load ();
+				else fail ("Your browser is not supported", unsupported);
+			}, function () {
+				fail ("Your browser is not supported", unsupported);
+			});
+
+		}) ();
+	</script>
+
+</body>
+</html>

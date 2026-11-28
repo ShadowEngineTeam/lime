@@ -29,6 +29,7 @@
 		<target name="ios" path="tools/platforms/IOSPlatform.hx" />
 		<target name="linux" path="tools/platforms/LinuxPlatform.hx" />
 		<target name="mac" path="tools/platforms/MacPlatform.hx" />
+		<target name="webassembly" path="tools/platforms/WebAssemblyPlatform.hx" />
 		<target name="windows" path="tools/platforms/WindowsPlatform.hx" />
 
 	</section>
@@ -36,8 +37,8 @@
 	<section unless="display">
 
 		<section unless="force-synchronous || force_synchronous">
-			<haxedef name="lime-threads" if="native" />
-			<haxedef name="lime-threads-deque" if="native" />
+			<haxedef name="lime-threads" if="native" unless="emscripten" />
+			<haxedef name="lime-threads-deque" if="native" unless="emscripten" />
 		</section>
 
 		<ndll name="lime" if="native" unless="static_link" />

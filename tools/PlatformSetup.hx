@@ -179,6 +179,9 @@ class PlatformSetup
 						setupWindows();
 					}
 
+				case "webassembly", "wasm", "emscripten":
+					setupWebAssembly();
+
 				case "lime":
 					setupLime();
 
@@ -543,6 +546,20 @@ class PlatformSetup
 		{
 			System.openURL(visualStudioURL);
 		}
+	}
+
+	public static function setupWebAssembly():Void
+	{
+		Log.println("\x1b[1mIn order to build for WebAssembly, you must download and install");
+		Log.println("the Emscripten SDK.");
+		Log.println("");
+		Log.println("After install, the SDK path may be at \"emsdk/upstream/emscripten\"");
+		Log.println("");
+
+		getDefineValue("EMSDK", "Absolute path to Emscripten SDK");
+
+		Log.println("");
+		Log.println("Setup complete.");
 	}
 
 	public static function setupMinGW():Void
