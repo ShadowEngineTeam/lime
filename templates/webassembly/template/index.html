@@ -114,10 +114,24 @@
 				return;
 			}
 
-			navigator.gpu.requestAdapter ().then (function (adapter) {
-				if (adapter) load ();
-				else fail ("Your browser is not supported", unsupported);
-			}, function () {
+			// bgfx takes this device instead of waiting for one itself, which would need Asyncify
+			navigator.gpu.requestAdapter ({ powerPreference: "high-performance" }).then (function (adapter) {
+				if (!adapter) throw new Error ("No WebGPU adapter");
+				var limits = {};
+				for (var key in adapter.limits) {
+					if (typeof adapter.limits[key] === "number") limits[key] = adapter.limits[key];
+				}
+				return adapter.requestDevice ({ requiredFeatures: Array.from (adapter.features), requiredLimits: limits });
+			}).then (function (device) {
+				device.lost.then (function (info) {
+					if (info.reason !== "destroyed") {
+						overlay.style.display = "";
+						fail ("The graphics device was lost", info.message + " Reload the page to continue.");
+					}
+				});
+				Module.preinitializedWebGPUDevice = device;
+				load ();
+			}).catch (function () {
 				fail ("Your browser is not supported", unsupported);
 			});
 

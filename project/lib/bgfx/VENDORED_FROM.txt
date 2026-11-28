@@ -37,3 +37,6 @@ Local changes on top of that commit (keep them when re-vendoring):
   surface has no VK_PRESENT_MODE_IMMEDIATE_KHR. bgfx only counts IMMEDIATE as a mode without vsync, and most
   Android drivers offer FIFO and MAILBOX only, so turning vsync off kept FIFO and the frame rate stayed
   locked to the display.
+- tools/shaderc/shaderc.cpp: the asm.js platform defines BGFX_SHADER_LANGUAGE_WGSL for the wgsl profile
+  instead of the GLSL and ESSL defines, the way the other platforms do. Emscripten compiles its shaders
+  for WebGPU at runtime.

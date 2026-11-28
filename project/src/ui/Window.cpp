@@ -145,7 +145,7 @@ namespace lime
 		// then Mesa's llvmpipe on OpenGL
 		auto addSoftware = [&choices]()
 		{
-#if !defined(__APPLE__)
+#if !defined(__APPLE__) && !defined(EMSCRIPTEN)
 #if defined(HX_WINDOWS)
 			choices.push_back({BGFXBindings::GetRendererType("d3d11"), "software (d3d11)", true});
 #endif
@@ -175,7 +175,9 @@ namespace lime
 
 		if (!fromTable)
 		{
-#if defined(__APPLE__)
+#if defined(EMSCRIPTEN)
+			choices.push_back({BGFXBindings::GetRendererType("webgpu"), "webgpu", false});
+#elif defined(__APPLE__)
 			choices.push_back({BGFXBindings::GetRendererType("metal"), "metal", false});
 #else
 #if defined(HX_WINDOWS)

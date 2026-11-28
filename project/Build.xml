@@ -82,6 +82,7 @@
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bx/include" />
 			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/bimg/include" />
 			<compilerflag value="-DLIME_BGFX" />
+			<compilerflag value="--use-port=emdawnwebgpu" if="emscripten" />
 
 			<file name="src/bindings/bgfx/BGFXBindings.cpp" cxx_standard="20" />
 

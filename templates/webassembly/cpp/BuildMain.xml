@@ -22,6 +22,7 @@
 		<flag value="-sEXIT_RUNTIME=0" />
 		<flag value="-sEXPORTED_RUNTIME_METHODS=['callMain','FS']" />
 		<flag value="-lidbfs.js" />
+		<flag value="--use-port=emdawnwebgpu" />
 
 	</target>
 

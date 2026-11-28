@@ -26,6 +26,11 @@
 #include <utils/HaxeResource.h>
 #include <vector>
 
+#if defined(EMSCRIPTEN)
+#include <emscripten.h>
+#include <webgpu/webgpu.h>
+#endif
+
 #if defined(ANDROID)
 #include <android/native_window.h>
 #endif
@@ -1100,6 +1105,8 @@ namespace lime
 		options.platform = "osx";
 #elif defined(HX_WINDOWS)
 		options.platform = "windows";
+#elif defined(EMSCRIPTEN)
+		options.platform = "asm.js";
 #endif
 
 		if (prof && *prof)
@@ -1127,6 +1134,9 @@ namespace lime
 					break;
 				case bgfx::RendererType::Vulkan:
 					options.profile = "spirv";
+					break;
+				case bgfx::RendererType::WebGPU:
+					options.profile = "wgsl";
 					break;
 				default:
 					options.profile = "";
@@ -2257,6 +2267,7 @@ namespace lime
 			{"d3d12", bgfx::RendererType::Direct3D12},
 			{"opengl", bgfx::RendererType::OpenGL},
 			{"opengles", bgfx::RendererType::OpenGLES},
+			{"webgpu", bgfx::RendererType::WebGPU},
 			{"noop", bgfx::RendererType::Noop},
 		};
 
@@ -2362,6 +2373,11 @@ namespace lime
 
 		return SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
 
+#elif defined(EMSCRIPTEN)
+
+		// bgfx takes the canvas selector, "#canvas"
+		return (void *)SDL_GetStringProperty(props, SDL_PROP_WINDOW_EMSCRIPTEN_CANVAS_ID_STRING, "#canvas");
+
 #endif
 
 		return NULL;
@@ -2459,6 +2475,20 @@ namespace lime
 		init.swapChain.nwh = getNativeWindowHandle(sdlWindow);
 		init.swapChain.ndt = getNativeDisplayHandle(sdlWindow);
 		init.platformData.type = getNativeWindowHandleType(sdlWindow);
+
+#if defined(EMSCRIPTEN)
+		// The page creates the WebGPU device, as waiting for one here would need Asyncify
+		if (rendererType == bgfx::RendererType::WebGPU)
+		{
+			if (!EM_ASM_INT({ return Module['preinitializedWebGPUDevice'] ? 1 : 0; }))
+			{
+				SDL_SetError("the page did not create a WebGPU device");
+				return false;
+			}
+
+			init.platformData.context = emscripten_webgpu_get_device();
+		}
+#endif
 
 		init.callback = &s_bgfxCallback;
 

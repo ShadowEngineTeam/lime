@@ -100,6 +100,14 @@
 
 			<compilerflag value="-DBGFX_CONFIG_VIDEO=0" />
 
+			<section if="emscripten">
+
+				<!-- WebGPU only, from the emdawnwebgpu port -->
+				<compilerflag value="-DBGFX_CONFIG_RENDERER_WEBGPU=1" />
+				<compilerflag value="--use-port=emdawnwebgpu" />
+
+			</section>
+
 		</section>
 
 		<file name="${NATIVE_TOOLKIT_PATH}/bgfx/src/bgfx.cpp" />
