@@ -12,11 +12,13 @@ jobs:
     uses: ./.github/workflows/mac.yml
   windows:
     uses: ./.github/workflows/windows.yml
+  webassembly:
+    uses: ./.github/workflows/webassembly.yml
   miscellaneous:
     uses: ./.github/workflows/miscellaneous.yml
 
   publisher:
-    needs: [android, ios, linux, mac, windows, miscellaneous]
+    needs: [android, ios, linux, mac, windows, webassembly, miscellaneous]
     runs-on: ubuntu-latest
     permissions:
       contents: write

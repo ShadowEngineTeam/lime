@@ -1,0 +1,53 @@
+name: WebAssembly CI
+on:
+  workflow_dispatch:
+  workflow_call:
+
+env:
+  HAXE_VERSION: 4.3.7
+  EMSDK_VERSION: 7.0.1
+
+jobs:
+  webassembly:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+      - name: Setup Emscripten
+        run: |
+          git clone --depth 1 https://github.com/emscripten-core/emsdk.git ~/emsdk
+          ~/emsdk/emsdk install ${{ env.EMSDK_VERSION }}
+          ~/emsdk/emsdk activate ${{ env.EMSDK_VERSION }}
+          echo "EMSDK=$HOME/emsdk" >> $GITHUB_ENV
+          echo "$HOME/emsdk" >> $GITHUB_PATH
+          echo "$HOME/emsdk/upstream/emscripten" >> $GITHUB_PATH
+      - name: Setup Haxe
+        uses: ShadowEngineTeam/setup-haxe@main
+        with:
+          haxe-version: ${{ env.HAXE_VERSION }}
+      - name: Set HAXEPATH
+        run: echo "HAXEPATH=$HAXE_STD_PATH/.." >> $GITHUB_ENV
+      - name: Install Haxe dependencies
+        run: |
+          haxelib git hxcpp https://github.com/ShadowEngineTeam/libhxcpp --quiet
+          haxelib git format https://github.com/HaxeFoundation/format 6e41f83987139febbb078ca5056c9c2f395e99d9 --quiet
+          haxelib git hxp https://github.com/openfl/hxp 9019664c287ce1322abac47a7317515511cd21ff --quiet
+      - name: Enable HXCPP compile cache
+        run: echo "HXCPP_COMPILE_CACHE=~/.hxcpp" >> $GITHUB_ENV
+      - name: Configure Lime
+        run: haxelib dev lime ${{ github.workspace }}
+      - name: Rebuild Lime tools
+        run: |
+          cd tools
+          haxe tools.hxml
+      - name: Rebuild Lime
+        run: haxelib run lime rebuild webassembly -release
+      - name: Upload Artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: Emscripten-NDLL
+          path: |
+            ndll/Emscripten/
+            !**/.gitignore
+            lime.png
+          if-no-files-found: error
