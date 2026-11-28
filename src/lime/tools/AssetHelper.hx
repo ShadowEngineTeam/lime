@@ -273,6 +273,13 @@ class AssetHelper
 		else
 		{
 			assetData.path = asset.resourceName;
+
+			// Files are fetched over HTTP on the web, so the synchronous getters only see what the preloader loaded
+			if (project.target == WEB_ASSEMBLY
+				&& (asset.embed != false || (asset.library != null && libraries.exists(asset.library) && libraries[asset.library].preload)))
+			{
+				assetData.preload = true;
+			}
 		}
 
 		return assetData;
