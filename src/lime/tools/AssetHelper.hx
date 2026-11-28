@@ -564,6 +564,12 @@ class AssetHelper
 							embed = true;
 					}
 
+					// The web has no synchronous file reads, so every library is registered from a compiled in manifest
+					if (project.target == WEB_ASSEMBLY)
+					{
+						embed = true;
+					}
+
 					asset = new Asset("", "manifest/" + library.name + ".json", AssetType.MANIFEST);
 
 					if (embed)
