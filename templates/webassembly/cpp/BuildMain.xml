@@ -17,6 +17,7 @@
 
 		<flag value="-sFETCH=1" />
 		<flag value="-sFORCE_FILESYSTEM=1" />
+		<flag value="-sINITIAL_MEMORY=64MB" />
 		<flag value="-sMAXIMUM_MEMORY=4GB" />
 		<flag value="-sEXIT_RUNTIME=0" />
 		<flag value="-sEXPORTED_RUNTIME_METHODS=['FS']" />
