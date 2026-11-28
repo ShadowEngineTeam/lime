@@ -171,6 +171,10 @@ class AssetLibrary
 		{
 			return AudioBuffer.fromBytes(cast(Type.createInstance(classTypes.get(id), []), Bytes));
 		}
+		else if (cachedBytes.exists(id))
+		{
+			return AudioBuffer.fromBytes(cachedBytes.get(id));
+		}
 		else
 		{
 			return AudioBuffer.fromFile(getPath(id));
@@ -224,6 +228,10 @@ class AssetLibrary
 		else if (classTypes.exists(id))
 		{
 			return cast(Type.createInstance(classTypes.get(id), []), Image);
+		}
+		else if (cachedBytes.exists(id))
+		{
+			return Image.fromBytes(cachedBytes.get(id));
 		}
 		else
 		{
@@ -350,7 +358,15 @@ class AssetLibrary
 
 				Log.verbose("Preloading asset: " + id + " [" + types.get(id) + "]");
 
-				switch (types.get(id))
+				var type = types.get(id);
+
+				#if emscripten
+				// Keep the downloaded files, they are decoded when they are used
+				if (type == IMAGE || type == MUSIC || type == SOUND)
+					type = BINARY;
+				#end
+
+				switch (type)
 				{
 					case BINARY:
 						assetsTotal++;
@@ -645,6 +661,9 @@ class AssetLibrary
 		cachedImages.clear();
 		cachedAudioBuffers.clear();
 		cachedText.clear();
+
+		loaded = false;
+		promise = null;
 	}
 
 	@:noCompletion private function __assetLoaded(id:String):Void
