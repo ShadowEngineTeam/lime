@@ -1677,6 +1677,8 @@ namespace lime
 #elif defined(IPHONE) || defined(HX_MACOS)
 				// "sdl3,null" in alconfig (SDL3 uses coreaudio)
 				ma_device_backend_coreaudio,
+#elif defined(EMSCRIPTEN)
+				ma_device_backend_webaudio,
 #elif defined(__linux__)
 				// "pipewire,pulse,alsa,jack,oss"
 				ma_device_backend_pipewire,

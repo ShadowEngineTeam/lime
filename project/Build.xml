@@ -319,6 +319,7 @@
 			<files id="native-toolkit-bgfx" />
 			<files id="native-toolkit-bgfx-shaderc" />
 			<files id="native-toolkit-bgfx-3rdparty" />
+			<files id="native-toolkit-bgfx-tint" if="emscripten" />
 
 		</section>
 

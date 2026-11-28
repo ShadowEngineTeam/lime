@@ -17,7 +17,6 @@
 		#content { position: absolute; inset: 0; }
 		#canvas { display: block; width: 100%; height: 100%; outline: none; touch-action: none; }
 		#overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: #000000; color: #ffffff; font: 24px sans-serif; text-align: center; user-select: none; -webkit-user-select: none; }
-		#overlay.ready { cursor: pointer; }
 		#overlay small { font-size: 16px; opacity: 0.6; max-width: 80%; }
 		#progress { width: 240px; height: 6px; background: #333333; }
 		#progress > div { width: 0; height: 100%; background: #ffffff; }
@@ -82,16 +81,11 @@
 					var match = text.match (/\((\d+(\.\d+)?)\/(\d+)\)/);
 					if (match) progress.firstElementChild.style.width = (100 * parseFloat (match[1]) / parseInt (match[3])) + "%";
 				},
+				// The game shows its own "Touch Here to Play" screen, and that tap resumes audio above
 				onRuntimeInitialized: function () {
-					progress.style.display = "none";
-					status.textContent = "Touch Here to Play";
-					overlay.classList.add ("ready");
-					overlay.addEventListener ("click", function () {
-						overlay.style.display = "none";
-						Module.canvas.focus ();
-						Module.callMain ([]);
-						resumeAudio ();
-					}, { once: true });
+					overlay.style.display = "none";
+					Module.canvas.focus ();
+					Module.callMain ([]);
 				},
 				onAbort: function (what) {
 					overlay.style.display = "";

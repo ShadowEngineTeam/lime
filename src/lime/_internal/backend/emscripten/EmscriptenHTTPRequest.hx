@@ -55,7 +55,7 @@ static void lime_fetch_finish (emscripten_fetch_t *fetch, bool success) {
 	lime_fetches.erase (id);
 	emscripten_fetch_close (fetch);
 
-	::lime::_internal::backend::emscripten::EmscriptenHTTPRequest_obj::__onFetchDone (id, success, status, data, headers);
+	::lime::_internal::backend::emscripten::EmscriptenHTTPRequest_obj::fetch_onDone (id, success, status, data, headers);
 
 }
 
@@ -73,7 +73,7 @@ static void lime_fetch_onerror (emscripten_fetch_t *fetch) {
 
 static void lime_fetch_onprogress (emscripten_fetch_t *fetch) {
 
-	::lime::_internal::backend::emscripten::EmscriptenHTTPRequest_obj::__onFetchProgress ((int)(intptr_t)fetch->userData, (int)(fetch->dataOffset + fetch->numBytes), (int)fetch->totalBytes);
+	::lime::_internal::backend::emscripten::EmscriptenHTTPRequest_obj::fetch_onProgress ((int)(intptr_t)fetch->userData, (int)(fetch->dataOffset + fetch->numBytes), (int)fetch->totalBytes);
 
 }
 
@@ -284,7 +284,7 @@ class EmscriptenHTTPRequest
 		return promise.future;
 	}
 
-	@:keep @:noCompletion private static function __onFetchDone(id:Int, success:Bool, status:Int, data:BytesData, headers:String):Void
+	@:keep @:noCompletion private static function fetch_onDone(id:Int, success:Bool, status:Int, data:BytesData, headers:String):Void
 	{
 		var request:EmscriptenHTTPRequest = requests.get(id);
 
@@ -332,7 +332,7 @@ class EmscriptenHTTPRequest
 		}
 	}
 
-	@:keep @:noCompletion private static function __onFetchProgress(id:Int, bytesLoaded:Int, bytesTotal:Int):Void
+	@:keep @:noCompletion private static function fetch_onProgress(id:Int, bytesLoaded:Int, bytesTotal:Int):Void
 	{
 		var request:EmscriptenHTTPRequest = requests.get(id);
 
